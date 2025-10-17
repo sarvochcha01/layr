@@ -1,7 +1,7 @@
 "use client";
 
+import { Loading } from "@/components/ui/loading";
 import { useAuth } from "@/contexts/AuthContext";
-import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
@@ -22,7 +22,7 @@ export default function PublicLayout({
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+        <Loading />
       </div>
     );
   }
@@ -33,7 +33,7 @@ export default function PublicLayout({
 
   return (
     <div className="flex items-center justify-center min-h-screen">
-      <Loader2 className="h-12 w-12 animate-spin text-primary" />
+      <Loading />
     </div>
   );
 }
