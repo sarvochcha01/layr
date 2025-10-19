@@ -9,6 +9,8 @@ interface CanvasProps {
   components: ComponentDefinition[];
   selectedComponentIds: string[];
   onSelectComponent: (id: string | null) => void;
+  viewport?: "desktop" | "tablet" | "mobile";
+  isPreviewMode?: boolean;
 }
 
 function DropZone({
@@ -63,12 +65,16 @@ function ComponentWrapper({
   onSelect,
   selectedComponentIds,
   onSelectComponent,
+  viewport,
+  isPreviewMode,
 }: {
   component: ComponentDefinition;
   isSelected: boolean;
   onSelect: () => void;
   selectedComponentIds: string[];
   onSelectComponent: (id: string) => void;
+  viewport?: "desktop" | "tablet" | "mobile";
+  isPreviewMode?: boolean;
 }) {
   const Component =
     COMPONENT_REGISTRY[component.type as keyof typeof COMPONENT_REGISTRY];
@@ -87,16 +93,21 @@ function ComponentWrapper({
       <div
         className={cn(
           "relative transition-all duration-200",
-          isSelected && "ring-2 ring-blue-500 ring-offset-2",
-          "hover:ring-1 hover:ring-blue-300 hover:ring-offset-1"
+          !isPreviewMode && isSelected && "ring-2 ring-blue-500 ring-offset-2",
+          !isPreviewMode &&
+            "hover:ring-1 hover:ring-blue-300 hover:ring-offset-1"
         )}
-        onClick={(e) => {
-          e.stopPropagation();
-          onSelect();
-        }}
+        onClick={
+          isPreviewMode
+            ? undefined
+            : (e) => {
+                e.stopPropagation();
+                onSelect();
+              }
+        }
       >
         {/* Selection overlay */}
-        {isSelected && (
+        {!isPreviewMode && isSelected && (
           <div className="absolute -top-6 left-0 bg-blue-500 text-white text-xs px-2 py-1 rounded z-10">
             {component.type}
           </div>
@@ -104,7 +115,11 @@ function ComponentWrapper({
 
         {/* Render component with or without children */}
         {canHaveChildren(component.type) ? (
-          <Component {...component.props}>
+          <Component
+            {...component.props}
+            viewport={viewport}
+            isPreviewMode={isPreviewMode}
+          >
             {component.children.length > 0 && (
               <div>
                 {component.children.map((child, index) => (
@@ -113,18 +128,23 @@ function ComponentWrapper({
                       component={child}
                       selectedComponentIds={selectedComponentIds}
                       onSelectComponent={onSelectComponent}
+                      viewport={viewport}
+                      isPreviewMode={isPreviewMode}
                     />
-                    {index < component.children.length - 1 && (
-                      <DropZone targetId={component.id} position="inside" />
-                    )}
+                    {!isPreviewMode &&
+                      index < component.children.length - 1 && (
+                        <DropZone targetId={component.id} position="inside" />
+                      )}
                   </div>
                 ))}
-                <DropZone targetId={component.id} position="inside" />
+                {!isPreviewMode && (
+                  <DropZone targetId={component.id} position="inside" />
+                )}
               </div>
             )}
 
             {/* Drop zone for empty containers */}
-            {component.children.length === 0 && (
+            {!isPreviewMode && component.children.length === 0 && (
               <DropZone
                 targetId={component.id}
                 position="inside"
@@ -134,7 +154,11 @@ function ComponentWrapper({
           </Component>
         ) : (
           // For leaf components (Image, Button, Text, etc.) that don't have children
-          <Component {...component.props} />
+          <Component
+            {...component.props}
+            viewport={viewport}
+            isPreviewMode={isPreviewMode}
+          />
         )}
       </div>
     </div>
@@ -145,10 +169,14 @@ function ComponentRenderer({
   component,
   selectedComponentIds,
   onSelectComponent,
+  viewport,
+  isPreviewMode,
 }: {
   component: ComponentDefinition;
   selectedComponentIds: string[];
   onSelectComponent: (id: string) => void;
+  viewport?: "desktop" | "tablet" | "mobile";
+  isPreviewMode?: boolean;
 }) {
   return (
     <ComponentWrapper
@@ -157,6 +185,8 @@ function ComponentRenderer({
       onSelect={() => onSelectComponent(component.id)}
       selectedComponentIds={selectedComponentIds}
       onSelectComponent={onSelectComponent}
+      viewport={viewport}
+      isPreviewMode={isPreviewMode}
     />
   );
 }
@@ -165,12 +195,18 @@ export function Canvas({
   components,
   selectedComponentIds,
   onSelectComponent,
+  viewport = "desktop",
+  isPreviewMode = false,
 }: CanvasProps) {
   return (
     <div
-      className="bg-white rounded-lg shadow-sm min-h-[800px] w-full p-4 editor-canvas"
-      onClick={() => onSelectComponent(null)}
-      tabIndex={0}
+      className={`bg-white w-full editor-canvas ${
+        isPreviewMode
+          ? "min-h-screen"
+          : "rounded-lg shadow-sm min-h-[800px] p-4"
+      }`}
+      onClick={isPreviewMode ? undefined : () => onSelectComponent(null)}
+      tabIndex={isPreviewMode ? undefined : 0}
     >
       {components.length === 0 ? (
         /* Empty state - single drop zone */
@@ -190,12 +226,16 @@ export function Canvas({
                 component={component}
                 selectedComponentIds={selectedComponentIds}
                 onSelectComponent={onSelectComponent}
+                viewport={viewport}
+                isPreviewMode={isPreviewMode}
               />
             ))}
           </div>
 
           {/* Final drop zone */}
-          <DropZone targetId={undefined} position="inside" className="mt-4" />
+          {!isPreviewMode && (
+            <DropZone targetId={undefined} position="inside" className="mt-4" />
+          )}
         </>
       )}
     </div>

@@ -5,6 +5,7 @@ interface ButtonProps {
   children?: React.ReactNode;
   text?: string;
   href?: string;
+  external?: boolean;
   variant?:
     | "default"
     | "destructive"
@@ -17,18 +18,21 @@ interface ButtonProps {
   disabled?: boolean;
   className?: string;
   onClick?: () => void;
+  isPreviewMode?: boolean;
 }
 
 export function Button({
   children,
   text,
   href,
+  external = false,
   variant = "default",
   size = "default",
   fullWidth = false,
   disabled = false,
   className,
   onClick,
+  isPreviewMode = false,
 }: ButtonProps) {
   const buttonContent = children || text || "Button";
 
@@ -37,16 +41,36 @@ export function Button({
       variant={variant}
       size={size}
       disabled={disabled}
-      onClick={onClick}
+      onClick={isPreviewMode ? onClick : (e) => e.preventDefault()}
       className={cn(fullWidth && "w-full", className)}
     >
       {buttonContent}
     </ShadcnButton>
   );
 
-  if (href && !disabled) {
-    return <a href={href}>{buttonElement}</a>;
+  // Wrap in a div that prevents all interactions in edit mode
+  const wrappedButton = (
+    <div
+      style={
+        isPreviewMode ? undefined : { pointerEvents: "none", cursor: "default" }
+      }
+      onClick={isPreviewMode ? undefined : (e) => e.stopPropagation()}
+    >
+      {buttonElement}
+    </div>
+  );
+
+  if (href && !disabled && isPreviewMode) {
+    return (
+      <a
+        href={href}
+        target={external ? "_blank" : undefined}
+        rel={external ? "noopener noreferrer" : undefined}
+      >
+        {wrappedButton}
+      </a>
+    );
   }
 
-  return buttonElement;
+  return wrappedButton;
 }

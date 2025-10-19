@@ -6,7 +6,7 @@ import { HierarchyPanel } from "./HierarchyPanel";
 import { ComponentPalette } from "./ComponentPalette";
 import { Canvas } from "./Canvas";
 import { PropertiesPanel } from "./PropertiesPanel";
-import { Download } from "lucide-react";
+import { Download, Eye, Edit } from "lucide-react";
 
 type Viewport = "desktop" | "tablet" | "mobile";
 
@@ -28,6 +28,7 @@ export function EditorLayout({
   onDuplicateComponent,
 }: EditorLayoutProps) {
   const [viewport, setViewport] = useState<Viewport>("desktop");
+  const [isPreviewMode, setIsPreviewMode] = useState(false);
 
   const selectedComponent =
     selectedComponentIds.length === 1
@@ -81,22 +82,24 @@ export function EditorLayout({
   return (
     <div className="h-screen flex bg-gray-50">
       {/* Left Panel - Split between Hierarchy and Components */}
-      <div className="w-80 bg-white border-r border-gray-200 flex flex-col h-full">
-        {/* Hierarchy Panel - Top Half */}
-        <div className="flex-1 border-b border-gray-200 min-h-0 overflow-hidden">
-          <HierarchyPanel
-            components={components}
-            selectedComponentIds={selectedComponentIds}
-            onSelectComponent={onSelectComponent}
-            onDeleteComponent={onDeleteComponent}
-          />
-        </div>
+      {!isPreviewMode && (
+        <div className="w-80 bg-white border-r border-gray-200 flex flex-col h-full">
+          {/* Hierarchy Panel - Top Half */}
+          <div className="flex-1 border-b border-gray-200 min-h-0 overflow-hidden">
+            <HierarchyPanel
+              components={components}
+              selectedComponentIds={selectedComponentIds}
+              onSelectComponent={onSelectComponent}
+              onDeleteComponent={onDeleteComponent}
+            />
+          </div>
 
-        {/* Component Palette - Bottom Half */}
-        <div className="flex-1 min-h-0 overflow-hidden">
-          <ComponentPalette />
+          {/* Component Palette - Bottom Half */}
+          <div className="flex-1 min-h-0 overflow-hidden">
+            <ComponentPalette />
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Canvas - Center */}
       <div className="flex-1 flex flex-col">
@@ -145,8 +148,29 @@ export function EditorLayout({
             </div>
           </div>
 
-          {/* Export Button */}
-          <div className="ml-auto">
+          {/* Preview & Export Buttons */}
+          <div className="ml-auto flex items-center space-x-2">
+            <button
+              onClick={() => setIsPreviewMode(!isPreviewMode)}
+              className={`flex items-center space-x-2 px-3 py-1 text-xs rounded transition-colors ${
+                isPreviewMode
+                  ? "bg-blue-600 text-white hover:bg-blue-700"
+                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+              }`}
+            >
+              {isPreviewMode ? (
+                <>
+                  <Edit className="w-3 h-3" />
+                  <span>Edit</span>
+                </>
+              ) : (
+                <>
+                  <Eye className="w-3 h-3" />
+                  <span>Preview</span>
+                </>
+              )}
+            </button>
+
             <button
               onClick={exportToZip}
               className="flex items-center space-x-2 px-3 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
@@ -158,32 +182,45 @@ export function EditorLayout({
         </div>
 
         {/* Canvas Area */}
-        <div className="flex-1 overflow-auto bg-gray-100 p-8">
+        <div
+          className={`flex-1 overflow-auto transition-all duration-300 ${
+            isPreviewMode ? "bg-white p-0" : "bg-gray-100 p-8"
+          }`}
+        >
           <div
             className="mx-auto transition-all duration-300 ease-in-out"
             style={{
               width: getCanvasWidth(),
-              maxWidth: viewport === "desktop" ? "1200px" : getCanvasWidth(),
+              maxWidth:
+                viewport === "desktop"
+                  ? isPreviewMode
+                    ? "none"
+                    : "1200px"
+                  : getCanvasWidth(),
             }}
           >
             <Canvas
               components={components}
-              selectedComponentIds={selectedComponentIds}
-              onSelectComponent={onSelectComponent}
+              selectedComponentIds={isPreviewMode ? [] : selectedComponentIds}
+              onSelectComponent={isPreviewMode ? () => {} : onSelectComponent}
+              viewport={viewport}
+              isPreviewMode={isPreviewMode}
             />
           </div>
         </div>
       </div>
 
       {/* Properties Panel - Right */}
-      <div className="w-80 bg-white border-l border-gray-200 h-full overflow-hidden">
-        <PropertiesPanel
-          selectedComponent={selectedComponent}
-          onUpdateComponent={onUpdateComponent}
-          onDeleteComponent={onDeleteComponent}
-          onDuplicateComponent={onDuplicateComponent}
-        />
-      </div>
+      {!isPreviewMode && (
+        <div className="w-80 bg-white border-l border-gray-200 h-full overflow-hidden">
+          <PropertiesPanel
+            selectedComponent={selectedComponent}
+            onUpdateComponent={onUpdateComponent}
+            onDeleteComponent={onDeleteComponent}
+            onDuplicateComponent={onDuplicateComponent}
+          />
+        </div>
+      )}
     </div>
   );
 }
@@ -225,21 +262,32 @@ function generateHTML(components: ComponentDefinition[]): string {
         return `
           <nav class="navbar">
             <div class="navbar-brand">${props.logoText || "Brand"}</div>
-            <ul class="navbar-nav">
-              ${links
-                .map(
-                  (link: any) =>
-                    `<li><a href="${link.href}">${link.text}</a></li>`
-                )
-                .join("")}
-            </ul>
-            ${
-              props.ctaText
-                ? `<a href="${props.ctaLink || "#"}" class="navbar-cta">${
-                    props.ctaText
-                  }</a>`
-                : ""
-            }
+            
+            <!-- Mobile menu button -->
+            <button class="navbar-toggle" onclick="toggleMobileMenu()">
+              <span class="hamburger-line"></span>
+              <span class="hamburger-line"></span>
+              <span class="hamburger-line"></span>
+            </button>
+            
+            <!-- Desktop navigation -->
+            <div class="navbar-menu" id="navbar-menu">
+              <ul class="navbar-nav">
+                ${links
+                  .map(
+                    (link: any) =>
+                      `<li><a href="${link.href}">${link.text}</a></li>`
+                  )
+                  .join("")}
+              </ul>
+              ${
+                props.ctaText
+                  ? `<a href="${props.ctaLink || "#"}" class="navbar-cta">${
+                      props.ctaText
+                    }</a>`
+                  : ""
+              }
+            </div>
           </nav>
         `;
 
@@ -404,6 +452,7 @@ body {
     padding: 1rem 2rem;
     max-width: 1200px;
     margin: 0 auto;
+    position: relative;
 }
 
 .navbar-brand {
@@ -412,10 +461,18 @@ body {
     color: #1f2937;
 }
 
+.navbar-menu {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
 .navbar-nav {
     display: flex;
     list-style: none;
     gap: 2rem;
+    margin: 0;
+    padding: 0;
 }
 
 .navbar-nav a {
@@ -430,7 +487,7 @@ body {
 }
 
 .navbar-cta {
-    background: #3b82f6;
+    background: hsl(223 90% 45%);
     color: white;
     padding: 0.5rem 1rem;
     border-radius: 0.375rem;
@@ -440,7 +497,85 @@ body {
 }
 
 .navbar-cta:hover {
-    background: #2563eb;
+    background: hsl(223 90% 40%);
+}
+
+/* Mobile Menu Toggle */
+.navbar-toggle {
+    display: none;
+    flex-direction: column;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    gap: 0.25rem;
+}
+
+.hamburger-line {
+    width: 1.5rem;
+    height: 2px;
+    background: #1f2937;
+    transition: all 0.3s ease;
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+    .navbar-toggle {
+        display: flex;
+    }
+    
+    .navbar-menu {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border-top: 1px solid #e5e7eb;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0;
+        padding: 1rem 2rem;
+        transform: translateY(-100%);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .navbar-menu.active {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    .navbar-nav {
+        flex-direction: column;
+        gap: 1rem;
+        width: 100%;
+    }
+    
+    .navbar-nav a {
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #f3f4f6;
+    }
+    
+    .navbar-cta {
+        margin-top: 1rem;
+        text-align: center;
+    }
+    
+    /* Hamburger Animation */
+    .navbar-toggle.active .hamburger-line:nth-child(1) {
+        transform: rotate(45deg) translate(0.375rem, 0.375rem);
+    }
+    
+    .navbar-toggle.active .hamburger-line:nth-child(2) {
+        opacity: 0;
+    }
+    
+    .navbar-toggle.active .hamburger-line:nth-child(3) {
+        transform: rotate(-45deg) translate(0.375rem, -0.375rem);
+    }
 }
 
 /* Hero Styles */
@@ -719,7 +854,18 @@ body {
 }
 
 function generateJS(): string {
-  return `// Basic interactivity
+  return `// Mobile menu toggle function
+function toggleMobileMenu() {
+    const menu = document.getElementById('navbar-menu');
+    const toggle = document.querySelector('.navbar-toggle');
+    
+    if (menu && toggle) {
+        menu.classList.toggle('active');
+        toggle.classList.toggle('active');
+    }
+}
+
+// Basic interactivity
 document.addEventListener('DOMContentLoaded', function() {
     // Smooth scrolling for anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -734,8 +880,32 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Button click handlers
-    document.querySelectorAll('button').forEach(button => {
+    // Close mobile menu when clicking on links
+    document.querySelectorAll('.navbar-nav a').forEach(link => {
+        link.addEventListener('click', function() {
+            const menu = document.getElementById('navbar-menu');
+            const toggle = document.querySelector('.navbar-toggle');
+            if (menu && toggle) {
+                menu.classList.remove('active');
+                toggle.classList.remove('active');
+            }
+        });
+    });
+
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', function(e) {
+        const navbar = document.querySelector('.navbar');
+        const menu = document.getElementById('navbar-menu');
+        const toggle = document.querySelector('.navbar-toggle');
+        
+        if (navbar && menu && toggle && !navbar.contains(e.target)) {
+            menu.classList.remove('active');
+            toggle.classList.remove('active');
+        }
+    });
+
+    // Button click handlers (excluding navbar toggle)
+    document.querySelectorAll('button:not(.navbar-toggle)').forEach(button => {
         button.addEventListener('click', function() {
             // Add your custom button logic here
             console.log('Button clicked:', this.textContent);

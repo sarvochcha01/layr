@@ -234,6 +234,17 @@ export function PropertiesPanel({
               />
               <Label htmlFor="fullWidth">Full Width</Label>
             </div>
+
+            {props.href && (
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="external"
+                  checked={props.external || false}
+                  onCheckedChange={(checked) => updateProp("external", checked)}
+                />
+                <Label htmlFor="external">External Link</Label>
+              </div>
+            )}
           </div>
         );
 
@@ -324,6 +335,429 @@ export function PropertiesPanel({
                 <option value="bordered">Bordered</option>
                 <option value="shadow">Shadow</option>
                 <option value="elevated">Elevated</option>
+              </select>
+            </div>
+          </div>
+        );
+
+      case "Header":
+        return (
+          <div className="space-y-4">
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="sticky"
+                checked={props.sticky || false}
+                onCheckedChange={(checked) => updateProp("sticky", checked)}
+              />
+              <Label htmlFor="sticky">Sticky Header</Label>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="shadow"
+                checked={props.shadow || false}
+                onCheckedChange={(checked) => updateProp("shadow", checked)}
+              />
+              <Label htmlFor="shadow">Drop Shadow</Label>
+            </div>
+
+            <div>
+              <Label htmlFor="backgroundColor">Background Color</Label>
+              <Input
+                id="backgroundColor"
+                type="color"
+                value={props.backgroundColor || "#ffffff"}
+                onChange={(e) => updateProp("backgroundColor", e.target.value)}
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="padding">Padding</Label>
+              <select
+                id="padding"
+                value={props.padding || "md"}
+                onChange={(e) => updateProp("padding", e.target.value)}
+                className="w-full p-2 border rounded-md"
+              >
+                <option value="sm">Small</option>
+                <option value="md">Medium</option>
+                <option value="lg">Large</option>
+                <option value="xl">Extra Large</option>
+              </select>
+            </div>
+          </div>
+        );
+
+      case "Navbar":
+        return (
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="logoText">Logo Text</Label>
+              <Input
+                id="logoText"
+                value={props.logoText || ""}
+                onChange={(e) => updateProp("logoText", e.target.value)}
+                placeholder="Brand Name"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="ctaText">CTA Button Text</Label>
+              <Input
+                id="ctaText"
+                value={props.ctaText || ""}
+                onChange={(e) => updateProp("ctaText", e.target.value)}
+                placeholder="Get Started"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="ctaLink">CTA Button Link</Label>
+              <Input
+                id="ctaLink"
+                value={props.ctaLink || ""}
+                onChange={(e) => updateProp("ctaLink", e.target.value)}
+                placeholder="https://example.com"
+              />
+            </div>
+
+            <div>
+              <Label>Navigation Links</Label>
+              <div className="space-y-2">
+                {(props.links || []).map((link: any, index: number) => (
+                  <div key={index} className="space-y-2 p-3 border rounded">
+                    <div className="flex space-x-2">
+                      <Input
+                        value={link.text || ""}
+                        onChange={(e) => {
+                          const newLinks = [...(props.links || [])];
+                          newLinks[index] = { ...link, text: e.target.value };
+                          updateProp("links", newLinks);
+                        }}
+                        placeholder="Link text"
+                      />
+                      <Input
+                        value={link.href || ""}
+                        onChange={(e) => {
+                          const newLinks = [...(props.links || [])];
+                          newLinks[index] = { ...link, href: e.target.value };
+                          updateProp("links", newLinks);
+                        }}
+                        placeholder="URL"
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <Switch
+                          id={`external-${index}`}
+                          checked={link.external || false}
+                          onCheckedChange={(checked) => {
+                            const newLinks = [...(props.links || [])];
+                            newLinks[index] = { ...link, external: checked };
+                            updateProp("links", newLinks);
+                          }}
+                        />
+                        <Label htmlFor={`external-${index}`}>
+                          External Link
+                        </Label>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const newLinks = (props.links || []).filter(
+                            (_: any, i: number) => i !== index
+                          );
+                          updateProp("links", newLinks);
+                        }}
+                      >
+                        Remove
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const newLinks = [
+                      ...(props.links || []),
+                      { text: "New Link", href: "#", external: false },
+                    ];
+                    updateProp("links", newLinks);
+                  }}
+                >
+                  Add Link
+                </Button>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="ctaExternal"
+                checked={props.ctaExternal || false}
+                onCheckedChange={(checked) =>
+                  updateProp("ctaExternal", checked)
+                }
+              />
+              <Label htmlFor="ctaExternal">CTA is External Link</Label>
+            </div>
+          </div>
+        );
+
+      case "Footer":
+        return (
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="logoText">Logo Text</Label>
+              <Input
+                id="logoText"
+                value={props.logoText || ""}
+                onChange={(e) => updateProp("logoText", e.target.value)}
+                placeholder="Brand Name"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="copyright">Copyright Text</Label>
+              <Input
+                id="copyright"
+                value={props.copyright || ""}
+                onChange={(e) => updateProp("copyright", e.target.value)}
+                placeholder="© 2024 All rights reserved"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="backgroundColor">Background Color</Label>
+              <Input
+                id="backgroundColor"
+                type="color"
+                value={props.backgroundColor || "#1f2937"}
+                onChange={(e) => updateProp("backgroundColor", e.target.value)}
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="textColor">Text Color</Label>
+              <Input
+                id="textColor"
+                type="color"
+                value={props.textColor || "#ffffff"}
+                onChange={(e) => updateProp("textColor", e.target.value)}
+              />
+            </div>
+          </div>
+        );
+
+      case "Container":
+        return (
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="maxWidth">Max Width</Label>
+              <select
+                id="maxWidth"
+                value={props.maxWidth || "xl"}
+                onChange={(e) => updateProp("maxWidth", e.target.value)}
+                className="w-full p-2 border rounded-md"
+              >
+                <option value="sm">Small (640px)</option>
+                <option value="md">Medium (768px)</option>
+                <option value="lg">Large (1024px)</option>
+                <option value="xl">Extra Large (1280px)</option>
+                <option value="2xl">2X Large (1536px)</option>
+                <option value="full">Full Width</option>
+              </select>
+            </div>
+
+            <div>
+              <Label htmlFor="padding">Padding</Label>
+              <select
+                id="padding"
+                value={props.padding || "md"}
+                onChange={(e) => updateProp("padding", e.target.value)}
+                className="w-full p-2 border rounded-md"
+              >
+                <option value="none">None</option>
+                <option value="sm">Small</option>
+                <option value="md">Medium</option>
+                <option value="lg">Large</option>
+                <option value="xl">Extra Large</option>
+              </select>
+            </div>
+
+            <div>
+              <Label htmlFor="backgroundColor">Background Color</Label>
+              <Input
+                id="backgroundColor"
+                type="color"
+                value={props.backgroundColor || "#ffffff"}
+                onChange={(e) => updateProp("backgroundColor", e.target.value)}
+              />
+            </div>
+          </div>
+        );
+
+      case "Grid":
+        return (
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="columns">Columns</Label>
+              <select
+                id="columns"
+                value={props.columns || 3}
+                onChange={(e) =>
+                  updateProp("columns", parseInt(e.target.value))
+                }
+                className="w-full p-2 border rounded-md"
+              >
+                <option value={1}>1 Column</option>
+                <option value={2}>2 Columns</option>
+                <option value={3}>3 Columns</option>
+                <option value={4}>4 Columns</option>
+                <option value={6}>6 Columns</option>
+              </select>
+            </div>
+
+            <div>
+              <Label htmlFor="gap">Gap</Label>
+              <select
+                id="gap"
+                value={props.gap || "md"}
+                onChange={(e) => updateProp("gap", e.target.value)}
+                className="w-full p-2 border rounded-md"
+              >
+                <option value="none">None</option>
+                <option value="sm">Small</option>
+                <option value="md">Medium</option>
+                <option value="lg">Large</option>
+                <option value="xl">Extra Large</option>
+              </select>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="responsive"
+                checked={props.responsive !== false}
+                onCheckedChange={(checked) => updateProp("responsive", checked)}
+              />
+              <Label htmlFor="responsive">Responsive (Stack on mobile)</Label>
+            </div>
+          </div>
+        );
+
+      case "Video":
+        return (
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="src">Video URL</Label>
+              <Input
+                id="src"
+                value={props.src || ""}
+                onChange={(e) => updateProp("src", e.target.value)}
+                placeholder="https://youtube.com/watch?v=..."
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="title">Video Title</Label>
+              <Input
+                id="title"
+                value={props.title || ""}
+                onChange={(e) => updateProp("title", e.target.value)}
+                placeholder="Video title"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="aspectRatio">Aspect Ratio</Label>
+              <select
+                id="aspectRatio"
+                value={props.aspectRatio || "16/9"}
+                onChange={(e) => updateProp("aspectRatio", e.target.value)}
+                className="w-full p-2 border rounded-md"
+              >
+                <option value="16/9">16:9 (Widescreen)</option>
+                <option value="4/3">4:3 (Standard)</option>
+                <option value="1/1">1:1 (Square)</option>
+                <option value="21/9">21:9 (Ultrawide)</option>
+              </select>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="autoplay"
+                checked={props.autoplay || false}
+                onCheckedChange={(checked) => updateProp("autoplay", checked)}
+              />
+              <Label htmlFor="autoplay">Autoplay</Label>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="controls"
+                checked={props.controls !== false}
+                onCheckedChange={(checked) => updateProp("controls", checked)}
+              />
+              <Label htmlFor="controls">Show Controls</Label>
+            </div>
+          </div>
+        );
+
+      case "Form":
+        return (
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="title">Form Title</Label>
+              <Input
+                id="title"
+                value={props.title || ""}
+                onChange={(e) => updateProp("title", e.target.value)}
+                placeholder="Contact Form"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                value={props.description || ""}
+                onChange={(e) => updateProp("description", e.target.value)}
+                placeholder="Form description"
+                rows={2}
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="submitText">Submit Button Text</Label>
+              <Input
+                id="submitText"
+                value={props.submitText || ""}
+                onChange={(e) => updateProp("submitText", e.target.value)}
+                placeholder="Submit"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="action">Form Action URL</Label>
+              <Input
+                id="action"
+                value={props.action || ""}
+                onChange={(e) => updateProp("action", e.target.value)}
+                placeholder="https://example.com/submit"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="method">Method</Label>
+              <select
+                id="method"
+                value={props.method || "POST"}
+                onChange={(e) => updateProp("method", e.target.value)}
+                className="w-full p-2 border rounded-md"
+              >
+                <option value="POST">POST</option>
+                <option value="GET">GET</option>
               </select>
             </div>
           </div>
