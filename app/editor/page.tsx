@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   DndContext,
   DragEndEvent,
@@ -51,8 +51,8 @@ export default function EditorPage() {
     },
   ]);
 
-  const [selectedComponentId, setSelectedComponentId] = useState<string | null>(
-    null
+  const [selectedComponentIds, setSelectedComponentIds] = useState<string[]>(
+    []
   );
   const [draggedComponent, setDraggedComponent] = useState<any>(null);
 
@@ -107,21 +107,97 @@ export default function EditorPage() {
   const deleteComponent = (componentId: string) => {
     setComponents((prev) => removeComponentFromTree(prev, componentId));
     // Clear selection if deleted component was selected
-    if (selectedComponentId === componentId) {
-      setSelectedComponentId(null);
-    }
+    setSelectedComponentIds((prev) => prev.filter((id) => id !== componentId));
+  };
+
+  const deleteSelectedComponents = () => {
+    selectedComponentIds.forEach((id) => {
+      setComponents((prev) => removeComponentFromTree(prev, id));
+    });
+    setSelectedComponentIds([]);
+  };
+
+  const getAllComponentIds = (components: ComponentDefinition[]): string[] => {
+    const ids: string[] = [];
+    const traverse = (items: ComponentDefinition[]) => {
+      items.forEach((item) => {
+        ids.push(item.id);
+        if (item.children.length > 0) {
+          traverse(item.children);
+        }
+      });
+    };
+    traverse(components);
+    return ids;
   };
 
   const duplicateComponent = (componentId: string) => {
     setComponents((prev) => duplicateComponentInTree(prev, componentId));
   };
 
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Prevent default browser shortcuts when editor is focused
+      if (
+        event.target === document.body ||
+        (event.target as Element)?.closest(".editor-canvas")
+      ) {
+        // Ctrl+A - Select all components
+        if (event.ctrlKey && event.key === "a") {
+          event.preventDefault();
+          const allIds = getAllComponentIds(components);
+          setSelectedComponentIds(allIds);
+          return;
+        }
+
+        // Delete key - Delete selected components
+        if (event.key === "Delete" && selectedComponentIds.length > 0) {
+          event.preventDefault();
+          deleteSelectedComponents();
+          return;
+        }
+
+        // Escape key - Deselect all components
+        if (event.key === "Escape") {
+          event.preventDefault();
+          setSelectedComponentIds([]);
+          return;
+        }
+
+        // Ctrl+D - Duplicate selected components
+        if (
+          event.ctrlKey &&
+          event.key === "d" &&
+          selectedComponentIds.length > 0
+        ) {
+          event.preventDefault();
+          selectedComponentIds.forEach((id) => duplicateComponent(id));
+          return;
+        }
+      }
+    };
+
+    // Add event listener
+    document.addEventListener("keydown", handleKeyDown);
+
+    // Cleanup
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [
+    components,
+    selectedComponentIds,
+    deleteSelectedComponents,
+    duplicateComponent,
+  ]);
+
   return (
     <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
       <EditorLayout
         components={components}
-        selectedComponentId={selectedComponentId}
-        onSelectComponent={setSelectedComponentId}
+        selectedComponentIds={selectedComponentIds}
+        onSelectComponent={(id) => setSelectedComponentIds(id ? [id] : [])}
         onUpdateComponent={updateComponent}
         onDeleteComponent={deleteComponent}
         onDuplicateComponent={duplicateComponent}

@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 
 interface CanvasProps {
   components: ComponentDefinition[];
-  selectedComponentId: string | null;
+  selectedComponentIds: string[];
   onSelectComponent: (id: string | null) => void;
 }
 
@@ -61,13 +61,13 @@ function ComponentWrapper({
   component,
   isSelected,
   onSelect,
-  selectedComponentId,
+  selectedComponentIds,
   onSelectComponent,
 }: {
   component: ComponentDefinition;
   isSelected: boolean;
   onSelect: () => void;
-  selectedComponentId: string | null;
+  selectedComponentIds: string[];
   onSelectComponent: (id: string) => void;
 }) {
   const Component =
@@ -111,7 +111,7 @@ function ComponentWrapper({
                   <div key={child.id}>
                     <ComponentRenderer
                       component={child}
-                      selectedComponentId={selectedComponentId}
+                      selectedComponentIds={selectedComponentIds}
                       onSelectComponent={onSelectComponent}
                     />
                     {index < component.children.length - 1 && (
@@ -143,19 +143,19 @@ function ComponentWrapper({
 
 function ComponentRenderer({
   component,
-  selectedComponentId,
+  selectedComponentIds,
   onSelectComponent,
 }: {
   component: ComponentDefinition;
-  selectedComponentId: string | null;
+  selectedComponentIds: string[];
   onSelectComponent: (id: string) => void;
 }) {
   return (
     <ComponentWrapper
       component={component}
-      isSelected={selectedComponentId === component.id}
+      isSelected={selectedComponentIds.includes(component.id)}
       onSelect={() => onSelectComponent(component.id)}
-      selectedComponentId={selectedComponentId}
+      selectedComponentIds={selectedComponentIds}
       onSelectComponent={onSelectComponent}
     />
   );
@@ -163,13 +163,14 @@ function ComponentRenderer({
 
 export function Canvas({
   components,
-  selectedComponentId,
+  selectedComponentIds,
   onSelectComponent,
 }: CanvasProps) {
   return (
     <div
-      className="bg-white rounded-lg shadow-sm min-h-[800px] w-full p-4"
+      className="bg-white rounded-lg shadow-sm min-h-[800px] w-full p-4 editor-canvas"
       onClick={() => onSelectComponent(null)}
+      tabIndex={0}
     >
       {components.length === 0 ? (
         /* Empty state - single drop zone */
@@ -187,7 +188,7 @@ export function Canvas({
               <ComponentRenderer
                 key={component.id}
                 component={component}
-                selectedComponentId={selectedComponentId}
+                selectedComponentIds={selectedComponentIds}
                 onSelectComponent={onSelectComponent}
               />
             ))}

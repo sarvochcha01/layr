@@ -16,14 +16,14 @@ import { Button } from "@/components/ui/button";
 
 interface HierarchyPanelProps {
   components: ComponentDefinition[];
-  selectedComponentId: string | null;
+  selectedComponentIds: string[];
   onSelectComponent: (id: string | null) => void;
   onDeleteComponent: (id: string) => void;
 }
 
 export function HierarchyPanel({
   components,
-  selectedComponentId,
+  selectedComponentIds,
   onSelectComponent,
   onDeleteComponent,
 }: HierarchyPanelProps) {
@@ -64,7 +64,7 @@ export function HierarchyPanel({
     component: ComponentDefinition,
     level: number = 0
   ) => {
-    const isSelected = selectedComponentId === component.id;
+    const isSelected = selectedComponentIds.includes(component.id);
     const isExpanded = expandedItems.has(component.id);
     const hasChildren = component.children.length > 0;
 

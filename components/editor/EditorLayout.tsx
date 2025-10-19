@@ -11,7 +11,7 @@ type Viewport = "desktop" | "tablet" | "mobile";
 
 interface EditorLayoutProps {
   components: ComponentDefinition[];
-  selectedComponentId: string | null;
+  selectedComponentIds: string[];
   onSelectComponent: (id: string | null) => void;
   onUpdateComponent: (id: string, updates: Record<string, any>) => void;
   onDeleteComponent: (id: string) => void;
@@ -20,7 +20,7 @@ interface EditorLayoutProps {
 
 export function EditorLayout({
   components,
-  selectedComponentId,
+  selectedComponentIds,
   onSelectComponent,
   onUpdateComponent,
   onDeleteComponent,
@@ -28,9 +28,10 @@ export function EditorLayout({
 }: EditorLayoutProps) {
   const [viewport, setViewport] = useState<Viewport>("desktop");
 
-  const selectedComponent = selectedComponentId
-    ? findComponentById(components, selectedComponentId)
-    : null;
+  const selectedComponent =
+    selectedComponentIds.length === 1
+      ? findComponentById(components, selectedComponentIds[0])
+      : null;
 
   const getCanvasWidth = () => {
     switch (viewport) {
@@ -52,7 +53,7 @@ export function EditorLayout({
         <div className="flex-1 border-b border-gray-200 min-h-0 overflow-hidden">
           <HierarchyPanel
             components={components}
-            selectedComponentId={selectedComponentId}
+            selectedComponentIds={selectedComponentIds}
             onSelectComponent={onSelectComponent}
             onDeleteComponent={onDeleteComponent}
           />
@@ -123,7 +124,7 @@ export function EditorLayout({
           >
             <Canvas
               components={components}
-              selectedComponentId={selectedComponentId}
+              selectedComponentIds={selectedComponentIds}
               onSelectComponent={onSelectComponent}
             />
           </div>
