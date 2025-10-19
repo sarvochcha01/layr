@@ -29,6 +29,12 @@ const componentCategories: ComponentCategory[] = [
         description: "Page header with navigation",
       },
       {
+        type: "Navbar",
+        name: "Navbar",
+        icon: "�",
+        description: "Navigation bar with menu items",
+      },
+      {
         type: "Footer",
         name: "Footer",
         icon: "🦶",
@@ -37,7 +43,7 @@ const componentCategories: ComponentCategory[] = [
       {
         type: "Section",
         name: "Section",
-        icon: "📄",
+        icon: "�",
         description: "Content section container",
       },
       {

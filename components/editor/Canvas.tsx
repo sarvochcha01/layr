@@ -15,10 +15,12 @@ function DropZone({
   targetId,
   position,
   className,
+  emptyStateText,
 }: {
   targetId?: string;
   position: "before" | "after" | "inside";
   className?: string;
+  emptyStateText?: string;
 }) {
   const { isOver, setNodeRef } = useDroppable({
     id: `drop-zone-${targetId || "root"}-${position}`,
@@ -40,10 +42,16 @@ function DropZone({
         className
       )}
     >
-      {isOver && (
+      {isOver ? (
         <div className="flex items-center justify-center h-full text-blue-600 text-sm font-medium">
           Drop component here
         </div>
+      ) : (
+        emptyStateText && (
+          <div className="flex items-center justify-center h-full text-gray-500 text-sm">
+            {emptyStateText}
+          </div>
+        )
       )}
     </div>
   );
@@ -166,24 +174,33 @@ export function Canvas({
 }: CanvasProps) {
   return (
     <div
-      className="bg-white rounded-lg shadow-sm min-h-[800px] w-full"
+      className="bg-white rounded-lg shadow-sm min-h-[800px] w-full p-4"
       onClick={() => onSelectComponent(null)}
     >
-      {/* Initial drop zone */}
-      <DropZone targetId={undefined} position="inside" className="m-4" />
-
-      {/* Render components */}
-      {components.map((component) => (
-        <ComponentRenderer
-          key={component.id}
-          component={component}
-          selectedComponentId={selectedComponentId}
-          onSelectComponent={onSelectComponent}
+      {components.length === 0 ? (
+        /* Empty state - single drop zone */
+        <DropZone
+          targetId={undefined}
+          position="inside"
+          className="min-h-[200px] flex items-center justify-center border-2 border-dashed border-gray-300 rounded-lg"
+          emptyStateText="Drag components here to start building"
         />
-      ))}
+      ) : (
+        <>
+          {/* Render components */}
+          {components.map((component) => (
+            <ComponentRenderer
+              key={component.id}
+              component={component}
+              selectedComponentId={selectedComponentId}
+              onSelectComponent={onSelectComponent}
+            />
+          ))}
 
-      {/* Final drop zone */}
-      <DropZone targetId={undefined} position="inside" className="m-4" />
+          {/* Final drop zone */}
+          <DropZone targetId={undefined} position="inside" />
+        </>
+      )}
     </div>
   );
 }
