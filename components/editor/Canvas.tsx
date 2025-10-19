@@ -83,9 +83,6 @@ function ComponentWrapper({
 
   return (
     <div className="relative group">
-      {/* Drop zone before */}
-      <DropZone targetId={component.id} position="before" />
-
       {/* Component wrapper */}
       <div
         className={cn(
@@ -140,9 +137,6 @@ function ComponentWrapper({
           <Component {...component.props} />
         )}
       </div>
-
-      {/* Drop zone after */}
-      <DropZone targetId={component.id} position="after" />
     </div>
   );
 }
@@ -187,18 +181,20 @@ export function Canvas({
         />
       ) : (
         <>
-          {/* Render components */}
-          {components.map((component) => (
-            <ComponentRenderer
-              key={component.id}
-              component={component}
-              selectedComponentId={selectedComponentId}
-              onSelectComponent={onSelectComponent}
-            />
-          ))}
+          <div className="space-y-4">
+            {/* Render components */}
+            {components.map((component) => (
+              <ComponentRenderer
+                key={component.id}
+                component={component}
+                selectedComponentId={selectedComponentId}
+                onSelectComponent={onSelectComponent}
+              />
+            ))}
+          </div>
 
           {/* Final drop zone */}
-          <DropZone targetId={undefined} position="inside" />
+          <DropZone targetId={undefined} position="inside" className="mt-4" />
         </>
       )}
     </div>
