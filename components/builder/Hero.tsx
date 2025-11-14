@@ -15,6 +15,8 @@ interface HeroProps {
   alignment?: "left" | "center" | "right";
   size?: "sm" | "md" | "lg" | "xl";
   className?: string;
+  width?: string;
+  height?: string;
 }
 
 export function Hero({
@@ -31,6 +33,8 @@ export function Hero({
   alignment = "center",
   size = "lg",
   className,
+  width,
+  height,
 }: HeroProps) {
   const sizeClasses = {
     sm: "py-12 sm:py-16 px-4",
@@ -61,6 +65,8 @@ export function Hero({
         backgroundSize: "cover",
         backgroundPosition: "center",
         color: textColor,
+        width: width || undefined,
+        height: height || undefined,
       }}
     >
       {/* Overlay for background images */}

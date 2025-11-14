@@ -21,6 +21,8 @@ interface FormProps {
   method?: "GET" | "POST";
   className?: string;
   layout?: "vertical" | "horizontal";
+  width?: string;
+  height?: string;
 }
 
 export function Form({
@@ -32,6 +34,8 @@ export function Form({
   method = "POST",
   className,
   layout = "vertical",
+  width,
+  height,
 }: FormProps) {
   const renderField = (field: FormField) => {
     const fieldId = `field-${field.id}`;
@@ -124,7 +128,13 @@ export function Form({
   };
 
   return (
-    <div className={cn("w-full max-w-md mx-auto", className)}>
+    <div
+      className={cn("w-full max-w-md mx-auto", className)}
+      style={{
+        width: width || undefined,
+        height: height || undefined,
+      }}
+    >
       {title && <h2 className="text-2xl font-bold mb-2">{title}</h2>}
 
       {description && <p className="text-gray-600 mb-6">{description}</p>}

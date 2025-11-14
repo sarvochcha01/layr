@@ -5,8 +5,8 @@ interface VideoProps {
   youtubeId?: string;
   vimeoId?: string;
   poster?: string;
-  width?: number;
-  height?: number;
+  width?: string;
+  height?: string;
   autoplay?: boolean;
   muted?: boolean;
   loop?: boolean;
@@ -46,7 +46,13 @@ export function Video({
     });
 
     return (
-      <div className={cn("w-full", aspectRatioClasses[aspectRatio], className)}>
+      <div
+        className={cn("w-full", aspectRatioClasses[aspectRatio], className)}
+        style={{
+          width: width || undefined,
+          height: height || undefined,
+        }}
+      >
         <iframe
           src={`https://www.youtube.com/embed/${youtubeId}?${youtubeParams}`}
           title="YouTube video"
@@ -67,7 +73,13 @@ export function Video({
     });
 
     return (
-      <div className={cn("w-full", aspectRatioClasses[aspectRatio], className)}>
+      <div
+        className={cn("w-full", aspectRatioClasses[aspectRatio], className)}
+        style={{
+          width: width || undefined,
+          height: height || undefined,
+        }}
+      >
         <iframe
           src={`https://player.vimeo.com/video/${vimeoId}?${vimeoParams}`}
           title="Vimeo video"
@@ -85,8 +97,6 @@ export function Video({
       <video
         src={src}
         poster={poster}
-        width={width}
-        height={height}
         autoPlay={autoplay}
         muted={muted}
         loop={loop}
@@ -97,8 +107,8 @@ export function Video({
           className
         )}
         style={{
-          width: width ? `${width}px` : undefined,
-          height: height ? `${height}px` : undefined,
+          width: width || undefined,
+          height: height || undefined,
         }}
       />
     );
@@ -111,6 +121,10 @@ export function Video({
         aspectRatioClasses[aspectRatio],
         className
       )}
+      style={{
+        width: width || undefined,
+        height: height || undefined,
+      }}
     >
       <p className="text-gray-500">No video source provided</p>
     </div>

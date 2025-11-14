@@ -83,7 +83,7 @@ export function EditorLayout({
     <div className="h-screen flex bg-gray-50">
       {/* Left Panel - Split between Hierarchy and Components */}
       {!isPreviewMode && (
-        <div className="w-80 bg-white border-r border-gray-200 flex flex-col h-full">
+        <div className="w-80 flex-shrink-0 bg-white border-r border-gray-200 flex flex-col h-full">
           {/* Hierarchy Panel - Top Half */}
           <div className="flex-1 border-b border-gray-200 min-h-0 overflow-hidden">
             <HierarchyPanel
@@ -102,7 +102,7 @@ export function EditorLayout({
       )}
 
       {/* Canvas - Center */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col" style={{ minWidth: 0 }}>
         {/* Toolbar */}
         <div className="h-12 bg-white border-b border-gray-200 flex items-center px-4">
           <div className="flex items-center space-x-4">
@@ -186,9 +186,13 @@ export function EditorLayout({
           className={`flex-1 overflow-auto transition-all duration-300 ${
             isPreviewMode ? "bg-white p-0" : "bg-gray-100 p-8"
           }`}
+          style={{
+            maxHeight: "calc(100vh - 3rem)",
+            minWidth: 0,
+          }}
         >
           <div
-            className="mx-auto transition-all duration-300 ease-in-out"
+            className="transition-all duration-300 ease-in-out"
             style={{
               width: getCanvasWidth(),
               maxWidth:
@@ -197,6 +201,8 @@ export function EditorLayout({
                     ? "none"
                     : "1200px"
                   : getCanvasWidth(),
+              minHeight: "100%",
+              margin: "0 auto",
             }}
           >
             <Canvas
@@ -212,7 +218,7 @@ export function EditorLayout({
 
       {/* Properties Panel - Right */}
       {!isPreviewMode && (
-        <div className="w-80 bg-white border-l border-gray-200 h-full overflow-hidden">
+        <div className="w-80 flex-shrink-0 bg-white border-l border-gray-200 h-full overflow-hidden">
           <PropertiesPanel
             selectedComponent={selectedComponent}
             onUpdateComponent={onUpdateComponent}

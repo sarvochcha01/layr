@@ -7,6 +7,8 @@ interface HeaderProps {
   padding?: string;
   sticky?: boolean;
   shadow?: boolean;
+  width?: string;
+  height?: string;
 }
 
 export function Header({
@@ -16,6 +18,8 @@ export function Header({
   padding = "1rem 2rem",
   sticky = false,
   shadow = true,
+  width,
+  height,
 }: HeaderProps) {
   return (
     <header
@@ -28,6 +32,8 @@ export function Header({
       style={{
         backgroundColor,
         padding,
+        width: width || undefined,
+        height: height || undefined,
       }}
     >
       {children}

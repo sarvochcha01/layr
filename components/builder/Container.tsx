@@ -20,6 +20,8 @@ interface ContainerProps {
   backgroundColor?: string;
   textColor?: string;
   tag?: "div" | "main" | "section" | "article" | "aside" | "header" | "footer";
+  width?: string;
+  height?: string;
 }
 
 export function Container({
@@ -31,6 +33,8 @@ export function Container({
   backgroundColor,
   textColor,
   tag = "div",
+  width,
+  height,
 }: ContainerProps) {
   const Component = tag;
 
@@ -76,6 +80,8 @@ export function Container({
       style={{
         backgroundColor,
         color: textColor,
+        width: width || undefined,
+        height: height || undefined,
       }}
     >
       {children}

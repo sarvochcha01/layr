@@ -6,6 +6,8 @@ interface GridProps {
   gap?: "sm" | "md" | "lg" | "xl";
   className?: string;
   responsive?: boolean;
+  width?: string;
+  height?: string;
 }
 
 export function Grid({
@@ -14,6 +16,8 @@ export function Grid({
   gap = "md",
   className,
   responsive = true,
+  width,
+  height,
 }: GridProps) {
   const gapClasses = {
     sm: "gap-4",
@@ -34,6 +38,10 @@ export function Grid({
   return (
     <div
       className={cn("grid", columnClasses[columns], gapClasses[gap], className)}
+      style={{
+        width: width || undefined,
+        height: height || undefined,
+      }}
     >
       {children}
     </div>

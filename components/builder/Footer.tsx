@@ -27,6 +27,8 @@ interface FooterProps {
   backgroundColor?: string;
   textColor?: string;
   className?: string;
+  width?: string;
+  height?: string;
 }
 
 export function Footer({
@@ -39,6 +41,8 @@ export function Footer({
   backgroundColor = "#1f2937",
   textColor = "#ffffff",
   className,
+  width,
+  height,
 }: FooterProps) {
   const currentYear = new Date().getFullYear();
   const defaultCopyright = `© ${currentYear} ${logoText}. All rights reserved.`;
@@ -46,7 +50,12 @@ export function Footer({
   return (
     <footer
       className={cn("w-full py-8 sm:py-12 px-4 sm:px-8", className)}
-      style={{ backgroundColor, color: textColor }}
+      style={{
+        backgroundColor,
+        color: textColor,
+        width: width || undefined,
+        height: height || undefined,
+      }}
     >
       <div className="max-w-6xl mx-auto">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">

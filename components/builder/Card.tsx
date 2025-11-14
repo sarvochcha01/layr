@@ -10,6 +10,8 @@ interface CardProps {
   buttonLink?: string;
   variant?: "default" | "bordered" | "shadow" | "elevated";
   className?: string;
+  width?: string;
+  height?: string;
 }
 
 export function Card({
@@ -21,6 +23,8 @@ export function Card({
   buttonLink = "#",
   variant = "default",
   className,
+  width,
+  height,
 }: CardProps) {
   const variantClasses = {
     default: "bg-white",
@@ -30,7 +34,13 @@ export function Card({
   };
 
   return (
-    <div className={cn("rounded-lg p-6", variantClasses[variant], className)}>
+    <div
+      className={cn("rounded-lg p-6", variantClasses[variant], className)}
+      style={{
+        width: width || undefined,
+        height: height || undefined,
+      }}
+    >
       {/* Image */}
       {image && (
         <div className="mb-4">

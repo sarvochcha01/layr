@@ -19,6 +19,8 @@ interface ButtonProps {
   className?: string;
   onClick?: () => void;
   isPreviewMode?: boolean;
+  width?: string;
+  height?: string;
 }
 
 export function Button({
@@ -33,6 +35,8 @@ export function Button({
   className,
   onClick,
   isPreviewMode = false,
+  width,
+  height,
 }: ButtonProps) {
   const buttonContent = children || text || "Button";
 
@@ -43,6 +47,10 @@ export function Button({
       disabled={disabled}
       onClick={isPreviewMode ? onClick : (e) => e.preventDefault()}
       className={cn(fullWidth && "w-full", className)}
+      style={{
+        width: width || undefined,
+        height: height || undefined,
+      }}
     >
       {buttonContent}
     </ShadcnButton>

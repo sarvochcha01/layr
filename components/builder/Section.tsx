@@ -8,6 +8,8 @@ interface SectionProps {
   padding?: "none" | "sm" | "md" | "lg" | "xl";
   maxWidth?: "sm" | "md" | "lg" | "xl" | "2xl" | "full";
   id?: string;
+  width?: string;
+  height?: string;
 }
 
 export function Section({
@@ -18,6 +20,8 @@ export function Section({
   padding = "lg",
   maxWidth = "xl",
   id,
+  width,
+  height,
 }: SectionProps) {
   const paddingClasses = {
     none: "",
@@ -43,6 +47,8 @@ export function Section({
       style={{
         backgroundColor,
         color: textColor,
+        width: width || undefined,
+        height: height || undefined,
       }}
     >
       <div className={cn("mx-auto", maxWidthClasses[maxWidth])}>{children}</div>

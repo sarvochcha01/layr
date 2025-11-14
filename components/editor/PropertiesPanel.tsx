@@ -64,12 +64,150 @@ export function PropertiesPanel({
   const renderPropertyFields = () => {
     const { type, props } = selectedComponent;
 
+    // Parse dimension value into number and unit
+    const parseDimension = (value: string | undefined) => {
+      if (!value || value === "auto") return { value: "", unit: "auto" };
+      // Handle empty string with unit (e.g., "px" means empty value with px unit)
+      if (value && !value.match(/\d/)) {
+        return { value: "", unit: value };
+      }
+      const match = value.match(/^(\d+\.?\d*)(.*)$/);
+      if (match) {
+        return { value: match[1], unit: match[2] || "px" };
+      }
+      return { value: "", unit: "px" };
+    };
+
+    // Combine value and unit into dimension string
+    const combineDimension = (value: string, unit: string) => {
+      if (!value || unit === "auto") return "auto";
+      return `${value}${unit}`;
+    };
+
+    // Combine value and unit, allowing empty during editing
+    const combineDimensionAllowEmpty = (value: string, unit: string) => {
+      if (unit === "auto") return "auto";
+      if (!value) return unit; // Store just the unit when empty
+      return `${value}${unit}`;
+    };
+
+    // Common dimension fields for all components
+    const renderDimensionFields = () => {
+      const width = parseDimension(props.width || "");
+      const height = parseDimension(props.height || "");
+
+      return (
+        <div className="space-y-3 pb-4 border-b border-gray-200">
+          <div className="text-xs font-semibold text-gray-700 uppercase">
+            Dimensions
+          </div>
+          <div className="space-y-3">
+            <div>
+              <Label htmlFor="width" className="mb-2 block">
+                Width
+              </Label>
+              <div className="flex gap-2">
+                <Input
+                  id="width"
+                  type="number"
+                  value={width.value}
+                  onChange={(e) =>
+                    updateProp(
+                      "width",
+                      combineDimensionAllowEmpty(e.target.value, width.unit)
+                    )
+                  }
+                  onBlur={(e) => {
+                    // Convert to auto if empty on blur
+                    if (!e.target.value && width.unit !== "auto") {
+                      updateProp("width", "auto");
+                    }
+                  }}
+                  placeholder="auto"
+                  className="flex-1"
+                  disabled={width.unit === "auto"}
+                />
+                <select
+                  value={width.unit}
+                  onChange={(e) => {
+                    const newUnit = e.target.value;
+                    updateProp(
+                      "width",
+                      newUnit === "auto"
+                        ? "auto"
+                        : combineDimension(width.value || "100", newUnit)
+                    );
+                  }}
+                  className="w-20 px-2 py-2 border rounded-md text-sm"
+                >
+                  <option value="auto">auto</option>
+                  <option value="px">px</option>
+                  <option value="%">%</option>
+                  <option value="rem">rem</option>
+                  <option value="em">em</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="height" className="mb-2 block">
+                Height
+              </Label>
+              <div className="flex gap-2">
+                <Input
+                  id="height"
+                  type="number"
+                  value={height.value}
+                  onChange={(e) =>
+                    updateProp(
+                      "height",
+                      combineDimensionAllowEmpty(e.target.value, height.unit)
+                    )
+                  }
+                  onBlur={(e) => {
+                    // Convert to auto if empty on blur
+                    if (!e.target.value && height.unit !== "auto") {
+                      updateProp("height", "auto");
+                    }
+                  }}
+                  placeholder="auto"
+                  className="flex-1"
+                  disabled={height.unit === "auto"}
+                />
+                <select
+                  value={height.unit}
+                  onChange={(e) => {
+                    const newUnit = e.target.value;
+                    updateProp(
+                      "height",
+                      newUnit === "auto"
+                        ? "auto"
+                        : combineDimension(height.value || "100", newUnit)
+                    );
+                  }}
+                  className="w-20 px-2 py-2 border rounded-md text-sm"
+                >
+                  <option value="auto">auto</option>
+                  <option value="px">px</option>
+                  <option value="%">%</option>
+                  <option value="rem">rem</option>
+                  <option value="em">em</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
     switch (type) {
       case "Hero":
         return (
           <div className="space-y-4">
+            {renderDimensionFields()}
             <div>
-              <Label htmlFor="title">Title</Label>
+              <Label htmlFor="title" className="mb-2 block">
+                Title
+              </Label>
               <Input
                 id="title"
                 value={props.title || ""}
@@ -79,7 +217,9 @@ export function PropertiesPanel({
             </div>
 
             <div>
-              <Label htmlFor="subtitle">Subtitle</Label>
+              <Label htmlFor="subtitle" className="mb-2 block">
+                Subtitle
+              </Label>
               <Input
                 id="subtitle"
                 value={props.subtitle || ""}
@@ -89,7 +229,9 @@ export function PropertiesPanel({
             </div>
 
             <div>
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description" className="mb-2 block">
+                Description
+              </Label>
               <Textarea
                 id="description"
                 value={props.description || ""}
@@ -100,7 +242,9 @@ export function PropertiesPanel({
             </div>
 
             <div>
-              <Label htmlFor="primaryButtonText">Primary Button Text</Label>
+              <Label htmlFor="primaryButtonText" className="mb-2 block">
+                Primary Button Text
+              </Label>
               <Input
                 id="primaryButtonText"
                 value={props.primaryButtonText || ""}
@@ -112,7 +256,9 @@ export function PropertiesPanel({
             </div>
 
             <div>
-              <Label htmlFor="backgroundColor">Background Color</Label>
+              <Label htmlFor="backgroundColor" className="mb-2 block">
+                Background Color
+              </Label>
               <Input
                 id="backgroundColor"
                 type="color"
@@ -126,8 +272,11 @@ export function PropertiesPanel({
       case "Text":
         return (
           <div className="space-y-4">
+            {renderDimensionFields()}
             <div>
-              <Label htmlFor="content">Content</Label>
+              <Label htmlFor="content" className="mb-2 block">
+                Content
+              </Label>
               <Textarea
                 id="content"
                 value={props.content || ""}
@@ -138,7 +287,9 @@ export function PropertiesPanel({
             </div>
 
             <div>
-              <Label htmlFor="tag">HTML Tag</Label>
+              <Label htmlFor="tag" className="mb-2 block">
+                HTML Tag
+              </Label>
               <select
                 id="tag"
                 value={props.tag || "p"}
@@ -157,7 +308,9 @@ export function PropertiesPanel({
             </div>
 
             <div>
-              <Label htmlFor="size">Size</Label>
+              <Label htmlFor="size" className="mb-2 block">
+                Size
+              </Label>
               <select
                 id="size"
                 value={props.size || "base"}
@@ -175,7 +328,9 @@ export function PropertiesPanel({
             </div>
 
             <div>
-              <Label htmlFor="color">Text Color</Label>
+              <Label htmlFor="color" className="mb-2 block">
+                Text Color
+              </Label>
               <Input
                 id="color"
                 type="color"
@@ -189,8 +344,11 @@ export function PropertiesPanel({
       case "Button":
         return (
           <div className="space-y-4">
+            {renderDimensionFields()}
             <div>
-              <Label htmlFor="text">Button Text</Label>
+              <Label htmlFor="text" className="mb-2 block">
+                Button Text
+              </Label>
               <Input
                 id="text"
                 value={props.text || ""}
@@ -200,7 +358,9 @@ export function PropertiesPanel({
             </div>
 
             <div>
-              <Label htmlFor="href">Link URL</Label>
+              <Label htmlFor="href" className="mb-2 block">
+                Link URL
+              </Label>
               <Input
                 id="href"
                 value={props.href || ""}
@@ -210,7 +370,9 @@ export function PropertiesPanel({
             </div>
 
             <div>
-              <Label htmlFor="variant">Variant</Label>
+              <Label htmlFor="variant" className="mb-2 block">
+                Variant
+              </Label>
               <select
                 id="variant"
                 value={props.variant || "default"}
@@ -251,8 +413,11 @@ export function PropertiesPanel({
       case "Image":
         return (
           <div className="space-y-4">
+            {renderDimensionFields()}
             <div>
-              <Label htmlFor="src">Image URL</Label>
+              <Label htmlFor="src" className="mb-2 block">
+                Image URL
+              </Label>
               <Input
                 id="src"
                 value={props.src || ""}
@@ -262,7 +427,9 @@ export function PropertiesPanel({
             </div>
 
             <div>
-              <Label htmlFor="alt">Alt Text</Label>
+              <Label htmlFor="alt" className="mb-2 block">
+                Alt Text
+              </Label>
               <Input
                 id="alt"
                 value={props.alt || ""}
@@ -272,7 +439,9 @@ export function PropertiesPanel({
             </div>
 
             <div>
-              <Label htmlFor="rounded">Border Radius</Label>
+              <Label htmlFor="rounded" className="mb-2 block">
+                Border Radius
+              </Label>
               <select
                 id="rounded"
                 value={props.rounded || "md"}
@@ -292,8 +461,11 @@ export function PropertiesPanel({
       case "Card":
         return (
           <div className="space-y-4">
+            {renderDimensionFields()}
             <div>
-              <Label htmlFor="title">Title</Label>
+              <Label htmlFor="title" className="mb-2 block">
+                Title
+              </Label>
               <Input
                 id="title"
                 value={props.title || ""}
@@ -303,7 +475,9 @@ export function PropertiesPanel({
             </div>
 
             <div>
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description" className="mb-2 block">
+                Description
+              </Label>
               <Textarea
                 id="description"
                 value={props.description || ""}
@@ -314,7 +488,9 @@ export function PropertiesPanel({
             </div>
 
             <div>
-              <Label htmlFor="buttonText">Button Text</Label>
+              <Label htmlFor="buttonText" className="mb-2 block">
+                Button Text
+              </Label>
               <Input
                 id="buttonText"
                 value={props.buttonText || ""}
@@ -324,7 +500,9 @@ export function PropertiesPanel({
             </div>
 
             <div>
-              <Label htmlFor="variant">Card Style</Label>
+              <Label htmlFor="variant" className="mb-2 block">
+                Card Style
+              </Label>
               <select
                 id="variant"
                 value={props.variant || "default"}
@@ -343,6 +521,7 @@ export function PropertiesPanel({
       case "Header":
         return (
           <div className="space-y-4">
+            {renderDimensionFields()}
             <div className="flex items-center space-x-2">
               <Switch
                 id="sticky"
@@ -362,7 +541,9 @@ export function PropertiesPanel({
             </div>
 
             <div>
-              <Label htmlFor="backgroundColor">Background Color</Label>
+              <Label htmlFor="backgroundColor" className="mb-2 block">
+                Background Color
+              </Label>
               <Input
                 id="backgroundColor"
                 type="color"
@@ -372,7 +553,9 @@ export function PropertiesPanel({
             </div>
 
             <div>
-              <Label htmlFor="padding">Padding</Label>
+              <Label htmlFor="padding" className="mb-2 block">
+                Padding
+              </Label>
               <select
                 id="padding"
                 value={props.padding || "md"}
@@ -391,8 +574,11 @@ export function PropertiesPanel({
       case "Navbar":
         return (
           <div className="space-y-4">
+            {renderDimensionFields()}
             <div>
-              <Label htmlFor="logoText">Logo Text</Label>
+              <Label htmlFor="logoText" className="mb-2 block">
+                Logo Text
+              </Label>
               <Input
                 id="logoText"
                 value={props.logoText || ""}
@@ -402,7 +588,9 @@ export function PropertiesPanel({
             </div>
 
             <div>
-              <Label htmlFor="ctaText">CTA Button Text</Label>
+              <Label htmlFor="ctaText" className="mb-2 block">
+                CTA Button Text
+              </Label>
               <Input
                 id="ctaText"
                 value={props.ctaText || ""}
@@ -412,7 +600,9 @@ export function PropertiesPanel({
             </div>
 
             <div>
-              <Label htmlFor="ctaLink">CTA Button Link</Label>
+              <Label htmlFor="ctaLink" className="mb-2 block">
+                CTA Button Link
+              </Label>
               <Input
                 id="ctaLink"
                 value={props.ctaLink || ""}
@@ -422,7 +612,7 @@ export function PropertiesPanel({
             </div>
 
             <div>
-              <Label>Navigation Links</Label>
+              <Label className="mb-2 block">Navigation Links</Label>
               <div className="space-y-2">
                 {(props.links || []).map((link: any, index: number) => (
                   <div key={index} className="space-y-2 p-3 border rounded">
@@ -508,8 +698,11 @@ export function PropertiesPanel({
       case "Footer":
         return (
           <div className="space-y-4">
+            {renderDimensionFields()}
             <div>
-              <Label htmlFor="logoText">Logo Text</Label>
+              <Label htmlFor="logoText" className="mb-2 block">
+                Logo Text
+              </Label>
               <Input
                 id="logoText"
                 value={props.logoText || ""}
@@ -519,7 +712,9 @@ export function PropertiesPanel({
             </div>
 
             <div>
-              <Label htmlFor="copyright">Copyright Text</Label>
+              <Label htmlFor="copyright" className="mb-2 block">
+                Copyright Text
+              </Label>
               <Input
                 id="copyright"
                 value={props.copyright || ""}
@@ -529,7 +724,9 @@ export function PropertiesPanel({
             </div>
 
             <div>
-              <Label htmlFor="backgroundColor">Background Color</Label>
+              <Label htmlFor="backgroundColor" className="mb-2 block">
+                Background Color
+              </Label>
               <Input
                 id="backgroundColor"
                 type="color"
@@ -539,7 +736,9 @@ export function PropertiesPanel({
             </div>
 
             <div>
-              <Label htmlFor="textColor">Text Color</Label>
+              <Label htmlFor="textColor" className="mb-2 block">
+                Text Color
+              </Label>
               <Input
                 id="textColor"
                 type="color"
@@ -553,8 +752,11 @@ export function PropertiesPanel({
       case "Container":
         return (
           <div className="space-y-4">
+            {renderDimensionFields()}
             <div>
-              <Label htmlFor="maxWidth">Max Width</Label>
+              <Label htmlFor="maxWidth" className="mb-2 block">
+                Max Width
+              </Label>
               <select
                 id="maxWidth"
                 value={props.maxWidth || "xl"}
@@ -571,7 +773,9 @@ export function PropertiesPanel({
             </div>
 
             <div>
-              <Label htmlFor="padding">Padding</Label>
+              <Label htmlFor="padding" className="mb-2 block">
+                Padding
+              </Label>
               <select
                 id="padding"
                 value={props.padding || "md"}
@@ -587,7 +791,9 @@ export function PropertiesPanel({
             </div>
 
             <div>
-              <Label htmlFor="backgroundColor">Background Color</Label>
+              <Label htmlFor="backgroundColor" className="mb-2 block">
+                Background Color
+              </Label>
               <Input
                 id="backgroundColor"
                 type="color"
@@ -601,8 +807,11 @@ export function PropertiesPanel({
       case "Grid":
         return (
           <div className="space-y-4">
+            {renderDimensionFields()}
             <div>
-              <Label htmlFor="columns">Columns</Label>
+              <Label htmlFor="columns" className="mb-2 block">
+                Columns
+              </Label>
               <select
                 id="columns"
                 value={props.columns || 3}
@@ -620,7 +829,9 @@ export function PropertiesPanel({
             </div>
 
             <div>
-              <Label htmlFor="gap">Gap</Label>
+              <Label htmlFor="gap" className="mb-2 block">
+                Gap
+              </Label>
               <select
                 id="gap"
                 value={props.gap || "md"}
@@ -649,8 +860,11 @@ export function PropertiesPanel({
       case "Video":
         return (
           <div className="space-y-4">
+            {renderDimensionFields()}
             <div>
-              <Label htmlFor="src">Video URL</Label>
+              <Label htmlFor="src" className="mb-2 block">
+                Video URL
+              </Label>
               <Input
                 id="src"
                 value={props.src || ""}
@@ -660,7 +874,9 @@ export function PropertiesPanel({
             </div>
 
             <div>
-              <Label htmlFor="title">Video Title</Label>
+              <Label htmlFor="title" className="mb-2 block">
+                Video Title
+              </Label>
               <Input
                 id="title"
                 value={props.title || ""}
@@ -670,7 +886,9 @@ export function PropertiesPanel({
             </div>
 
             <div>
-              <Label htmlFor="aspectRatio">Aspect Ratio</Label>
+              <Label htmlFor="aspectRatio" className="mb-2 block">
+                Aspect Ratio
+              </Label>
               <select
                 id="aspectRatio"
                 value={props.aspectRatio || "16/9"}
@@ -707,8 +925,11 @@ export function PropertiesPanel({
       case "Form":
         return (
           <div className="space-y-4">
+            {renderDimensionFields()}
             <div>
-              <Label htmlFor="title">Form Title</Label>
+              <Label htmlFor="title" className="mb-2 block">
+                Form Title
+              </Label>
               <Input
                 id="title"
                 value={props.title || ""}
@@ -718,7 +939,9 @@ export function PropertiesPanel({
             </div>
 
             <div>
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description" className="mb-2 block">
+                Description
+              </Label>
               <Textarea
                 id="description"
                 value={props.description || ""}
@@ -729,7 +952,9 @@ export function PropertiesPanel({
             </div>
 
             <div>
-              <Label htmlFor="submitText">Submit Button Text</Label>
+              <Label htmlFor="submitText" className="mb-2 block">
+                Submit Button Text
+              </Label>
               <Input
                 id="submitText"
                 value={props.submitText || ""}
@@ -739,7 +964,9 @@ export function PropertiesPanel({
             </div>
 
             <div>
-              <Label htmlFor="action">Form Action URL</Label>
+              <Label htmlFor="action" className="mb-2 block">
+                Form Action URL
+              </Label>
               <Input
                 id="action"
                 value={props.action || ""}
@@ -749,7 +976,9 @@ export function PropertiesPanel({
             </div>
 
             <div>
-              <Label htmlFor="method">Method</Label>
+              <Label htmlFor="method" className="mb-2 block">
+                Method
+              </Label>
               <select
                 id="method"
                 value={props.method || "POST"}

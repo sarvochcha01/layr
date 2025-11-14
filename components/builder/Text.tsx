@@ -19,6 +19,8 @@ interface TextProps {
   color?: string;
   align?: "left" | "center" | "right" | "justify";
   className?: string;
+  width?: string;
+  height?: string;
 }
 
 export function Text({
@@ -30,6 +32,8 @@ export function Text({
   color,
   align = "left",
   className,
+  width,
+  height,
 }: TextProps) {
   const Component = tag;
 
@@ -70,7 +74,11 @@ export function Text({
         alignClasses[align],
         className
       )}
-      style={{ color }}
+      style={{
+        color,
+        width: width || undefined,
+        height: height || undefined,
+      }}
     >
       {children || content}
     </Component>

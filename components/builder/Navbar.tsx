@@ -21,6 +21,8 @@ interface NavbarProps {
   className?: string;
   viewport?: "desktop" | "tablet" | "mobile";
   isPreviewMode?: boolean;
+  width?: string;
+  height?: string;
 }
 
 export function Navbar({
@@ -34,6 +36,8 @@ export function Navbar({
   className,
   viewport = "desktop",
   isPreviewMode = false,
+  width,
+  height,
 }: NavbarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -53,6 +57,10 @@ export function Navbar({
           theme === "dark" ? "text-white" : "text-gray-900",
           className
         )}
+        style={{
+          width: width || undefined,
+          height: height || undefined,
+        }}
       >
         {/* Logo */}
         <div className="flex items-center space-x-2">
@@ -68,7 +76,6 @@ export function Navbar({
           <div className="flex items-center space-x-4 xl:space-x-8">
             {links.map((link, index) => {
               const linkProps = {
-                key: index,
                 href: isPreviewMode ? link.href : "#",
                 className: cn(
                   "hover:opacity-75 transition-opacity text-sm lg:text-base",
@@ -85,9 +92,13 @@ export function Navbar({
               };
 
               return link.external && isPreviewMode ? (
-                <a {...linkProps}>{link.text}</a>
+                <a key={index} {...linkProps}>
+                  {link.text}
+                </a>
               ) : (
-                <Link {...linkProps}>{link.text}</Link>
+                <Link key={index} {...linkProps}>
+                  {link.text}
+                </Link>
               );
             })}
           </div>
@@ -141,7 +152,6 @@ export function Navbar({
           <div className="py-2">
             {links.map((link, index) => {
               const linkProps = {
-                key: index,
                 href: isPreviewMode ? link.href : "#",
                 className: cn(
                   "block px-4 py-3 text-sm hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0",
@@ -158,9 +168,13 @@ export function Navbar({
               };
 
               return link.external && isPreviewMode ? (
-                <a {...linkProps}>{link.text}</a>
+                <a key={index} {...linkProps}>
+                  {link.text}
+                </a>
               ) : (
-                <Link {...linkProps}>{link.text}</Link>
+                <Link key={index} {...linkProps}>
+                  {link.text}
+                </Link>
               );
             })}
 
