@@ -1,77 +1,39 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
-import {
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  GoogleAuthProvider,
-  signInWithPopup,
-  signOut,
-  User,
-} from "firebase/auth";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { User, onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 
-interface AuthContextValue {
+interface AuthContextType {
   user: User | null;
   loading: boolean;
-  loginWithEmail: (email: string, password: string) => Promise<void>;
-  signupWithEmail: (email: string, password: string) => Promise<void>;
-  loginWithGoogle: () => Promise<void>;
-  logout: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextValue | null>(null);
+const AuthContext = createContext<AuthContextType>({
+  user: null,
+  loading: true,
+});
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      setUser(firebaseUser);
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
       setLoading(false);
     });
-    return () => unsubscribe();
+
+    return unsubscribe;
   }, []);
 
-
-  const loginWithEmail = async (email: string, password: string) => {
-    await signInWithEmailAndPassword(auth, email, password);
-  };
-
-  const signupWithEmail = async (email: string, password: string) => {
-    await createUserWithEmailAndPassword(auth, email, password);
-  };
-
-  const loginWithGoogle = async () => {
-    const provider = new GoogleAuthProvider();
-    await signInWithPopup(auth, provider);
-  };
-
-  const logout = async () => {
-    await signOut(auth);
-  };
-
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        loading,
-        loginWithEmail,
-        signupWithEmail,
-        loginWithGoogle,
-        logout,
-      }}
-    >
+    <AuthContext.Provider value={{ user, loading }}>
       {children}
     </AuthContext.Provider>
   );
-};
+}
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context)
-    throw new Error("useAuth must be used inside an AuthProvider");
-  return context;
-};
+export function useAuth() {
+  return useContext(AuthContext);
+}

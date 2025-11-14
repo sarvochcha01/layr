@@ -454,7 +454,7 @@ body {
     justify-content: center;
     gap: 0.5rem;
     white-space: nowrap;
-    border-radius: 0.375rem;
+    border-radius: 0.5rem;
     font-size: 0.875rem;
     font-weight: 500;
     transition: all 0.2s;
@@ -471,54 +471,57 @@ body {
 }
 
 .btn-default {
-    background: #3b82f6;
-    color: white;
+    background: hsl(223 90% 45%);
+    color: hsl(210 40% 98%);
 }
 
 .btn-default:hover {
-    background: #2563eb;
+    background: hsl(223 90% 40%);
 }
 
 .btn-destructive {
-    background: #ef4444;
+    background: hsl(0, 100%, 50%);
     color: white;
 }
 
 .btn-destructive:hover {
-    background: #dc2626;
+    background: hsl(0, 100%, 45%);
 }
 
 .btn-outline {
-    border: 1px solid #e5e7eb;
-    background: white;
-    color: #1f2937;
+    border: 1px solid hsl(214.3 31.8% 91.4%);
+    background: hsl(0 0% 100%);
+    color: hsl(222.2 84% 4.9%);
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
 .btn-outline:hover {
-    background: #f9fafb;
+    background: hsl(224 100% 95%);
+    color: hsl(22, 90% 45%);
 }
 
 .btn-secondary {
-    background: #f3f4f6;
-    color: #1f2937;
+    background: hsl(210 40% 96.1%);
+    color: hsl(222.2 47.4% 11.2%);
 }
 
 .btn-secondary:hover {
-    background: #e5e7eb;
+    background: hsl(210 40% 92%);
 }
 
 .btn-ghost {
     background: transparent;
-    color: #1f2937;
+    color: hsl(222.2 84% 4.9%);
 }
 
 .btn-ghost:hover {
-    background: #f9fafb;
+    background: hsl(224 100% 95%);
+    color: hsl(22, 90% 45%);
 }
 
 .btn-link {
     background: transparent;
-    color: #3b82f6;
+    color: hsl(223 90% 45%);
     text-decoration: underline;
     text-underline-offset: 4px;
 }
@@ -530,11 +533,14 @@ body {
 /* Button Sizes */
 .btn-sm {
     height: 2rem;
+    border-radius: 0.5rem;
+    gap: 0.375rem;
     padding: 0 0.75rem;
 }
 
 .btn-lg {
-    height: 2.75rem;
+    height: 2.5rem;
+    border-radius: 0.5rem;
     padding: 0 1.5rem;
 }
 
