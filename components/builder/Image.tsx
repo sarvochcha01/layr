@@ -13,7 +13,7 @@ interface ImageProps {
 }
 
 export function Image({
-  src = "https://via.placeholder.com/400x200/e5e7eb/6b7280?text=Image",
+  src = "https://placehold.co/400x200/e5e7eb/6b7280?text=Image",
   alt = "",
   width,
   height,

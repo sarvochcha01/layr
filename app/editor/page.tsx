@@ -258,7 +258,7 @@ function getDefaultProps(componentType: string): Record<string, any> {
     Button: { text: "Button", variant: "default" },
     Text: { content: "Add your text here", tag: "p", size: "base" },
     Image: {
-      src: "https://via.placeholder.com/400x200/e5e7eb/6b7280?text=Image",
+      src: "https://placehold.co/400x200/e5e7eb/6b7280?text=Image",
       alt: "Placeholder image",
     },
     Grid: { columns: 3, gap: "md" },

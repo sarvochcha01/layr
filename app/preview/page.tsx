@@ -163,7 +163,7 @@ export default function PreviewPage() {
             <Card
               title="Image Card"
               description="This card includes a placeholder image."
-              image="https://via.placeholder.com/400x200/3b82f6/ffffff?text=Image"
+              image="https://placehold.co/400x200/3b82f6/ffffff?text=Image"
               buttonText="View Gallery"
               variant="shadow"
             />
@@ -198,13 +198,13 @@ export default function PreviewPage() {
               </Text>
               <div className="space-y-4">
                 <Image
-                  src="https://via.placeholder.com/400x200/10b981/ffffff?text=Responsive+Image"
+                  src="https://placehold.co/400x200/10b981/ffffff?text=Responsive+Image"
                   alt="Sample image"
                   rounded="lg"
                   className="w-full"
                 />
                 <Image
-                  src="https://via.placeholder.com/150x150/f59e0b/ffffff?text=Square"
+                  src="https://placehold.co/150x150/f59e0b/ffffff?text=Square"
                   alt="Square image"
                   rounded="full"
                   className="mx-auto"

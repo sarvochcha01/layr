@@ -120,28 +120,44 @@ function ComponentWrapper({
             viewport={viewport}
             isPreviewMode={isPreviewMode}
           >
-            {component.children.length > 0 && (
-              <div>
-                {component.children.map((child, index) => (
-                  <div key={child.id}>
+            {component.children.length > 0 &&
+              (component.type === "Grid" ? (
+                // Grid: render children without wrapper divs to preserve grid layout
+                <>
+                  {component.children.map((child) => (
                     <ComponentRenderer
+                      key={child.id}
                       component={child}
                       selectedComponentIds={selectedComponentIds}
                       onSelectComponent={onSelectComponent}
                       viewport={viewport}
                       isPreviewMode={isPreviewMode}
                     />
-                    {!isPreviewMode &&
-                      index < component.children.length - 1 && (
-                        <DropZone targetId={component.id} position="inside" />
-                      )}
-                  </div>
-                ))}
-                {!isPreviewMode && (
-                  <DropZone targetId={component.id} position="inside" />
-                )}
-              </div>
-            )}
+                  ))}
+                </>
+              ) : (
+                // Other containers: render with wrapper divs and drop zones
+                <div>
+                  {component.children.map((child, index) => (
+                    <div key={child.id}>
+                      <ComponentRenderer
+                        component={child}
+                        selectedComponentIds={selectedComponentIds}
+                        onSelectComponent={onSelectComponent}
+                        viewport={viewport}
+                        isPreviewMode={isPreviewMode}
+                      />
+                      {!isPreviewMode &&
+                        index < component.children.length - 1 && (
+                          <DropZone targetId={component.id} position="inside" />
+                        )}
+                    </div>
+                  ))}
+                  {!isPreviewMode && (
+                    <DropZone targetId={component.id} position="inside" />
+                  )}
+                </div>
+              ))}
 
             {/* Drop zone for empty containers */}
             {!isPreviewMode && component.children.length === 0 && (
