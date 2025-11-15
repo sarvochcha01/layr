@@ -1,230 +1,222 @@
 import { ComponentDefinition } from "@/types/editor";
 
+// Generate inline styles for custom properties with defaults
+function getInlineStyles(props: Record<string, any>, defaults?: { backgroundColor?: string; textColor?: string }): string {
+    const styles: string[] = [];
+
+    const bgColor = props.backgroundColor || defaults?.backgroundColor;
+    const txtColor = props.textColor || defaults?.textColor;
+
+    if (bgColor) styles.push(`background-color: ${bgColor}`);
+    if (txtColor) styles.push(`color: ${txtColor}`);
+    if (props.width && props.width !== 'auto') styles.push(`width: ${props.width}`);
+    if (props.height && props.height !== 'auto') styles.push(`height: ${props.height}`);
+
+    return styles.length > 0 ? ` style="${styles.join('; ')}"` : '';
+}
+
 export function generateHTML(components: ComponentDefinition[]): string {
     const renderComponent = (component: ComponentDefinition): string => {
         const { type, props, children } = component;
 
         switch (type) {
             case "Header":
+                const headerClasses = `w-full bg-white border-b ${props.sticky ? 'sticky top-0 z-50' : ''} ${props.shadow ? 'shadow-md' : ''}`;
                 return `
-          <header class="header ${props.sticky ? "sticky" : ""} ${props.shadow ? "shadow" : ""
-                    }">
-            ${children.map(renderComponent).join("")}
-          </header>
-        `;
+<header class="${headerClasses}"${getInlineStyles(props)}>
+    ${children.map(renderComponent).join("")}
+</header>`;
 
             case "Navbar":
                 const links = props.links || [];
+                const linkColor = props.linkColor || '#6b7280';
+                const linkHoverColor = props.linkHoverColor || '#1f2937';
+
                 return `
-          <nav class="navbar">
-            <div class="navbar-brand">${props.logoText || "Brand"}</div>
-            
-            <!-- Mobile menu button -->
-            <button class="navbar-toggle" onclick="toggleMobileMenu()">
-              <span class="hamburger-line"></span>
-              <span class="hamburger-line"></span>
-              <span class="hamburger-line"></span>
-            </button>
-            
-            <!-- Desktop navigation -->
-            <div class="navbar-menu" id="navbar-menu">
-              <ul class="navbar-nav">
-                ${links
-                        .map(
-                            (link: any) =>
-                                `<li><a href="${link.href}">${link.text}</a></li>`
-                        )
-                        .join("")}
-              </ul>
-              ${props.ctaText
-                        ? `<a href="${props.ctaLink || "#"}" class="navbar-cta">${props.ctaText
-                        }</a>`
-                        : ""
-                    }
-            </div>
-          </nav>
-        `;
+<nav class="flex items-center justify-between px-8 py-4 max-w-7xl mx-auto"${getInlineStyles(props)}>
+    <div class="text-xl font-bold">${props.logoText || "Brand"}</div>
+    <button class="md:hidden flex flex-col gap-1" onclick="toggleMobileMenu()">
+        <span class="w-6 h-0.5 bg-gray-800"></span>
+        <span class="w-6 h-0.5 bg-gray-800"></span>
+        <span class="w-6 h-0.5 bg-gray-800"></span>
+    </button>
+    <div id="navbar-menu" class="hidden md:flex items-center gap-8">
+        <ul class="flex gap-8">
+            ${links.map((link: any) => `
+            <li><a href="${link.href}" class="hover:opacity-75 transition-opacity" style="color: ${linkColor}" onmouseover="this.style.color='${linkHoverColor}'" onmouseout="this.style.color='${linkColor}'">${link.text}</a></li>
+            `).join('')}
+        </ul>
+        ${props.ctaText && props.ctaLink ? `<a href="${props.ctaLink}" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">${props.ctaText}</a>` : ''}
+    </div>
+</nav>`;
 
             case "Hero":
+                const sizeClasses = { sm: 'py-12 sm:py-16 px-4', md: 'py-16 sm:py-24 px-4 sm:px-6', lg: 'py-20 sm:py-32 px-4 sm:px-8', xl: 'py-24 sm:py-40 px-4 sm:px-12' };
+                const alignmentClasses = { left: 'text-left', center: 'text-center', right: 'text-right' };
+                const heroSize = sizeClasses[props.size as keyof typeof sizeClasses] || sizeClasses.lg;
+                const heroAlign = alignmentClasses[props.alignment as keyof typeof alignmentClasses] || alignmentClasses.center;
+
                 return `
-          <section class="hero" style="background-color: ${props.backgroundColor || "#f8fafc"
-                    }">
-            <div class="hero-content">
-              <h1 class="hero-title">${props.title || "Hero Title"}</h1>
-              <p class="hero-description">${props.description || "Hero description"
-                    }</p>
-              ${props.primaryButtonText
-                        ? `<button class="hero-button">${props.primaryButtonText}</button>`
-                        : ""
-                    }
-            </div>
-          </section>
-        `;
-
-            case "Button":
-                const variant = props.variant || "default";
-                const size = props.size || "default";
-                const sizeClass = size !== "default" ? ` btn-${size}` : "";
-                const fullWidthClass = props.fullWidth ? " w-full" : "";
-                const disabledAttr = props.disabled ? " disabled" : "";
-
-                const buttonHtml = `<button class="btn btn-${variant}${sizeClass}${fullWidthClass}"${disabledAttr}>${props.text || "Button"
-                    }</button>`;
-
-                if (props.href && !props.disabled) {
-                    return `<a href="${props.href}">${buttonHtml}</a>`;
-                }
-
-                return buttonHtml;
-
-            case "Text":
-                const tag = props.tag || "p";
-                return `<${tag} class="text text-${props.size || "base"}">${props.content || "Text content"
-                    }</${tag}>`;
-
-            case "Image":
-                return `<img src="${props.src || ""}" alt="${props.alt || ""
-                    }" class="image" />`;
-
-            case "Container":
-                return `
-          <div class="container container-${props.maxWidth || "xl"} padding-${props.padding || "md"
-                    }">
-            ${children.map(renderComponent).join("")}
-          </div>
-        `;
+<section class="relative flex items-center justify-center min-h-[500px] w-full ${heroSize} ${heroAlign}"${getInlineStyles(props, { backgroundColor: '#f8f9fa', textColor: '#1f2937' })}>
+    ${props.backgroundImage ? '<div class="absolute inset-0 bg-black bg-opacity-40"></div>' : ''}
+    <div class="relative z-10 max-w-4xl mx-auto px-4">
+        ${props.subtitle ? `<p class="text-xs sm:text-sm font-medium uppercase tracking-wide mb-3 sm:mb-4 opacity-80">${props.subtitle}</p>` : ''}
+        <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 leading-tight">${props.title || "Welcome to Our Website"}</h1>
+        <p class="text-base sm:text-lg md:text-xl mb-6 sm:mb-8 opacity-90 max-w-2xl mx-auto">${props.description || "Build amazing websites with our powerful tools"}</p>
+        <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center">
+            <a href="${props.primaryButtonLink || '#'}" class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors h-10 px-8 bg-blue-600 text-white hover:bg-blue-700 w-full sm:w-auto">${props.primaryButtonText || "Get Started"}</a>
+            ${props.secondaryButtonText ? `<a href="${props.secondaryButtonLink || '#'}" class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors h-10 px-8 border-2 border-gray-300 hover:bg-gray-100 w-full sm:w-auto">${props.secondaryButtonText}</a>` : ''}
+        </div>
+    </div>
+</section>`;
 
             case "Section":
+                const paddingMap = { none: '', sm: 'py-8 px-4', md: 'py-16 px-6', lg: 'py-24 px-8', xl: 'py-32 px-12' };
+                const maxWidthMap = { sm: 'max-w-sm', md: 'max-w-md', lg: 'max-w-4xl', xl: 'max-w-6xl', '2xl': 'max-w-7xl', full: 'max-w-full' };
                 return `
-          <section class="section padding-${props.padding || "lg"}">
-            <div class="section-content max-width-${props.maxWidth || "xl"}">
-              ${children.map(renderComponent).join("")}
-            </div>
-          </section>
-        `;
+<section class="w-full ${paddingMap[props.padding as keyof typeof paddingMap] || paddingMap.lg}"${getInlineStyles(props)}>
+    <div class="${maxWidthMap[props.maxWidth as keyof typeof maxWidthMap] || maxWidthMap.xl} mx-auto">
+        ${children.map(renderComponent).join("")}
+    </div>
+</section>`;
+
+            case "Container":
+                const containerMaxWidth = { sm: 'max-w-sm', md: 'max-w-md', lg: 'max-w-lg', xl: 'max-w-xl', '2xl': 'max-w-2xl', '3xl': 'max-w-3xl', '4xl': 'max-w-4xl', '5xl': 'max-w-5xl', '6xl': 'max-w-6xl', '7xl': 'max-w-7xl', full: 'max-w-full' };
+                const containerPadding = { none: '', sm: 'p-4', md: 'p-6', lg: 'p-8', xl: 'p-12' };
+                return `
+<div class="${containerMaxWidth[props.maxWidth as keyof typeof containerMaxWidth] || containerMaxWidth.xl} ${containerPadding[props.padding as keyof typeof containerPadding] || containerPadding.md} mx-auto"${getInlineStyles(props)}>
+    ${children.map(renderComponent).join("")}
+</div>`;
 
             case "Grid":
-                const isResponsive = props.responsive !== false;
                 const columns = props.columns || 3;
-                let gridClass = "";
-
-                if (isResponsive) {
-                    // Responsive grid classes
-                    switch (columns) {
-                        case 1:
-                            gridClass = "grid-cols-1";
-                            break;
-                        case 2:
-                            gridClass = "grid-cols-1 md:grid-cols-2";
-                            break;
-                        case 3:
-                            gridClass = "grid-cols-1 md:grid-cols-2 lg:grid-cols-3";
-                            break;
-                        case 4:
-                            gridClass = "grid-cols-1 md:grid-cols-2 lg:grid-cols-4";
-                            break;
-                        case 5:
-                            gridClass = "grid-cols-1 md:grid-cols-2 lg:grid-cols-5";
-                            break;
-                        case 6:
-                            gridClass = "grid-cols-1 md:grid-cols-3 lg:grid-cols-6";
-                            break;
-                        default:
-                            gridClass = "grid-cols-1 md:grid-cols-2 lg:grid-cols-3";
-                    }
+                const responsive = props.responsive !== false;
+                let gridCols = '';
+                if (responsive) {
+                    const responsiveMap: Record<number, string> = {
+                        1: 'grid-cols-1',
+                        2: 'grid-cols-1 md:grid-cols-2',
+                        3: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
+                        4: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4',
+                        5: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-5',
+                        6: 'grid-cols-1 md:grid-cols-3 lg:grid-cols-6',
+                    };
+                    gridCols = responsiveMap[columns] || responsiveMap[3];
                 } else {
-                    gridClass = `grid-cols-${columns}`;
+                    gridCols = `grid-cols-${columns}`;
                 }
-
+                const gapMap = { sm: 'gap-4', md: 'gap-6', lg: 'gap-8', xl: 'gap-12' };
                 return `
-          <div class="grid ${gridClass} gap-${props.gap || "md"}">
-            ${children.map(renderComponent).join("")}
-          </div>
-        `;
+<div class="grid ${gridCols} ${gapMap[props.gap as keyof typeof gapMap] || gapMap.md}"${getInlineStyles(props)}>
+    ${children.map(renderComponent).join("")}
+</div>`;
 
             case "Card":
                 return `
-          <div class="card card-${props.variant || "default"}">
-            ${props.image
-                        ? `<img src="${props.image}" alt="${props.title || ""
-                        }" class="card-image" />`
-                        : ""
-                    }
-            <div class="card-content">
-              <h3 class="card-title">${props.title || "Card Title"}</h3>
-              <p class="card-description">${props.description || "Card description"
-                    }</p>
-              ${props.buttonText
-                        ? `<button class="card-button">${props.buttonText}</button>`
-                        : ""
-                    }
-            </div>
-          </div>
-        `;
+<div class="bg-white rounded-lg overflow-hidden ${props.variant === 'bordered' ? 'border' : ''} ${props.variant === 'shadow' ? 'shadow-md' : ''} ${props.variant === 'elevated' ? 'shadow-lg' : ''}"${getInlineStyles(props)}>
+    ${props.image ? `<img src="${props.image}" alt="${props.title || ''}" class="w-full h-48 object-cover" />` : ''}
+    <div class="p-6">
+        <h3 class="text-xl font-bold mb-2">${props.title || "Card Title"}</h3>
+        <p class="text-gray-600 mb-4">${props.description || "Card description"}</p>
+        ${props.buttonText ? `<button class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">${props.buttonText}</button>` : ''}
+    </div>
+</div>`;
+
+            case "Button":
+                const btnVariantClasses: Record<string, string> = {
+                    default: 'bg-blue-600 text-white hover:bg-blue-700',
+                    destructive: 'bg-red-600 text-white hover:bg-red-700',
+                    outline: 'border-2 border-gray-300 hover:bg-gray-100',
+                    secondary: 'bg-gray-200 text-gray-900 hover:bg-gray-300',
+                    ghost: 'hover:bg-gray-100',
+                    link: 'text-blue-600 underline hover:no-underline',
+                };
+                const btnSizeClasses: Record<string, string> = {
+                    sm: 'px-3 py-1.5 text-sm',
+                    default: 'px-4 py-2',
+                    lg: 'px-6 py-3 text-lg',
+                };
+                const btnClass = `${btnVariantClasses[props.variant || 'default']} ${btnSizeClasses[props.size || 'default']} ${props.fullWidth ? 'w-full' : ''} rounded-md font-medium transition-colors`;
+                const button = `<button class="${btnClass}"${props.disabled ? ' disabled' : ''}${getInlineStyles(props)}>${props.text || "Button"}</button>`;
+                return props.href && !props.disabled ? `<a href="${props.href}">${button}</a>` : button;
+
+            case "Text":
+                const sizeMap: Record<string, string> = {
+                    xs: 'text-xs', sm: 'text-sm', base: 'text-base',
+                    lg: 'text-lg', xl: 'text-xl', '2xl': 'text-2xl', '3xl': 'text-3xl'
+                };
+                const tag = props.tag || 'p';
+                return `<${tag} class="${sizeMap[props.size || 'base'] || sizeMap.base}"${getInlineStyles(props)}>${props.content || "Text content"}</${tag}>`;
+
+            case "Image":
+                return `<img src="${props.src || ''}" alt="${props.alt || ''}" class="w-full h-auto rounded-${props.rounded || 'md'}"${getInlineStyles(props)} />`;
 
             case "Footer":
+                const sections = props.sections || [];
+                const socialLinks = props.socialLinks || [];
+                const currentYear = new Date().getFullYear();
+                const defaultCopyright = `© ${currentYear} ${props.logoText || 'Brand'}. All rights reserved.`;
+
                 return `
-          <footer class="footer">
-            <div class="footer-content">
-              <div class="footer-brand">${props.logoText || "Brand"}</div>
-              <p class="footer-copyright">${props.copyright || "© 2024 All rights reserved"
-                    }</p>
+<footer class="w-full py-8 sm:py-12 px-4 sm:px-8"${getInlineStyles(props, { backgroundColor: '#1f2937', textColor: '#ffffff' })}>
+    <div class="max-w-6xl mx-auto">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+            <div class="space-y-4">
+                ${props.logo ? `<img src="${props.logo}" alt="Logo" class="h-8 w-auto" />` : `<span class="text-xl font-bold">${props.logoText || "Brand"}</span>`}
+                ${props.description ? `<p class="text-sm opacity-80 leading-relaxed">${props.description}</p>` : ''}
+                ${socialLinks.length > 0 ? `
+                <div class="flex space-x-4">
+                    ${socialLinks.map((social: any) => `<a href="${social.href}" class="opacity-80 hover:opacity-100 transition-opacity" target="_blank" rel="noopener noreferrer">${social.icon || social.platform}</a>`).join('')}
+                </div>` : ''}
             </div>
-          </footer>
-        `;
+            ${sections.map((section: any) => `
+            <div class="space-y-4">
+                <h3 class="font-semibold text-lg">${section.title}</h3>
+                <ul class="space-y-2">
+                    ${section.links.map((link: any) => `<li><a href="${link.href}" class="text-sm opacity-80 hover:opacity-100 transition-opacity">${link.text}</a></li>`).join('')}
+                </ul>
+            </div>`).join('')}
+        </div>
+        <div class="mt-8 pt-8 border-t border-white/20 text-center">
+            <p class="text-sm opacity-80">${props.copyright || defaultCopyright}</p>
+        </div>
+    </div>
+</footer>`;
 
             case "Form":
                 const fields = props.fields || [];
                 return `
-          <div class="form-container">
-            ${props.title ? `<h2 class="form-title">${props.title}</h2>` : ""}
-            ${props.description
-                        ? `<p class="form-description">${props.description}</p>`
-                        : ""
+<div class="max-w-md mx-auto"${getInlineStyles(props)}>
+    ${props.title ? `<h2 class="text-2xl font-bold mb-2">${props.title}</h2>` : ''}
+    ${props.description ? `<p class="text-gray-600 mb-6">${props.description}</p>` : ''}
+    <form action="${props.action || '#'}" method="${props.method || 'POST'}" class="space-y-4">
+        ${fields.map((field: any) => `
+        <div class="space-y-2">
+            <label for="${field.id}" class="block font-medium text-sm">${field.label}</label>
+            ${field.type === 'textarea'
+                        ? `<textarea id="${field.id}" name="${field.id}" placeholder="${field.placeholder || ''}" ${field.required ? 'required' : ''} class="w-full min-h-[100px] px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>`
+                        : `<input type="${field.type}" id="${field.id}" name="${field.id}" placeholder="${field.placeholder || ''}" ${field.required ? 'required' : ''} class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />`
                     }
-            <form action="${props.action || "#"}" method="${props.method || "POST"
-                    }" class="form">
-              ${fields
-                        .map(
-                            (field: any) => `
-                <div class="form-field">
-                  <label for="${field.id}">${field.label}</label>
-                  ${field.type === "textarea"
-                                    ? `<textarea id="${field.id}" name="${field.id}" placeholder="${field.placeholder || ""}" ${field.required ? "required" : ""}></textarea>`
-                                    : `<input type="${field.type}" id="${field.id}" name="${field.id}" placeholder="${field.placeholder || ""}" ${field.required ? "required" : ""} />`
-                                }
-                </div>
-              `
-                        )
-                        .join("")}
-              <button type="submit" class="form-submit">${props.submitText || "Submit"
-                    }</button>
-            </form>
-          </div>
-        `;
+        </div>
+        `).join('')}
+        <button type="submit" class="w-full bg-blue-600 text-white px-6 py-3 rounded-md font-medium hover:bg-blue-700 transition-colors">${props.submitText || 'Submit'}</button>
+    </form>
+</div>`;
 
             case "Video":
                 if (props.youtubeId) {
                     return `
-            <div class="video-container aspect-${props.aspectRatio || "16-9"}">
-              <iframe src="https://www.youtube.com/embed/${props.youtubeId
-                        }" title="${props.title || "Video"}" allowfullscreen></iframe>
-            </div>
-          `;
+<div class="relative w-full pb-[56.25%] rounded-lg overflow-hidden"${getInlineStyles(props)}>
+    <iframe src="https://www.youtube.com/embed/${props.youtubeId}" title="${props.title || 'Video'}" class="absolute top-0 left-0 w-full h-full" allowfullscreen></iframe>
+</div>`;
                 }
                 if (props.src) {
-                    return `
-            <video src="${props.src}" ${props.controls !== false ? "controls" : ""
-                        } ${props.autoplay ? "autoplay" : ""} ${props.muted ? "muted" : ""
-                        } ${props.loop ? "loop" : ""} class="video"></video>
-          `;
+                    return `<video src="${props.src}" ${props.controls !== false ? 'controls' : ''} ${props.autoplay ? 'autoplay' : ''} ${props.muted ? 'muted' : ''} ${props.loop ? 'loop' : ''} class="w-full h-auto rounded-lg"${getInlineStyles(props)}></video>`;
                 }
-                return "";
+                return '';
 
             default:
-                return `<div class="component-${type.toLowerCase()}">${children
-                    .map(renderComponent)
-                    .join("")}</div>`;
+                return `<div class="p-4">${children.map(renderComponent).join("")}</div>`;
         }
     };
 
@@ -234,685 +226,51 @@ export function generateHTML(components: ComponentDefinition[]): string {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Exported Website</title>
-    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    </style>
 </head>
 <body>
-    ${components.map(renderComponent).join("")}
+    ${components.map(renderComponent).join("\n")}
     <script src="script.js"></script>
 </body>
 </html>`;
 }
 
 export function generateCSS(): string {
-    return `/* Reset and Base Styles */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    line-height: 1.6;
-    color: #333;
-}
-
-/* Header Styles */
-.header {
-    background: white;
-    border-bottom: 1px solid #e5e7eb;
-}
-
-.header.sticky {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-}
-
-.header.shadow {
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-/* Navbar Styles */
-.navbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1rem 2rem;
-    max-width: 1200px;
-    margin: 0 auto;
-    position: relative;
-}
-
-.navbar-brand {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #1f2937;
-}
-
-.navbar-menu {
-    display: flex;
-    align-items: center;
-    gap: 2rem;
-}
-
-.navbar-nav {
-    display: flex;
-    list-style: none;
-    gap: 2rem;
-    margin: 0;
-    padding: 0;
-}
-
-.navbar-nav a {
-    text-decoration: none;
-    color: #6b7280;
-    font-weight: 500;
-    transition: color 0.2s;
-}
-
-.navbar-nav a:hover {
-    color: #1f2937;
-}
-
-.navbar-cta {
-    background: #3b82f6;
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 0.375rem;
-    text-decoration: none;
-    font-weight: 500;
-    transition: background-color 0.2s;
-}
-
-.navbar-cta:hover {
-    background: #2563eb;
-}
-
-/* Mobile Menu Toggle */
-.navbar-toggle {
-    display: none;
-    flex-direction: column;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0.5rem;
-    gap: 0.25rem;
-}
-
-.hamburger-line {
-    width: 1.5rem;
-    height: 2px;
-    background: #1f2937;
-    transition: all 0.3s ease;
-}
-
-/* Mobile Styles */
-@media (max-width: 768px) {
-    .navbar-toggle {
-        display: flex;
-    }
-    
-    .navbar-menu {
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-        background: white;
-        border-top: 1px solid #e5e7eb;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        flex-direction: column;
-        align-items: stretch;
-        gap: 0;
-        padding: 1rem 2rem;
-        transform: translateY(-100%);
-        opacity: 0;
-        visibility: hidden;
-        transition: all 0.3s ease;
-    }
-    
-    .navbar-menu.active {
-        transform: translateY(0);
-        opacity: 1;
-        visibility: visible;
-    }
-    
-    .navbar-nav {
-        flex-direction: column;
-        gap: 1rem;
-        width: 100%;
-    }
-    
-    .navbar-nav a {
-        padding: 0.5rem 0;
-        border-bottom: 1px solid #f3f4f6;
-    }
-    
-    .navbar-cta {
-        margin-top: 1rem;
-        text-align: center;
-    }
-    
-    /* Hamburger Animation */
-    .navbar-toggle.active .hamburger-line:nth-child(1) {
-        transform: rotate(45deg) translate(0.375rem, 0.375rem);
-    }
-    
-    .navbar-toggle.active .hamburger-line:nth-child(2) {
-        opacity: 0;
-    }
-    
-    .navbar-toggle.active .hamburger-line:nth-child(3) {
-        transform: rotate(-45deg) translate(0.375rem, -0.375rem);
-    }
-}
-
-/* Hero Styles */
-.hero {
-    padding: 4rem 2rem;
-    text-align: center;
-}
-
-.hero-content {
-    max-width: 800px;
-    margin: 0 auto;
-}
-
-.hero-title {
-    font-size: 3rem;
-    font-weight: bold;
-    margin-bottom: 1rem;
-    color: #1f2937;
-}
-
-.hero-description {
-    font-size: 1.25rem;
-    color: #6b7280;
-    margin-bottom: 2rem;
-}
-
-.hero-button {
-    background: #3b82f6;
-    color: white;
-    padding: 0.75rem 2rem;
-    border: none;
-    border-radius: 0.375rem;
-    font-size: 1rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.hero-button:hover {
-    background: #2563eb;
-}
-
-/* Button Styles */
-.btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    white-space: nowrap;
-    border-radius: 0.5rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    transition: all 0.2s;
-    cursor: pointer;
-    outline: none;
-    border: 1px solid transparent;
-    height: 2.25rem;
-    padding: 0.5rem 1rem;
-}
-
-.btn:disabled {
-    pointer-events: none;
-    opacity: 0.5;
-}
-
-.btn-default {
-    background: hsl(223 90% 45%);
-    color: hsl(210 40% 98%);
-}
-
-.btn-default:hover {
-    background: hsl(223 90% 40%);
-}
-
-.btn-destructive {
-    background: hsl(0, 100%, 50%);
-    color: white;
-}
-
-.btn-destructive:hover {
-    background: hsl(0, 100%, 45%);
-}
-
-.btn-outline {
-    border: 1px solid hsl(214.3 31.8% 91.4%);
-    background: hsl(0 0% 100%);
-    color: hsl(222.2 84% 4.9%);
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-}
-
-.btn-outline:hover {
-    background: hsl(224 100% 95%);
-    color: hsl(22, 90% 45%);
-}
-
-.btn-secondary {
-    background: hsl(210 40% 96.1%);
-    color: hsl(222.2 47.4% 11.2%);
-}
-
-.btn-secondary:hover {
-    background: hsl(210 40% 92%);
-}
-
-.btn-ghost {
-    background: transparent;
-    color: hsl(222.2 84% 4.9%);
-}
-
-.btn-ghost:hover {
-    background: hsl(224 100% 95%);
-    color: hsl(22, 90% 45%);
-}
-
-.btn-link {
-    background: transparent;
-    color: hsl(223 90% 45%);
-    text-decoration: underline;
-    text-underline-offset: 4px;
-}
-
-.btn-link:hover {
-    text-decoration: none;
-}
-
-/* Button Sizes */
-.btn-sm {
-    height: 2rem;
-    border-radius: 0.5rem;
-    gap: 0.375rem;
-    padding: 0 0.75rem;
-}
-
-.btn-lg {
-    height: 2.5rem;
-    border-radius: 0.5rem;
-    padding: 0 1.5rem;
-}
-
-/* Utility Classes */
-.w-full {
-    width: 100%;
-}
-
-/* Text Styles */
-.text {
-    margin-bottom: 1rem;
-}
-
-.text-xs { font-size: 0.75rem; }
-.text-sm { font-size: 0.875rem; }
-.text-base { font-size: 1rem; }
-.text-lg { font-size: 1.125rem; }
-.text-xl { font-size: 1.25rem; }
-.text-2xl { font-size: 1.5rem; }
-.text-3xl { font-size: 1.875rem; }
-
-/* Image Styles */
-.image {
-    max-width: 100%;
-    width: 100%;
-    height: auto;
-    border-radius: 0.375rem;
-}
-
-/* Container Styles */
-.container {
-    margin: 0 auto;
-    padding: 0 1rem;
-}
-
-.container-sm { max-width: 640px; }
-.container-md { max-width: 768px; }
-.container-lg { max-width: 1024px; }
-.container-xl { max-width: 1280px; }
-.container-2xl { max-width: 1536px; }
-
-.padding-none { padding: 0; }
-.padding-sm { padding: 1rem; }
-.padding-md { padding: 2rem; }
-.padding-lg { padding: 3rem; }
-.padding-xl { padding: 4rem; }
-
-/* Section Styles */
-.section {
-    width: 100%;
-}
-
-.section-content {
-    margin: 0 auto;
-}
-
-.max-width-sm { max-width: 640px; }
-.max-width-md { max-width: 768px; }
-.max-width-lg { max-width: 1024px; }
-.max-width-xl { max-width: 1280px; }
-.max-width-2xl { max-width: 1536px; }
-
-/* Grid Styles */
-.grid {
-    display: grid;
-}
-
-.grid-cols-1 { grid-template-columns: repeat(1, 1fr); }
-.grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
-.grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
-.grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
-.grid-cols-5 { grid-template-columns: repeat(5, 1fr); }
-.grid-cols-6 { grid-template-columns: repeat(6, 1fr); }
-
-.gap-none { gap: 0; }
-.gap-sm { gap: 0.5rem; }
-.gap-md { gap: 1rem; }
-.gap-lg { gap: 2rem; }
-.gap-xl { gap: 3rem; }
-
-/* Card Styles */
-.card {
-    background: white;
-    border-radius: 0.5rem;
-    overflow: hidden;
-}
-
-.card-default {
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.card-bordered {
-    border: 1px solid #e5e7eb;
-}
-
-.card-shadow {
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-}
-
-.card-elevated {
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-}
-
-.card-image {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-}
-
-.card-content {
-    padding: 1.5rem;
-}
-
-.card-title {
-    font-size: 1.25rem;
-    font-weight: bold;
-    margin-bottom: 0.5rem;
-    color: #1f2937;
-}
-
-.card-description {
-    color: #6b7280;
-    margin-bottom: 1rem;
-}
-
-.card-button {
-    background: #3b82f6;
-    color: white;
-    padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 0.375rem;
-    font-weight: 500;
-    cursor: pointer;
-}
-
-/* Footer Styles */
-.footer {
-    background: #1f2937;
-    color: white;
-    padding: 2rem;
-    text-align: center;
-}
-
-.footer-content {
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.footer-brand {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-bottom: 1rem;
-}
-
-.footer-copyright {
-    color: #9ca3af;
-}
-
-/* Form Styles */
-.form-container {
-    max-width: 500px;
-    margin: 0 auto;
-}
-
-.form-title {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-bottom: 0.5rem;
-}
-
-.form-description {
-    color: #6b7280;
-    margin-bottom: 1.5rem;
-}
-
-.form {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.form-field {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.form-field label {
-    font-weight: 500;
-    font-size: 0.875rem;
-}
-
-.form-field input,
-.form-field textarea {
-    padding: 0.5rem;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.375rem;
-    font-size: 1rem;
-}
-
-.form-field input:focus,
-.form-field textarea:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-.form-submit {
-    background: #3b82f6;
-    color: white;
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 0.375rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.form-submit:hover {
-    background: #2563eb;
-}
-
-/* Video Styles */
-.video-container {
-    position: relative;
-    width: 100%;
-    overflow: hidden;
-    border-radius: 0.5rem;
-}
-
-.aspect-16-9 {
-    padding-bottom: 56.25%;
-}
-
-.aspect-4-3 {
-    padding-bottom: 75%;
-}
-
-.aspect-1-1 {
-    padding-bottom: 100%;
-}
-
-.aspect-21-9 {
-    padding-bottom: 42.86%;
-}
-
-.video-container iframe {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border: none;
-}
-
-.video {
-    width: 100%;
-    height: auto;
-    border-radius: 0.5rem;
-}
-
-/* Responsive Design */
-
-/* Tablet and up (768px+) */
-@media (min-width: 768px) {
-    .md\\:grid-cols-2 {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    
-    .md\\:grid-cols-3 {
-        grid-template-columns: repeat(3, 1fr);
-    }
-    
-    .md\\:grid-cols-4 {
-        grid-template-columns: repeat(4, 1fr);
-    }
-}
-
-/* Desktop and up (1024px+) */
-@media (min-width: 1024px) {
-    .lg\\:grid-cols-3 {
-        grid-template-columns: repeat(3, 1fr);
-    }
-    
-    .lg\\:grid-cols-4 {
-        grid-template-columns: repeat(4, 1fr);
-    }
-    
-    .lg\\:grid-cols-5 {
-        grid-template-columns: repeat(5, 1fr);
-    }
-    
-    .lg\\:grid-cols-6 {
-        grid-template-columns: repeat(6, 1fr);
-    }
-}
-
-/* Mobile styles */
-@media (max-width: 768px) {
-    .hero-title {
-        font-size: 2rem;
-    }
-}`;
+    // Tailwind handles all CSS via CDN
+    return `/* Tailwind CSS is loaded via CDN in the HTML file */`;
 }
 
 export function generateJS(): string {
-    return `// Mobile menu toggle function
+    return `// Mobile menu toggle
 function toggleMobileMenu() {
     const menu = document.getElementById('navbar-menu');
-    const toggle = document.querySelector('.navbar-toggle');
-    
-    if (menu && toggle) {
-        menu.classList.toggle('active');
-        toggle.classList.toggle('active');
+    if (menu) {
+        menu.classList.toggle('hidden');
+        menu.classList.toggle('flex');
     }
 }
 
-// Basic interactivity
-document.addEventListener('DOMContentLoaded', function() {
-    // Smooth scrolling for anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth'
-                });
-            }
-        });
-    });
-
-    // Close mobile menu when clicking on links
-    document.querySelectorAll('.navbar-nav a').forEach(link => {
-        link.addEventListener('click', function() {
-            const menu = document.getElementById('navbar-menu');
-            const toggle = document.querySelector('.navbar-toggle');
-            if (menu && toggle) {
-                menu.classList.remove('active');
-                toggle.classList.remove('active');
-            }
-        });
-    });
-
-    // Close mobile menu when clicking outside
-    document.addEventListener('click', function(e) {
-        const navbar = document.querySelector('.navbar');
-        const menu = document.getElementById('navbar-menu');
-        const toggle = document.querySelector('.navbar-toggle');
-        
-        if (navbar && menu && toggle && !navbar.contains(e.target)) {
-            menu.classList.remove('active');
-            toggle.classList.remove('active');
+// Smooth scrolling
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({ behavior: 'smooth' });
         }
     });
+});
 
-    // Button click handlers (excluding navbar toggle)
-    document.querySelectorAll('button:not(.navbar-toggle)').forEach(button => {
-        button.addEventListener('click', function() {
-            // Add your custom button logic here
-            console.log('Button clicked:', this.textContent);
-        });
-    });
-
-    // Form submission (if any forms exist)
-    document.querySelectorAll('form').forEach(form => {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            // Add your form submission logic here
-            console.log('Form submitted');
-            alert('Form submitted! Check console for details.');
-        });
+// Form submission
+document.querySelectorAll('form').forEach(form => {
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        console.log('Form submitted');
+        alert('Form submitted! Check console for details.');
     });
 });`;
 }
