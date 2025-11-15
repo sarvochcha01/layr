@@ -178,7 +178,7 @@ export default function ProjectsPage() {
               status="Draft"
               lastModified={formatDate(project.updatedAt.toString())}
               views="0"
-              onEdit={() => handleEditProject(project.id)}
+              onClick={() => handleEditProject(project.id)}
               onDelete={() => handleDeleteProject(project.id, project.name)}
             />
           ))}

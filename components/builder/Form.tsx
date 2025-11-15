@@ -23,6 +23,8 @@ interface FormProps {
   layout?: "vertical" | "horizontal";
   width?: string;
   height?: string;
+  backgroundColor?: string;
+  textColor?: string;
 }
 
 export function Form({
@@ -36,6 +38,8 @@ export function Form({
   layout = "vertical",
   width,
   height,
+  backgroundColor,
+  textColor,
 }: FormProps) {
   const renderField = (field: FormField) => {
     const fieldId = `field-${field.id}`;
@@ -133,11 +137,17 @@ export function Form({
       style={{
         width: width || undefined,
         height: height || undefined,
+        backgroundColor: backgroundColor || undefined,
+        color: textColor || undefined,
       }}
     >
       {title && <h2 className="text-2xl font-bold mb-2">{title}</h2>}
 
-      {description && <p className="text-gray-600 mb-6">{description}</p>}
+      {description && (
+        <p className="mb-6" style={{ color: textColor || undefined }}>
+          {description}
+        </p>
+      )}
 
       <form action={action} method={method} className="space-y-4">
         {fields.map(renderField)}

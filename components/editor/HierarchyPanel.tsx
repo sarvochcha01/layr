@@ -13,12 +13,20 @@ import {
   MoreHorizontal,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface HierarchyPanelProps {
   components: ComponentDefinition[];
   selectedComponentIds: string[];
   onSelectComponent: (id: string | null) => void;
   onDeleteComponent: (id: string) => void;
+  onAddComponent?: (componentType: string) => void;
 }
 
 export function HierarchyPanel({
@@ -26,10 +34,39 @@ export function HierarchyPanel({
   selectedComponentIds,
   onSelectComponent,
   onDeleteComponent,
+  onAddComponent,
 }: HierarchyPanelProps) {
   const [expandedItems, setExpandedItems] = useState<Set<string>>(
     new Set(["root"])
   );
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+
+  const componentTypes = [
+    { type: "Header", icon: "📦", description: "Page header with navigation" },
+    {
+      type: "Hero",
+      icon: "🎯",
+      description: "Hero section with title and CTA",
+    },
+    { type: "Section", icon: "📄", description: "Generic content section" },
+    { type: "Container", icon: "📦", description: "Container for content" },
+    { type: "Grid", icon: "🏗️", description: "Grid layout" },
+    { type: "Card", icon: "🃏", description: "Card component" },
+    { type: "Button", icon: "🔘", description: "Button element" },
+    { type: "Text", icon: "📝", description: "Text content" },
+    { type: "Image", icon: "🖼️", description: "Image element" },
+    { type: "Video", icon: "🎥", description: "Video player" },
+    { type: "Form", icon: "📋", description: "Form with inputs" },
+    { type: "Navbar", icon: "🧭", description: "Navigation bar" },
+    { type: "Footer", icon: "🦶", description: "Page footer" },
+  ];
+
+  const handleAddComponent = (componentType: string) => {
+    if (onAddComponent) {
+      onAddComponent(componentType);
+      setIsAddDialogOpen(false);
+    }
+  };
 
   const toggleExpanded = (id: string) => {
     const newExpanded = new Set(expandedItems);
@@ -184,10 +221,45 @@ export function HierarchyPanel({
 
       {/* Footer Actions */}
       <div className="p-4 border-t border-gray-200">
-        <Button variant="outline" size="sm" className="w-full">
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-full"
+          onClick={() => setIsAddDialogOpen(true)}
+        >
           Add Component
         </Button>
       </div>
+
+      {/* Add Component Dialog */}
+      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Add Component</DialogTitle>
+            <DialogDescription>
+              Select a component to add to your page
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="grid grid-cols-2 gap-3 mt-4">
+            {componentTypes.map((component) => (
+              <button
+                key={component.type}
+                onClick={() => handleAddComponent(component.type)}
+                className="flex items-start gap-3 p-4 border rounded-lg hover:bg-accent hover:border-primary transition-colors text-left"
+              >
+                <span className="text-2xl">{component.icon}</span>
+                <div className="flex-1">
+                  <div className="font-medium text-sm">{component.type}</div>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    {component.description}
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

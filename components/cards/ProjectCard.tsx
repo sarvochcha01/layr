@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2, Eye, Clock } from "lucide-react";
+import { Trash2, Eye, Clock } from "lucide-react";
 
 interface ProjectCardProps {
   name: string;
@@ -7,7 +7,7 @@ interface ProjectCardProps {
   status: "Published" | "Draft" | "In Review";
   lastModified?: string;
   views?: string;
-  onEdit?: () => void;
+  onClick?: () => void;
   onDelete?: () => void;
 }
 
@@ -17,7 +17,7 @@ export function ProjectCard({
   status,
   lastModified,
   views,
-  onEdit,
+  onClick,
   onDelete,
 }: ProjectCardProps) {
   const getStatusStyles = (status: string) => {
@@ -34,7 +34,10 @@ export function ProjectCard({
   };
 
   return (
-    <div className="p-6 border rounded-lg bg-card hover:shadow-md transition-shadow">
+    <div
+      className="p-6 border rounded-lg bg-card hover:shadow-md transition-shadow cursor-pointer relative group"
+      onClick={onClick}
+    >
       <div className="flex justify-between items-start mb-4">
         <div className="flex-1">
           <h3 className="font-semibold mb-2">{name}</h3>
@@ -68,28 +71,19 @@ export function ProjectCard({
           {status}
         </span>
 
-        <div className="flex gap-1">
-          {onEdit && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 w-8 p-0"
-              onClick={onEdit}
-            >
-              <Edit className="h-3 w-3" />
-            </Button>
-          )}
-          {onDelete && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 w-8 p-0"
-              onClick={onDelete}
-            >
-              <Trash2 className="h-3 w-3" />
-            </Button>
-          )}
-        </div>
+        {onDelete && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 w-8 p-0"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete();
+            }}
+          >
+            <Trash2 className="h-3 w-3" />
+          </Button>
+        )}
       </div>
     </div>
   );

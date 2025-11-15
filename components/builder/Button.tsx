@@ -21,6 +21,8 @@ interface ButtonProps {
   isPreviewMode?: boolean;
   width?: string;
   height?: string;
+  backgroundColor?: string;
+  textColor?: string;
 }
 
 export function Button({
@@ -37,6 +39,8 @@ export function Button({
   isPreviewMode = false,
   width,
   height,
+  backgroundColor,
+  textColor,
 }: ButtonProps) {
   const buttonContent = children || text || "Button";
 
@@ -50,6 +54,8 @@ export function Button({
       style={{
         width: width || undefined,
         height: height || undefined,
+        backgroundColor: backgroundColor || undefined,
+        color: textColor || undefined,
       }}
     >
       {buttonContent}

@@ -91,6 +91,41 @@ export function PropertiesPanel({
       return `${value}${unit}`;
     };
 
+    // Common color fields for all components
+    const renderColorFields = () => {
+      return (
+        <div className="space-y-3 pb-4 border-b border-gray-200">
+          <div className="text-xs font-semibold text-gray-700 uppercase">
+            Colors
+          </div>
+          <div className="space-y-3">
+            <div>
+              <Label htmlFor="backgroundColor" className="mb-2 block">
+                Background Color
+              </Label>
+              <Input
+                id="backgroundColor"
+                type="color"
+                value={props.backgroundColor || "#ffffff"}
+                onChange={(e) => updateProp("backgroundColor", e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="textColor" className="mb-2 block">
+                Text Color
+              </Label>
+              <Input
+                id="textColor"
+                type="color"
+                value={props.textColor || "#000000"}
+                onChange={(e) => updateProp("textColor", e.target.value)}
+              />
+            </div>
+          </div>
+        </div>
+      );
+    };
+
     // Common dimension fields for all components
     const renderDimensionFields = () => {
       const width = parseDimension(props.width || "");
@@ -203,6 +238,7 @@ export function PropertiesPanel({
       case "Hero":
         return (
           <div className="space-y-4">
+            {renderColorFields()}
             {renderDimensionFields()}
             <div>
               <Label htmlFor="title" className="mb-2 block">
@@ -272,6 +308,7 @@ export function PropertiesPanel({
       case "Text":
         return (
           <div className="space-y-4">
+            {renderColorFields()}
             {renderDimensionFields()}
             <div>
               <Label htmlFor="content" className="mb-2 block">
@@ -344,6 +381,7 @@ export function PropertiesPanel({
       case "Button":
         return (
           <div className="space-y-4">
+            {renderColorFields()}
             {renderDimensionFields()}
             <div>
               <Label htmlFor="text" className="mb-2 block">
@@ -413,6 +451,7 @@ export function PropertiesPanel({
       case "Image":
         return (
           <div className="space-y-4">
+            {renderColorFields()}
             {renderDimensionFields()}
             <div>
               <Label htmlFor="src" className="mb-2 block">
@@ -461,6 +500,7 @@ export function PropertiesPanel({
       case "Card":
         return (
           <div className="space-y-4">
+            {renderColorFields()}
             {renderDimensionFields()}
             <div>
               <Label htmlFor="title" className="mb-2 block">
@@ -521,6 +561,7 @@ export function PropertiesPanel({
       case "Header":
         return (
           <div className="space-y-4">
+            {renderColorFields()}
             {renderDimensionFields()}
             <div className="flex items-center space-x-2">
               <Switch
@@ -574,6 +615,7 @@ export function PropertiesPanel({
       case "Navbar":
         return (
           <div className="space-y-4">
+            {renderColorFields()}
             {renderDimensionFields()}
             <div>
               <Label htmlFor="logoText" className="mb-2 block">
@@ -692,12 +734,41 @@ export function PropertiesPanel({
               />
               <Label htmlFor="ctaExternal">CTA is External Link</Label>
             </div>
+
+            <div className="space-y-3 pt-4 border-t border-gray-200">
+              <div className="text-xs font-semibold text-gray-700 uppercase">
+                Link Styling
+              </div>
+              <div>
+                <Label htmlFor="linkColor" className="mb-2 block">
+                  Link Color
+                </Label>
+                <Input
+                  id="linkColor"
+                  type="color"
+                  value={props.linkColor || "#000000"}
+                  onChange={(e) => updateProp("linkColor", e.target.value)}
+                />
+              </div>
+              <div>
+                <Label htmlFor="linkHoverColor" className="mb-2 block">
+                  Link Hover Color
+                </Label>
+                <Input
+                  id="linkHoverColor"
+                  type="color"
+                  value={props.linkHoverColor || "#3b82f6"}
+                  onChange={(e) => updateProp("linkHoverColor", e.target.value)}
+                />
+              </div>
+            </div>
           </div>
         );
 
       case "Footer":
         return (
           <div className="space-y-4">
+            {renderColorFields()}
             {renderDimensionFields()}
             <div>
               <Label htmlFor="logoText" className="mb-2 block">
@@ -752,6 +823,7 @@ export function PropertiesPanel({
       case "Container":
         return (
           <div className="space-y-4">
+            {renderColorFields()}
             {renderDimensionFields()}
             <div>
               <Label htmlFor="maxWidth" className="mb-2 block">
@@ -807,6 +879,7 @@ export function PropertiesPanel({
       case "Grid":
         return (
           <div className="space-y-4">
+            {renderColorFields()}
             {renderDimensionFields()}
             <div>
               <Label htmlFor="columns" className="mb-2 block">
@@ -857,9 +930,54 @@ export function PropertiesPanel({
           </div>
         );
 
+      case "Section":
+        return (
+          <div className="space-y-4">
+            {renderColorFields()}
+            {renderDimensionFields()}
+            <div>
+              <Label htmlFor="padding" className="mb-2 block">
+                Padding
+              </Label>
+              <select
+                id="padding"
+                value={props.padding || "lg"}
+                onChange={(e) => updateProp("padding", e.target.value)}
+                className="w-full p-2 border rounded-md"
+              >
+                <option value="none">None</option>
+                <option value="sm">Small</option>
+                <option value="md">Medium</option>
+                <option value="lg">Large</option>
+                <option value="xl">Extra Large</option>
+              </select>
+            </div>
+
+            <div>
+              <Label htmlFor="maxWidth" className="mb-2 block">
+                Max Width
+              </Label>
+              <select
+                id="maxWidth"
+                value={props.maxWidth || "xl"}
+                onChange={(e) => updateProp("maxWidth", e.target.value)}
+                className="w-full p-2 border rounded-md"
+              >
+                <option value="sm">Small (640px)</option>
+                <option value="md">Medium (768px)</option>
+                <option value="lg">Large (1024px)</option>
+                <option value="xl">Extra Large (1280px)</option>
+                <option value="2xl">2X Large (1536px)</option>
+                <option value="full">Full Width</option>
+              </select>
+            </div>
+          </div>
+        );
+
       case "Video":
         return (
           <div className="space-y-4">
+            {renderColorFields()}
             {renderDimensionFields()}
             <div>
               <Label htmlFor="src" className="mb-2 block">
@@ -925,6 +1043,7 @@ export function PropertiesPanel({
       case "Form":
         return (
           <div className="space-y-4">
+            {renderColorFields()}
             {renderDimensionFields()}
             <div>
               <Label htmlFor="title" className="mb-2 block">

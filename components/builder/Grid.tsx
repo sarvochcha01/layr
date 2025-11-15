@@ -8,6 +8,8 @@ interface GridProps {
   responsive?: boolean;
   width?: string;
   height?: string;
+  backgroundColor?: string;
+  textColor?: string;
 }
 
 export function Grid({
@@ -18,6 +20,8 @@ export function Grid({
   responsive = true,
   width,
   height,
+  backgroundColor,
+  textColor,
 }: GridProps) {
   const gapClasses = {
     sm: "gap-4",
@@ -41,6 +45,8 @@ export function Grid({
       style={{
         width: width || undefined,
         height: height || undefined,
+        backgroundColor: backgroundColor || undefined,
+        color: textColor || undefined,
       }}
     >
       {children}

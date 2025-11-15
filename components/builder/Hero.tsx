@@ -64,7 +64,7 @@ export function Hero({
         backgroundColor: !backgroundImage ? backgroundColor : undefined,
         backgroundSize: "cover",
         backgroundPosition: "center",
-        color: textColor,
+        color: textColor || "#1f2937",
         width: width || undefined,
         height: height || undefined,
       }}

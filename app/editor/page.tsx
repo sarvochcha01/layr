@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import {
   DndContext,
   DragEndEvent,
@@ -10,51 +11,141 @@ import {
 import { EditorLayout } from "@/components/editor/EditorLayout";
 import { ComponentDefinition } from "@/types/editor";
 import { generateId } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
+import { getProject } from "@/hooks/useProjects";
+import { toast } from "sonner";
+import { Loading } from "@/components/ui/loading";
+
+const placeholderComponents: ComponentDefinition[] = [
+  {
+    id: "header-1",
+    type: "Header",
+    props: {
+      sticky: true,
+      shadow: true,
+    },
+    children: [
+      {
+        id: "navbar-1",
+        type: "Navbar",
+        props: {
+          logoText: "My Website",
+          links: [
+            { text: "Home", href: "#" },
+            { text: "About", href: "#" },
+            { text: "Contact", href: "#" },
+          ],
+          ctaText: "Get Started",
+          ctaLink: "#",
+        },
+        children: [],
+      },
+    ],
+  },
+  {
+    id: "hero-1",
+    type: "Hero",
+    props: {
+      title: "Welcome to My Website",
+      description: "Build amazing websites with our drag and drop editor",
+      primaryButtonText: "Get Started",
+      backgroundColor: "#f8fafc",
+    },
+    children: [],
+  },
+];
 
 export default function EditorPage() {
-  const [components, setComponents] = useState<ComponentDefinition[]>([
-    {
-      id: "header-1",
-      type: "Header",
-      props: {
-        sticky: true,
-        shadow: true,
-      },
-      children: [
-        {
-          id: "navbar-1",
-          type: "Navbar",
-          props: {
-            logoText: "My Website",
-            links: [
-              { text: "Home", href: "#" },
-              { text: "About", href: "#" },
-              { text: "Contact", href: "#" },
-            ],
-            ctaText: "Get Started",
-            ctaLink: "#",
-          },
-          children: [],
-        },
-      ],
-    },
-    {
-      id: "hero-1",
-      type: "Hero",
-      props: {
-        title: "Welcome to My Website",
-        description: "Build amazing websites with our drag and drop editor",
-        primaryButtonText: "Get Started",
-        backgroundColor: "#f8fafc",
-      },
-      children: [],
-    },
-  ]);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const { user, loading: authLoading } = useAuth();
+  const projectId = searchParams.get("projectId");
 
+  const [components, setComponents] = useState<ComponentDefinition[]>(
+    placeholderComponents
+  );
   const [selectedComponentIds, setSelectedComponentIds] = useState<string[]>(
     []
   );
   const [draggedComponent, setDraggedComponent] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [redirecting, setRedirecting] = useState(false);
+  const [projectName, setProjectName] = useState<string>("");
+
+  // Redirect if no projectId
+  useEffect(() => {
+    if (!projectId) {
+      router.push("/projects");
+      return;
+    }
+  }, [projectId, router]);
+
+  // Load project if projectId is provided
+  useEffect(() => {
+    if (!projectId) return;
+    if (authLoading) return;
+
+    if (!user) {
+      toast.error("Please log in");
+      router.push("/projects");
+      return;
+    }
+
+    loadProject();
+  }, [projectId, user, authLoading]);
+
+  // Auto-save when components or project name change (only if projectId exists)
+  useEffect(() => {
+    if (!projectId || !user || loading) return;
+
+    const timeoutId = setTimeout(() => {
+      saveProject();
+    }, 2000);
+
+    return () => clearTimeout(timeoutId);
+  }, [components, projectName, projectId, user]);
+
+  const loadProject = async () => {
+    if (!user || !projectId) return;
+
+    setLoading(true);
+    try {
+      const projectData = await getProject(projectId, user.uid);
+      setComponents(projectData.components || placeholderComponents);
+      setProjectName(projectData.name || "Untitled Project");
+      setLoading(false);
+    } catch (err) {
+      setRedirecting(true);
+      toast.error("Project not found");
+      router.push("/projects");
+    }
+  };
+
+  const saveProject = async () => {
+    if (!user || !projectId) return;
+
+    try {
+      const response = await fetch(`/api/projects/${projectId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": user.uid,
+        },
+        body: JSON.stringify({ components, name: projectName }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save project");
+      }
+    } catch (err) {
+      // Silently fail - user will see stale data on reload
+    }
+  };
+
+  const handleProjectNameChange = (newName: string) => {
+    setProjectName(newName);
+    toast.success("Project name updated");
+  };
 
   const handleDragStart = (event: DragStartEvent) => {
     setDraggedComponent(event.active.data.current);
@@ -68,7 +159,6 @@ export default function EditorPage() {
       return;
     }
 
-    // Handle adding new component from palette
     if (active.data.current?.type === "palette-item") {
       const componentType = active.data.current.componentType;
       const newComponent: ComponentDefinition = {
@@ -88,12 +178,6 @@ export default function EditorPage() {
       }
     }
 
-    // Handle reordering existing components
-    if (active.data.current?.type === "component") {
-      // Implementation for reordering components
-      console.log("Reordering component:", active.id, "to:", over.id);
-    }
-
     setDraggedComponent(null);
   };
 
@@ -106,7 +190,6 @@ export default function EditorPage() {
 
   const deleteComponent = (componentId: string) => {
     setComponents((prev) => removeComponentFromTree(prev, componentId));
-    // Clear selection if deleted component was selected
     setSelectedComponentIds((prev) => prev.filter((id) => id !== componentId));
   };
 
@@ -135,15 +218,24 @@ export default function EditorPage() {
     setComponents((prev) => duplicateComponentInTree(prev, componentId));
   };
 
+  const addComponent = (componentType: string) => {
+    const newComponent: ComponentDefinition = {
+      id: generateId(),
+      type: componentType,
+      props: getDefaultProps(componentType),
+      children: [],
+    };
+    setComponents((prev) => [...prev, newComponent]);
+    toast.success(`${componentType} added to page`);
+  };
+
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      // Prevent default browser shortcuts when editor is focused
       if (
         event.target === document.body ||
         (event.target as Element)?.closest(".editor-canvas")
       ) {
-        // Ctrl+A - Select all components
         if (event.ctrlKey && event.key === "a") {
           event.preventDefault();
           const allIds = getAllComponentIds(components);
@@ -151,21 +243,18 @@ export default function EditorPage() {
           return;
         }
 
-        // Delete key - Delete selected components
         if (event.key === "Delete" && selectedComponentIds.length > 0) {
           event.preventDefault();
           deleteSelectedComponents();
           return;
         }
 
-        // Escape key - Deselect all components
         if (event.key === "Escape") {
           event.preventDefault();
           setSelectedComponentIds([]);
           return;
         }
 
-        // Ctrl+D - Duplicate selected components
         if (
           event.ctrlKey &&
           event.key === "d" &&
@@ -178,19 +267,22 @@ export default function EditorPage() {
       }
     };
 
-    // Add event listener
     document.addEventListener("keydown", handleKeyDown);
-
-    // Cleanup
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [
-    components,
-    selectedComponentIds,
-    deleteSelectedComponents,
-    duplicateComponent,
-  ]);
+  }, [components, selectedComponentIds]);
+
+  if (redirecting || loading || (projectId && authLoading)) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <Loading
+          text={loading ? "Loading project..." : "Loading..."}
+          size="lg"
+        />
+      </div>
+    );
+  }
 
   return (
     <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
@@ -201,6 +293,9 @@ export default function EditorPage() {
         onUpdateComponent={updateComponent}
         onDeleteComponent={deleteComponent}
         onDuplicateComponent={duplicateComponent}
+        onAddComponent={addComponent}
+        projectName={projectName}
+        onProjectNameChange={handleProjectNameChange}
       />
 
       <DragOverlay>
@@ -296,12 +391,6 @@ function insertComponent(
             ...item,
             children: [...item.children, newComponent],
           };
-        } else if (position === "before") {
-          // Handle before insertion at parent level
-          return item;
-        } else if (position === "after") {
-          // Handle after insertion at parent level
-          return item;
         }
       }
 
@@ -382,10 +471,8 @@ function duplicateComponentInTree(
       result.push(item);
 
       if (item.id === componentId) {
-        // Add duplicated component right after the original
         result.push(duplicateComponent(item));
       } else if (item.children.length > 0) {
-        // Recursively check children
         const updatedItem = {
           ...item,
           children: duplicateInTree(item.children),

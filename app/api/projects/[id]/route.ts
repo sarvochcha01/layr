@@ -11,7 +11,7 @@ import { db } from "@/lib/firebase";
 // GET - Get a single project
 export async function GET(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const userId = request.headers.get("x-user-id");
@@ -20,7 +20,8 @@ export async function GET(
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const projectRef = doc(db, "projects", params.id);
+        const { id } = await params;
+        const projectRef = doc(db, "projects", id);
         const projectSnap = await getDoc(projectRef);
 
         if (!projectSnap.exists()) {
@@ -54,7 +55,7 @@ export async function GET(
 // PATCH - Update a project
 export async function PATCH(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const userId = request.headers.get("x-user-id");
@@ -63,7 +64,8 @@ export async function PATCH(
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const projectRef = doc(db, "projects", params.id);
+        const { id } = await params;
+        const projectRef = doc(db, "projects", id);
         const projectSnap = await getDoc(projectRef);
 
         if (!projectSnap.exists()) {
@@ -114,7 +116,7 @@ export async function PATCH(
 // DELETE - Delete a project
 export async function DELETE(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const userId = request.headers.get("x-user-id");
@@ -123,7 +125,8 @@ export async function DELETE(
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const projectRef = doc(db, "projects", params.id);
+        const { id } = await params;
+        const projectRef = doc(db, "projects", id);
         const projectSnap = await getDoc(projectRef);
 
         if (!projectSnap.exists()) {

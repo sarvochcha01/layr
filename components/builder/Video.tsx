@@ -13,6 +13,8 @@ interface VideoProps {
   controls?: boolean;
   className?: string;
   aspectRatio?: "16:9" | "4:3" | "1:1" | "21:9";
+  backgroundColor?: string;
+  textColor?: string;
 }
 
 export function Video({
@@ -28,6 +30,8 @@ export function Video({
   controls = true,
   className,
   aspectRatio = "16:9",
+  backgroundColor,
+  textColor,
 }: VideoProps) {
   const aspectRatioClasses = {
     "16:9": "aspect-video",
@@ -117,16 +121,21 @@ export function Video({
   return (
     <div
       className={cn(
-        "w-full bg-gray-200 rounded-lg flex items-center justify-center",
+        "w-full rounded-lg flex items-center justify-center",
+        !backgroundColor && "bg-gray-200",
         aspectRatioClasses[aspectRatio],
         className
       )}
       style={{
         width: width || undefined,
         height: height || undefined,
+        backgroundColor: backgroundColor || undefined,
+        color: textColor || undefined,
       }}
     >
-      <p className="text-gray-500">No video source provided</p>
+      <p className={cn(!textColor && "text-gray-500")}>
+        No video source provided
+      </p>
     </div>
   );
 }

@@ -17,6 +17,9 @@ interface EditorLayoutProps {
   onUpdateComponent: (id: string, updates: Record<string, any>) => void;
   onDeleteComponent: (id: string) => void;
   onDuplicateComponent: (id: string) => void;
+  onAddComponent?: (componentType: string) => void;
+  projectName?: string;
+  onProjectNameChange?: (name: string) => void;
 }
 
 export function EditorLayout({
@@ -26,9 +29,14 @@ export function EditorLayout({
   onUpdateComponent,
   onDeleteComponent,
   onDuplicateComponent,
+  onAddComponent,
+  projectName,
+  onProjectNameChange,
 }: EditorLayoutProps) {
   const [viewport, setViewport] = useState<Viewport>("desktop");
   const [isPreviewMode, setIsPreviewMode] = useState(false);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [editedName, setEditedName] = useState(projectName || "");
 
   const selectedComponent =
     selectedComponentIds.length === 1
@@ -92,6 +100,7 @@ export function EditorLayout({
               selectedComponentIds={selectedComponentIds}
               onSelectComponent={onSelectComponent}
               onDeleteComponent={onDeleteComponent}
+              onAddComponent={onAddComponent}
             />
           </div>
 
@@ -105,9 +114,52 @@ export function EditorLayout({
       {/* Canvas - Center */}
       <div className="flex-1 flex flex-col" style={{ minWidth: 0 }}>
         {/* Toolbar */}
-        <div className="h-12 bg-white border-b border-gray-200 flex items-center px-4">
+        <div className="h-12 bg-white border-b border-gray-200 flex items-center px-4 justify-between">
           <div className="flex items-center space-x-4">
-            <span className="text-sm font-medium">Canvas</span>
+            {projectName && onProjectNameChange ? (
+              isEditingName ? (
+                <input
+                  type="text"
+                  value={editedName}
+                  onChange={(e) => setEditedName(e.target.value)}
+                  onBlur={() => {
+                    if (editedName.trim()) {
+                      onProjectNameChange(editedName.trim());
+                    } else {
+                      setEditedName(projectName);
+                    }
+                    setIsEditingName(false);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      if (editedName.trim()) {
+                        onProjectNameChange(editedName.trim());
+                      } else {
+                        setEditedName(projectName);
+                      }
+                      setIsEditingName(false);
+                    } else if (e.key === "Escape") {
+                      setEditedName(projectName);
+                      setIsEditingName(false);
+                    }
+                  }}
+                  autoFocus
+                  className="text-sm font-medium px-2 py-1 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              ) : (
+                <button
+                  onClick={() => {
+                    setEditedName(projectName);
+                    setIsEditingName(true);
+                  }}
+                  className="text-sm font-medium hover:text-blue-600 transition-colors"
+                >
+                  {projectName}
+                </button>
+              )
+            ) : (
+              <span className="text-sm font-medium">Canvas</span>
+            )}
             <div className="flex items-center space-x-2">
               <button
                 onClick={() => setViewport("desktop")}

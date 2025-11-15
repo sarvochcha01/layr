@@ -23,6 +23,10 @@ interface NavbarProps {
   isPreviewMode?: boolean;
   width?: string;
   height?: string;
+  backgroundColor?: string;
+  textColor?: string;
+  linkColor?: string;
+  linkHoverColor?: string;
 }
 
 export function Navbar({
@@ -38,6 +42,10 @@ export function Navbar({
   isPreviewMode = false,
   width,
   height,
+  backgroundColor,
+  textColor,
+  linkColor,
+  linkHoverColor = "#3b82f6",
 }: NavbarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -54,12 +62,14 @@ export function Navbar({
       <nav
         className={cn(
           "flex items-center justify-between w-full",
-          theme === "dark" ? "text-white" : "text-gray-900",
+          !textColor && (theme === "dark" ? "text-white" : "text-gray-900"),
           className
         )}
         style={{
           width: width || undefined,
           height: height || undefined,
+          backgroundColor: backgroundColor || undefined,
+          color: textColor || undefined,
         }}
       >
         {/* Logo */}
@@ -78,9 +88,23 @@ export function Navbar({
               const linkProps = {
                 href: isPreviewMode ? link.href : "#",
                 className: cn(
-                  "hover:opacity-75 transition-opacity text-sm lg:text-base",
-                  theme === "dark" ? "text-white" : "text-gray-700"
+                  "transition-colors text-sm lg:text-base cursor-pointer",
+                  !linkColor &&
+                    (theme === "dark" ? "text-white" : "text-gray-700")
                 ),
+                style: {
+                  color: linkColor || undefined,
+                },
+                onMouseEnter: (e: React.MouseEvent<HTMLAnchorElement>) => {
+                  if (linkHoverColor) {
+                    e.currentTarget.style.color = linkHoverColor;
+                  }
+                },
+                onMouseLeave: (e: React.MouseEvent<HTMLAnchorElement>) => {
+                  if (linkColor) {
+                    e.currentTarget.style.color = linkColor;
+                  }
+                },
                 onClick: isPreviewMode
                   ? undefined
                   : (e: React.MouseEvent) => e.preventDefault(),
