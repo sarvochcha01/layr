@@ -1,73 +1,90 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { TemplateCard } from "@/components/cards/TemplateCard";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
+import {
+  useTemplates,
+  useCreateProjectFromTemplate,
+} from "@/hooks/useTemplates";
+
+interface Template {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  thumbnail: string;
+  featured: boolean;
+}
 
 export default function TemplatesPage() {
-  const [activeFilter, setActiveFilter] = useState("All Templates");
+  const router = useRouter();
+  const { user } = useAuth();
+  const [activeFilter, setActiveFilter] = useState("All");
+  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(
+    null
+  );
+  const [projectName, setProjectName] = useState("");
 
-  const allTemplates = [
-    {
-      name: "Modern Business",
-      description: "Clean and professional business template",
-      category: "Business",
-      previewColor: "bg-gradient-to-br from-blue-100 to-blue-200",
-    },
-    {
-      name: "Creative Portfolio",
-      description: "Showcase your work with style",
-      category: "Portfolio",
-      previewColor: "bg-gradient-to-br from-purple-100 to-purple-200",
-    },
-    {
-      name: "Landing Page Pro",
-      description: "Convert visitors into customers",
-      category: "Landing Page",
-      previewColor: "bg-gradient-to-br from-green-100 to-green-200",
-    },
-    {
-      name: "Tech Startup",
-      description: "Perfect for technology companies",
-      category: "Business",
-      previewColor: "bg-gradient-to-br from-indigo-100 to-indigo-200",
-    },
-    {
-      name: "Photography Portfolio",
-      description: "Beautiful gallery layouts for photographers",
-      category: "Portfolio",
-      previewColor: "bg-gradient-to-br from-pink-100 to-pink-200",
-    },
-    {
-      name: "SaaS Landing",
-      description: "Optimized for software products",
-      category: "Landing Page",
-      previewColor: "bg-gradient-to-br from-orange-100 to-orange-200",
-    },
-    {
-      name: "Restaurant Menu",
-      description: "Elegant design for restaurants",
-      category: "Business",
-      previewColor: "bg-gradient-to-br from-red-100 to-red-200",
-    },
-    {
-      name: "Designer Showcase",
-      description: "Minimalist portfolio for designers",
-      category: "Portfolio",
-      previewColor: "bg-gradient-to-br from-teal-100 to-teal-200",
-    },
+  // React Query hooks
+  const { data: templates = [], isLoading: loading } = useTemplates();
+  const createProjectMutation = useCreateProjectFromTemplate();
+
+  const categories = [
+    "All",
+    ...Array.from(new Set(templates.map((t) => t.category))),
   ];
 
-  const filters = ["All Templates", "Business", "Portfolio", "Landing Page"];
-
   const filteredTemplates =
-    activeFilter === "All Templates"
-      ? allTemplates
-      : allTemplates.filter((template) => template.category === activeFilter);
+    activeFilter === "All"
+      ? templates
+      : templates.filter((template) => template.category === activeFilter);
 
-  const handleUseTemplate = (templateName: string) => {
-    toast.success(`Using template: ${templateName}`);
+  const handleUseTemplate = (template: Template) => {
+    setSelectedTemplate(template);
+    setProjectName(`${template.name} Project`);
+  };
+
+  const handleCreateProject = async () => {
+    if (!projectName.trim()) {
+      toast.error("Please enter a project name");
+      return;
+    }
+
+    if (!user) {
+      toast.error("You must be logged in");
+      return;
+    }
+
+    createProjectMutation.mutate(
+      {
+        templateId: selectedTemplate!.id,
+        projectName,
+        userId: user.uid,
+      },
+      {
+        onSuccess: (data) => {
+          toast.success("Project created successfully!");
+          router.push(`/editor?projectId=${data.projectId}`);
+        },
+        onError: (error: Error) => {
+          toast.error(error.message || "Failed to create project");
+        },
+      }
+    );
   };
 
   return (
@@ -80,8 +97,8 @@ export default function TemplatesPage() {
         </p>
       </div>
 
-      <div className="flex gap-4 mb-6">
-        {filters.map((filter) => (
+      <div className="flex gap-4 mb-6 flex-wrap">
+        {categories.map((filter) => (
           <Button
             key={filter}
             variant={activeFilter === filter ? "default" : "outline"}
@@ -93,26 +110,81 @@ export default function TemplatesPage() {
         ))}
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {filteredTemplates.map((template) => (
-          <TemplateCard
-            key={template.name}
-            name={template.name}
-            description={template.description}
-            category={template.category}
-            previewColor={template.previewColor}
-            onUse={() => handleUseTemplate(template.name)}
-          />
-        ))}
-      </div>
-
-      {filteredTemplates.length === 0 && (
+      {loading ? (
         <div className="text-center py-12">
-          <p className="text-muted-foreground">
-            No templates found for the selected category.
-          </p>
+          <p className="text-muted-foreground">Loading templates...</p>
         </div>
+      ) : (
+        <>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {filteredTemplates.map((template) => (
+              <TemplateCard
+                key={template.id}
+                name={template.name}
+                description={template.description}
+                category={template.category}
+                previewColor="bg-gradient-to-br from-blue-100 to-blue-200"
+                thumbnail={template.thumbnail}
+                onUse={() => handleUseTemplate(template)}
+              />
+            ))}
+          </div>
+
+          {filteredTemplates.length === 0 && (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">
+                No templates found for the selected category.
+              </p>
+            </div>
+          )}
+        </>
       )}
+
+      {/* Create Project Dialog */}
+      <Dialog
+        open={!!selectedTemplate}
+        onOpenChange={() => setSelectedTemplate(null)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create Project from Template</DialogTitle>
+            <DialogDescription>
+              Create a new project using the "{selectedTemplate?.name}" template
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="projectName">Project Name</Label>
+              <Input
+                id="projectName"
+                value={projectName}
+                onChange={(e) => setProjectName(e.target.value)}
+                placeholder="Enter project name"
+                disabled={createProjectMutation.isPending}
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setSelectedTemplate(null)}
+              disabled={createProjectMutation.isPending}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleCreateProject}
+              disabled={createProjectMutation.isPending}
+            >
+              {createProjectMutation.isPending
+                ? "Creating..."
+                : "Create Project"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

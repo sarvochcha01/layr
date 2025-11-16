@@ -1,40 +1,51 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import {
+  User,
   onAuthStateChanged,
+  signOut,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  GoogleAuthProvider,
   signInWithPopup,
-  signOut,
-  User,
+  GoogleAuthProvider,
 } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 
-interface AuthContextValue {
+interface AuthContextType {
   user: User | null;
   loading: boolean;
+  logout: () => Promise<void>;
   loginWithEmail: (email: string, password: string) => Promise<void>;
   signupWithEmail: (email: string, password: string) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
-  logout: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextValue | null>(null);
+const AuthContext = createContext<AuthContextType>({
+  user: null,
+  loading: true,
+  logout: async () => {},
+  loginWithEmail: async () => {},
+  signupWithEmail: async () => {},
+  loginWithGoogle: async () => {},
+});
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      setUser(firebaseUser);
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
       setLoading(false);
     });
-    return () => unsubscribe();
+
+    return unsubscribe;
   }, []);
 
+  const logout = async () => {
+    await signOut(auth);
+  };
 
   const loginWithEmail = async (email: string, password: string) => {
     await signInWithEmailAndPassword(auth, email, password);
@@ -49,29 +60,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     await signInWithPopup(auth, provider);
   };
 
-  const logout = async () => {
-    await signOut(auth);
-  };
-
   return (
     <AuthContext.Provider
       value={{
         user,
         loading,
+        logout,
         loginWithEmail,
         signupWithEmail,
         loginWithGoogle,
-        logout,
       }}
     >
       {children}
     </AuthContext.Provider>
   );
-};
+}
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context)
-    throw new Error("useAuth must be used inside an AuthProvider");
-  return context;
-};
+export function useAuth() {
+  return useContext(AuthContext);
+}

@@ -17,6 +17,12 @@ import {
 import { ProjectCard } from "@/components/cards/ProjectCard";
 import { CreateCard } from "@/components/cards/CreateCard";
 import { toast } from "sonner";
+import {
+  useProjects,
+  useCreateProject,
+  useDeleteProject,
+} from "@/hooks/useProjects";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function ProjectsPage() {
   const searchParams = useSearchParams();
@@ -24,7 +30,13 @@ export default function ProjectsPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [projectName, setProjectName] = useState("");
   const [projectDescription, setProjectDescription] = useState("");
-  const [isCreating, setIsCreating] = useState(false);
+
+  const { user, loading: authLoading } = useAuth();
+
+  // React Query hooks
+  const { data: projects = [], isLoading: loading } = useProjects(user?.uid);
+  const createProjectMutation = useCreateProject();
+  const deleteProjectMutation = useDeleteProject();
 
   // Check if dialog should be opened from URL parameter
   useEffect(() => {
@@ -38,7 +50,6 @@ export default function ProjectsPage() {
   const handleDialogOpenChange = (open: boolean) => {
     setIsDialogOpen(open);
     if (!open && searchParams.get("openDialog") === "true") {
-      // Remove the openDialog parameter from URL
       const newUrl = new URL(window.location.href);
       newUrl.searchParams.delete("openDialog");
       router.replace(newUrl.pathname + newUrl.search);
@@ -51,20 +62,29 @@ export default function ProjectsPage() {
       return;
     }
 
-    setIsCreating(true);
-    try {
-      // Here you would typically make an API call to create the project
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
-
-      toast.success(`Project "${projectName}" created successfully!`);
-      handleDialogOpenChange(false);
-      setProjectName("");
-      setProjectDescription("");
-    } catch (error) {
-      toast.error("Failed to create project");
-    } finally {
-      setIsCreating(false);
+    if (!user) {
+      toast.error("You must be logged in");
+      return;
     }
+
+    createProjectMutation.mutate(
+      {
+        name: projectName,
+        userId: user.uid,
+      },
+      {
+        onSuccess: (data) => {
+          toast.success(`Project "${projectName}" created successfully!`);
+          handleDialogOpenChange(false);
+          setProjectName("");
+          setProjectDescription("");
+          router.push(`/editor?projectId=${data.projectId}`);
+        },
+        onError: (error: Error) => {
+          toast.error(error.message || "Failed to create project");
+        },
+      }
+    );
   };
 
   const handleCancel = () => {
@@ -73,43 +93,54 @@ export default function ProjectsPage() {
     setProjectDescription("");
   };
 
-  const projects = [
-    {
-      name: "My Portfolio",
-      description: "Personal portfolio website",
-      status: "Published" as const,
-      lastModified: "2 hours ago",
-      views: "1.2K",
-    },
-    {
-      name: "Business Site",
-      description: "Company landing page",
-      status: "Draft" as const,
-      lastModified: "1 day ago",
-      views: "0",
-    },
-    {
-      name: "E-commerce Store",
-      description: "Online shopping platform",
-      status: "In Review" as const,
-      lastModified: "3 days ago",
-      views: "856",
-    },
-    {
-      name: "Blog Website",
-      description: "Personal blog and articles",
-      status: "Published" as const,
-      lastModified: "1 week ago",
-      views: "3.4K",
-    },
-  ];
-
-  const handleEditProject = (projectName: string) => {
-    toast.info(`Editing ${projectName}`);
+  const handleEditProject = (projectId: string) => {
+    router.push(`/editor?projectId=${projectId}`);
   };
 
-  const handleDeleteProject = (projectName: string) => {
-    toast.error(`Deleting ${projectName}`);
+  const handleDeleteProject = async (
+    projectId: string,
+    projectName: string
+  ) => {
+    if (!confirm(`Are you sure you want to delete "${projectName}"?`)) {
+      return;
+    }
+
+    if (!user) {
+      toast.error("You must be logged in");
+      return;
+    }
+
+    deleteProjectMutation.mutate(
+      { projectId, userId: user.uid },
+      {
+        onSuccess: () => {
+          toast.success(`Project "${projectName}" deleted successfully`);
+        },
+        onError: (error: Error) => {
+          toast.error(error.message || "Failed to delete project");
+        },
+      }
+    );
+  };
+
+  const formatDate = (timestamp: any) => {
+    if (!timestamp) return "Just now";
+
+    // Handle Firestore Timestamp
+    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return "Just now";
+    if (diffMins < 60)
+      return `${diffMins} minute${diffMins > 1 ? "s" : ""} ago`;
+    if (diffHours < 24)
+      return `${diffHours} hour${diffHours > 1 ? "s" : ""} ago`;
+    if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? "s" : ""} ago`;
+    return date.toLocaleDateString();
   };
 
   return (
@@ -121,82 +152,103 @@ export default function ProjectsPage() {
         </p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {projects.map((project) => (
-          <ProjectCard
-            key={project.name}
-            name={project.name}
-            description={project.description}
-            status={project.status}
-            lastModified={project.lastModified}
-            views={project.views}
-            onEdit={() => handleEditProject(project.name)}
-            onDelete={() => handleDeleteProject(project.name)}
-          />
-        ))}
-
-        <Dialog open={isDialogOpen} onOpenChange={handleDialogOpenChange}>
-          <DialogTrigger asChild>
-            <CreateCard
-              title="Create New Project"
-              onClick={() => handleDialogOpenChange(true)}
+      {authLoading || loading ? (
+        <div className="flex items-center justify-center py-12">
+          <div className="text-muted-foreground">
+            {authLoading ? "Authenticating..." : "Loading projects..."}
+          </div>
+        </div>
+      ) : !user ? (
+        <div className="flex items-center justify-center py-12">
+          <div className="text-muted-foreground">
+            Please log in to view your projects
+          </div>
+        </div>
+      ) : (
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {projects.map((project) => (
+            <ProjectCard
+              key={project.id}
+              name={project.name}
+              description="No description"
+              status="Draft"
+              lastModified={formatDate(project.updatedAt)}
+              views="0"
+              onClick={() => handleEditProject(project.id)}
+              onDelete={() => handleDeleteProject(project.id, project.name)}
             />
-          </DialogTrigger>
+          ))}
 
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Create New Project</DialogTitle>
-              <DialogDescription>
-                Start a new website project. You can always change these details
-                later.
-              </DialogDescription>
-            </DialogHeader>
+          <Dialog open={isDialogOpen} onOpenChange={handleDialogOpenChange}>
+            <DialogTrigger asChild>
+              <CreateCard
+                title="Create New Project"
+                onClick={() => handleDialogOpenChange(true)}
+              />
+            </DialogTrigger>
 
-            <div className="grid gap-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="project-name">Project Name</Label>
-                <Input
-                  id="project-name"
-                  placeholder="My Awesome Website"
-                  value={projectName}
-                  onChange={(e) => setProjectName(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && !e.shiftKey) {
-                      e.preventDefault();
-                      handleCreateProject();
-                    }
-                  }}
-                />
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Create New Project</DialogTitle>
+                <DialogDescription>
+                  Start a new website project. You can always change these
+                  details later.
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="grid gap-4 py-4">
+                <div className="space-y-2">
+                  <Label htmlFor="project-name">Project Name</Label>
+                  <Input
+                    id="project-name"
+                    placeholder="My Awesome Website"
+                    value={projectName}
+                    onChange={(e) => setProjectName(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        handleCreateProject();
+                      }
+                    }}
+                    disabled={createProjectMutation.isPending}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="project-description">
+                    Description (Optional)
+                  </Label>
+                  <Input
+                    id="project-description"
+                    placeholder="Brief description of your project"
+                    value={projectDescription}
+                    onChange={(e) => setProjectDescription(e.target.value)}
+                    disabled={createProjectMutation.isPending}
+                  />
+                </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="project-description">
-                  Description (Optional)
-                </Label>
-                <Input
-                  id="project-description"
-                  placeholder="Brief description of your project"
-                  value={projectDescription}
-                  onChange={(e) => setProjectDescription(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={handleCancel}
-                disabled={isCreating}
-              >
-                Cancel
-              </Button>
-              <Button onClick={handleCreateProject} disabled={isCreating}>
-                {isCreating ? "Creating..." : "Create Project"}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      </div>
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  onClick={handleCancel}
+                  disabled={createProjectMutation.isPending}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleCreateProject}
+                  disabled={createProjectMutation.isPending}
+                >
+                  {createProjectMutation.isPending
+                    ? "Creating..."
+                    : "Create Project"}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
+      )}
     </div>
   );
 }

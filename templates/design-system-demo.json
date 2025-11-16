@@ -1,0 +1,1927 @@
+{
+    "name": "Design System Demo",
+    "description": "Comprehensive design system showcase using every component with multiple configurations",
+    "thumbnail": "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800&h=600&fit=crop",
+    "category": "showcase",
+    "pages": [
+        {
+            "id": "home",
+            "name": "Home",
+            "path": "/",
+            "components": [
+                {
+                    "id": "nav-1",
+                    "type": "Navbar",
+                    "props": {
+                        "brandText": "DesignSystem",
+                        "links": [
+                            {
+                                "text": "Home",
+                                "href": "/"
+                            },
+                            {
+                                "text": "Components",
+                                "href": "/components"
+                            },
+                            {
+                                "text": "Layouts",
+                                "href": "/layouts"
+                            },
+                            {
+                                "text": "Pricing",
+                                "href": "/pricing"
+                            }
+                        ],
+                        "backgroundColor": "#1a1a2e",
+                        "textColor": "#ffffff",
+                        "linkColor": "#16c79a",
+                        "linkHoverColor": "#11998e",
+                        "padding": "20px 40px"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "hero-container",
+                    "type": "Container",
+                    "props": {
+                        "backgroundColor": "#0f3460",
+                        "padding": "80px 40px",
+                        "display": "flex",
+                        "flexDirection": "column",
+                        "justifyContent": "center",
+                        "alignItems": "center",
+                        "gap": "30px",
+                        "minHeight": "500px"
+                    },
+                    "children": [
+                        {
+                            "id": "hero-badge",
+                            "type": "Badge",
+                            "props": {
+                                "text": "v2.0 Released",
+                                "variant": "success",
+                                "size": "large"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "hero-heading",
+                            "type": "Text",
+                            "props": {
+                                "text": "Complete Design System",
+                                "color": "#ffffff",
+                                "fontSize": "56px",
+                                "textAlign": "center"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "hero-text",
+                            "type": "Text",
+                            "props": {
+                                "content": "A comprehensive showcase of all UI components with multiple configurations and real-world examples",
+                                "fontSize": "20px",
+                                "color": "#e8e8e8",
+                                "textAlign": "center",
+                                "maxWidth": "700px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "hero-buttons",
+                            "type": "Container",
+                            "props": {
+                                "display": "flex",
+                                "flexDirection": "row",
+                                "gap": "20px",
+                                "flexWrap": "wrap",
+                                "justifyContent": "center"
+                            },
+                            "children": [
+                                {
+                                    "id": "hero-btn-1",
+                                    "type": "Button",
+                                    "props": {
+                                        "text": "Get Started",
+                                        "variant": "primary",
+                                        "size": "large",
+                                        "backgroundColor": "#16c79a",
+                                        "textColor": "#ffffff",
+                                        "padding": "16px 40px",
+                                        "fontSize": "18px",
+                                        "linkType": "page",
+                                        "linkPage": "components"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "hero-btn-2",
+                                    "type": "Button",
+                                    "props": {
+                                        "text": "View Pricing",
+                                        "variant": "secondary",
+                                        "size": "large",
+                                        "backgroundColor": "transparent",
+                                        "textColor": "#ffffff",
+                                        "padding": "16px 40px",
+                                        "fontSize": "18px",
+                                        "borderWidth": "2px",
+                                        "borderColor": "#ffffff",
+                                        "linkType": "page",
+                                        "linkPage": "pricing"
+                                    },
+                                    "children": []
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "alerts-section",
+                    "type": "Container",
+                    "props": {
+                        "backgroundColor": "#f8f9fa",
+                        "padding": "60px 40px",
+                        "display": "flex",
+                        "flexDirection": "column",
+                        "gap": "20px"
+                    },
+                    "children": [
+                        {
+                            "id": "alert-1",
+                            "type": "Alert",
+                            "props": {
+                                "title": "Success Alert",
+                                "message": "Your design system has been successfully deployed!",
+                                "type": "success"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "alert-2",
+                            "type": "Alert",
+                            "props": {
+                                "title": "Information",
+                                "message": "New components are available in the latest update.",
+                                "type": "info"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "alert-3",
+                            "type": "Alert",
+                            "props": {
+                                "title": "Warning",
+                                "message": "Some features require additional configuration.",
+                                "type": "warning"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "alert-4",
+                            "type": "Alert",
+                            "props": {
+                                "title": "Error",
+                                "message": "Failed to load external resources. Please check your connection.",
+                                "type": "error"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "stats-container",
+                    "type": "Container",
+                    "props": {
+                        "backgroundColor": "#ffffff",
+                        "padding": "80px 40px"
+                    },
+                    "children": [
+                        {
+                            "id": "stats-1",
+                            "type": "Stats",
+                            "props": {
+                                "stats": [
+                                    {
+                                        "value": "25+",
+                                        "label": "Components"
+                                    },
+                                    {
+                                        "value": "100+",
+                                        "label": "Properties"
+                                    },
+                                    {
+                                        "value": "50K+",
+                                        "label": "Downloads"
+                                    },
+                                    {
+                                        "value": "99.9%",
+                                        "label": "Uptime"
+                                    }
+                                ],
+                                "layout": "horizontal",
+                                "backgroundColor": "#ffffff"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "divider-1",
+                    "type": "Divider",
+                    "props": {
+                        "thickness": "2px",
+                        "color": "#e0e0e0",
+                        "margin": "0"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "features-section",
+                    "type": "Container",
+                    "props": {
+                        "backgroundColor": "#ffffff",
+                        "padding": "80px 40px",
+                        "display": "flex",
+                        "flexDirection": "column",
+                        "alignItems": "center",
+                        "gap": "50px"
+                    },
+                    "children": [
+                        {
+                            "id": "features-heading",
+                            "type": "Text",
+                            "props": {
+                                "text": "Powerful Features",
+                                "color": "#1a1a2e",
+                                "fontSize": "42px",
+                                "textAlign": "center"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "features-grid",
+                            "type": "Container",
+                            "props": {
+                                "display": "flex",
+                                "flexDirection": "row",
+                                "flexWrap": "wrap",
+                                "gap": "30px",
+                                "justifyContent": "center",
+                                "maxWidth": "1200px"
+                            },
+                            "children": [
+                                {
+                                    "id": "feature-1",
+                                    "type": "Feature",
+                                    "props": {
+                                        "icon": "⚡",
+                                        "title": "Lightning Fast",
+                                        "description": "Optimized for performance with minimal bundle size",
+                                        "iconSize": "48px",
+                                        "iconColor": "#16c79a"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "feature-2",
+                                    "type": "Feature",
+                                    "props": {
+                                        "icon": "🎨",
+                                        "title": "Fully Customizable",
+                                        "description": "Every component can be styled to match your brand",
+                                        "iconSize": "48px",
+                                        "iconColor": "#f39c12"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "feature-3",
+                                    "type": "Feature",
+                                    "props": {
+                                        "icon": "📱",
+                                        "title": "Responsive Design",
+                                        "description": "Works perfectly on all devices and screen sizes",
+                                        "iconSize": "48px",
+                                        "iconColor": "#3498db"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "feature-4",
+                                    "type": "Feature",
+                                    "props": {
+                                        "icon": "🔒",
+                                        "title": "Secure by Default",
+                                        "description": "Built with security best practices in mind",
+                                        "iconSize": "48px",
+                                        "iconColor": "#e74c3c"
+                                    },
+                                    "children": []
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "spacer-1",
+                    "type": "Spacer",
+                    "props": {
+                        "height": "60px"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "testimonials-section",
+                    "type": "Container",
+                    "props": {
+                        "backgroundColor": "#f8f9fa",
+                        "padding": "80px 40px",
+                        "display": "flex",
+                        "flexDirection": "column",
+                        "alignItems": "center",
+                        "gap": "50px"
+                    },
+                    "children": [
+                        {
+                            "id": "testimonials-heading",
+                            "type": "Text",
+                            "props": {
+                                "text": "What Developers Say",
+                                "color": "#1a1a2e",
+                                "fontSize": "42px",
+                                "textAlign": "center"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "testimonials-grid",
+                            "type": "Container",
+                            "props": {
+                                "display": "flex",
+                                "flexDirection": "row",
+                                "flexWrap": "wrap",
+                                "gap": "30px",
+                                "justifyContent": "center",
+                                "maxWidth": "1200px"
+                            },
+                            "children": [
+                                {
+                                    "id": "testimonial-1",
+                                    "type": "Testimonial",
+                                    "props": {
+                                        "quote": "This design system saved us months of development time. The components are well-designed and easy to customize.",
+                                        "author": "Sarah Johnson",
+                                        "role": "Lead Developer at TechCorp",
+                                        "avatar": "https://i.pravatar.cc/150?img=1",
+                                        "rating": 5
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "testimonial-2",
+                                    "type": "Testimonial",
+                                    "props": {
+                                        "quote": "The flexibility and performance of these components are outstanding. Highly recommended for any project.",
+                                        "author": "Michael Chen",
+                                        "role": "CTO at StartupXYZ",
+                                        "avatar": "https://i.pravatar.cc/150?img=2",
+                                        "rating": 5
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "testimonial-3",
+                                    "type": "Testimonial",
+                                    "props": {
+                                        "quote": "Best design system I've worked with. Clean code, great documentation, and excellent support.",
+                                        "author": "Emily Rodriguez",
+                                        "role": "Frontend Architect",
+                                        "avatar": "https://i.pravatar.cc/150?img=3",
+                                        "rating": 5
+                                    },
+                                    "children": []
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "cta-1",
+                    "type": "CTA",
+                    "props": {
+                        "title": "Ready to Get Started?",
+                        "description": "Join thousands of developers building amazing products with our design system",
+                        "buttonText": "Start Building Now",
+                        "buttonLink": "/components",
+                        "backgroundColor": "#16c79a",
+                        "textColor": "#ffffff"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "footer-1",
+                    "type": "Footer",
+                    "props": {
+                        "content": "© 2024 DesignSystem. All rights reserved.",
+                        "backgroundColor": "#1a1a2e",
+                        "textColor": "#ffffff",
+                        "padding": "30px 40px",
+                        "textAlign": "center"
+                    },
+                    "children": []
+                }
+            ]
+        },
+        {
+            "id": "components",
+            "name": "Components",
+            "path": "/components",
+            "components": [
+                {
+                    "id": "nav-2",
+                    "type": "Navbar",
+                    "props": {
+                        "brandText": "DesignSystem",
+                        "links": [
+                            {
+                                "text": "Home",
+                                "href": "/"
+                            },
+                            {
+                                "text": "Components",
+                                "href": "/components"
+                            },
+                            {
+                                "text": "Layouts",
+                                "href": "/layouts"
+                            },
+                            {
+                                "text": "Pricing",
+                                "href": "/pricing"
+                            }
+                        ],
+                        "backgroundColor": "#1a1a2e",
+                        "textColor": "#ffffff",
+                        "linkColor": "#16c79a",
+                        "linkHoverColor": "#11998e",
+                        "padding": "20px 40px"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "comp-hero",
+                    "type": "Container",
+                    "props": {
+                        "backgroundColor": "#0f3460",
+                        "padding": "60px 40px",
+                        "display": "flex",
+                        "flexDirection": "column",
+                        "alignItems": "center",
+                        "gap": "20px"
+                    },
+                    "children": [
+                        {
+                            "id": "comp-heading",
+                            "type": "Text",
+                            "props": {
+                                "text": "Component Library",
+                                "color": "#ffffff",
+                                "fontSize": "48px",
+                                "textAlign": "center"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "comp-text",
+                            "type": "Text",
+                            "props": {
+                                "content": "Explore our comprehensive collection of UI components",
+                                "fontSize": "18px",
+                                "color": "#e8e8e8",
+                                "textAlign": "center"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "badges-section",
+                    "type": "Container",
+                    "props": {
+                        "backgroundColor": "#ffffff",
+                        "padding": "60px 40px",
+                        "display": "flex",
+                        "flexDirection": "column",
+                        "gap": "30px"
+                    },
+                    "children": [
+                        {
+                            "id": "badges-title",
+                            "type": "Text",
+                            "props": {
+                                "text": "Badges",
+                                "color": "#1a1a2e",
+                                "fontSize": "28px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "badges-container",
+                            "type": "Container",
+                            "props": {
+                                "display": "flex",
+                                "flexDirection": "row",
+                                "flexWrap": "wrap",
+                                "gap": "15px",
+                                "alignItems": "center"
+                            },
+                            "children": [
+                                {
+                                    "id": "badge-1",
+                                    "type": "Badge",
+                                    "props": {
+                                        "text": "New",
+                                        "variant": "primary",
+                                        "size": "small"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "badge-2",
+                                    "type": "Badge",
+                                    "props": {
+                                        "text": "Success",
+                                        "variant": "success",
+                                        "size": "medium"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "badge-3",
+                                    "type": "Badge",
+                                    "props": {
+                                        "text": "Warning",
+                                        "variant": "warning",
+                                        "size": "large"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "badge-4",
+                                    "type": "Badge",
+                                    "props": {
+                                        "text": "Error",
+                                        "variant": "error",
+                                        "size": "medium"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "badge-5",
+                                    "type": "Badge",
+                                    "props": {
+                                        "text": "Info",
+                                        "variant": "info",
+                                        "size": "small"
+                                    },
+                                    "children": []
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "buttons-section",
+                    "type": "Container",
+                    "props": {
+                        "backgroundColor": "#f8f9fa",
+                        "padding": "60px 40px",
+                        "display": "flex",
+                        "flexDirection": "column",
+                        "gap": "30px"
+                    },
+                    "children": [
+                        {
+                            "id": "buttons-title",
+                            "type": "Text",
+                            "props": {
+                                "text": "Buttons",
+                                "color": "#1a1a2e",
+                                "fontSize": "28px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "buttons-row-1",
+                            "type": "Container",
+                            "props": {
+                                "display": "flex",
+                                "flexDirection": "row",
+                                "flexWrap": "wrap",
+                                "gap": "15px",
+                                "alignItems": "center"
+                            },
+                            "children": [
+                                {
+                                    "id": "btn-1",
+                                    "type": "Button",
+                                    "props": {
+                                        "text": "Primary Small",
+                                        "variant": "primary",
+                                        "size": "small",
+                                        "backgroundColor": "#3498db",
+                                        "textColor": "#ffffff"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "btn-2",
+                                    "type": "Button",
+                                    "props": {
+                                        "text": "Primary Medium",
+                                        "variant": "primary",
+                                        "size": "medium",
+                                        "backgroundColor": "#3498db",
+                                        "textColor": "#ffffff"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "btn-3",
+                                    "type": "Button",
+                                    "props": {
+                                        "text": "Primary Large",
+                                        "variant": "primary",
+                                        "size": "large",
+                                        "backgroundColor": "#3498db",
+                                        "textColor": "#ffffff"
+                                    },
+                                    "children": []
+                                }
+                            ]
+                        },
+                        {
+                            "id": "buttons-row-2",
+                            "type": "Container",
+                            "props": {
+                                "display": "flex",
+                                "flexDirection": "row",
+                                "flexWrap": "wrap",
+                                "gap": "15px",
+                                "alignItems": "center"
+                            },
+                            "children": [
+                                {
+                                    "id": "btn-4",
+                                    "type": "Button",
+                                    "props": {
+                                        "text": "Secondary",
+                                        "variant": "secondary",
+                                        "size": "medium",
+                                        "backgroundColor": "#95a5a6",
+                                        "textColor": "#ffffff"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "btn-5",
+                                    "type": "Button",
+                                    "props": {
+                                        "text": "Outline",
+                                        "variant": "outline",
+                                        "size": "medium",
+                                        "backgroundColor": "transparent",
+                                        "textColor": "#3498db",
+                                        "borderWidth": "2px",
+                                        "borderColor": "#3498db"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "btn-6",
+                                    "type": "Button",
+                                    "props": {
+                                        "text": "Rounded",
+                                        "variant": "primary",
+                                        "size": "medium",
+                                        "backgroundColor": "#e74c3c",
+                                        "textColor": "#ffffff",
+                                        "borderRadius": "50px"
+                                    },
+                                    "children": []
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "cards-section",
+                    "type": "Container",
+                    "props": {
+                        "backgroundColor": "#ffffff",
+                        "padding": "60px 40px",
+                        "display": "flex",
+                        "flexDirection": "column",
+                        "gap": "30px"
+                    },
+                    "children": [
+                        {
+                            "id": "cards-title",
+                            "type": "Text",
+                            "props": {
+                                "text": "Cards",
+                                "color": "#1a1a2e",
+                                "fontSize": "28px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "cards-grid",
+                            "type": "Container",
+                            "props": {
+                                "display": "flex",
+                                "flexDirection": "row",
+                                "flexWrap": "wrap",
+                                "gap": "25px",
+                                "justifyContent": "flex-start"
+                            },
+                            "children": [
+                                {
+                                    "id": "card-1",
+                                    "type": "Card",
+                                    "props": {
+                                        "title": "Card with Image",
+                                        "description": "This card includes an image, title, and description",
+                                        "imageUrl": "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&h=250&fit=crop",
+                                        "imageAlt": "Coding",
+                                        "padding": "0",
+                                        "borderRadius": "12px",
+                                        "boxShadow": "0 4px 6px rgba(0,0,0,0.1)"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "card-2",
+                                    "type": "Card",
+                                    "props": {
+                                        "title": "Simple Card",
+                                        "description": "A clean card without an image but with custom styling",
+                                        "padding": "30px",
+                                        "borderRadius": "8px",
+                                        "backgroundColor": "#f8f9fa",
+                                        "boxShadow": "0 2px 4px rgba(0,0,0,0.05)"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "card-3",
+                                    "type": "Card",
+                                    "props": {
+                                        "title": "Colored Card",
+                                        "description": "Cards can have custom background and text colors",
+                                        "padding": "30px",
+                                        "borderRadius": "16px",
+                                        "backgroundColor": "#3498db",
+                                        "textColor": "#ffffff",
+                                        "boxShadow": "0 8px 16px rgba(52,152,219,0.3)"
+                                    },
+                                    "children": []
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "accordion-section",
+                    "type": "Container",
+                    "props": {
+                        "backgroundColor": "#f8f9fa",
+                        "padding": "60px 40px",
+                        "display": "flex",
+                        "flexDirection": "column",
+                        "gap": "30px"
+                    },
+                    "children": [
+                        {
+                            "id": "accordion-title",
+                            "type": "Text",
+                            "props": {
+                                "text": "Accordion",
+                                "color": "#1a1a2e",
+                                "fontSize": "28px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "accordion-1",
+                            "type": "Accordion",
+                            "props": {
+                                "items": [
+                                    {
+                                        "title": "What is this design system?",
+                                        "content": "A comprehensive collection of reusable UI components built with modern web technologies. It includes everything you need to build beautiful, responsive websites."
+                                    },
+                                    {
+                                        "title": "How do I customize components?",
+                                        "content": "Every component accepts props for styling including colors, sizes, spacing, and more. You can easily override default styles to match your brand."
+                                    },
+                                    {
+                                        "title": "Is it responsive?",
+                                        "content": "Yes! All components are built with responsive design in mind and work seamlessly across desktop, tablet, and mobile devices."
+                                    },
+                                    {
+                                        "title": "What about browser support?",
+                                        "content": "We support all modern browsers including Chrome, Firefox, Safari, and Edge. IE11 is not supported."
+                                    }
+                                ],
+                                "allowMultiple": false
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "tabs-section",
+                    "type": "Container",
+                    "props": {
+                        "backgroundColor": "#ffffff",
+                        "padding": "60px 40px",
+                        "display": "flex",
+                        "flexDirection": "column",
+                        "gap": "30px"
+                    },
+                    "children": [
+                        {
+                            "id": "tabs-title",
+                            "type": "Text",
+                            "props": {
+                                "text": "Tabs",
+                                "color": "#1a1a2e",
+                                "fontSize": "28px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "tabs-1",
+                            "type": "Tabs",
+                            "props": {
+                                "tabs": [
+                                    {
+                                        "label": "Overview",
+                                        "content": "Our design system provides a complete set of components for building modern web applications. Each component is carefully crafted with attention to detail and user experience."
+                                    },
+                                    {
+                                        "label": "Features",
+                                        "content": "Key features include: Responsive design, Accessibility support, Dark mode ready, Customizable themes, TypeScript support, and Comprehensive documentation."
+                                    },
+                                    {
+                                        "label": "Installation",
+                                        "content": "Install via npm: npm install design-system. Then import components: import { Button, Card } from 'design-system'. Start building amazing interfaces!"
+                                    },
+                                    {
+                                        "label": "Support",
+                                        "content": "Need help? Check our documentation, join our Discord community, or contact support at support@designsystem.com. We're here to help!"
+                                    }
+                                ],
+                                "defaultTab": 0
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "divider-2",
+                    "type": "Divider",
+                    "props": {
+                        "thickness": "1px",
+                        "color": "#dee2e6",
+                        "margin": "0"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "images-section",
+                    "type": "Container",
+                    "props": {
+                        "backgroundColor": "#f8f9fa",
+                        "padding": "60px 40px",
+                        "display": "flex",
+                        "flexDirection": "column",
+                        "gap": "30px"
+                    },
+                    "children": [
+                        {
+                            "id": "images-title",
+                            "type": "Text",
+                            "props": {
+                                "text": "Images",
+                                "color": "#1a1a2e",
+                                "fontSize": "28px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "images-grid",
+                            "type": "Container",
+                            "props": {
+                                "display": "flex",
+                                "flexDirection": "row",
+                                "flexWrap": "wrap",
+                                "gap": "20px",
+                                "justifyContent": "flex-start"
+                            },
+                            "children": [
+                                {
+                                    "id": "img-1",
+                                    "type": "Image",
+                                    "props": {
+                                        "src": "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&h=300&fit=crop",
+                                        "alt": "Computer setup",
+                                        "width": "350px",
+                                        "height": "250px",
+                                        "borderRadius": "8px",
+                                        "objectFit": "cover"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "img-2",
+                                    "type": "Image",
+                                    "props": {
+                                        "src": "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400&h=300&fit=crop",
+                                        "alt": "Code editor",
+                                        "width": "350px",
+                                        "height": "250px",
+                                        "borderRadius": "16px",
+                                        "objectFit": "cover"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "img-3",
+                                    "type": "Image",
+                                    "props": {
+                                        "src": "https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=400&h=300&fit=crop",
+                                        "alt": "Workspace",
+                                        "width": "350px",
+                                        "height": "250px",
+                                        "borderRadius": "50%",
+                                        "objectFit": "cover"
+                                    },
+                                    "children": []
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "footer-2",
+                    "type": "Footer",
+                    "props": {
+                        "content": "© 2024 DesignSystem. All rights reserved.",
+                        "backgroundColor": "#1a1a2e",
+                        "textColor": "#ffffff",
+                        "padding": "30px 40px",
+                        "textAlign": "center"
+                    },
+                    "children": []
+                }
+            ]
+        },
+        {
+            "id": "layouts",
+            "name": "Layouts",
+            "path": "/layouts",
+            "components": [
+                {
+                    "id": "nav-3",
+                    "type": "Navbar",
+                    "props": {
+                        "brandText": "DesignSystem",
+                        "links": [
+                            {
+                                "text": "Home",
+                                "href": "/"
+                            },
+                            {
+                                "text": "Components",
+                                "href": "/components"
+                            },
+                            {
+                                "text": "Layouts",
+                                "href": "/layouts"
+                            },
+                            {
+                                "text": "Pricing",
+                                "href": "/pricing"
+                            }
+                        ],
+                        "backgroundColor": "#1a1a2e",
+                        "textColor": "#ffffff",
+                        "linkColor": "#16c79a",
+                        "linkHoverColor": "#11998e",
+                        "padding": "20px 40px"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "layouts-hero",
+                    "type": "Container",
+                    "props": {
+                        "backgroundColor": "#0f3460",
+                        "padding": "60px 40px",
+                        "display": "flex",
+                        "flexDirection": "column",
+                        "alignItems": "center",
+                        "gap": "20px"
+                    },
+                    "children": [
+                        {
+                            "id": "layouts-heading",
+                            "type": "Text",
+                            "props": {
+                                "text": "Layout Examples",
+                                "color": "#ffffff",
+                                "fontSize": "48px",
+                                "textAlign": "center"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "layouts-text",
+                            "type": "Text",
+                            "props": {
+                                "content": "Flexible container layouts with different flex configurations",
+                                "fontSize": "18px",
+                                "color": "#e8e8e8",
+                                "textAlign": "center"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "layout-1-title",
+                    "type": "Container",
+                    "props": {
+                        "backgroundColor": "#ffffff",
+                        "padding": "40px 40px 20px 40px"
+                    },
+                    "children": [
+                        {
+                            "id": "layout-1-heading",
+                            "type": "Text",
+                            "props": {
+                                "text": "Horizontal Layout - Space Between",
+                                "color": "#1a1a2e",
+                                "fontSize": "24px"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "layout-1",
+                    "type": "Container",
+                    "props": {
+                        "backgroundColor": "#ffffff",
+                        "padding": "20px 40px 40px 40px",
+                        "display": "flex",
+                        "flexDirection": "row",
+                        "justifyContent": "space-between",
+                        "alignItems": "center",
+                        "gap": "20px",
+                        "borderWidth": "2px",
+                        "borderColor": "#e0e0e0",
+                        "borderRadius": "8px",
+                        "margin": "0 40px"
+                    },
+                    "children": [
+                        {
+                            "id": "layout-1-card-1",
+                            "type": "Card",
+                            "props": {
+                                "title": "Item 1",
+                                "description": "First item",
+                                "padding": "20px",
+                                "backgroundColor": "#e3f2fd",
+                                "borderRadius": "8px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "layout-1-card-2",
+                            "type": "Card",
+                            "props": {
+                                "title": "Item 2",
+                                "description": "Second item",
+                                "padding": "20px",
+                                "backgroundColor": "#f3e5f5",
+                                "borderRadius": "8px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "layout-1-card-3",
+                            "type": "Card",
+                            "props": {
+                                "title": "Item 3",
+                                "description": "Third item",
+                                "padding": "20px",
+                                "backgroundColor": "#fff3e0",
+                                "borderRadius": "8px"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "spacer-2",
+                    "type": "Spacer",
+                    "props": {
+                        "height": "40px"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "layout-2-title",
+                    "type": "Container",
+                    "props": {
+                        "backgroundColor": "#f8f9fa",
+                        "padding": "40px 40px 20px 40px"
+                    },
+                    "children": [
+                        {
+                            "id": "layout-2-heading",
+                            "type": "Text",
+                            "props": {
+                                "text": "Vertical Layout - Center Aligned",
+                                "color": "#1a1a2e",
+                                "fontSize": "24px"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "layout-2",
+                    "type": "Container",
+                    "props": {
+                        "backgroundColor": "#f8f9fa",
+                        "padding": "20px 40px 40px 40px",
+                        "display": "flex",
+                        "flexDirection": "column",
+                        "justifyContent": "center",
+                        "alignItems": "center",
+                        "gap": "25px",
+                        "borderWidth": "2px",
+                        "borderColor": "#dee2e6",
+                        "borderRadius": "8px",
+                        "margin": "0 40px",
+                        "minHeight": "400px"
+                    },
+                    "children": [
+                        {
+                            "id": "layout-2-feature-1",
+                            "type": "Feature",
+                            "props": {
+                                "icon": "🎯",
+                                "title": "Centered Content",
+                                "description": "All items are centered both horizontally and vertically",
+                                "iconSize": "40px",
+                                "iconColor": "#e74c3c"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "layout-2-feature-2",
+                            "type": "Feature",
+                            "props": {
+                                "icon": "📐",
+                                "title": "Equal Spacing",
+                                "description": "Consistent gaps between all elements",
+                                "iconSize": "40px",
+                                "iconColor": "#3498db"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "layout-2-feature-3",
+                            "type": "Feature",
+                            "props": {
+                                "icon": "✨",
+                                "title": "Clean Design",
+                                "description": "Simple and elegant vertical arrangement",
+                                "iconSize": "40px",
+                                "iconColor": "#f39c12"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "spacer-3",
+                    "type": "Spacer",
+                    "props": {
+                        "height": "40px"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "layout-3-title",
+                    "type": "Container",
+                    "props": {
+                        "backgroundColor": "#ffffff",
+                        "padding": "40px 40px 20px 40px"
+                    },
+                    "children": [
+                        {
+                            "id": "layout-3-heading",
+                            "type": "Text",
+                            "props": {
+                                "text": "Wrapped Grid - Flex Start",
+                                "color": "#1a1a2e",
+                                "fontSize": "24px"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "layout-3",
+                    "type": "Container",
+                    "props": {
+                        "backgroundColor": "#ffffff",
+                        "padding": "20px 40px 40px 40px",
+                        "display": "flex",
+                        "flexDirection": "row",
+                        "flexWrap": "wrap",
+                        "justifyContent": "flex-start",
+                        "alignItems": "flex-start",
+                        "gap": "20px",
+                        "borderWidth": "2px",
+                        "borderColor": "#e0e0e0",
+                        "borderRadius": "8px",
+                        "margin": "0 40px"
+                    },
+                    "children": [
+                        {
+                            "id": "layout-3-badge-1",
+                            "type": "Badge",
+                            "props": {
+                                "text": "React",
+                                "variant": "primary",
+                                "size": "large"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "layout-3-badge-2",
+                            "type": "Badge",
+                            "props": {
+                                "text": "TypeScript",
+                                "variant": "info",
+                                "size": "large"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "layout-3-badge-3",
+                            "type": "Badge",
+                            "props": {
+                                "text": "Next.js",
+                                "variant": "success",
+                                "size": "large"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "layout-3-badge-4",
+                            "type": "Badge",
+                            "props": {
+                                "text": "Tailwind",
+                                "variant": "warning",
+                                "size": "large"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "layout-3-badge-5",
+                            "type": "Badge",
+                            "props": {
+                                "text": "Node.js",
+                                "variant": "success",
+                                "size": "large"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "layout-3-badge-6",
+                            "type": "Badge",
+                            "props": {
+                                "text": "MongoDB",
+                                "variant": "primary",
+                                "size": "large"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "layout-3-badge-7",
+                            "type": "Badge",
+                            "props": {
+                                "text": "GraphQL",
+                                "variant": "error",
+                                "size": "large"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "layout-3-badge-8",
+                            "type": "Badge",
+                            "props": {
+                                "text": "Docker",
+                                "variant": "info",
+                                "size": "large"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "spacer-4",
+                    "type": "Spacer",
+                    "props": {
+                        "height": "40px"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "layout-4-title",
+                    "type": "Container",
+                    "props": {
+                        "backgroundColor": "#f8f9fa",
+                        "padding": "40px 40px 20px 40px"
+                    },
+                    "children": [
+                        {
+                            "id": "layout-4-heading",
+                            "type": "Text",
+                            "props": {
+                                "text": "Column Layout with Overflow",
+                                "color": "#1a1a2e",
+                                "fontSize": "24px"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "layout-4",
+                    "type": "Container",
+                    "props": {
+                        "backgroundColor": "#f8f9fa",
+                        "padding": "20px 40px 40px 40px",
+                        "display": "flex",
+                        "flexDirection": "column",
+                        "gap": "15px",
+                        "borderWidth": "2px",
+                        "borderColor": "#dee2e6",
+                        "borderRadius": "8px",
+                        "margin": "0 40px",
+                        "maxHeight": "400px",
+                        "overflowY": "auto",
+                        "overflowX": "hidden"
+                    },
+                    "children": [
+                        {
+                            "id": "layout-4-text-1",
+                            "type": "Text",
+                            "props": {
+                                "content": "This container has a fixed height with vertical scrolling enabled. It demonstrates overflow handling.",
+                                "fontSize": "16px",
+                                "color": "#495057"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "layout-4-card-1",
+                            "type": "Card",
+                            "props": {
+                                "title": "Scrollable Item 1",
+                                "description": "Content that extends beyond the container height",
+                                "padding": "20px",
+                                "backgroundColor": "#ffffff",
+                                "borderRadius": "8px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "layout-4-card-2",
+                            "type": "Card",
+                            "props": {
+                                "title": "Scrollable Item 2",
+                                "description": "More content to demonstrate scrolling",
+                                "padding": "20px",
+                                "backgroundColor": "#ffffff",
+                                "borderRadius": "8px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "layout-4-card-3",
+                            "type": "Card",
+                            "props": {
+                                "title": "Scrollable Item 3",
+                                "description": "Even more content",
+                                "padding": "20px",
+                                "backgroundColor": "#ffffff",
+                                "borderRadius": "8px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "layout-4-card-4",
+                            "type": "Card",
+                            "props": {
+                                "title": "Scrollable Item 4",
+                                "description": "Keep scrolling to see all items",
+                                "padding": "20px",
+                                "backgroundColor": "#ffffff",
+                                "borderRadius": "8px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "layout-4-card-5",
+                            "type": "Card",
+                            "props": {
+                                "title": "Scrollable Item 5",
+                                "description": "Last item in the scrollable container",
+                                "padding": "20px",
+                                "backgroundColor": "#ffffff",
+                                "borderRadius": "8px"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "spacer-5",
+                    "type": "Spacer",
+                    "props": {
+                        "height": "40px"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "layout-5-title",
+                    "type": "Container",
+                    "props": {
+                        "backgroundColor": "#ffffff",
+                        "padding": "40px 40px 20px 40px"
+                    },
+                    "children": [
+                        {
+                            "id": "layout-5-heading",
+                            "type": "Text",
+                            "props": {
+                                "text": "Horizontal Scroll Layout",
+                                "color": "#1a1a2e",
+                                "fontSize": "24px"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "layout-5",
+                    "type": "Container",
+                    "props": {
+                        "backgroundColor": "#ffffff",
+                        "padding": "20px 40px 40px 40px",
+                        "display": "flex",
+                        "flexDirection": "row",
+                        "gap": "20px",
+                        "borderWidth": "2px",
+                        "borderColor": "#e0e0e0",
+                        "borderRadius": "8px",
+                        "margin": "0 40px",
+                        "overflowX": "auto",
+                        "overflowY": "hidden",
+                        "flexWrap": "nowrap"
+                    },
+                    "children": [
+                        {
+                            "id": "layout-5-card-1",
+                            "type": "Card",
+                            "props": {
+                                "title": "Card 1",
+                                "description": "Horizontal scrolling",
+                                "imageUrl": "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=300&h=200&fit=crop",
+                                "padding": "0",
+                                "borderRadius": "8px",
+                                "minWidth": "300px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "layout-5-card-2",
+                            "type": "Card",
+                            "props": {
+                                "title": "Card 2",
+                                "description": "Scroll to see more",
+                                "imageUrl": "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=300&h=200&fit=crop",
+                                "padding": "0",
+                                "borderRadius": "8px",
+                                "minWidth": "300px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "layout-5-card-3",
+                            "type": "Card",
+                            "props": {
+                                "title": "Card 3",
+                                "description": "Keep scrolling",
+                                "imageUrl": "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=300&h=200&fit=crop",
+                                "padding": "0",
+                                "borderRadius": "8px",
+                                "minWidth": "300px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "layout-5-card-4",
+                            "type": "Card",
+                            "props": {
+                                "title": "Card 4",
+                                "description": "More content",
+                                "imageUrl": "https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=300&h=200&fit=crop",
+                                "padding": "0",
+                                "borderRadius": "8px",
+                                "minWidth": "300px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "layout-5-card-5",
+                            "type": "Card",
+                            "props": {
+                                "title": "Card 5",
+                                "description": "Last card",
+                                "imageUrl": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=300&h=200&fit=crop",
+                                "padding": "0",
+                                "borderRadius": "8px",
+                                "minWidth": "300px"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "spacer-6",
+                    "type": "Spacer",
+                    "props": {
+                        "height": "60px"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "footer-3",
+                    "type": "Footer",
+                    "props": {
+                        "content": "© 2024 DesignSystem. All rights reserved.",
+                        "backgroundColor": "#1a1a2e",
+                        "textColor": "#ffffff",
+                        "padding": "30px 40px",
+                        "textAlign": "center"
+                    },
+                    "children": []
+                }
+            ]
+        },
+        {
+            "id": "pricing",
+            "name": "Pricing",
+            "path": "/pricing",
+            "components": [
+                {
+                    "id": "nav-4",
+                    "type": "Navbar",
+                    "props": {
+                        "brandText": "DesignSystem",
+                        "links": [
+                            {
+                                "text": "Home",
+                                "href": "/"
+                            },
+                            {
+                                "text": "Components",
+                                "href": "/components"
+                            },
+                            {
+                                "text": "Layouts",
+                                "href": "/layouts"
+                            },
+                            {
+                                "text": "Pricing",
+                                "href": "/pricing"
+                            }
+                        ],
+                        "backgroundColor": "#1a1a2e",
+                        "textColor": "#ffffff",
+                        "linkColor": "#16c79a",
+                        "linkHoverColor": "#11998e",
+                        "padding": "20px 40px"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "pricing-hero",
+                    "type": "Container",
+                    "props": {
+                        "backgroundColor": "#0f3460",
+                        "padding": "80px 40px",
+                        "display": "flex",
+                        "flexDirection": "column",
+                        "alignItems": "center",
+                        "gap": "20px"
+                    },
+                    "children": [
+                        {
+                            "id": "pricing-badge",
+                            "type": "Badge",
+                            "props": {
+                                "text": "Special Offer",
+                                "variant": "warning",
+                                "size": "large"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "pricing-heading",
+                            "type": "Text",
+                            "props": {
+                                "text": "Simple, Transparent Pricing",
+                                "color": "#ffffff",
+                                "fontSize": "48px",
+                                "textAlign": "center"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "pricing-text",
+                            "type": "Text",
+                            "props": {
+                                "content": "Choose the perfect plan for your needs. All plans include our core features.",
+                                "fontSize": "18px",
+                                "color": "#e8e8e8",
+                                "textAlign": "center",
+                                "maxWidth": "600px"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "pricing-cards-section",
+                    "type": "Container",
+                    "props": {
+                        "backgroundColor": "#ffffff",
+                        "padding": "80px 40px",
+                        "display": "flex",
+                        "flexDirection": "row",
+                        "flexWrap": "wrap",
+                        "justifyContent": "center",
+                        "alignItems": "stretch",
+                        "gap": "30px"
+                    },
+                    "children": [
+                        {
+                            "id": "pricing-card-1",
+                            "type": "PricingCard",
+                            "props": {
+                                "title": "Starter",
+                                "price": "$0",
+                                "period": "forever",
+                                "features": [
+                                    "5 Projects",
+                                    "Basic Components",
+                                    "Community Support",
+                                    "Export to HTML",
+                                    "1 Team Member"
+                                ],
+                                "buttonText": "Get Started",
+                                "buttonLink": "/",
+                                "highlighted": false
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "pricing-card-2",
+                            "type": "PricingCard",
+                            "props": {
+                                "title": "Professional",
+                                "price": "$29",
+                                "period": "per month",
+                                "features": [
+                                    "Unlimited Projects",
+                                    "All Components",
+                                    "Priority Support",
+                                    "Advanced Export Options",
+                                    "5 Team Members",
+                                    "Custom Domains",
+                                    "Analytics Dashboard"
+                                ],
+                                "buttonText": "Start Free Trial",
+                                "buttonLink": "/",
+                                "highlighted": true
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "pricing-card-3",
+                            "type": "PricingCard",
+                            "props": {
+                                "title": "Enterprise",
+                                "price": "$99",
+                                "period": "per month",
+                                "features": [
+                                    "Everything in Pro",
+                                    "Unlimited Team Members",
+                                    "Dedicated Support",
+                                    "Custom Components",
+                                    "SSO & Advanced Security",
+                                    "SLA Guarantee",
+                                    "Training & Onboarding",
+                                    "API Access"
+                                ],
+                                "buttonText": "Contact Sales",
+                                "buttonLink": "/",
+                                "highlighted": false
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "divider-3",
+                    "type": "Divider",
+                    "props": {
+                        "thickness": "2px",
+                        "color": "#e0e0e0",
+                        "margin": "0"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "comparison-section",
+                    "type": "Container",
+                    "props": {
+                        "backgroundColor": "#f8f9fa",
+                        "padding": "80px 40px",
+                        "display": "flex",
+                        "flexDirection": "column",
+                        "alignItems": "center",
+                        "gap": "40px"
+                    },
+                    "children": [
+                        {
+                            "id": "comparison-heading",
+                            "type": "Text",
+                            "props": {
+                                "text": "Compare Plans",
+                                "color": "#1a1a2e",
+                                "fontSize": "42px",
+                                "textAlign": "center"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "comparison-stats",
+                            "type": "Stats",
+                            "props": {
+                                "stats": [
+                                    {
+                                        "value": "10K+",
+                                        "label": "Active Users"
+                                    },
+                                    {
+                                        "value": "500+",
+                                        "label": "Companies"
+                                    },
+                                    {
+                                        "value": "50K+",
+                                        "label": "Projects Created"
+                                    },
+                                    {
+                                        "value": "4.9/5",
+                                        "label": "User Rating"
+                                    }
+                                ],
+                                "layout": "horizontal",
+                                "backgroundColor": "transparent"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "faq-section",
+                    "type": "Container",
+                    "props": {
+                        "backgroundColor": "#ffffff",
+                        "padding": "80px 40px",
+                        "display": "flex",
+                        "flexDirection": "column",
+                        "alignItems": "center",
+                        "gap": "40px"
+                    },
+                    "children": [
+                        {
+                            "id": "faq-heading",
+                            "type": "Text",
+                            "props": {
+                                "text": "Frequently Asked Questions",
+                                "color": "#1a1a2e",
+                                "fontSize": "42px",
+                                "textAlign": "center"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "faq-accordion",
+                            "type": "Container",
+                            "props": {
+                                "maxWidth": "800px",
+                                "width": "100%"
+                            },
+                            "children": [
+                                {
+                                    "id": "faq-accordion-1",
+                                    "type": "Accordion",
+                                    "props": {
+                                        "items": [
+                                            {
+                                                "title": "Can I change plans later?",
+                                                "content": "Yes! You can upgrade or downgrade your plan at any time. Changes take effect immediately, and we'll prorate any charges."
+                                            },
+                                            {
+                                                "title": "What payment methods do you accept?",
+                                                "content": "We accept all major credit cards (Visa, MasterCard, American Express), PayPal, and bank transfers for Enterprise plans."
+                                            },
+                                            {
+                                                "title": "Is there a free trial?",
+                                                "content": "Yes! Professional and Enterprise plans come with a 14-day free trial. No credit card required to start."
+                                            },
+                                            {
+                                                "title": "What happens when I reach my project limit?",
+                                                "content": "You'll be notified when approaching your limit. You can upgrade your plan or archive old projects to make room for new ones."
+                                            },
+                                            {
+                                                "title": "Do you offer refunds?",
+                                                "content": "Yes, we offer a 30-day money-back guarantee. If you're not satisfied, contact us for a full refund."
+                                            },
+                                            {
+                                                "title": "Can I cancel anytime?",
+                                                "content": "Absolutely! There are no long-term contracts. You can cancel your subscription at any time from your account settings."
+                                            }
+                                        ],
+                                        "allowMultiple": true
+                                    },
+                                    "children": []
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "cta-2",
+                    "type": "CTA",
+                    "props": {
+                        "title": "Still Have Questions?",
+                        "description": "Our team is here to help. Contact us for personalized assistance.",
+                        "buttonText": "Contact Support",
+                        "buttonLink": "/",
+                        "backgroundColor": "#3498db",
+                        "textColor": "#ffffff"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "footer-4",
+                    "type": "Footer",
+                    "props": {
+                        "content": "© 2024 DesignSystem. All rights reserved.",
+                        "backgroundColor": "#1a1a2e",
+                        "textColor": "#ffffff",
+                        "padding": "30px 40px",
+                        "textAlign": "center"
+                    },
+                    "children": []
+                }
+            ]
+        }
+    ]
+}
