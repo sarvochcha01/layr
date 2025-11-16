@@ -9,7 +9,7 @@ import {
   DragStartEvent,
 } from "@dnd-kit/core";
 import { EditorLayout } from "@/components/editor/EditorLayout";
-import { ComponentDefinition } from "@/types/editor";
+import { ComponentDefinition, Page } from "@/types/editor";
 import { generateId } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProject, useUpdateProject } from "@/hooks/useProjects";
@@ -61,17 +61,28 @@ export default function EditorPage() {
   const { user, loading: authLoading } = useAuth();
   const projectId = searchParams.get("projectId");
 
-  const [components, setComponents] = useState<ComponentDefinition[]>(
-    placeholderComponents
-  );
+  const [pages, setPages] = useState<Page[]>([
+    {
+      id: "home",
+      name: "Home",
+      slug: "index",
+      components: placeholderComponents,
+    },
+  ]);
+  const [currentPageId, setCurrentPageId] = useState<string>("home");
   const [selectedComponentIds, setSelectedComponentIds] = useState<string[]>(
     []
   );
   const [draggedComponent, setDraggedComponent] = useState<any>(null);
   const [redirecting, setRedirecting] = useState(false);
   const [projectName, setProjectName] = useState<string>("");
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
-  // React Query hooks
+  // Get current page
+  const currentPage = pages.find((p) => p.id === currentPageId) || pages[0];
+  const components = currentPage.components;
+
+  // React Query hooks - disable refetching to prevent overwriting local changes
   const {
     data: projectData,
     isLoading: projectLoading,
@@ -106,28 +117,86 @@ export default function EditorPage() {
     }
   }, [projectId, user, authLoading, projectLoading, projectError, router]);
 
-  // Load project data when available
+  // Load project data ONLY on initial load
   useEffect(() => {
-    if (projectData) {
-      setComponents(projectData.components || placeholderComponents);
+    if (projectData && isInitialLoad) {
+      // Load pages from project data, or create default home page
+      if (projectData.pages && Array.isArray(projectData.pages)) {
+        setPages(projectData.pages);
+        setCurrentPageId(projectData.pages[0]?.id || "home");
+      } else {
+        // Legacy support: convert old components array to pages
+        setPages([
+          {
+            id: "home",
+            name: "Home",
+            slug: "index",
+            components: projectData.components || placeholderComponents,
+          },
+        ]);
+      }
       setProjectName(projectData.name || "Untitled Project");
+      setIsInitialLoad(false);
     }
-  }, [projectData]);
+  }, [projectData, isInitialLoad]);
 
-  // Auto-save when components or project name change
+  // Auto-save when pages or project name change
   useEffect(() => {
-    if (!projectId || !user || projectLoading || !projectData) return;
+    if (!projectId || !user || isInitialLoad) return;
 
     const timeoutId = setTimeout(() => {
       updateProjectMutation.mutate({
         projectId,
-        updates: { components, name: projectName },
+        updates: { pages, name: projectName },
         userId: user.uid,
       });
     }, 2000);
 
     return () => clearTimeout(timeoutId);
-  }, [components, projectName, projectId, user, projectLoading, projectData]);
+  }, [pages, projectName, projectId, user, isInitialLoad]);
+
+  // Helper to update current page components
+  const updateCurrentPageComponents = (
+    updater: (components: ComponentDefinition[]) => ComponentDefinition[]
+  ) => {
+    setPages((prevPages) =>
+      prevPages.map((page) =>
+        page.id === currentPageId
+          ? { ...page, components: updater(page.components) }
+          : page
+      )
+    );
+  };
+
+  // Page management functions
+  const handlePageAdd = (name: string, slug: string) => {
+    const newPage: Page = {
+      id: generateId(),
+      name,
+      slug,
+      components: [],
+    };
+    setPages((prev) => [...prev, newPage]);
+    setCurrentPageId(newPage.id);
+    toast.success(`Page "${name}" created`);
+  };
+
+  const handlePageDelete = (pageId: string) => {
+    if (pages.length === 1) {
+      toast.error("Cannot delete the last page");
+      return;
+    }
+    setPages((prev) => prev.filter((p) => p.id !== pageId));
+    if (currentPageId === pageId) {
+      setCurrentPageId(pages[0].id);
+    }
+    toast.success("Page deleted");
+  };
+
+  const handlePageSelect = (pageId: string) => {
+    setCurrentPageId(pageId);
+    setSelectedComponentIds([]);
+  };
 
   const handleProjectNameChange = (newName: string) => {
     setProjectName(newName);
@@ -159,7 +228,7 @@ export default function EditorPage() {
         const targetId = over.data.current.targetId;
         const position = over.data.current.position;
 
-        setComponents((prev) =>
+        updateCurrentPageComponents((prev) =>
           insertComponent(prev, newComponent, targetId, position)
         );
       }
@@ -172,17 +241,23 @@ export default function EditorPage() {
     componentId: string,
     updates: Partial<ComponentDefinition["props"]>
   ) => {
-    setComponents((prev) => updateComponentInTree(prev, componentId, updates));
+    updateCurrentPageComponents((prev) =>
+      updateComponentInTree(prev, componentId, updates)
+    );
   };
 
   const deleteComponent = (componentId: string) => {
-    setComponents((prev) => removeComponentFromTree(prev, componentId));
+    updateCurrentPageComponents((prev) =>
+      removeComponentFromTree(prev, componentId)
+    );
     setSelectedComponentIds((prev) => prev.filter((id) => id !== componentId));
   };
 
   const deleteSelectedComponents = () => {
     selectedComponentIds.forEach((id) => {
-      setComponents((prev) => removeComponentFromTree(prev, id));
+      updateCurrentPageComponents((prev: ComponentDefinition[]) =>
+        removeComponentFromTree(prev, id)
+      );
     });
     setSelectedComponentIds([]);
   };
@@ -202,7 +277,9 @@ export default function EditorPage() {
   };
 
   const duplicateComponent = (componentId: string) => {
-    setComponents((prev) => duplicateComponentInTree(prev, componentId));
+    updateCurrentPageComponents((prev) =>
+      duplicateComponentInTree(prev, componentId)
+    );
   };
 
   const addComponent = (componentType: string) => {
@@ -212,7 +289,7 @@ export default function EditorPage() {
       props: getDefaultProps(componentType),
       children: [],
     };
-    setComponents((prev) => [...prev, newComponent]);
+    updateCurrentPageComponents((prev) => [...prev, newComponent]);
     toast.success(`${componentType} added to page`);
   };
 
@@ -283,6 +360,11 @@ export default function EditorPage() {
         onAddComponent={addComponent}
         projectName={projectName}
         onProjectNameChange={handleProjectNameChange}
+        pages={pages}
+        currentPageId={currentPageId}
+        onPageSelect={handlePageSelect}
+        onPageAdd={handlePageAdd}
+        onPageDelete={handlePageDelete}
       />
 
       <DragOverlay>

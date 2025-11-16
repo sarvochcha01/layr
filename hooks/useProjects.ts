@@ -4,7 +4,8 @@ interface Project {
     id: string;
     name: string;
     userId: string;
-    components: any[];
+    components?: any[]; // Legacy support
+    pages?: any[]; // New multi-page support
     createdAt: any;
     updatedAt: any;
 }
@@ -49,6 +50,11 @@ export function useProject(projectId: string | null, userId?: string) {
             return data.project;
         },
         enabled: !!projectId && !!userId,
+        staleTime: Infinity, // Never consider data stale
+        gcTime: Infinity, // Keep in cache forever
+        refetchOnMount: false, // Don't refetch on component mount
+        refetchOnWindowFocus: false, // Don't refetch on window focus
+        refetchOnReconnect: false, // Don't refetch on reconnect
     });
 }
 
@@ -83,8 +89,7 @@ export function useUpdateProject() {
             return response.json();
         },
         onSuccess: (data, variables) => {
-            // Invalidate and refetch
-            queryClient.invalidateQueries({ queryKey: ["project", variables.projectId] });
+            // Only invalidate projects list, NOT the current project to avoid overwriting local state
             queryClient.invalidateQueries({ queryKey: ["projects"] });
         },
     });

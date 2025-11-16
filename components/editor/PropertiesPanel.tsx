@@ -1,7 +1,7 @@
 // @ts-nocheck
 "use client";
 import React from "react";
-import { ComponentDefinition } from "@/types/editor";
+import { ComponentDefinition, Page } from "@/types/editor";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -31,6 +31,7 @@ interface PropertiesPanelProps {
   onUpdateComponent: (id: string, updates: Record<string, any>) => void;
   onDeleteComponent: (id: string) => void;
   onDuplicateComponent: (id: string) => void;
+  pages?: Page[];
 }
 
 export function PropertiesPanel({
@@ -38,6 +39,7 @@ export function PropertiesPanel({
   onUpdateComponent,
   onDeleteComponent,
   onDuplicateComponent,
+  pages = [],
 }: PropertiesPanelProps) {
   if (!selectedComponent) {
     return (
@@ -396,15 +398,56 @@ export function PropertiesPanel({
             </div>
 
             <div>
-              <Label htmlFor="href" className="mb-2 block">
-                Link URL
+              <Label htmlFor="linkType" className="mb-2 block">
+                Link Type
               </Label>
-              <Input
-                id="href"
-                value={props.href || ""}
-                onChange={(e) => updateProp("href", e.target.value)}
-                placeholder="https://example.com"
-              />
+              <select
+                id="linkType"
+                value={props.href?.startsWith("page:") ? "page" : "url"}
+                onChange={(e) => {
+                  if (e.target.value === "page" && pages.length > 0) {
+                    updateProp("href", `page:${pages[0].id}`);
+                  } else {
+                    updateProp("href", "");
+                  }
+                }}
+                className="w-full p-2 border rounded-md mb-2"
+              >
+                <option value="url">External URL</option>
+                <option value="page">Internal Page</option>
+              </select>
+
+              {props.href?.startsWith("page:") ? (
+                <>
+                  <Label htmlFor="href" className="mb-2 block">
+                    Select Page
+                  </Label>
+                  <select
+                    id="href"
+                    value={props.href}
+                    onChange={(e) => updateProp("href", e.target.value)}
+                    className="w-full p-2 border rounded-md"
+                  >
+                    {pages.map((page) => (
+                      <option key={page.id} value={`page:${page.id}`}>
+                        {page.name}
+                      </option>
+                    ))}
+                  </select>
+                </>
+              ) : (
+                <>
+                  <Label htmlFor="href" className="mb-2 block">
+                    Link URL
+                  </Label>
+                  <Input
+                    id="href"
+                    value={props.href || ""}
+                    onChange={(e) => updateProp("href", e.target.value)}
+                    placeholder="https://example.com"
+                  />
+                </>
+              )}
             </div>
 
             <div>
@@ -658,16 +701,52 @@ export function PropertiesPanel({
               <div className="space-y-2">
                 {(props.links || []).map((link: any, index: number) => (
                   <div key={index} className="space-y-2 p-3 border rounded">
-                    <div className="flex space-x-2">
-                      <Input
-                        value={link.text || ""}
+                    <Input
+                      value={link.text || ""}
+                      onChange={(e) => {
+                        const newLinks = [...(props.links || [])];
+                        newLinks[index] = { ...link, text: e.target.value };
+                        updateProp("links", newLinks);
+                      }}
+                      placeholder="Link text"
+                      className="mb-2"
+                    />
+                    <select
+                      value={link.href?.startsWith("page:") ? "page" : "url"}
+                      onChange={(e) => {
+                        const newLinks = [...(props.links || [])];
+                        if (e.target.value === "page" && pages.length > 0) {
+                          newLinks[index] = {
+                            ...link,
+                            href: `page:${pages[0].id}`,
+                          };
+                        } else {
+                          newLinks[index] = { ...link, href: "" };
+                        }
+                        updateProp("links", newLinks);
+                      }}
+                      className="w-full p-2 border rounded-md mb-2"
+                    >
+                      <option value="url">External URL</option>
+                      <option value="page">Internal Page</option>
+                    </select>
+                    {link.href?.startsWith("page:") ? (
+                      <select
+                        value={link.href}
                         onChange={(e) => {
                           const newLinks = [...(props.links || [])];
-                          newLinks[index] = { ...link, text: e.target.value };
+                          newLinks[index] = { ...link, href: e.target.value };
                           updateProp("links", newLinks);
                         }}
-                        placeholder="Link text"
-                      />
+                        className="w-full p-2 border rounded-md"
+                      >
+                        {pages.map((page) => (
+                          <option key={page.id} value={`page:${page.id}`}>
+                            {page.name}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
                       <Input
                         value={link.href || ""}
                         onChange={(e) => {
@@ -677,7 +756,7 @@ export function PropertiesPanel({
                         }}
                         placeholder="URL"
                       />
-                    </div>
+                    )}
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
                         <Switch
@@ -1596,6 +1675,17 @@ export function PropertiesPanel({
           <div className="space-y-4">
             {renderColorFields()}
             {renderDimensionFields()}
+            <div>
+              <Label htmlFor="accentColor" className="mb-2 block">
+                Accent Color (for values)
+              </Label>
+              <Input
+                id="accentColor"
+                type="color"
+                value={props.accentColor || "#3b82f6"}
+                onChange={(e) => updateProp("accentColor", e.target.value)}
+              />
+            </div>
             <div>
               <Label className="mb-2 block">Statistics</Label>
               <div className="space-y-2">

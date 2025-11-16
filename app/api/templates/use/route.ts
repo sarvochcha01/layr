@@ -26,12 +26,30 @@ export async function POST(request: Request) {
 
         const templateData = templateDoc.data();
 
-        // Create a new project with the template's components
+        // Convert template to pages format if needed
+        let pages;
+        if (templateData.pages && Array.isArray(templateData.pages)) {
+            pages = templateData.pages;
+        } else if (templateData.components && Array.isArray(templateData.components)) {
+            // Legacy template: convert components to pages format
+            pages = [
+                {
+                    id: "home",
+                    name: "Home",
+                    slug: "index",
+                    components: templateData.components,
+                },
+            ];
+        } else {
+            pages = [];
+        }
+
+        // Create a new project with the template's pages
         const projectsRef = collection(db, "projects");
         const newProject = await addDoc(projectsRef, {
             name: projectName,
             userId,
-            components: templateData.components || [],
+            pages,
             createdAt: serverTimestamp(),
             updatedAt: serverTimestamp(),
             templateId,

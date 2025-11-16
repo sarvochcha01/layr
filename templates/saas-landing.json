@@ -1,0 +1,502 @@
+{
+    "name": "SaaS Landing Page",
+    "description": "Professional SaaS landing page with features, pricing tiers, and testimonials - Multi-page",
+    "category": "SaaS",
+    "thumbnail": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400",
+    "featured": true,
+    "pages": [
+        {
+            "id": "home",
+            "name": "Home",
+            "slug": "index",
+            "components": [
+                {
+                    "id": "nav-1",
+                    "type": "Navbar",
+                    "props": {
+                        "logoText": "CloudFlow",
+                        "links": [
+                            {
+                                "text": "Features",
+                                "href": "#features"
+                            },
+                            {
+                                "text": "Pricing",
+                                "href": "page:pricing"
+                            },
+                            {
+                                "text": "Blog",
+                                "href": "page:blog"
+                            },
+                            {
+                                "text": "About",
+                                "href": "page:about"
+                            }
+                        ],
+                        "ctaText": "Start Free Trial",
+                        "ctaLink": "#signup",
+                        "backgroundColor": "#ffffff",
+                        "textColor": "#1f2937"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "hero-1",
+                    "type": "Hero",
+                    "props": {
+                        "title": "Streamline Your Workflow",
+                        "subtitle": "The All-in-One Platform",
+                        "description": "Powerful collaboration tools that help your team work smarter, faster, and better together. Start your 14-day free trial today.",
+                        "primaryButtonText": "Get Started Free",
+                        "backgroundColor": "#6366f1",
+                        "textColor": "#ffffff"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "features-section",
+                    "type": "Container",
+                    "props": {
+                        "padding": "xl",
+                        "maxWidth": "xl",
+                        "backgroundColor": "#ffffff"
+                    },
+                    "children": [
+                        {
+                            "id": "features-title",
+                            "type": "Text",
+                            "props": {
+                                "content": "Everything You Need to Succeed",
+                                "tag": "h2",
+                                "size": "3xl",
+                                "color": "#1f2937"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "features-grid",
+                            "type": "Container",
+                            "props": {
+                                "display": "flex",
+                                "flexDirection": "row",
+                                "flexWrap": "wrap",
+                                "gap": "lg",
+                                "justifyContent": "center",
+                                "padding": "lg"
+                            },
+                            "children": [
+                                {
+                                    "id": "feature-1",
+                                    "type": "Feature",
+                                    "props": {
+                                        "icon": "⚡",
+                                        "title": "Lightning Fast",
+                                        "description": "Optimized performance with sub-second response times",
+                                        "backgroundColor": "#f9fafb",
+                                        "textColor": "#1f2937"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "feature-2",
+                                    "type": "Feature",
+                                    "props": {
+                                        "icon": "🔒",
+                                        "title": "Enterprise Security",
+                                        "description": "Bank-level encryption and SOC 2 compliance",
+                                        "backgroundColor": "#f9fafb",
+                                        "textColor": "#1f2937"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "feature-3",
+                                    "type": "Feature",
+                                    "props": {
+                                        "icon": "🎨",
+                                        "title": "Fully Customizable",
+                                        "description": "Tailor every aspect to match your workflow",
+                                        "backgroundColor": "#f9fafb",
+                                        "textColor": "#1f2937"
+                                    },
+                                    "children": []
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "cta-1",
+                    "type": "CTA",
+                    "props": {
+                        "title": "Ready to Transform Your Workflow?",
+                        "description": "Join 10,000+ teams already using CloudFlow",
+                        "buttonText": "View Pricing",
+                        "buttonLink": "page:pricing",
+                        "backgroundColor": "#6366f1",
+                        "textColor": "#ffffff"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "footer-1",
+                    "type": "Footer",
+                    "props": {
+                        "logoText": "CloudFlow",
+                        "copyright": "© 2024 CloudFlow. All rights reserved.",
+                        "backgroundColor": "#111827",
+                        "textColor": "#9ca3af"
+                    },
+                    "children": []
+                }
+            ]
+        },
+        {
+            "id": "pricing",
+            "name": "Pricing",
+            "slug": "pricing",
+            "components": [
+                {
+                    "id": "nav-pricing",
+                    "type": "Navbar",
+                    "props": {
+                        "logoText": "CloudFlow",
+                        "links": [
+                            {
+                                "text": "Home",
+                                "href": "page:home"
+                            },
+                            {
+                                "text": "Features",
+                                "href": "page:home"
+                            },
+                            {
+                                "text": "Blog",
+                                "href": "page:blog"
+                            },
+                            {
+                                "text": "About",
+                                "href": "page:about"
+                            }
+                        ],
+                        "ctaText": "Start Free Trial",
+                        "ctaLink": "#signup",
+                        "backgroundColor": "#ffffff",
+                        "textColor": "#1f2937"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "pricing-hero",
+                    "type": "Container",
+                    "props": {
+                        "padding": "xl",
+                        "maxWidth": "xl",
+                        "backgroundColor": "#f9fafb"
+                    },
+                    "children": [
+                        {
+                            "id": "pricing-title",
+                            "type": "Text",
+                            "props": {
+                                "content": "Simple, Transparent Pricing",
+                                "tag": "h1",
+                                "size": "3xl",
+                                "color": "#1f2937"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "pricing-subtitle",
+                            "type": "Text",
+                            "props": {
+                                "content": "Choose the perfect plan for your team",
+                                "tag": "p",
+                                "size": "lg",
+                                "color": "#6b7280"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "pricing-grid",
+                    "type": "Container",
+                    "props": {
+                        "padding": "xl",
+                        "maxWidth": "xl",
+                        "display": "flex",
+                        "flexDirection": "row",
+                        "flexWrap": "wrap",
+                        "gap": "lg",
+                        "justifyContent": "center",
+                        "backgroundColor": "#ffffff"
+                    },
+                    "children": [
+                        {
+                            "id": "pricing-1",
+                            "type": "PricingCard",
+                            "props": {
+                                "title": "Starter",
+                                "price": "$19",
+                                "period": "/month",
+                                "description": "Perfect for small teams",
+                                "features": [
+                                    "Up to 5 team members",
+                                    "10GB storage",
+                                    "Basic analytics",
+                                    "Email support"
+                                ],
+                                "buttonText": "Start Free Trial",
+                                "featured": false,
+                                "backgroundColor": "#ffffff",
+                                "textColor": "#1f2937"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "pricing-2",
+                            "type": "PricingCard",
+                            "props": {
+                                "title": "Professional",
+                                "price": "$49",
+                                "period": "/month",
+                                "description": "Best for growing teams",
+                                "features": [
+                                    "Up to 20 team members",
+                                    "100GB storage",
+                                    "Advanced analytics",
+                                    "Priority support",
+                                    "API access"
+                                ],
+                                "buttonText": "Start Free Trial",
+                                "featured": true,
+                                "backgroundColor": "#ffffff",
+                                "textColor": "#1f2937"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "pricing-3",
+                            "type": "PricingCard",
+                            "props": {
+                                "title": "Enterprise",
+                                "price": "$149",
+                                "period": "/month",
+                                "description": "For large organizations",
+                                "features": [
+                                    "Unlimited team members",
+                                    "Unlimited storage",
+                                    "Custom analytics",
+                                    "24/7 phone support",
+                                    "SLA guarantee"
+                                ],
+                                "buttonText": "Contact Sales",
+                                "featured": false,
+                                "backgroundColor": "#ffffff",
+                                "textColor": "#1f2937"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "footer-pricing",
+                    "type": "Footer",
+                    "props": {
+                        "logoText": "CloudFlow",
+                        "copyright": "© 2024 CloudFlow. All rights reserved.",
+                        "backgroundColor": "#111827",
+                        "textColor": "#9ca3af"
+                    },
+                    "children": []
+                }
+            ]
+        },
+        {
+            "id": "blog",
+            "name": "Blog",
+            "slug": "blog",
+            "components": [
+                {
+                    "id": "nav-blog",
+                    "type": "Navbar",
+                    "props": {
+                        "logoText": "CloudFlow",
+                        "links": [
+                            {
+                                "text": "Home",
+                                "href": "page:home"
+                            },
+                            {
+                                "text": "Features",
+                                "href": "page:home"
+                            },
+                            {
+                                "text": "Pricing",
+                                "href": "page:pricing"
+                            },
+                            {
+                                "text": "About",
+                                "href": "page:about"
+                            }
+                        ],
+                        "ctaText": "Start Free Trial",
+                        "ctaLink": "#signup",
+                        "backgroundColor": "#ffffff",
+                        "textColor": "#1f2937"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "blog-hero",
+                    "type": "Hero",
+                    "props": {
+                        "title": "CloudFlow Blog",
+                        "subtitle": "Latest Updates & Insights",
+                        "description": "Stay updated with the latest features, tips, and best practices",
+                        "primaryButtonText": "Subscribe",
+                        "backgroundColor": "#f8fafc",
+                        "textColor": "#1f2937"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "blog-content",
+                    "type": "Container",
+                    "props": {
+                        "padding": "xl",
+                        "maxWidth": "xl",
+                        "backgroundColor": "#ffffff"
+                    },
+                    "children": [
+                        {
+                            "id": "blog-alert",
+                            "type": "Alert",
+                            "props": {
+                                "title": "New Feature Released!",
+                                "message": "Check out our latest collaboration tools that make teamwork even easier",
+                                "variant": "info",
+                                "dismissible": true,
+                                "backgroundColor": "#ffffff",
+                                "textColor": "#1f2937"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "footer-blog",
+                    "type": "Footer",
+                    "props": {
+                        "logoText": "CloudFlow",
+                        "copyright": "© 2024 CloudFlow. All rights reserved.",
+                        "backgroundColor": "#111827",
+                        "textColor": "#9ca3af"
+                    },
+                    "children": []
+                }
+            ]
+        },
+        {
+            "id": "about",
+            "name": "About Us",
+            "slug": "about",
+            "components": [
+                {
+                    "id": "nav-about",
+                    "type": "Navbar",
+                    "props": {
+                        "logoText": "CloudFlow",
+                        "links": [
+                            {
+                                "text": "Home",
+                                "href": "page:home"
+                            },
+                            {
+                                "text": "Features",
+                                "href": "page:home"
+                            },
+                            {
+                                "text": "Pricing",
+                                "href": "page:pricing"
+                            },
+                            {
+                                "text": "Blog",
+                                "href": "page:blog"
+                            }
+                        ],
+                        "ctaText": "Start Free Trial",
+                        "ctaLink": "#signup",
+                        "backgroundColor": "#ffffff",
+                        "textColor": "#1f2937"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "about-hero",
+                    "type": "Hero",
+                    "props": {
+                        "title": "About CloudFlow",
+                        "subtitle": "Our Mission",
+                        "description": "We're on a mission to help teams collaborate better and achieve more together",
+                        "primaryButtonText": "Join Us",
+                        "backgroundColor": "#6366f1",
+                        "textColor": "#ffffff"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "about-stats",
+                    "type": "Container",
+                    "props": {
+                        "padding": "xl",
+                        "maxWidth": "xl",
+                        "backgroundColor": "#f9fafb"
+                    },
+                    "children": [
+                        {
+                            "id": "stats-about",
+                            "type": "Stats",
+                            "props": {
+                                "stats": [
+                                    {
+                                        "value": "10K+",
+                                        "label": "Active Teams"
+                                    },
+                                    {
+                                        "value": "50+",
+                                        "label": "Countries"
+                                    },
+                                    {
+                                        "value": "99.9%",
+                                        "label": "Uptime"
+                                    },
+                                    {
+                                        "value": "24/7",
+                                        "label": "Support"
+                                    }
+                                ],
+                                "backgroundColor": "transparent",
+                                "textColor": "#1f2937",
+                                "accentColor": "#6366f1"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "footer-about",
+                    "type": "Footer",
+                    "props": {
+                        "logoText": "CloudFlow",
+                        "copyright": "© 2024 CloudFlow. All rights reserved.",
+                        "backgroundColor": "#111827",
+                        "textColor": "#9ca3af"
+                    },
+                    "children": []
+                }
+            ]
+        }
+    ]
+}

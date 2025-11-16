@@ -5,6 +5,14 @@ export interface ComponentDefinition {
     children: ComponentDefinition[];
 }
 
+export interface Page {
+    id: string;
+    name: string;
+    slug?: string; // URL slug like "about-us", "contact" (legacy)
+    path?: string; // URL path like "/", "/about", "/contact" (preferred)
+    components: ComponentDefinition[];
+}
+
 export interface EditorState {
     components: ComponentDefinition[];
     selectedComponentId: string | null;

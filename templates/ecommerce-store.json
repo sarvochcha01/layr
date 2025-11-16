@@ -1,0 +1,533 @@
+{
+    "name": "E-commerce Store",
+    "description": "Complete online store with product showcase, features, testimonials - Multi-page",
+    "category": "E-commerce",
+    "thumbnail": "https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=400",
+    "featured": true,
+    "pages": [
+        {
+            "id": "home",
+            "name": "Home",
+            "slug": "index",
+            "components": [
+                {
+                    "id": "nav-1",
+                    "type": "Navbar",
+                    "props": {
+                        "logoText": "ShopHub",
+                        "links": [
+                            {
+                                "text": "Shop",
+                                "href": "page:shop"
+                            },
+                            {
+                                "text": "About",
+                                "href": "page:about"
+                            },
+                            {
+                                "text": "Contact",
+                                "href": "page:contact"
+                            }
+                        ],
+                        "ctaText": "Cart (0)",
+                        "ctaLink": "#cart",
+                        "backgroundColor": "#ffffff",
+                        "textColor": "#1f2937",
+                        "linkColor": "#4b5563",
+                        "linkHoverColor": "#3b82f6"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "hero-1",
+                    "type": "Hero",
+                    "props": {
+                        "title": "Discover Premium Products",
+                        "subtitle": "Shop the Latest Collection",
+                        "description": "Curated selection of high-quality products delivered to your doorstep. Free shipping on orders over $50.",
+                        "primaryButtonText": "Shop Now",
+                        "backgroundColor": "#f0f9ff",
+                        "textColor": "#1e293b"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "container-features",
+                    "type": "Container",
+                    "props": {
+                        "padding": "xl",
+                        "maxWidth": "xl",
+                        "backgroundColor": "#ffffff"
+                    },
+                    "children": [
+                        {
+                            "id": "features-title",
+                            "type": "Text",
+                            "props": {
+                                "content": "Why Shop With Us",
+                                "tag": "h2",
+                                "size": "3xl",
+                                "color": "#1f2937"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "features-grid",
+                            "type": "Container",
+                            "props": {
+                                "display": "flex",
+                                "flexDirection": "row",
+                                "flexWrap": "wrap",
+                                "gap": "lg",
+                                "justifyContent": "center",
+                                "padding": "md"
+                            },
+                            "children": [
+                                {
+                                    "id": "feature-1",
+                                    "type": "Feature",
+                                    "props": {
+                                        "icon": "🚚",
+                                        "title": "Free Shipping",
+                                        "description": "Free delivery on all orders over $50",
+                                        "backgroundColor": "#f9fafb",
+                                        "textColor": "#1f2937"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "feature-2",
+                                    "type": "Feature",
+                                    "props": {
+                                        "icon": "🔒",
+                                        "title": "Secure Payment",
+                                        "description": "100% secure payment processing",
+                                        "backgroundColor": "#f9fafb",
+                                        "textColor": "#1f2937"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "feature-3",
+                                    "type": "Feature",
+                                    "props": {
+                                        "icon": "↩️",
+                                        "title": "Easy Returns",
+                                        "description": "30-day hassle-free return policy",
+                                        "backgroundColor": "#f9fafb",
+                                        "textColor": "#1f2937"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "feature-4",
+                                    "type": "Feature",
+                                    "props": {
+                                        "icon": "⭐",
+                                        "title": "Quality Guarantee",
+                                        "description": "Premium quality products guaranteed",
+                                        "backgroundColor": "#f9fafb",
+                                        "textColor": "#1f2937"
+                                    },
+                                    "children": []
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "stats-section",
+                    "type": "Container",
+                    "props": {
+                        "padding": "xl",
+                        "maxWidth": "xl",
+                        "backgroundColor": "#3b82f6"
+                    },
+                    "children": [
+                        {
+                            "id": "stats-1",
+                            "type": "Stats",
+                            "props": {
+                                "stats": [
+                                    {
+                                        "value": "50K+",
+                                        "label": "Happy Customers"
+                                    },
+                                    {
+                                        "value": "1000+",
+                                        "label": "Products"
+                                    },
+                                    {
+                                        "value": "100+",
+                                        "label": "Categories"
+                                    },
+                                    {
+                                        "value": "24/7",
+                                        "label": "Support"
+                                    }
+                                ],
+                                "backgroundColor": "transparent",
+                                "textColor": "#ffffff",
+                                "accentColor": "#ffffff"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "cta-1",
+                    "type": "CTA",
+                    "props": {
+                        "title": "Ready to Start Shopping?",
+                        "description": "Browse our collection of amazing products",
+                        "buttonText": "View Products",
+                        "buttonLink": "page:shop",
+                        "backgroundColor": "#1f2937",
+                        "textColor": "#ffffff"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "footer-1",
+                    "type": "Footer",
+                    "props": {
+                        "logoText": "ShopHub",
+                        "copyright": "© 2024 ShopHub. All rights reserved.",
+                        "backgroundColor": "#111827",
+                        "textColor": "#9ca3af"
+                    },
+                    "children": []
+                }
+            ]
+        },
+        {
+            "id": "shop",
+            "name": "Shop",
+            "slug": "shop",
+            "components": [
+                {
+                    "id": "nav-shop",
+                    "type": "Navbar",
+                    "props": {
+                        "logoText": "ShopHub",
+                        "links": [
+                            {
+                                "text": "Home",
+                                "href": "page:home"
+                            },
+                            {
+                                "text": "About",
+                                "href": "page:about"
+                            },
+                            {
+                                "text": "Contact",
+                                "href": "page:contact"
+                            }
+                        ],
+                        "ctaText": "Cart (0)",
+                        "ctaLink": "#cart",
+                        "backgroundColor": "#ffffff",
+                        "textColor": "#1f2937"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "shop-hero",
+                    "type": "Container",
+                    "props": {
+                        "padding": "xl",
+                        "maxWidth": "xl",
+                        "backgroundColor": "#f9fafb"
+                    },
+                    "children": [
+                        {
+                            "id": "shop-title",
+                            "type": "Text",
+                            "props": {
+                                "content": "Our Products",
+                                "tag": "h1",
+                                "size": "3xl",
+                                "color": "#1f2937"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "shop-subtitle",
+                            "type": "Text",
+                            "props": {
+                                "content": "Browse our curated collection of premium products",
+                                "tag": "p",
+                                "size": "lg",
+                                "color": "#6b7280"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "products-grid",
+                    "type": "Container",
+                    "props": {
+                        "padding": "xl",
+                        "maxWidth": "xl",
+                        "display": "flex",
+                        "flexDirection": "row",
+                        "flexWrap": "wrap",
+                        "gap": "lg",
+                        "justifyContent": "center",
+                        "backgroundColor": "#ffffff"
+                    },
+                    "children": [
+                        {
+                            "id": "product-1",
+                            "type": "Card",
+                            "props": {
+                                "title": "Premium Product",
+                                "description": "High-quality product with amazing features",
+                                "buttonText": "Add to Cart",
+                                "backgroundColor": "#ffffff",
+                                "textColor": "#1f2937"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "product-2",
+                            "type": "Card",
+                            "props": {
+                                "title": "Best Seller",
+                                "description": "Our most popular product this season",
+                                "buttonText": "Add to Cart",
+                                "backgroundColor": "#ffffff",
+                                "textColor": "#1f2937"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "product-3",
+                            "type": "Card",
+                            "props": {
+                                "title": "New Arrival",
+                                "description": "Just added to our collection",
+                                "buttonText": "Add to Cart",
+                                "backgroundColor": "#ffffff",
+                                "textColor": "#1f2937"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "footer-shop",
+                    "type": "Footer",
+                    "props": {
+                        "logoText": "ShopHub",
+                        "copyright": "© 2024 ShopHub. All rights reserved.",
+                        "backgroundColor": "#111827",
+                        "textColor": "#9ca3af"
+                    },
+                    "children": []
+                }
+            ]
+        },
+        {
+            "id": "about",
+            "name": "About Us",
+            "slug": "about",
+            "components": [
+                {
+                    "id": "nav-about",
+                    "type": "Navbar",
+                    "props": {
+                        "logoText": "ShopHub",
+                        "links": [
+                            {
+                                "text": "Home",
+                                "href": "page:home"
+                            },
+                            {
+                                "text": "Shop",
+                                "href": "page:shop"
+                            },
+                            {
+                                "text": "Contact",
+                                "href": "page:contact"
+                            }
+                        ],
+                        "ctaText": "Cart (0)",
+                        "ctaLink": "#cart",
+                        "backgroundColor": "#ffffff",
+                        "textColor": "#1f2937"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "about-hero",
+                    "type": "Hero",
+                    "props": {
+                        "title": "About ShopHub",
+                        "subtitle": "Our Story",
+                        "description": "We're passionate about bringing you the best products at the best prices",
+                        "primaryButtonText": "Start Shopping",
+                        "backgroundColor": "#f0f9ff",
+                        "textColor": "#1e293b"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "testimonials",
+                    "type": "Container",
+                    "props": {
+                        "padding": "xl",
+                        "maxWidth": "xl",
+                        "backgroundColor": "#ffffff"
+                    },
+                    "children": [
+                        {
+                            "id": "testimonials-title",
+                            "type": "Text",
+                            "props": {
+                                "content": "What Our Customers Say",
+                                "tag": "h2",
+                                "size": "3xl",
+                                "color": "#1f2937"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "testimonials-grid",
+                            "type": "Container",
+                            "props": {
+                                "display": "flex",
+                                "flexDirection": "row",
+                                "flexWrap": "wrap",
+                                "gap": "lg",
+                                "justifyContent": "center",
+                                "padding": "md"
+                            },
+                            "children": [
+                                {
+                                    "id": "testimonial-1",
+                                    "type": "Testimonial",
+                                    "props": {
+                                        "quote": "Amazing quality and fast shipping! Will definitely order again.",
+                                        "author": "Sarah Johnson",
+                                        "role": "Verified Customer",
+                                        "rating": 5,
+                                        "backgroundColor": "#f9fafb",
+                                        "textColor": "#1f2937"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "testimonial-2",
+                                    "type": "Testimonial",
+                                    "props": {
+                                        "quote": "Best online shopping experience I've had. Highly recommend!",
+                                        "author": "Michael Chen",
+                                        "role": "Verified Customer",
+                                        "rating": 5,
+                                        "backgroundColor": "#f9fafb",
+                                        "textColor": "#1f2937"
+                                    },
+                                    "children": []
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "footer-about",
+                    "type": "Footer",
+                    "props": {
+                        "logoText": "ShopHub",
+                        "copyright": "© 2024 ShopHub. All rights reserved.",
+                        "backgroundColor": "#111827",
+                        "textColor": "#9ca3af"
+                    },
+                    "children": []
+                }
+            ]
+        },
+        {
+            "id": "contact",
+            "name": "Contact",
+            "slug": "contact",
+            "components": [
+                {
+                    "id": "nav-contact",
+                    "type": "Navbar",
+                    "props": {
+                        "logoText": "ShopHub",
+                        "links": [
+                            {
+                                "text": "Home",
+                                "href": "page:home"
+                            },
+                            {
+                                "text": "Shop",
+                                "href": "page:shop"
+                            },
+                            {
+                                "text": "About",
+                                "href": "page:about"
+                            }
+                        ],
+                        "ctaText": "Cart (0)",
+                        "ctaLink": "#cart",
+                        "backgroundColor": "#ffffff",
+                        "textColor": "#1f2937"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "contact-hero",
+                    "type": "Hero",
+                    "props": {
+                        "title": "Get In Touch",
+                        "subtitle": "Contact Us",
+                        "description": "Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.",
+                        "primaryButtonText": "Send Message",
+                        "backgroundColor": "#f8fafc",
+                        "textColor": "#1f2937"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "contact-info",
+                    "type": "Container",
+                    "props": {
+                        "padding": "xl",
+                        "maxWidth": "xl",
+                        "backgroundColor": "#ffffff"
+                    },
+                    "children": [
+                        {
+                            "id": "contact-alert",
+                            "type": "Alert",
+                            "props": {
+                                "title": "Customer Support",
+                                "message": "Our team is available 24/7 to help you with any questions",
+                                "variant": "info",
+                                "dismissible": false,
+                                "backgroundColor": "#ffffff",
+                                "textColor": "#1f2937"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "footer-contact",
+                    "type": "Footer",
+                    "props": {
+                        "logoText": "ShopHub",
+                        "copyright": "© 2024 ShopHub. All rights reserved.",
+                        "backgroundColor": "#111827",
+                        "textColor": "#9ca3af"
+                    },
+                    "children": []
+                }
+            ]
+        }
+    ]
+}

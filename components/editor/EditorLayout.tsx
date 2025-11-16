@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { ComponentDefinition } from "@/types/editor";
+import { ComponentDefinition, Page } from "@/types/editor";
 import { HierarchyPanel } from "./HierarchyPanel";
 import { ComponentPalette } from "./ComponentPalette";
 import { Canvas } from "./Canvas";
 import { PropertiesPanel } from "./PropertiesPanel";
-import { Download, Eye, Edit } from "lucide-react";
+import { PagesPanel } from "./PagesPanel";
+import { Download, Eye, Edit, X } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 type Viewport = "desktop" | "tablet" | "mobile";
 
@@ -20,6 +22,11 @@ interface EditorLayoutProps {
   onAddComponent?: (componentType: string) => void;
   projectName?: string;
   onProjectNameChange?: (name: string) => void;
+  pages: Page[];
+  currentPageId: string;
+  onPageSelect: (pageId: string) => void;
+  onPageAdd: (name: string, slug: string) => void;
+  onPageDelete: (pageId: string) => void;
 }
 
 export function EditorLayout({
@@ -32,7 +39,13 @@ export function EditorLayout({
   onAddComponent,
   projectName,
   onProjectNameChange,
+  pages,
+  currentPageId,
+  onPageSelect,
+  onPageAdd,
+  onPageDelete,
 }: EditorLayoutProps) {
+  const router = useRouter();
   const [viewport, setViewport] = useState<Viewport>("desktop");
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false);
@@ -57,13 +70,13 @@ export function EditorLayout({
 
   const exportToZip = async () => {
     try {
-      // Call the export API
+      // Call the export API with pages
       const response = await fetch("/api/export", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ components }),
+        body: JSON.stringify({ pages }),
       });
 
       if (!response.ok) {
@@ -90,10 +103,24 @@ export function EditorLayout({
 
   return (
     <div className="h-screen flex bg-gray-50">
-      {/* Left Panel - Split between Hierarchy and Components */}
+      {/* Left Panel - Pages, Hierarchy, and Components */}
       {!isPreviewMode && (
         <div className="w-80 flex-shrink-0 bg-white border-r border-gray-200 flex flex-col h-full">
-          {/* Hierarchy Panel - Top Half */}
+          {/* Pages Panel */}
+          <div className="h-64 border-b border-gray-200 flex-shrink-0 overflow-hidden">
+            <PagesPanel
+              pages={pages}
+              currentPageId={currentPageId}
+              onPageSelect={onPageSelect}
+              onPageAdd={onPageAdd}
+              onPageDelete={onPageDelete}
+              onPageRename={(id, name, slug) => {
+                // TODO: Implement page rename
+              }}
+            />
+          </div>
+
+          {/* Hierarchy Panel */}
           <div className="flex-1 border-b border-gray-200 min-h-0 overflow-hidden">
             <HierarchyPanel
               components={components}
@@ -104,7 +131,7 @@ export function EditorLayout({
             />
           </div>
 
-          {/* Component Palette - Bottom Half */}
+          {/* Component Palette */}
           <div className="flex-1 min-h-0 overflow-hidden">
             <ComponentPalette />
           </div>
@@ -116,6 +143,14 @@ export function EditorLayout({
         {/* Toolbar */}
         <div className="h-12 bg-white border-b border-gray-200 flex items-center px-4 justify-between">
           <div className="flex items-center space-x-4">
+            {/* Close Button */}
+            <button
+              onClick={() => router.back()}
+              className="p-2 hover:bg-gray-100 rounded-md transition-colors"
+              title="Close Editor"
+            >
+              <X className="w-5 h-5 text-gray-600" />
+            </button>
             {projectName && onProjectNameChange ? (
               isEditingName ? (
                 <input
@@ -277,6 +312,7 @@ export function EditorLayout({
             onUpdateComponent={onUpdateComponent}
             onDeleteComponent={onDeleteComponent}
             onDuplicateComponent={onDuplicateComponent}
+            pages={pages}
           />
         </div>
       )}

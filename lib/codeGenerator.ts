@@ -15,7 +15,44 @@ function getInlineStyles(props: Record<string, any>, defaults?: { backgroundColo
     return styles.length > 0 ? ` style="${styles.join('; ')}"` : '';
 }
 
-export function generateHTML(components: ComponentDefinition[]): string {
+export function generateHTML(components: ComponentDefinition[], allPages?: any[]): string {
+    // Helper to convert internal page links to proper hrefs
+    const convertLink = (href: string): string => {
+        if (!href || !allPages) return href;
+
+        // Check if it's an internal page link (format: "page:pageId")
+        if (href.startsWith('page:')) {
+            const pageId = href.substring(5);
+            const page = allPages.find(p => p.id === pageId);
+            if (page) {
+                // Support both slug and path fields
+                if (page.slug) {
+                    return `${page.slug}.html`;
+                } else if (page.path) {
+                    const pathName = page.path === "/" ? "index" : page.path.replace(/^\//, "").replace(/\//g, "-");
+                    return `${pathName}.html`;
+                } else {
+                    return `${page.id}.html`;
+                }
+            }
+        }
+
+        // Also handle direct path references (e.g., "/about" -> "about.html")
+        if (href.startsWith('/') && !href.includes('.')) {
+            const page = allPages.find(p => p.path === href);
+            if (page) {
+                if (page.slug) {
+                    return `${page.slug}.html`;
+                } else {
+                    const pathName = href === "/" ? "index" : href.replace(/^\//, "").replace(/\//g, "-");
+                    return `${pathName}.html`;
+                }
+            }
+        }
+
+        return href;
+    };
+
     const renderComponent = (component: ComponentDefinition): string => {
         const { type, props, children } = component;
 
@@ -43,10 +80,10 @@ export function generateHTML(components: ComponentDefinition[]): string {
     <div id="navbar-menu" class="hidden md:flex items-center gap-8">
         <ul class="flex gap-8">
             ${links.map((link: any) => `
-            <li><a href="${link.href}" class="hover:opacity-75 transition-opacity" style="color: ${linkColor}" onmouseover="this.style.color='${linkHoverColor}'" onmouseout="this.style.color='${linkColor}'">${link.text}</a></li>
+            <li><a href="${convertLink(link.href)}" class="hover:opacity-75 transition-opacity" style="color: ${linkColor}" onmouseover="this.style.color='${linkHoverColor}'" onmouseout="this.style.color='${linkColor}'">${link.text}</a></li>
             `).join('')}
         </ul>
-        ${props.ctaText && props.ctaLink ? `<a href="${props.ctaLink}" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">${props.ctaText}</a>` : ''}
+        ${props.ctaText && props.ctaLink ? `<a href="${convertLink(props.ctaLink)}" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">${props.ctaText}</a>` : ''}
     </div>
 </nav>`;
 
@@ -161,7 +198,7 @@ export function generateHTML(components: ComponentDefinition[]): string {
                 };
                 const btnClass = `${btnVariantClasses[props.variant || 'default']} ${btnSizeClasses[props.size || 'default']} ${props.fullWidth ? 'w-full' : ''} rounded-md font-medium transition-colors`;
                 const button = `<button class="${btnClass}"${props.disabled ? ' disabled' : ''}${getInlineStyles(props)}>${props.text || "Button"}</button>`;
-                return props.href && !props.disabled ? `<a href="${props.href}">${button}</a>` : button;
+                return props.href && !props.disabled ? `<a href="${convertLink(props.href)}">${button}</a>` : button;
 
             case "Text":
                 const sizeMap: Record<string, string> = {
@@ -237,6 +274,137 @@ export function generateHTML(components: ComponentDefinition[]): string {
                     return `<video src="${props.src}" ${props.controls !== false ? 'controls' : ''} ${props.autoplay ? 'autoplay' : ''} ${props.muted ? 'muted' : ''} ${props.loop ? 'loop' : ''} class="w-full h-auto rounded-lg"${getInlineStyles(props)}></video>`;
                 }
                 return '';
+
+            case "Accordion":
+                const accordionItems = props.items || [];
+                return `
+<div class="space-y-2"${getInlineStyles(props)}>
+    ${accordionItems.map((item: any, idx: number) => `
+    <details class="border rounded-lg">
+        <summary class="px-4 py-3 cursor-pointer font-medium hover:bg-gray-50">${item.title}</summary>
+        <div class="px-4 py-3 border-t">${item.content}</div>
+    </details>
+    `).join('')}
+</div>`;
+
+            case "Tabs":
+                const tabs = props.tabs || [];
+                return `
+<div${getInlineStyles(props)}>
+    <div class="flex border-b">
+        ${tabs.map((tab: any, idx: number) => `
+        <button class="px-4 py-2 font-medium ${idx === 0 ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600 hover:text-gray-900'}" onclick="showTab(${idx})">${tab.label}</button>
+        `).join('')}
+    </div>
+    ${tabs.map((tab: any, idx: number) => `
+    <div id="tab-${idx}" class="p-4 ${idx !== 0 ? 'hidden' : ''}">${tab.content}</div>
+    `).join('')}
+</div>`;
+
+            case "Testimonial":
+                const stars = '★'.repeat(props.rating || 5) + '☆'.repeat(5 - (props.rating || 5));
+                return `
+<div class="p-6 rounded-lg"${getInlineStyles(props)}>
+    <div class="text-yellow-400 text-xl mb-3">${stars}</div>
+    <p class="text-lg mb-4 italic">"${props.quote || ''}"</p>
+    <div class="flex items-center gap-3">
+        ${props.avatar ? `<img src="${props.avatar}" alt="${props.author}" class="w-12 h-12 rounded-full" />` : ''}
+        <div>
+            <div class="font-semibold">${props.author || ''}</div>
+            <div class="text-sm opacity-75">${props.role || ''}</div>
+        </div>
+    </div>
+</div>`;
+
+            case "PricingCard":
+                const features = props.features || [];
+                return `
+<div class="p-8 rounded-lg border-2 ${props.featured ? 'border-blue-500 shadow-xl' : 'border-gray-200 shadow-md'}"${getInlineStyles(props)}>
+    ${props.featured ? '<div class="text-center mb-4"><span class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium">Most Popular</span></div>' : ''}
+    <div class="text-center mb-6">
+        <h3 class="text-2xl font-bold mb-2">${props.title || ''}</h3>
+        <div class="mb-2">
+            <span class="text-4xl font-bold">${props.price || ''}</span>
+            <span class="text-gray-600">${props.period || ''}</span>
+        </div>
+        <p class="text-sm opacity-75">${props.description || ''}</p>
+    </div>
+    <ul class="space-y-3 mb-6">
+        ${features.map((feature: string) => `
+        <li class="flex items-center gap-2">
+            <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
+            <span>${feature}</span>
+        </li>
+        `).join('')}
+    </ul>
+    <button class="w-full ${props.featured ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-200 hover:bg-gray-300'} text-${props.featured ? 'white' : 'gray-900'} px-6 py-3 rounded-md font-medium transition-colors">${props.buttonText || 'Get Started'}</button>
+</div>`;
+
+            case "Feature":
+                return `
+<div class="p-6 rounded-lg text-center"${getInlineStyles(props)}>
+    <div class="text-4xl mb-4">${props.icon || '✨'}</div>
+    <h3 class="text-xl font-bold mb-2">${props.title || ''}</h3>
+    <p class="opacity-75">${props.description || ''}</p>
+</div>`;
+
+            case "Stats":
+                const stats = props.stats || [];
+                const accentColor = props.accentColor || '#3b82f6';
+                return `
+<div class="flex justify-around items-center flex-wrap gap-8 p-8"${getInlineStyles(props)}>
+    ${stats.map((stat: any) => `
+    <div class="text-center">
+        <div class="text-4xl font-bold mb-2" style="color: ${accentColor}">${stat.value}</div>
+        <div class="text-sm opacity-75 uppercase tracking-wide">${stat.label}</div>
+    </div>
+    `).join('')}
+</div>`;
+
+            case "CTA":
+                return `
+<div class="text-center py-16 px-8"${getInlineStyles(props)}>
+    <h2 class="text-3xl font-bold mb-4">${props.title || ''}</h2>
+    <p class="text-lg mb-8 opacity-90">${props.description || ''}</p>
+    <a href="${convertLink(props.buttonLink || '#')}" class="inline-block bg-white text-gray-900 px-8 py-3 rounded-md font-medium hover:bg-gray-100 transition-colors">${props.buttonText || 'Get Started'}</a>
+</div>`;
+
+            case "Divider":
+                return `<hr class="border-t-${props.thickness || '1'} ${props.style === 'dashed' ? 'border-dashed' : props.style === 'dotted' ? 'border-dotted' : ''}" style="border-color: ${props.color || '#e5e7eb'}"${getInlineStyles(props)} />`;
+
+            case "Spacer":
+                const spacerSizeMap = { xs: '8px', sm: '16px', md: '32px', lg: '64px', xl: '128px' };
+                return `<div style="height: ${spacerSizeMap[props.size as keyof typeof spacerSizeMap] || spacerSizeMap.md}"${getInlineStyles(props)}></div>`;
+
+            case "Badge":
+                const variantColors = {
+                    default: 'bg-gray-200 text-gray-900',
+                    success: 'bg-green-100 text-green-800',
+                    warning: 'bg-yellow-100 text-yellow-800',
+                    error: 'bg-red-100 text-red-800',
+                    info: 'bg-blue-100 text-blue-800'
+                };
+                return `<span class="inline-block px-3 py-1 rounded-full text-sm font-medium ${variantColors[props.variant as keyof typeof variantColors] || variantColors.default}"${getInlineStyles(props)}>${props.text || ''}</span>`;
+
+            case "Alert":
+                const alertVariants = {
+                    info: { bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-900', icon: 'ℹ️' },
+                    success: { bg: 'bg-green-50', border: 'border-green-200', text: 'text-green-900', icon: '✓' },
+                    warning: { bg: 'bg-yellow-50', border: 'border-yellow-200', text: 'text-yellow-900', icon: '⚠️' },
+                    error: { bg: 'bg-red-50', border: 'border-red-200', text: 'text-red-900', icon: '✕' }
+                };
+                const alertStyle = alertVariants[props.variant as keyof typeof alertVariants] || alertVariants.info;
+                return `
+<div class="p-4 rounded-lg border ${alertStyle.bg} ${alertStyle.border} ${alertStyle.text}"${getInlineStyles(props)}>
+    <div class="flex items-start gap-3">
+        <span class="text-2xl">${alertStyle.icon}</span>
+        <div class="flex-1">
+            <h4 class="font-semibold mb-1">${props.title || ''}</h4>
+            <p class="text-sm">${props.message || ''}</p>
+        </div>
+        ${props.dismissible ? '<button class="text-xl hover:opacity-75">×</button>' : ''}
+    </div>
+</div>`;
 
             default:
                 return `<div class="p-4">${children.map(renderComponent).join("")}</div>`;

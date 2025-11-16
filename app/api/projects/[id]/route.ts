@@ -80,7 +80,7 @@ export async function PATCH(
         }
 
         const body = await request.json();
-        const { name, description, components, thumbnail } = body;
+        const { name, description, components, pages, thumbnail } = body;
 
         const updateData: any = {
             updatedAt: Timestamp.now(),
@@ -89,6 +89,7 @@ export async function PATCH(
         if (name !== undefined) updateData.name = name;
         if (description !== undefined) updateData.description = description;
         if (components !== undefined) updateData.components = components;
+        if (pages !== undefined) updateData.pages = pages;
         if (thumbnail !== undefined) updateData.thumbnail = thumbnail;
 
         await updateDoc(projectRef, updateData);
