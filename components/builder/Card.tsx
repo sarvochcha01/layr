@@ -12,6 +12,8 @@ interface CardProps {
   className?: string;
   width?: string;
   height?: string;
+  backgroundColor?: string;
+  textColor?: string;
 }
 
 export function Card({
@@ -25,20 +27,30 @@ export function Card({
   className,
   width,
   height,
+  backgroundColor,
+  textColor,
 }: CardProps) {
   const variantClasses = {
-    default: "bg-white",
-    bordered: "bg-white border border-gray-200",
-    shadow: "bg-white shadow-md",
-    elevated: "bg-white shadow-lg hover:shadow-xl transition-shadow",
+    default: !backgroundColor && "bg-white",
+    bordered: !backgroundColor && "bg-white border border-gray-200",
+    shadow: !backgroundColor && "bg-white shadow-md",
+    elevated:
+      !backgroundColor &&
+      "bg-white shadow-lg hover:shadow-xl transition-shadow",
   };
 
   return (
     <div
-      className={cn("rounded-lg p-6", variantClasses[variant], className)}
+      className={cn(
+        "rounded-lg p-6 flex-shrink-0",
+        variantClasses[variant],
+        className
+      )}
       style={{
-        width: width || undefined,
+        width: width || "250px",
         height: height || undefined,
+        backgroundColor: backgroundColor || undefined,
+        color: textColor || undefined,
       }}
     >
       {/* Image */}

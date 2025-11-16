@@ -121,8 +121,8 @@ function ComponentWrapper({
             isPreviewMode={isPreviewMode}
           >
             {component.children.length > 0 &&
-              (component.type === "Grid" ? (
-                // Grid: render children without wrapper divs to preserve grid layout
+              (component.type === "Grid" || component.type === "Container" ? (
+                // Grid & Container: render children without wrapper divs to preserve layout
                 <>
                   {component.children.map((child) => (
                     <ComponentRenderer

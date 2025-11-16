@@ -863,15 +863,148 @@ export function PropertiesPanel({
             </div>
 
             <div>
-              <Label htmlFor="backgroundColor" className="mb-2 block">
-                Background Color
+              <Label htmlFor="display" className="mb-2 block">
+                Display
               </Label>
-              <Input
-                id="backgroundColor"
-                type="color"
-                value={props.backgroundColor || "#ffffff"}
-                onChange={(e) => updateProp("backgroundColor", e.target.value)}
-              />
+              <select
+                id="display"
+                value={props.display || "block"}
+                onChange={(e) => updateProp("display", e.target.value)}
+                className="w-full p-2 border rounded-md"
+              >
+                <option value="block">Block</option>
+                <option value="flex">Flex</option>
+              </select>
+            </div>
+
+            {props.display === "flex" && (
+              <>
+                <div>
+                  <Label htmlFor="flexDirection" className="mb-2 block">
+                    Flex Direction
+                  </Label>
+                  <select
+                    id="flexDirection"
+                    value={props.flexDirection || "row"}
+                    onChange={(e) =>
+                      updateProp("flexDirection", e.target.value)
+                    }
+                    className="w-full p-2 border rounded-md"
+                  >
+                    <option value="row">Row</option>
+                    <option value="column">Column</option>
+                    <option value="row-reverse">Row Reverse</option>
+                    <option value="column-reverse">Column Reverse</option>
+                  </select>
+                </div>
+
+                <div>
+                  <Label htmlFor="flexWrap" className="mb-2 block">
+                    Flex Wrap
+                  </Label>
+                  <select
+                    id="flexWrap"
+                    value={props.flexWrap || "nowrap"}
+                    onChange={(e) => updateProp("flexWrap", e.target.value)}
+                    className="w-full p-2 border rounded-md"
+                  >
+                    <option value="nowrap">No Wrap</option>
+                    <option value="wrap">Wrap</option>
+                    <option value="wrap-reverse">Wrap Reverse</option>
+                  </select>
+                </div>
+
+                <div>
+                  <Label htmlFor="justifyContent" className="mb-2 block">
+                    Justify Content
+                  </Label>
+                  <select
+                    id="justifyContent"
+                    value={props.justifyContent || "start"}
+                    onChange={(e) =>
+                      updateProp("justifyContent", e.target.value)
+                    }
+                    className="w-full p-2 border rounded-md"
+                  >
+                    <option value="start">Start</option>
+                    <option value="center">Center</option>
+                    <option value="end">End</option>
+                    <option value="between">Space Between</option>
+                    <option value="around">Space Around</option>
+                    <option value="evenly">Space Evenly</option>
+                  </select>
+                </div>
+
+                <div>
+                  <Label htmlFor="alignItems" className="mb-2 block">
+                    Align Items
+                  </Label>
+                  <select
+                    id="alignItems"
+                    value={props.alignItems || "start"}
+                    onChange={(e) => updateProp("alignItems", e.target.value)}
+                    className="w-full p-2 border rounded-md"
+                  >
+                    <option value="start">Start</option>
+                    <option value="center">Center</option>
+                    <option value="end">End</option>
+                    <option value="stretch">Stretch</option>
+                    <option value="baseline">Baseline</option>
+                  </select>
+                </div>
+
+                <div>
+                  <Label htmlFor="gap" className="mb-2 block">
+                    Gap
+                  </Label>
+                  <select
+                    id="gap"
+                    value={props.gap || "none"}
+                    onChange={(e) => updateProp("gap", e.target.value)}
+                    className="w-full p-2 border rounded-md"
+                  >
+                    <option value="none">None</option>
+                    <option value="sm">Small</option>
+                    <option value="md">Medium</option>
+                    <option value="lg">Large</option>
+                    <option value="xl">Extra Large</option>
+                  </select>
+                </div>
+              </>
+            )}
+
+            <div>
+              <Label htmlFor="overflowX" className="mb-2 block">
+                Overflow X
+              </Label>
+              <select
+                id="overflowX"
+                value={props.overflowX || "visible"}
+                onChange={(e) => updateProp("overflowX", e.target.value)}
+                className="w-full p-2 border rounded-md"
+              >
+                <option value="visible">Visible</option>
+                <option value="hidden">Hidden</option>
+                <option value="scroll">Scroll</option>
+                <option value="auto">Auto</option>
+              </select>
+            </div>
+
+            <div>
+              <Label htmlFor="overflowY" className="mb-2 block">
+                Overflow Y
+              </Label>
+              <select
+                id="overflowY"
+                value={props.overflowY || "visible"}
+                onChange={(e) => updateProp("overflowY", e.target.value)}
+                className="w-full p-2 border rounded-md"
+              >
+                <option value="visible">Visible</option>
+                <option value="hidden">Hidden</option>
+                <option value="scroll">Scroll</option>
+                <option value="auto">Auto</option>
+              </select>
             </div>
           </div>
         );

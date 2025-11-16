@@ -83,8 +83,31 @@ export function generateHTML(components: ComponentDefinition[]): string {
             case "Container":
                 const containerMaxWidth = { sm: 'max-w-sm', md: 'max-w-md', lg: 'max-w-lg', xl: 'max-w-xl', '2xl': 'max-w-2xl', '3xl': 'max-w-3xl', '4xl': 'max-w-4xl', '5xl': 'max-w-5xl', '6xl': 'max-w-6xl', '7xl': 'max-w-7xl', full: 'max-w-full' };
                 const containerPadding = { none: '', sm: 'p-4', md: 'p-6', lg: 'p-8', xl: 'p-12' };
+                const containerDisplay = props.display === 'flex' ? 'flex' : '';
+                const containerFlexDir = { row: 'flex-row', column: 'flex-col', 'row-reverse': 'flex-row-reverse', 'column-reverse': 'flex-col-reverse' };
+                const containerFlexWrap = { nowrap: 'flex-nowrap', wrap: 'flex-wrap', 'wrap-reverse': 'flex-wrap-reverse' };
+                const containerJustify = { start: 'justify-start', center: 'justify-center', end: 'justify-end', between: 'justify-between', around: 'justify-around', evenly: 'justify-evenly' };
+                const containerAlign = { start: 'items-start', center: 'items-center', end: 'items-end', stretch: 'items-stretch', baseline: 'items-baseline' };
+                const containerGap = { none: '', sm: 'gap-2', md: 'gap-4', lg: 'gap-6', xl: 'gap-8' };
+                const containerOverflowX = { visible: 'overflow-x-visible', hidden: 'overflow-x-hidden', scroll: 'overflow-x-scroll', auto: 'overflow-x-auto' };
+                const containerOverflowY = { visible: 'overflow-y-visible', hidden: 'overflow-y-hidden', scroll: 'overflow-y-scroll', auto: 'overflow-y-auto' };
+
+                const containerClasses = [
+                    containerMaxWidth[props.maxWidth as keyof typeof containerMaxWidth] || containerMaxWidth.xl,
+                    containerPadding[props.padding as keyof typeof containerPadding] || containerPadding.md,
+                    'mx-auto',
+                    containerDisplay,
+                    props.display === 'flex' && (containerFlexDir[props.flexDirection as keyof typeof containerFlexDir] || containerFlexDir.row),
+                    props.display === 'flex' && (containerFlexWrap[props.flexWrap as keyof typeof containerFlexWrap] || containerFlexWrap.nowrap),
+                    props.display === 'flex' && (containerJustify[props.justifyContent as keyof typeof containerJustify] || containerJustify.start),
+                    props.display === 'flex' && (containerAlign[props.alignItems as keyof typeof containerAlign] || containerAlign.start),
+                    props.display === 'flex' && (containerGap[props.gap as keyof typeof containerGap] || ''),
+                    containerOverflowX[props.overflowX as keyof typeof containerOverflowX] || containerOverflowX.visible,
+                    containerOverflowY[props.overflowY as keyof typeof containerOverflowY] || containerOverflowY.visible,
+                ].filter(Boolean).join(' ');
+
                 return `
-<div class="${containerMaxWidth[props.maxWidth as keyof typeof containerMaxWidth] || containerMaxWidth.xl} ${containerPadding[props.padding as keyof typeof containerPadding] || containerPadding.md} mx-auto"${getInlineStyles(props)}>
+<div class="${containerClasses}"${getInlineStyles(props)}>
     ${children.map(renderComponent).join("")}
 </div>`;
 
