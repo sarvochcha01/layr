@@ -12,7 +12,7 @@ import { EditorLayout } from "@/components/editor/EditorLayout";
 import { ComponentDefinition } from "@/types/editor";
 import { generateId } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
-import { getProject } from "@/hooks/useProjects";
+import { useProject, useUpdateProject } from "@/hooks/useProjects";
 import { toast } from "sonner";
 import { Loading } from "@/components/ui/loading";
 
@@ -68,9 +68,16 @@ export default function EditorPage() {
     []
   );
   const [draggedComponent, setDraggedComponent] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
   const [redirecting, setRedirecting] = useState(false);
   const [projectName, setProjectName] = useState<string>("");
+
+  // React Query hooks
+  const {
+    data: projectData,
+    isLoading: projectLoading,
+    error: projectError,
+  } = useProject(projectId, user?.uid);
+  const updateProjectMutation = useUpdateProject();
 
   // Redirect if no projectId
   useEffect(() => {
@@ -80,10 +87,10 @@ export default function EditorPage() {
     }
   }, [projectId, router]);
 
-  // Load project if projectId is provided
+  // Handle auth and project errors
   useEffect(() => {
     if (!projectId) return;
-    if (authLoading) return;
+    if (authLoading || projectLoading) return;
 
     if (!user) {
       toast.error("Please log in");
@@ -91,56 +98,36 @@ export default function EditorPage() {
       return;
     }
 
-    loadProject();
-  }, [projectId, user, authLoading]);
-
-  // Auto-save when components or project name change (only if projectId exists)
-  useEffect(() => {
-    if (!projectId || !user || loading) return;
-
-    const timeoutId = setTimeout(() => {
-      saveProject();
-    }, 2000);
-
-    return () => clearTimeout(timeoutId);
-  }, [components, projectName, projectId, user]);
-
-  const loadProject = async () => {
-    if (!user || !projectId) return;
-
-    setLoading(true);
-    try {
-      const projectData = await getProject(projectId, user.uid);
-      setComponents(projectData.components || placeholderComponents);
-      setProjectName(projectData.name || "Untitled Project");
-      setLoading(false);
-    } catch (err) {
+    if (projectError) {
       setRedirecting(true);
       toast.error("Project not found");
       router.push("/projects");
+      return;
     }
-  };
+  }, [projectId, user, authLoading, projectLoading, projectError, router]);
 
-  const saveProject = async () => {
-    if (!user || !projectId) return;
+  // Load project data when available
+  useEffect(() => {
+    if (projectData) {
+      setComponents(projectData.components || placeholderComponents);
+      setProjectName(projectData.name || "Untitled Project");
+    }
+  }, [projectData]);
 
-    try {
-      const response = await fetch(`/api/projects/${projectId}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          "x-user-id": user.uid,
-        },
-        body: JSON.stringify({ components, name: projectName }),
+  // Auto-save when components or project name change
+  useEffect(() => {
+    if (!projectId || !user || projectLoading || !projectData) return;
+
+    const timeoutId = setTimeout(() => {
+      updateProjectMutation.mutate({
+        projectId,
+        updates: { components, name: projectName },
+        userId: user.uid,
       });
+    }, 2000);
 
-      if (!response.ok) {
-        throw new Error("Failed to save project");
-      }
-    } catch (err) {
-      // Silently fail - user will see stale data on reload
-    }
-  };
+    return () => clearTimeout(timeoutId);
+  }, [components, projectName, projectId, user, projectLoading, projectData]);
 
   const handleProjectNameChange = (newName: string) => {
     setProjectName(newName);
@@ -273,11 +260,11 @@ export default function EditorPage() {
     };
   }, [components, selectedComponentIds]);
 
-  if (redirecting || loading || (projectId && authLoading)) {
+  if (redirecting || projectLoading || (projectId && authLoading)) {
     return (
       <div className="h-screen flex items-center justify-center">
         <Loading
-          text={loading ? "Loading project..." : "Loading..."}
+          text={projectLoading ? "Loading project..." : "Loading..."}
           size="lg"
         />
       </div>

@@ -12,7 +12,7 @@ interface PricingCardProps {
   price?: string;
   period?: string;
   description?: string;
-  features?: Feature[];
+  features?: (string | Feature)[]; // Allow both string[] and Feature[]
   buttonText?: string;
   buttonLink?: string;
   featured?: boolean;
@@ -40,6 +40,13 @@ export function PricingCard({
   width,
   height,
 }: PricingCardProps) {
+  // Normalize features to handle both string[] and Feature[] formats
+  const normalizedFeatures = features.map((feature) => {
+    if (typeof feature === "string") {
+      return { text: feature, included: true };
+    }
+    return feature;
+  });
   return (
     <div
       className={cn(
@@ -73,7 +80,7 @@ export function PricingCard({
       </div>
 
       <ul className="space-y-3 mb-6">
-        {features.map((feature, index) => (
+        {normalizedFeatures.map((feature, index) => (
           <li key={index} className="flex items-center gap-2">
             {feature.included ? (
               <Check className="w-5 h-5 text-green-500 flex-shrink-0" />

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +16,10 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import {
+  useTemplates,
+  useCreateProjectFromTemplate,
+} from "@/hooks/useTemplates";
 
 interface Template {
   id: string;
@@ -30,30 +34,14 @@ export default function TemplatesPage() {
   const router = useRouter();
   const { user } = useAuth();
   const [activeFilter, setActiveFilter] = useState("All");
-  const [templates, setTemplates] = useState<Template[]>([]);
-  const [loading, setLoading] = useState(true);
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(
     null
   );
   const [projectName, setProjectName] = useState("");
-  const [isCreating, setIsCreating] = useState(false);
 
-  useEffect(() => {
-    fetchTemplates();
-  }, []);
-
-  const fetchTemplates = async () => {
-    try {
-      const response = await fetch("/api/templates");
-      const data = await response.json();
-      setTemplates(data.templates || []);
-    } catch (error) {
-      console.error("Error fetching templates:", error);
-      toast.error("Failed to load templates");
-    } finally {
-      setLoading(false);
-    }
-  };
+  // React Query hooks
+  const { data: templates = [], isLoading: loading } = useTemplates();
+  const createProjectMutation = useCreateProjectFromTemplate();
 
   const categories = [
     "All",
@@ -81,33 +69,22 @@ export default function TemplatesPage() {
       return;
     }
 
-    setIsCreating(true);
-
-    try {
-      const response = await fetch("/api/templates/use", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          templateId: selectedTemplate?.id,
-          projectName,
-          userId: user.uid,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to create project");
+    createProjectMutation.mutate(
+      {
+        templateId: selectedTemplate!.id,
+        projectName,
+        userId: user.uid,
+      },
+      {
+        onSuccess: (data) => {
+          toast.success("Project created successfully!");
+          router.push(`/editor?projectId=${data.projectId}`);
+        },
+        onError: (error: Error) => {
+          toast.error(error.message || "Failed to create project");
+        },
       }
-
-      toast.success("Project created successfully!");
-      router.push(`/editor?projectId=${data.projectId}`);
-    } catch (error: any) {
-      console.error("Error creating project:", error);
-      toast.error(error.message || "Failed to create project");
-    } finally {
-      setIsCreating(false);
-    }
+    );
   };
 
   return (
@@ -184,7 +161,7 @@ export default function TemplatesPage() {
                 value={projectName}
                 onChange={(e) => setProjectName(e.target.value)}
                 placeholder="Enter project name"
-                disabled={isCreating}
+                disabled={createProjectMutation.isPending}
               />
             </div>
           </div>
@@ -193,12 +170,17 @@ export default function TemplatesPage() {
             <Button
               variant="outline"
               onClick={() => setSelectedTemplate(null)}
-              disabled={isCreating}
+              disabled={createProjectMutation.isPending}
             >
               Cancel
             </Button>
-            <Button onClick={handleCreateProject} disabled={isCreating}>
-              {isCreating ? "Creating..." : "Create Project"}
+            <Button
+              onClick={handleCreateProject}
+              disabled={createProjectMutation.isPending}
+            >
+              {createProjectMutation.isPending
+                ? "Creating..."
+                : "Create Project"}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -17,7 +17,11 @@ import {
 import { ProjectCard } from "@/components/cards/ProjectCard";
 import { CreateCard } from "@/components/cards/CreateCard";
 import { toast } from "sonner";
-import { useProjects } from "@/hooks/useProjects";
+import {
+  useProjects,
+  useCreateProject,
+  useDeleteProject,
+} from "@/hooks/useProjects";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function ProjectsPage() {
@@ -26,33 +30,13 @@ export default function ProjectsPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [projectName, setProjectName] = useState("");
   const [projectDescription, setProjectDescription] = useState("");
-  const [isCreating, setIsCreating] = useState(false);
 
   const { user, loading: authLoading } = useAuth();
-  const { projects, loading, error, createProject, deleteProject } =
-    useProjects(user?.uid || null);
 
-  // Debug logging
-  useEffect(() => {
-    console.log("Auth state:", { userId: user?.uid, authLoading });
-    console.log("Projects:", projects.length, projects);
-    if (error) console.error("Projects error:", error);
-  }, [user, authLoading, projects, error]);
-
-  // Refetch projects when page becomes visible (user navigates back)
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "visible" && user?.uid) {
-        console.log("Page visible, refetching projects...");
-        // The useProjects hook will automatically refetch when userId changes
-      }
-    };
-
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-    return () => {
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-    };
-  }, [user]);
+  // React Query hooks
+  const { data: projects = [], isLoading: loading } = useProjects(user?.uid);
+  const createProjectMutation = useCreateProject();
+  const deleteProjectMutation = useDeleteProject();
 
   // Check if dialog should be opened from URL parameter
   useEffect(() => {
@@ -66,7 +50,6 @@ export default function ProjectsPage() {
   const handleDialogOpenChange = (open: boolean) => {
     setIsDialogOpen(open);
     if (!open && searchParams.get("openDialog") === "true") {
-      // Remove the openDialog parameter from URL
       const newUrl = new URL(window.location.href);
       newUrl.searchParams.delete("openDialog");
       router.replace(newUrl.pathname + newUrl.search);
@@ -79,27 +62,29 @@ export default function ProjectsPage() {
       return;
     }
 
-    setIsCreating(true);
-    try {
-      const project = await createProject({
-        name: projectName,
-        description: projectDescription,
-        components: [],
-      });
-
-      toast.success(`Project "${projectName}" created successfully!`);
-      handleDialogOpenChange(false);
-      setProjectName("");
-      setProjectDescription("");
-
-      // Navigate to editor with the new project
-      router.push(`/editor?projectId=${project.id}`);
-    } catch (error) {
-      toast.error("Failed to create project");
-      console.error(error);
-    } finally {
-      setIsCreating(false);
+    if (!user) {
+      toast.error("You must be logged in");
+      return;
     }
+
+    createProjectMutation.mutate(
+      {
+        name: projectName,
+        userId: user.uid,
+      },
+      {
+        onSuccess: (data) => {
+          toast.success(`Project "${projectName}" created successfully!`);
+          handleDialogOpenChange(false);
+          setProjectName("");
+          setProjectDescription("");
+          router.push(`/editor?projectId=${data.projectId}`);
+        },
+        onError: (error: Error) => {
+          toast.error(error.message || "Failed to create project");
+        },
+      }
+    );
   };
 
   const handleCancel = () => {
@@ -120,26 +105,41 @@ export default function ProjectsPage() {
       return;
     }
 
-    try {
-      await deleteProject(projectId);
-      toast.success(`Project "${projectName}" deleted successfully`);
-    } catch (error) {
-      toast.error("Failed to delete project");
-      console.error(error);
+    if (!user) {
+      toast.error("You must be logged in");
+      return;
     }
+
+    deleteProjectMutation.mutate(
+      { projectId, userId: user.uid },
+      {
+        onSuccess: () => {
+          toast.success(`Project "${projectName}" deleted successfully`);
+        },
+        onError: (error: Error) => {
+          toast.error(error.message || "Failed to delete project");
+        },
+      }
+    );
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
+  const formatDate = (timestamp: any) => {
+    if (!timestamp) return "Just now";
+
+    // Handle Firestore Timestamp
+    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffMins = Math.floor(diffMs / 60000);
     const diffHours = Math.floor(diffMs / 3600000);
     const diffDays = Math.floor(diffMs / 86400000);
 
-    if (diffMins < 60) return `${diffMins} minutes ago`;
-    if (diffHours < 24) return `${diffHours} hours ago`;
-    if (diffDays < 7) return `${diffDays} days ago`;
+    if (diffMins < 1) return "Just now";
+    if (diffMins < 60)
+      return `${diffMins} minute${diffMins > 1 ? "s" : ""} ago`;
+    if (diffHours < 24)
+      return `${diffHours} hour${diffHours > 1 ? "s" : ""} ago`;
+    if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? "s" : ""} ago`;
     return date.toLocaleDateString();
   };
 
@@ -164,19 +164,15 @@ export default function ProjectsPage() {
             Please log in to view your projects
           </div>
         </div>
-      ) : error ? (
-        <div className="flex items-center justify-center py-12">
-          <div className="text-destructive">Error: {error}</div>
-        </div>
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {projects.map((project) => (
             <ProjectCard
               key={project.id}
               name={project.name}
-              description={project.description || "No description"}
+              description="No description"
               status="Draft"
-              lastModified={formatDate(project.updatedAt.toString())}
+              lastModified={formatDate(project.updatedAt)}
               views="0"
               onClick={() => handleEditProject(project.id)}
               onDelete={() => handleDeleteProject(project.id, project.name)}
@@ -214,6 +210,7 @@ export default function ProjectsPage() {
                         handleCreateProject();
                       }
                     }}
+                    disabled={createProjectMutation.isPending}
                   />
                 </div>
 
@@ -226,6 +223,7 @@ export default function ProjectsPage() {
                     placeholder="Brief description of your project"
                     value={projectDescription}
                     onChange={(e) => setProjectDescription(e.target.value)}
+                    disabled={createProjectMutation.isPending}
                   />
                 </div>
               </div>
@@ -234,12 +232,17 @@ export default function ProjectsPage() {
                 <Button
                   variant="outline"
                   onClick={handleCancel}
-                  disabled={isCreating}
+                  disabled={createProjectMutation.isPending}
                 >
                   Cancel
                 </Button>
-                <Button onClick={handleCreateProject} disabled={isCreating}>
-                  {isCreating ? "Creating..." : "Create Project"}
+                <Button
+                  onClick={handleCreateProject}
+                  disabled={createProjectMutation.isPending}
+                >
+                  {createProjectMutation.isPending
+                    ? "Creating..."
+                    : "Create Project"}
                 </Button>
               </DialogFooter>
             </DialogContent>

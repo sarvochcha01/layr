@@ -1,101 +1,102 @@
-import { useState, useEffect } from "react";
-import { Project, CreateProjectInput, UpdateProjectInput } from "@/types/project";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-export function useProjects(userId: string | null) {
-    const [projects, setProjects] = useState<Project[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+interface Project {
+    id: string;
+    name: string;
+    userId: string;
+    components: any[];
+    createdAt: any;
+    updatedAt: any;
+}
 
-    const fetchProjects = async () => {
-        if (!userId) {
-            setProjects([]);
-            setLoading(false);
-            return;
-        }
-
-        try {
-            setLoading(true);
+// Fetch all projects for a user
+export function useProjects(userId: string | undefined) {
+    return useQuery({
+        queryKey: ["projects", userId],
+        queryFn: async () => {
+            if (!userId) return [];
             const response = await fetch("/api/projects", {
                 headers: {
                     "x-user-id": userId,
                 },
             });
-
             if (!response.ok) {
                 throw new Error("Failed to fetch projects");
             }
-
             const data = await response.json();
-            setProjects(data.projects);
-            setError(null);
-        } catch (err) {
-            setError(err instanceof Error ? err.message : "An error occurred");
-        } finally {
-            setLoading(false);
-        }
-    };
+            return data.projects as Project[];
+        },
+        enabled: !!userId,
+    });
+}
 
-    useEffect(() => {
-        fetchProjects();
-    }, [userId]);
-
-    const createProject = async (input: CreateProjectInput) => {
-        if (!userId) throw new Error("User not authenticated");
-
-        try {
-            const response = await fetch("/api/projects", {
-                method: "POST",
+// Fetch single project
+export function useProject(projectId: string | null, userId?: string) {
+    return useQuery({
+        queryKey: ["project", projectId],
+        queryFn: async () => {
+            if (!projectId || !userId) return null;
+            const response = await fetch(`/api/projects/${projectId}`, {
                 headers: {
-                    "Content-Type": "application/json",
                     "x-user-id": userId,
                 },
-                body: JSON.stringify(input),
             });
-
             if (!response.ok) {
-                throw new Error("Failed to create project");
+                const error = await response.json();
+                throw new Error(error.error || "Failed to fetch project");
             }
-
             const data = await response.json();
-            setProjects((prev) => [data.project, ...prev]);
             return data.project;
-        } catch (err) {
-            throw err;
-        }
-    };
+        },
+        enabled: !!projectId && !!userId,
+    });
+}
 
-    const updateProject = async (id: string, input: UpdateProjectInput) => {
-        if (!userId) throw new Error("User not authenticated");
+// Update project
+export function useUpdateProject() {
+    const queryClient = useQueryClient();
 
-        try {
-            const response = await fetch(`/api/projects/${id}`, {
+    return useMutation({
+        mutationFn: async ({
+            projectId,
+            updates,
+            userId,
+        }: {
+            projectId: string;
+            updates: Partial<Project>;
+            userId: string;
+        }) => {
+            const response = await fetch(`/api/projects/${projectId}`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
                     "x-user-id": userId,
                 },
-                body: JSON.stringify(input),
+                body: JSON.stringify(updates),
             });
 
             if (!response.ok) {
-                throw new Error("Failed to update project");
+                const error = await response.json();
+                throw new Error(error.error || "Failed to update project");
             }
 
-            const data = await response.json();
-            setProjects((prev) =>
-                prev.map((p) => (p.id === id ? data.project : p))
-            );
-            return data.project;
-        } catch (err) {
-            throw err;
-        }
-    };
+            return response.json();
+        },
+        onSuccess: (data, variables) => {
+            // Invalidate and refetch
+            queryClient.invalidateQueries({ queryKey: ["project", variables.projectId] });
+            queryClient.invalidateQueries({ queryKey: ["projects"] });
+        },
+    });
+}
 
-    const deleteProject = async (id: string) => {
-        if (!userId) throw new Error("User not authenticated");
+// Delete project
+export function useDeleteProject() {
+    const queryClient = useQueryClient();
 
-        try {
-            const response = await fetch(`/api/projects/${id}`, {
+    return useMutation({
+        mutationFn: async ({ projectId, userId }: { projectId: string; userId: string }) => {
+            const response = await fetch(`/api/projects/${projectId}`, {
                 method: "DELETE",
                 headers: {
                     "x-user-id": userId,
@@ -103,37 +104,49 @@ export function useProjects(userId: string | null) {
             });
 
             if (!response.ok) {
-                throw new Error("Failed to delete project");
+                const error = await response.json();
+                throw new Error(error.error || "Failed to delete project");
             }
 
-            setProjects((prev) => prev.filter((p) => p.id !== id));
-        } catch (err) {
-            throw err;
-        }
-    };
-
-    return {
-        projects,
-        loading,
-        error,
-        createProject,
-        updateProject,
-        deleteProject,
-        refetch: fetchProjects,
-    };
-}
-
-export async function getProject(id: string, userId: string): Promise<Project> {
-    const response = await fetch(`/api/projects/${id}`, {
-        headers: {
-            "x-user-id": userId,
+            return response.json();
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["projects"] });
         },
     });
+}
 
-    if (!response.ok) {
-        throw new Error("Failed to fetch project");
-    }
+// Create new project
+export function useCreateProject() {
+    const queryClient = useQueryClient();
 
-    const data = await response.json();
-    return data.project;
+    return useMutation({
+        mutationFn: async ({
+            name,
+            userId,
+        }: {
+            name: string;
+            userId: string;
+        }) => {
+            const response = await fetch("/api/projects", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-user-id": userId,
+                },
+                body: JSON.stringify({ name }),
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || "Failed to create project");
+            }
+
+            const data = await response.json();
+            return { projectId: data.project.id, ...data };
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["projects"] });
+        },
+    });
 }
