@@ -59,6 +59,25 @@ export function HierarchyPanel({
     { type: "Form", icon: "📋", description: "Form with inputs" },
     { type: "Navbar", icon: "🧭", description: "Navigation bar" },
     { type: "Footer", icon: "🦶", description: "Page footer" },
+    {
+      type: "Accordion",
+      icon: "📑",
+      description: "Collapsible accordion items",
+    },
+    { type: "Tabs", icon: "📂", description: "Tabbed content sections" },
+    {
+      type: "Testimonial",
+      icon: "💬",
+      description: "Customer testimonial with rating",
+    },
+    { type: "PricingCard", icon: "💰", description: "Pricing plan card" },
+    { type: "Feature", icon: "✨", description: "Feature highlight with icon" },
+    { type: "Stats", icon: "📊", description: "Statistics display" },
+    { type: "CTA", icon: "🎯", description: "Call-to-action section" },
+    { type: "Divider", icon: "➖", description: "Horizontal divider line" },
+    { type: "Spacer", icon: "⬜", description: "Vertical spacing element" },
+    { type: "Badge", icon: "🏷️", description: "Label or status badge" },
+    { type: "Alert", icon: "⚠️", description: "Alert or notification box" },
   ];
 
   const handleAddComponent = (componentType: string) => {
@@ -93,6 +112,17 @@ export function HierarchyPanel({
       Video: "🎥",
       Form: "📋",
       Navbar: "🧭",
+      Accordion: "📑",
+      Tabs: "📂",
+      Testimonial: "💬",
+      PricingCard: "💰",
+      Feature: "✨",
+      Stats: "📊",
+      CTA: "🎯",
+      Divider: "➖",
+      Spacer: "⬜",
+      Badge: "🏷️",
+      Alert: "⚠️",
     };
     return icons[type] || "📦";
   };

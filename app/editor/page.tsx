@@ -368,6 +368,53 @@ function getDefaultProps(componentType: string): Record<string, any> {
       links: [{ text: "Home", href: "#" }],
       ctaText: "Get Started",
     },
+    Accordion: {
+      items: [
+        { title: "Item 1", content: "Content 1" },
+        { title: "Item 2", content: "Content 2" },
+      ],
+    },
+    Tabs: {
+      tabs: [
+        { label: "Tab 1", content: "Content 1" },
+        { label: "Tab 2", content: "Content 2" },
+      ],
+    },
+    Testimonial: {
+      quote: "Great product!",
+      author: "John Doe",
+      role: "CEO",
+      rating: 5,
+    },
+    PricingCard: {
+      title: "Basic",
+      price: "$29",
+      period: "month",
+      features: [
+        { text: "Feature 1", included: true },
+        { text: "Feature 2", included: true },
+      ],
+    },
+    Feature: {
+      icon: "✨",
+      title: "Feature Title",
+      description: "Feature description",
+    },
+    Stats: {
+      stats: [
+        { value: "10K+", label: "Users" },
+        { value: "50+", label: "Countries" },
+      ],
+    },
+    CTA: {
+      title: "Ready to start?",
+      description: "Join us today",
+      primaryButtonText: "Get Started",
+    },
+    Divider: { variant: "solid", thickness: "thin" },
+    Spacer: { height: "2rem" },
+    Badge: { text: "New", variant: "default" },
+    Alert: { message: "This is an alert", variant: "info" },
   };
 
   return defaults[componentType] || {};

@@ -12,6 +12,17 @@ import { Image } from './Image';
 import { Video } from './Video';
 import { Button } from './Button';
 import { Form } from './Form';
+import { Accordion } from './Accordion';
+import { Tabs } from './Tabs';
+import { Testimonial } from './Testimonial';
+import { PricingCard } from './PricingCard';
+import { Feature } from './Feature';
+import { Stats } from './Stats';
+import { CTA } from './CTA';
+import { Divider } from './Divider';
+import { Spacer } from './Spacer';
+import { Badge } from './Badge';
+import { Alert } from './Alert';
 
 // Layout Components
 export { Header } from './Header';
@@ -35,6 +46,21 @@ export { Video } from './Video';
 // Interactive Components
 export { Button } from './Button';
 export { Form } from './Form';
+export { Accordion } from './Accordion';
+export { Tabs } from './Tabs';
+
+// Marketing Components
+export { Testimonial } from './Testimonial';
+export { PricingCard } from './PricingCard';
+export { Feature } from './Feature';
+export { Stats } from './Stats';
+export { CTA } from './CTA';
+
+// UI Components
+export { Divider } from './Divider';
+export { Spacer } from './Spacer';
+export { Badge } from './Badge';
+export { Alert } from './Alert';
 
 // Component Registry for dynamic rendering
 export const COMPONENT_REGISTRY = {
@@ -51,6 +77,17 @@ export const COMPONENT_REGISTRY = {
     Video,
     Button,
     Form,
+    Accordion,
+    Tabs,
+    Testimonial,
+    PricingCard,
+    Feature,
+    Stats,
+    CTA,
+    Divider,
+    Spacer,
+    Badge,
+    Alert,
 } as const;
 
 export type ComponentType = keyof typeof COMPONENT_REGISTRY;

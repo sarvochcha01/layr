@@ -117,6 +117,87 @@ const componentCategories: ComponentCategory[] = [
       },
     ],
   },
+  {
+    name: "Interactive",
+    components: [
+      {
+        type: "Accordion",
+        name: "Accordion",
+        icon: "📑",
+        description: "Collapsible content sections",
+      },
+      {
+        type: "Tabs",
+        name: "Tabs",
+        icon: "📂",
+        description: "Tabbed content switcher",
+      },
+    ],
+  },
+  {
+    name: "Marketing",
+    components: [
+      {
+        type: "Testimonial",
+        name: "Testimonial",
+        icon: "💬",
+        description: "Customer review with rating",
+      },
+      {
+        type: "PricingCard",
+        name: "Pricing Card",
+        icon: "💰",
+        description: "Pricing plan with features",
+      },
+      {
+        type: "Feature",
+        name: "Feature",
+        icon: "✨",
+        description: "Feature showcase with icon",
+      },
+      {
+        type: "Stats",
+        name: "Stats",
+        icon: "📊",
+        description: "Statistics and numbers",
+      },
+      {
+        type: "CTA",
+        name: "CTA",
+        icon: "🎯",
+        description: "Call-to-action section",
+      },
+    ],
+  },
+  {
+    name: "UI Elements",
+    components: [
+      {
+        type: "Divider",
+        name: "Divider",
+        icon: "➖",
+        description: "Visual separator line",
+      },
+      {
+        type: "Spacer",
+        name: "Spacer",
+        icon: "⬜",
+        description: "Vertical spacing",
+      },
+      {
+        type: "Badge",
+        name: "Badge",
+        icon: "🏷️",
+        description: "Small label or tag",
+      },
+      {
+        type: "Alert",
+        name: "Alert",
+        icon: "⚠️",
+        description: "Notification message",
+      },
+    ],
+  },
 ];
 
 function DraggableComponent({ component }: { component: ComponentItem }) {

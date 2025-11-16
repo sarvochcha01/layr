@@ -1244,6 +1244,634 @@ export function PropertiesPanel({
           </div>
         );
 
+      case "Accordion":
+        return (
+          <div className="space-y-4">
+            {renderColorFields()}
+            {renderDimensionFields()}
+            <div>
+              <Label className="mb-2 block">Accordion Items</Label>
+              <div className="space-y-2">
+                {(props.items || []).map((item: any, index: number) => (
+                  <div key={index} className="space-y-2 p-3 border rounded">
+                    <Input
+                      value={item.title || ""}
+                      onChange={(e) => {
+                        const newItems = [...(props.items || [])];
+                        newItems[index] = { ...item, title: e.target.value };
+                        updateProp("items", newItems);
+                      }}
+                      placeholder="Item title"
+                    />
+                    <Textarea
+                      value={item.content || ""}
+                      onChange={(e) => {
+                        const newItems = [...(props.items || [])];
+                        newItems[index] = { ...item, content: e.target.value };
+                        updateProp("items", newItems);
+                      }}
+                      placeholder="Item content"
+                      rows={2}
+                    />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const newItems = (props.items || []).filter(
+                          (_: any, i: number) => i !== index
+                        );
+                        updateProp("items", newItems);
+                      }}
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                ))}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const newItems = [
+                      ...(props.items || []),
+                      { title: "New Item", content: "Content here" },
+                    ];
+                    updateProp("items", newItems);
+                  }}
+                >
+                  Add Item
+                </Button>
+              </div>
+            </div>
+          </div>
+        );
+
+      case "Tabs":
+        return (
+          <div className="space-y-4">
+            {renderColorFields()}
+            {renderDimensionFields()}
+            <div>
+              <Label className="mb-2 block">Tab Items</Label>
+              <div className="space-y-2">
+                {(props.tabs || []).map((tab: any, index: number) => (
+                  <div key={index} className="space-y-2 p-3 border rounded">
+                    <Input
+                      value={tab.label || ""}
+                      onChange={(e) => {
+                        const newTabs = [...(props.tabs || [])];
+                        newTabs[index] = { ...tab, label: e.target.value };
+                        updateProp("tabs", newTabs);
+                      }}
+                      placeholder="Tab label"
+                    />
+                    <Textarea
+                      value={tab.content || ""}
+                      onChange={(e) => {
+                        const newTabs = [...(props.tabs || [])];
+                        newTabs[index] = { ...tab, content: e.target.value };
+                        updateProp("tabs", newTabs);
+                      }}
+                      placeholder="Tab content"
+                      rows={2}
+                    />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const newTabs = (props.tabs || []).filter(
+                          (_: any, i: number) => i !== index
+                        );
+                        updateProp("tabs", newTabs);
+                      }}
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                ))}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const newTabs = [
+                      ...(props.tabs || []),
+                      { label: "New Tab", content: "Content here" },
+                    ];
+                    updateProp("tabs", newTabs);
+                  }}
+                >
+                  Add Tab
+                </Button>
+              </div>
+            </div>
+          </div>
+        );
+
+      case "Testimonial":
+        return (
+          <div className="space-y-4">
+            {renderColorFields()}
+            {renderDimensionFields()}
+            <div>
+              <Label htmlFor="quote" className="mb-2 block">
+                Quote
+              </Label>
+              <Textarea
+                id="quote"
+                value={props.quote || ""}
+                onChange={(e) => updateProp("quote", e.target.value)}
+                placeholder="Enter testimonial quote"
+                rows={3}
+              />
+            </div>
+            <div>
+              <Label htmlFor="author" className="mb-2 block">
+                Author Name
+              </Label>
+              <Input
+                id="author"
+                value={props.author || ""}
+                onChange={(e) => updateProp("author", e.target.value)}
+                placeholder="John Doe"
+              />
+            </div>
+            <div>
+              <Label htmlFor="role" className="mb-2 block">
+                Author Role
+              </Label>
+              <Input
+                id="role"
+                value={props.role || ""}
+                onChange={(e) => updateProp("role", e.target.value)}
+                placeholder="CEO, Company"
+              />
+            </div>
+            <div>
+              <Label htmlFor="avatar" className="mb-2 block">
+                Avatar URL
+              </Label>
+              <Input
+                id="avatar"
+                value={props.avatar || ""}
+                onChange={(e) => updateProp("avatar", e.target.value)}
+                placeholder="https://example.com/avatar.jpg"
+              />
+            </div>
+            <div>
+              <Label htmlFor="rating" className="mb-2 block">
+                Rating (1-5)
+              </Label>
+              <Input
+                id="rating"
+                type="number"
+                min="1"
+                max="5"
+                value={props.rating || 5}
+                onChange={(e) => updateProp("rating", parseInt(e.target.value))}
+              />
+            </div>
+          </div>
+        );
+
+      case "PricingCard":
+        return (
+          <div className="space-y-4">
+            {renderColorFields()}
+            {renderDimensionFields()}
+            <div>
+              <Label htmlFor="title" className="mb-2 block">
+                Plan Name
+              </Label>
+              <Input
+                id="title"
+                value={props.title || ""}
+                onChange={(e) => updateProp("title", e.target.value)}
+                placeholder="Pro Plan"
+              />
+            </div>
+            <div>
+              <Label htmlFor="price" className="mb-2 block">
+                Price
+              </Label>
+              <Input
+                id="price"
+                value={props.price || ""}
+                onChange={(e) => updateProp("price", e.target.value)}
+                placeholder="$29"
+              />
+            </div>
+            <div>
+              <Label htmlFor="period" className="mb-2 block">
+                Billing Period
+              </Label>
+              <Input
+                id="period"
+                value={props.period || ""}
+                onChange={(e) => updateProp("period", e.target.value)}
+                placeholder="/month"
+              />
+            </div>
+            <div>
+              <Label htmlFor="description" className="mb-2 block">
+                Description
+              </Label>
+              <Textarea
+                id="description"
+                value={props.description || ""}
+                onChange={(e) => updateProp("description", e.target.value)}
+                placeholder="Plan description"
+                rows={2}
+              />
+            </div>
+            <div>
+              <Label className="mb-2 block">Features</Label>
+              <div className="space-y-2">
+                {(props.features || []).map(
+                  (feature: string, index: number) => (
+                    <div key={index} className="flex gap-2">
+                      <Input
+                        value={feature}
+                        onChange={(e) => {
+                          const newFeatures = [...(props.features || [])];
+                          newFeatures[index] = e.target.value;
+                          updateProp("features", newFeatures);
+                        }}
+                        placeholder="Feature"
+                      />
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const newFeatures = (props.features || []).filter(
+                            (_: any, i: number) => i !== index
+                          );
+                          updateProp("features", newFeatures);
+                        }}
+                      >
+                        Remove
+                      </Button>
+                    </div>
+                  )
+                )}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const newFeatures = [
+                      ...(props.features || []),
+                      "New feature",
+                    ];
+                    updateProp("features", newFeatures);
+                  }}
+                >
+                  Add Feature
+                </Button>
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="buttonText" className="mb-2 block">
+                Button Text
+              </Label>
+              <Input
+                id="buttonText"
+                value={props.buttonText || ""}
+                onChange={(e) => updateProp("buttonText", e.target.value)}
+                placeholder="Get Started"
+              />
+            </div>
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="featured"
+                checked={props.featured || false}
+                onCheckedChange={(checked) => updateProp("featured", checked)}
+              />
+              <Label htmlFor="featured">Featured Plan</Label>
+            </div>
+          </div>
+        );
+
+      case "Feature":
+        return (
+          <div className="space-y-4">
+            {renderColorFields()}
+            {renderDimensionFields()}
+            <div>
+              <Label htmlFor="icon" className="mb-2 block">
+                Icon (Emoji)
+              </Label>
+              <Input
+                id="icon"
+                value={props.icon || ""}
+                onChange={(e) => updateProp("icon", e.target.value)}
+                placeholder="⭐"
+              />
+            </div>
+            <div>
+              <Label htmlFor="title" className="mb-2 block">
+                Title
+              </Label>
+              <Input
+                id="title"
+                value={props.title || ""}
+                onChange={(e) => updateProp("title", e.target.value)}
+                placeholder="Feature title"
+              />
+            </div>
+            <div>
+              <Label htmlFor="description" className="mb-2 block">
+                Description
+              </Label>
+              <Textarea
+                id="description"
+                value={props.description || ""}
+                onChange={(e) => updateProp("description", e.target.value)}
+                placeholder="Feature description"
+                rows={3}
+              />
+            </div>
+          </div>
+        );
+
+      case "Stats":
+        return (
+          <div className="space-y-4">
+            {renderColorFields()}
+            {renderDimensionFields()}
+            <div>
+              <Label className="mb-2 block">Statistics</Label>
+              <div className="space-y-2">
+                {(props.stats || []).map((stat: any, index: number) => (
+                  <div key={index} className="space-y-2 p-3 border rounded">
+                    <Input
+                      value={stat.value || ""}
+                      onChange={(e) => {
+                        const newStats = [...(props.stats || [])];
+                        newStats[index] = { ...stat, value: e.target.value };
+                        updateProp("stats", newStats);
+                      }}
+                      placeholder="100+"
+                    />
+                    <Input
+                      value={stat.label || ""}
+                      onChange={(e) => {
+                        const newStats = [...(props.stats || [])];
+                        newStats[index] = { ...stat, label: e.target.value };
+                        updateProp("stats", newStats);
+                      }}
+                      placeholder="Customers"
+                    />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const newStats = (props.stats || []).filter(
+                          (_: any, i: number) => i !== index
+                        );
+                        updateProp("stats", newStats);
+                      }}
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                ))}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const newStats = [
+                      ...(props.stats || []),
+                      { value: "100+", label: "Stat" },
+                    ];
+                    updateProp("stats", newStats);
+                  }}
+                >
+                  Add Stat
+                </Button>
+              </div>
+            </div>
+          </div>
+        );
+
+      case "CTA":
+        return (
+          <div className="space-y-4">
+            {renderColorFields()}
+            {renderDimensionFields()}
+            <div>
+              <Label htmlFor="title" className="mb-2 block">
+                Title
+              </Label>
+              <Input
+                id="title"
+                value={props.title || ""}
+                onChange={(e) => updateProp("title", e.target.value)}
+                placeholder="Ready to get started?"
+              />
+            </div>
+            <div>
+              <Label htmlFor="description" className="mb-2 block">
+                Description
+              </Label>
+              <Textarea
+                id="description"
+                value={props.description || ""}
+                onChange={(e) => updateProp("description", e.target.value)}
+                placeholder="Join thousands of users today"
+                rows={2}
+              />
+            </div>
+            <div>
+              <Label htmlFor="buttonText" className="mb-2 block">
+                Button Text
+              </Label>
+              <Input
+                id="buttonText"
+                value={props.buttonText || ""}
+                onChange={(e) => updateProp("buttonText", e.target.value)}
+                placeholder="Get Started"
+              />
+            </div>
+            <div>
+              <Label htmlFor="buttonLink" className="mb-2 block">
+                Button Link
+              </Label>
+              <Input
+                id="buttonLink"
+                value={props.buttonLink || ""}
+                onChange={(e) => updateProp("buttonLink", e.target.value)}
+                placeholder="https://example.com"
+              />
+            </div>
+          </div>
+        );
+
+      case "Divider":
+        return (
+          <div className="space-y-4">
+            {renderColorFields()}
+            {renderDimensionFields()}
+            <div>
+              <Label htmlFor="thickness" className="mb-2 block">
+                Thickness
+              </Label>
+              <select
+                id="thickness"
+                value={props.thickness || "1"}
+                onChange={(e) => updateProp("thickness", e.target.value)}
+                className="w-full p-2 border rounded-md"
+              >
+                <option value="1">1px</option>
+                <option value="2">2px</option>
+                <option value="4">4px</option>
+                <option value="8">8px</option>
+              </select>
+            </div>
+            <div>
+              <Label htmlFor="color" className="mb-2 block">
+                Color
+              </Label>
+              <Input
+                id="color"
+                type="color"
+                value={props.color || "#e5e7eb"}
+                onChange={(e) => updateProp("color", e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="style" className="mb-2 block">
+                Style
+              </Label>
+              <select
+                id="style"
+                value={props.style || "solid"}
+                onChange={(e) => updateProp("style", e.target.value)}
+                className="w-full p-2 border rounded-md"
+              >
+                <option value="solid">Solid</option>
+                <option value="dashed">Dashed</option>
+                <option value="dotted">Dotted</option>
+              </select>
+            </div>
+          </div>
+        );
+
+      case "Spacer":
+        return (
+          <div className="space-y-4">
+            {renderColorFields()}
+            {renderDimensionFields()}
+            <div>
+              <Label htmlFor="size" className="mb-2 block">
+                Size
+              </Label>
+              <select
+                id="size"
+                value={props.size || "md"}
+                onChange={(e) => updateProp("size", e.target.value)}
+                className="w-full p-2 border rounded-md"
+              >
+                <option value="xs">Extra Small (8px)</option>
+                <option value="sm">Small (16px)</option>
+                <option value="md">Medium (32px)</option>
+                <option value="lg">Large (64px)</option>
+                <option value="xl">Extra Large (128px)</option>
+              </select>
+            </div>
+          </div>
+        );
+
+      case "Badge":
+        return (
+          <div className="space-y-4">
+            {renderColorFields()}
+            {renderDimensionFields()}
+            <div>
+              <Label htmlFor="text" className="mb-2 block">
+                Text
+              </Label>
+              <Input
+                id="text"
+                value={props.text || ""}
+                onChange={(e) => updateProp("text", e.target.value)}
+                placeholder="New"
+              />
+            </div>
+            <div>
+              <Label htmlFor="variant" className="mb-2 block">
+                Variant
+              </Label>
+              <select
+                id="variant"
+                value={props.variant || "default"}
+                onChange={(e) => updateProp("variant", e.target.value)}
+                className="w-full p-2 border rounded-md"
+              >
+                <option value="default">Default</option>
+                <option value="success">Success</option>
+                <option value="warning">Warning</option>
+                <option value="error">Error</option>
+                <option value="info">Info</option>
+              </select>
+            </div>
+          </div>
+        );
+
+      case "Alert":
+        return (
+          <div className="space-y-4">
+            {renderColorFields()}
+            {renderDimensionFields()}
+            <div>
+              <Label htmlFor="title" className="mb-2 block">
+                Title
+              </Label>
+              <Input
+                id="title"
+                value={props.title || ""}
+                onChange={(e) => updateProp("title", e.target.value)}
+                placeholder="Alert title"
+              />
+            </div>
+            <div>
+              <Label htmlFor="message" className="mb-2 block">
+                Message
+              </Label>
+              <Textarea
+                id="message"
+                value={props.message || ""}
+                onChange={(e) => updateProp("message", e.target.value)}
+                placeholder="Alert message"
+                rows={2}
+              />
+            </div>
+            <div>
+              <Label htmlFor="variant" className="mb-2 block">
+                Variant
+              </Label>
+              <select
+                id="variant"
+                value={props.variant || "info"}
+                onChange={(e) => updateProp("variant", e.target.value)}
+                className="w-full p-2 border rounded-md"
+              >
+                <option value="info">Info</option>
+                <option value="success">Success</option>
+                <option value="warning">Warning</option>
+                <option value="error">Error</option>
+              </select>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="dismissible"
+                checked={props.dismissible || false}
+                onCheckedChange={(checked) =>
+                  updateProp("dismissible", checked)
+                }
+              />
+              <Label htmlFor="dismissible">Dismissible</Label>
+            </div>
+          </div>
+        );
+
       default:
         return (
           <div className="text-center text-gray-500 py-8">
