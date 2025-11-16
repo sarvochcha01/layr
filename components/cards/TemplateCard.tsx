@@ -1,10 +1,12 @@
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 interface TemplateCardProps {
   name: string;
   description: string;
   category: string;
   previewColor: string;
+  thumbnail?: string;
   onUse?: () => void;
 }
 
@@ -13,11 +15,16 @@ export function TemplateCard({
   description,
   category,
   previewColor,
+  thumbnail,
   onUse,
 }: TemplateCardProps) {
   return (
     <div className="border rounded-lg overflow-hidden bg-card hover:shadow-md transition-shadow">
-      <div className={`h-40 ${previewColor}`}></div>
+      <div className={`h-40 relative ${previewColor}`}>
+        {thumbnail ? (
+          <Image src={thumbnail} alt={name} fill className="object-cover" />
+        ) : null}
+      </div>
       <div className="p-4">
         <div className="flex items-center gap-2 mb-2">
           <h3 className="font-semibold">{name}</h3>
