@@ -87,12 +87,42 @@ function ComponentWrapper({
     );
   }
 
+  // Components that should take full width
+  const fullWidthComponents = [
+    "Accordion",
+    "Navbar",
+    "Footer",
+    "Header",
+    "Container",
+    "Section",
+    "Grid",
+    "Divider",
+  ];
+  const shouldTakeFullWidth = fullWidthComponents.includes(component.type);
+
+  // Components that should take full height (for flex stretch)
+  const fullHeightComponents = [
+    "PricingCard",
+    "Card",
+    "Feature",
+    "Testimonial",
+  ];
+  const shouldTakeFullHeight = fullHeightComponents.includes(component.type);
+
   return (
-    <div className="relative group">
+    <div
+      className={cn(
+        "relative group flex",
+        shouldTakeFullWidth && "w-full",
+        shouldTakeFullHeight && "self-stretch"
+      )}
+    >
       {/* Component wrapper */}
       <div
         className={cn(
-          "relative transition-all duration-200",
+          "relative transition-all duration-200 flex",
+          shouldTakeFullWidth && "w-full",
+          shouldTakeFullHeight && "flex-1",
           !isPreviewMode && isSelected && "ring-2 ring-blue-500 ring-offset-2",
           !isPreviewMode &&
             "hover:ring-1 hover:ring-blue-300 hover:ring-offset-1"

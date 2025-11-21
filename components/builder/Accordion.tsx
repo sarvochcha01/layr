@@ -47,16 +47,17 @@ export function Accordion({
 
   return (
     <div
-      className="space-y-2"
+      className="w-full space-y-2"
       style={{
-        width: width || undefined,
+        width: width || "100%",
         height: height || undefined,
+        display: "block",
       }}
     >
       {items.map((item, index) => (
         <div
           key={index}
-          className="border rounded-lg overflow-hidden"
+          className="w-full border rounded-lg overflow-hidden"
           style={{
             backgroundColor,
             color: textColor || undefined,

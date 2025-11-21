@@ -50,14 +50,13 @@ export function PricingCard({
   return (
     <div
       className={cn(
-        "p-8 rounded-lg border-2",
-        featured
-          ? "border-blue-500 shadow-xl scale-105"
-          : "border-gray-200 shadow-md"
+        "p-8 rounded-lg border-2 flex flex-col",
+        featured ? "border-blue-500 shadow-xl" : "border-gray-200 shadow-md"
       )}
       style={{
         width: width || "320px",
-        height: height || undefined,
+        minWidth: "280px",
+        maxWidth: "400px",
         backgroundColor: backgroundColor || "#ffffff",
         color: textColor || undefined,
       }}
@@ -79,7 +78,7 @@ export function PricingCard({
         <p className="text-sm opacity-75">{description}</p>
       </div>
 
-      <ul className="space-y-3 mb-6">
+      <ul className="space-y-3 mb-6 flex-grow">
         {normalizedFeatures.map((feature, index) => (
           <li key={index} className="flex items-center gap-2">
             {feature.included ? (
@@ -94,13 +93,15 @@ export function PricingCard({
         ))}
       </ul>
 
-      <Button
-        className="w-full"
-        variant={featured ? "default" : "outline"}
-        asChild
-      >
-        <a href={buttonLink}>{buttonText}</a>
-      </Button>
+      <div className="mt-auto">
+        <Button
+          className="w-full"
+          variant={featured ? "default" : "outline"}
+          asChild
+        >
+          <a href={buttonLink}>{buttonText}</a>
+        </Button>
+      </div>
     </div>
   );
 }
