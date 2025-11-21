@@ -7,7 +7,7 @@ import { ComponentPalette } from "./ComponentPalette";
 import { Canvas } from "./Canvas";
 import { PropertiesPanel } from "./PropertiesPanel";
 import { PagesPanel } from "./PagesPanel";
-import { Download, Eye, Edit, X } from "lucide-react";
+import { Download, Eye, Edit, X, Undo, Redo } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 type Viewport = "desktop" | "tablet" | "mobile";
@@ -27,6 +27,10 @@ interface EditorLayoutProps {
   onPageSelect: (pageId: string) => void;
   onPageAdd: (name: string, slug: string) => void;
   onPageDelete: (pageId: string) => void;
+  onUndo?: () => void;
+  onRedo?: () => void;
+  canUndo?: boolean;
+  canRedo?: boolean;
 }
 
 export function EditorLayout({
@@ -44,6 +48,10 @@ export function EditorLayout({
   onPageSelect,
   onPageAdd,
   onPageDelete,
+  onUndo,
+  onRedo,
+  canUndo = false,
+  canRedo = false,
 }: EditorLayoutProps) {
   const router = useRouter();
   const [viewport, setViewport] = useState<Viewport>("desktop");
@@ -236,8 +244,40 @@ export function EditorLayout({
             </div>
           </div>
 
-          {/* Preview & Export Buttons */}
+          {/* Undo/Redo, Preview & Export Buttons */}
           <div className="ml-auto flex items-center space-x-2">
+            {/* Undo Button */}
+            <button
+              onClick={onUndo}
+              disabled={!canUndo}
+              className={`flex items-center space-x-1 px-3 py-1 text-xs rounded transition-colors ${
+                canUndo
+                  ? "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                  : "bg-gray-100 text-gray-400 cursor-not-allowed"
+              }`}
+              title="Undo (Ctrl+Z)"
+            >
+              <Undo className="w-3 h-3" />
+              <span>Undo</span>
+            </button>
+
+            {/* Redo Button */}
+            <button
+              onClick={onRedo}
+              disabled={!canRedo}
+              className={`flex items-center space-x-1 px-3 py-1 text-xs rounded transition-colors ${
+                canRedo
+                  ? "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                  : "bg-gray-100 text-gray-400 cursor-not-allowed"
+              }`}
+              title="Redo (Ctrl+Y)"
+            >
+              <Redo className="w-3 h-3" />
+              <span>Redo</span>
+            </button>
+
+            <div className="w-px h-6 bg-gray-300"></div>
+
             <button
               onClick={() => setIsPreviewMode(!isPreviewMode)}
               className={`flex items-center space-x-2 px-3 py-1 text-xs rounded transition-colors ${

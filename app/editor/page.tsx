@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
   DndContext,
@@ -15,6 +15,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useProject, useUpdateProject } from "@/hooks/useProjects";
 import { toast } from "sonner";
 import { Loading } from "@/components/ui/loading";
+import { useHistory } from "@/hooks/useHistory";
 
 const placeholderComponents: ComponentDefinition[] = [
   {
@@ -61,7 +62,16 @@ export default function EditorPage() {
   const { user, loading: authLoading } = useAuth();
   const projectId = searchParams.get("projectId");
 
-  const [pages, setPages] = useState<Page[]>([
+  // Use history hook for undo/redo
+  const {
+    state: pages,
+    setState: setPages,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
+    clearHistory,
+  } = useHistory<Page[]>([
     {
       id: "home",
       name: "Home",
@@ -69,6 +79,7 @@ export default function EditorPage() {
       components: placeholderComponents,
     },
   ]);
+
   const [currentPageId, setCurrentPageId] = useState<string>("home");
   const [selectedComponentIds, setSelectedComponentIds] = useState<string[]>(
     []
@@ -122,23 +133,27 @@ export default function EditorPage() {
     if (projectData && isInitialLoad) {
       // Load pages from project data, or create default home page
       if (projectData.pages && Array.isArray(projectData.pages)) {
-        setPages(projectData.pages);
+        setPages(projectData.pages, false); // Don't record initial load in history
         setCurrentPageId(projectData.pages[0]?.id || "home");
       } else {
         // Legacy support: convert old components array to pages
-        setPages([
-          {
-            id: "home",
-            name: "Home",
-            slug: "index",
-            components: projectData.components || placeholderComponents,
-          },
-        ]);
+        setPages(
+          [
+            {
+              id: "home",
+              name: "Home",
+              slug: "index",
+              components: projectData.components || placeholderComponents,
+            },
+          ],
+          false // Don't record initial load in history
+        );
       }
       setProjectName(projectData.name || "Untitled Project");
       setIsInitialLoad(false);
+      clearHistory(); // Clear any history from initialization
     }
-  }, [projectData, isInitialLoad]);
+  }, [projectData, isInitialLoad, setPages, clearHistory]);
 
   // Auto-save when pages or project name change
   useEffect(() => {
@@ -327,10 +342,36 @@ export default function EditorPage() {
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      // Check if user is typing in an input field
+      const target = event.target as HTMLElement;
+      const isInputField =
+        target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.isContentEditable;
+
       if (
         event.target === document.body ||
         (event.target as Element)?.closest(".editor-canvas")
       ) {
+        // Undo
+        if (event.ctrlKey && event.key === "z" && !event.shiftKey) {
+          event.preventDefault();
+          undo();
+          toast.success("Undo");
+          return;
+        }
+
+        // Redo (Ctrl+Y or Ctrl+Shift+Z)
+        if (
+          (event.ctrlKey && event.key === "y") ||
+          (event.ctrlKey && event.shiftKey && event.key === "z")
+        ) {
+          event.preventDefault();
+          redo();
+          toast.success("Redo");
+          return;
+        }
+
         if (event.ctrlKey && event.key === "a") {
           event.preventDefault();
           const allIds = getAllComponentIds(components);
@@ -366,7 +407,7 @@ export default function EditorPage() {
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [components, selectedComponentIds]);
+  }, [components, selectedComponentIds, undo, redo]);
 
   if (redirecting || projectLoading || (projectId && authLoading)) {
     return (
@@ -396,6 +437,10 @@ export default function EditorPage() {
         onPageSelect={handlePageSelect}
         onPageAdd={handlePageAdd}
         onPageDelete={handlePageDelete}
+        onUndo={undo}
+        onRedo={redo}
+        canUndo={canUndo}
+        canRedo={canRedo}
       />
 
       <DragOverlay>
