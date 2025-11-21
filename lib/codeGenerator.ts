@@ -68,23 +68,19 @@ export function generateHTML(components: ComponentDefinition[], allPages?: any[]
                 const links = props.links || [];
                 const linkColor = props.linkColor || '#6b7280';
                 const linkHoverColor = props.linkHoverColor || '#1f2937';
+                const ctaButton = (props.ctaText && props.ctaLink)
+                    ? `<a href="${convertLink(props.ctaLink)}" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors ml-4">${props.ctaText}</a>`
+                    : '';
+
+                const logoText = props.logoText || props.brandText || "Brand";
 
                 return `
-<nav class="flex items-center justify-between px-8 py-4 max-w-7xl mx-auto"${getInlineStyles(props)}>
-    <div class="text-xl font-bold">${props.logoText || "Brand"}</div>
-    <button class="md:hidden flex flex-col gap-1" onclick="toggleMobileMenu()">
-        <span class="w-6 h-0.5 bg-gray-800"></span>
-        <span class="w-6 h-0.5 bg-gray-800"></span>
-        <span class="w-6 h-0.5 bg-gray-800"></span>
-    </button>
-    <div id="navbar-menu" class="hidden md:flex items-center gap-8">
-        <ul class="flex gap-8">
-            ${links.map((link: any) => `
-            <li><a href="${convertLink(link.href)}" class="hover:opacity-75 transition-opacity" style="color: ${linkColor}" onmouseover="this.style.color='${linkHoverColor}'" onmouseout="this.style.color='${linkColor}'">${link.text}</a></li>
-            `).join('')}
-        </ul>
-        ${props.ctaText && props.ctaLink ? `<a href="${convertLink(props.ctaLink)}" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">${props.ctaText}</a>` : ''}
+<nav class="w-full flex items-center px-8 py-4"${getInlineStyles(props)}>
+    <div class="text-xl font-bold">${logoText}</div>
+    <div class="flex items-center space-x-8 ml-auto">
+        ${links.map((link: any) => `<a href="${convertLink(link.href)}" class="hover:opacity-75 transition-opacity" style="color: ${linkColor}" onmouseover="this.style.color='${linkHoverColor}'" onmouseout="this.style.color='${linkColor}'">${link.text}</a>`).join('')}
     </div>
+    ${ctaButton}
 </nav>`;
 
             case "Hero":
@@ -130,9 +126,9 @@ export function generateHTML(components: ComponentDefinition[], allPages?: any[]
                 const containerOverflowY = { visible: 'overflow-y-visible', hidden: 'overflow-y-hidden', scroll: 'overflow-y-scroll', auto: 'overflow-y-auto' };
 
                 const containerClasses = [
-                    containerMaxWidth[props.maxWidth as keyof typeof containerMaxWidth] || containerMaxWidth.xl,
+                    props.display !== 'flex' && (containerMaxWidth[props.maxWidth as keyof typeof containerMaxWidth] || containerMaxWidth.xl),
                     containerPadding[props.padding as keyof typeof containerPadding] || containerPadding.md,
-                    'mx-auto',
+                    props.display !== 'flex' && 'mx-auto',
                     containerDisplay,
                     props.display === 'flex' && (containerFlexDir[props.flexDirection as keyof typeof containerFlexDir] || containerFlexDir.row),
                     props.display === 'flex' && (containerFlexWrap[props.flexWrap as keyof typeof containerFlexWrap] || containerFlexWrap.nowrap),

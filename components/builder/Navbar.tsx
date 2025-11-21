@@ -61,7 +61,7 @@ export function Navbar({
     <div className="relative">
       <nav
         className={cn(
-          "flex items-center justify-between w-full",
+          "flex items-center w-full",
           !textColor && (theme === "dark" ? "text-white" : "text-gray-900"),
           className
         )}
@@ -83,10 +83,10 @@ export function Navbar({
 
         {/* Navigation Links - Hidden on mobile */}
         {viewport === "desktop" && (
-          <div className="flex items-center space-x-4 xl:space-x-8">
+          <div className="flex items-center space-x-4 xl:space-x-8 ml-auto mr-4">
             {links.map((link, index) => {
               const linkProps = {
-                href: isPreviewMode ? link.href : "#",
+                href: "#",
                 className: cn(
                   "transition-colors text-sm lg:text-base cursor-pointer",
                   !linkColor &&
@@ -105,24 +105,13 @@ export function Navbar({
                     e.currentTarget.style.color = linkColor;
                   }
                 },
-                onClick: isPreviewMode
-                  ? undefined
-                  : (e: React.MouseEvent) => e.preventDefault(),
-                ...(isPreviewMode &&
-                  link.external && {
-                    target: "_blank",
-                    rel: "noopener noreferrer",
-                  }),
+                onClick: (e: React.MouseEvent) => e.preventDefault(),
               };
 
-              return link.external && isPreviewMode ? (
+              return (
                 <a key={index} {...linkProps}>
                   {link.text}
                 </a>
-              ) : (
-                <Link key={index} {...linkProps}>
-                  {link.text}
-                </Link>
               );
             })}
           </div>

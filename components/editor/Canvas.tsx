@@ -112,17 +112,17 @@ function ComponentWrapper({
   return (
     <div
       className={cn(
-        "relative group flex",
-        shouldTakeFullWidth && "w-full",
-        shouldTakeFullHeight && "self-stretch"
+        "relative group",
+        shouldTakeFullHeight && "flex self-stretch",
+        shouldTakeFullWidth && "w-full"
       )}
     >
       {/* Component wrapper */}
       <div
         className={cn(
-          "relative transition-all duration-200 flex",
+          "relative transition-all duration-200",
+          shouldTakeFullHeight && "flex flex-1",
           shouldTakeFullWidth && "w-full",
-          shouldTakeFullHeight && "flex-1",
           !isPreviewMode && isSelected && "ring-2 ring-blue-500 ring-offset-2",
           !isPreviewMode &&
             "hover:ring-1 hover:ring-blue-300 hover:ring-offset-1"

@@ -241,9 +241,40 @@ export default function EditorPage() {
     componentId: string,
     updates: Partial<ComponentDefinition["props"]>
   ) => {
+    // Update component on current page
     updateCurrentPageComponents((prev) =>
       updateComponentInTree(prev, componentId, updates)
     );
+
+    // If it's a Navbar or Footer, sync to all other pages by type
+    const component = findComponentInTree(components, componentId);
+    if (
+      component &&
+      (component.type === "Navbar" || component.type === "Footer")
+    ) {
+      setPages((prevPages) =>
+        prevPages.map((page) => {
+          if (page.id === currentPageId) return page; // Skip current page (already updated)
+
+          // Find the first Navbar or Footer of the same type on this page
+          const targetComponent = findComponentByType(
+            page.components,
+            component.type
+          );
+          if (targetComponent) {
+            return {
+              ...page,
+              components: updateComponentInTree(
+                page.components,
+                targetComponent.id,
+                updates
+              ),
+            };
+          }
+          return page;
+        })
+      );
+    }
   };
 
   const deleteComponent = (componentId: string) => {
@@ -522,6 +553,38 @@ function insertComponent(
   }
 
   return insertInTree(components);
+}
+
+function findComponentInTree(
+  components: ComponentDefinition[],
+  componentId: string
+): ComponentDefinition | null {
+  for (const component of components) {
+    if (component.id === componentId) {
+      return component;
+    }
+    if (component.children.length > 0) {
+      const found = findComponentInTree(component.children, componentId);
+      if (found) return found;
+    }
+  }
+  return null;
+}
+
+function findComponentByType(
+  components: ComponentDefinition[],
+  type: string
+): ComponentDefinition | null {
+  for (const component of components) {
+    if (component.type === type) {
+      return component;
+    }
+    if (component.children.length > 0) {
+      const found = findComponentByType(component.children, type);
+      if (found) return found;
+    }
+  }
+  return null;
 }
 
 function updateComponentInTree(
