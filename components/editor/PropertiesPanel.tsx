@@ -862,6 +862,19 @@ export function PropertiesPanel({
             </div>
 
             <div>
+              <Label htmlFor="description" className="mb-2 block">
+                Description
+              </Label>
+              <Textarea
+                id="description"
+                value={props.description || ""}
+                onChange={(e) => updateProp("description", e.target.value)}
+                placeholder="Brief description about your brand"
+                rows={3}
+              />
+            </div>
+
+            <div>
               <Label htmlFor="copyright" className="mb-2 block">
                 Copyright Text
               </Label>
@@ -873,28 +886,228 @@ export function PropertiesPanel({
               />
             </div>
 
-            <div>
-              <Label htmlFor="backgroundColor" className="mb-2 block">
-                Background Color
-              </Label>
-              <Input
-                id="backgroundColor"
-                type="color"
-                value={props.backgroundColor || "#1f2937"}
-                onChange={(e) => updateProp("backgroundColor", e.target.value)}
-              />
+            {/* Footer Sections */}
+            <div className="space-y-3 pt-4 border-t border-gray-200">
+              <div className="text-xs font-semibold text-gray-700 uppercase">
+                Footer Sections
+              </div>
+              <div className="space-y-3">
+                {(props.sections || []).map(
+                  (section: any, sectionIndex: number) => (
+                    <div
+                      key={sectionIndex}
+                      className="space-y-2 p-3 border rounded"
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <Label className="text-sm font-semibold">
+                          Section {sectionIndex + 1}
+                        </Label>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            const newSections = (props.sections || []).filter(
+                              (_: any, i: number) => i !== sectionIndex
+                            );
+                            updateProp("sections", newSections);
+                          }}
+                        >
+                          Remove Section
+                        </Button>
+                      </div>
+                      <Input
+                        value={section.title || ""}
+                        onChange={(e) => {
+                          const newSections = [...(props.sections || [])];
+                          newSections[sectionIndex] = {
+                            ...section,
+                            title: e.target.value,
+                          };
+                          updateProp("sections", newSections);
+                        }}
+                        placeholder="Section title (e.g., Products, Company)"
+                        className="mb-2"
+                      />
+
+                      {/* Links within section */}
+                      <div className="ml-2 space-y-2">
+                        <Label className="text-xs">Links</Label>
+                        {(section.links || []).map(
+                          (link: any, linkIndex: number) => (
+                            <div
+                              key={linkIndex}
+                              className="space-y-2 p-2 bg-gray-50 rounded"
+                            >
+                              <Input
+                                value={link.text || ""}
+                                onChange={(e) => {
+                                  const newSections = [
+                                    ...(props.sections || []),
+                                  ];
+                                  const newLinks = [...(section.links || [])];
+                                  newLinks[linkIndex] = {
+                                    ...link,
+                                    text: e.target.value,
+                                  };
+                                  newSections[sectionIndex] = {
+                                    ...section,
+                                    links: newLinks,
+                                  };
+                                  updateProp("sections", newSections);
+                                }}
+                                placeholder="Link text"
+                                className="mb-1"
+                              />
+                              <Input
+                                value={link.href || ""}
+                                onChange={(e) => {
+                                  const newSections = [
+                                    ...(props.sections || []),
+                                  ];
+                                  const newLinks = [...(section.links || [])];
+                                  newLinks[linkIndex] = {
+                                    ...link,
+                                    href: e.target.value,
+                                  };
+                                  newSections[sectionIndex] = {
+                                    ...section,
+                                    links: newLinks,
+                                  };
+                                  updateProp("sections", newSections);
+                                }}
+                                placeholder="URL"
+                              />
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  const newSections = [
+                                    ...(props.sections || []),
+                                  ];
+                                  const newLinks = (section.links || []).filter(
+                                    (_: any, i: number) => i !== linkIndex
+                                  );
+                                  newSections[sectionIndex] = {
+                                    ...section,
+                                    links: newLinks,
+                                  };
+                                  updateProp("sections", newSections);
+                                }}
+                                className="w-full"
+                              >
+                                Remove Link
+                              </Button>
+                            </div>
+                          )
+                        )}
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            const newSections = [...(props.sections || [])];
+                            const newLinks = [
+                              ...(section.links || []),
+                              { text: "New Link", href: "#" },
+                            ];
+                            newSections[sectionIndex] = {
+                              ...section,
+                              links: newLinks,
+                            };
+                            updateProp("sections", newSections);
+                          }}
+                          className="w-full"
+                        >
+                          Add Link
+                        </Button>
+                      </div>
+                    </div>
+                  )
+                )}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const newSections = [
+                      ...(props.sections || []),
+                      { title: "New Section", links: [] },
+                    ];
+                    updateProp("sections", newSections);
+                  }}
+                >
+                  Add Section
+                </Button>
+              </div>
             </div>
 
-            <div>
-              <Label htmlFor="textColor" className="mb-2 block">
-                Text Color
-              </Label>
-              <Input
-                id="textColor"
-                type="color"
-                value={props.textColor || "#ffffff"}
-                onChange={(e) => updateProp("textColor", e.target.value)}
-              />
+            {/* Social Links */}
+            <div className="space-y-3 pt-4 border-t border-gray-200">
+              <div className="text-xs font-semibold text-gray-700 uppercase">
+                Social Links
+              </div>
+              <div className="space-y-2">
+                {(props.socialLinks || []).map((social: any, index: number) => (
+                  <div key={index} className="space-y-2 p-3 border rounded">
+                    <Input
+                      value={social.platform || ""}
+                      onChange={(e) => {
+                        const newSocials = [...(props.socialLinks || [])];
+                        newSocials[index] = {
+                          ...social,
+                          platform: e.target.value,
+                        };
+                        updateProp("socialLinks", newSocials);
+                      }}
+                      placeholder="Platform name (e.g., Twitter, LinkedIn)"
+                      className="mb-2"
+                    />
+                    <Input
+                      value={social.href || ""}
+                      onChange={(e) => {
+                        const newSocials = [...(props.socialLinks || [])];
+                        newSocials[index] = { ...social, href: e.target.value };
+                        updateProp("socialLinks", newSocials);
+                      }}
+                      placeholder="URL"
+                      className="mb-2"
+                    />
+                    <Input
+                      value={social.icon || ""}
+                      onChange={(e) => {
+                        const newSocials = [...(props.socialLinks || [])];
+                        newSocials[index] = { ...social, icon: e.target.value };
+                        updateProp("socialLinks", newSocials);
+                      }}
+                      placeholder="Icon (emoji or text)"
+                    />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const newSocials = (props.socialLinks || []).filter(
+                          (_: any, i: number) => i !== index
+                        );
+                        updateProp("socialLinks", newSocials);
+                      }}
+                      className="w-full"
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                ))}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const newSocials = [
+                      ...(props.socialLinks || []),
+                      { platform: "Social", href: "#", icon: "🔗" },
+                    ];
+                    updateProp("socialLinks", newSocials);
+                  }}
+                >
+                  Add Social Link
+                </Button>
+              </div>
             </div>
           </div>
         );

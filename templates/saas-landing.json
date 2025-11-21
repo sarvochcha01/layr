@@ -143,9 +143,92 @@
                     "type": "Footer",
                     "props": {
                         "logoText": "CloudFlow",
+                        "description": "Streamline your workflow with powerful cloud-based tools.",
                         "copyright": "© 2024 CloudFlow. All rights reserved.",
                         "backgroundColor": "#111827",
-                        "textColor": "#9ca3af"
+                        "textColor": "#9ca3af",
+                        "sections": [
+                            {
+                                "title": "Product",
+                                "links": [
+                                    {
+                                        "text": "Features",
+                                        "href": "#features"
+                                    },
+                                    {
+                                        "text": "Pricing",
+                                        "href": "#pricing"
+                                    },
+                                    {
+                                        "text": "Security",
+                                        "href": "#security"
+                                    },
+                                    {
+                                        "text": "Roadmap",
+                                        "href": "#roadmap"
+                                    }
+                                ]
+                            },
+                            {
+                                "title": "Company",
+                                "links": [
+                                    {
+                                        "text": "About",
+                                        "href": "#about"
+                                    },
+                                    {
+                                        "text": "Blog",
+                                        "href": "#blog"
+                                    },
+                                    {
+                                        "text": "Careers",
+                                        "href": "#careers"
+                                    },
+                                    {
+                                        "text": "Contact",
+                                        "href": "#contact"
+                                    }
+                                ]
+                            },
+                            {
+                                "title": "Resources",
+                                "links": [
+                                    {
+                                        "text": "Documentation",
+                                        "href": "#docs"
+                                    },
+                                    {
+                                        "text": "Help Center",
+                                        "href": "#help"
+                                    },
+                                    {
+                                        "text": "API Reference",
+                                        "href": "#api"
+                                    },
+                                    {
+                                        "text": "Community",
+                                        "href": "#community"
+                                    }
+                                ]
+                            }
+                        ],
+                        "socialLinks": [
+                            {
+                                "platform": "Twitter",
+                                "href": "https://twitter.com",
+                                "icon": "🐦"
+                            },
+                            {
+                                "platform": "LinkedIn",
+                                "href": "https://linkedin.com",
+                                "icon": "💼"
+                            },
+                            {
+                                "platform": "GitHub",
+                                "href": "https://github.com",
+                                "icon": "🐙"
+                            }
+                        ]
                     },
                     "children": []
                 }
