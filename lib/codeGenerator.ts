@@ -305,15 +305,17 @@ export function generateHTML(components: ComponentDefinition[], allPages?: any[]
 
             case "Testimonial":
                 const stars = '★'.repeat(props.rating || 5) + '☆'.repeat(5 - (props.rating || 5));
+                const variant = props.variant || 'card';
+                const testimonialClasses = `p-6 rounded-lg ${variant === 'card' ? 'bg-white shadow-md' : ''} ${variant === 'featured' ? 'bg-white shadow-lg border-l-4 border-blue-500' : ''}`;
                 return `
-<div class="p-6 rounded-lg"${getInlineStyles(props)}>
+<div class="${testimonialClasses}"${getInlineStyles(props)}>
     <div class="text-yellow-400 text-xl mb-3">${stars}</div>
     <p class="text-lg mb-4 italic">"${props.quote || ''}"</p>
     <div class="flex items-center gap-3">
         ${props.avatar ? `<img src="${props.avatar}" alt="${props.author}" class="w-12 h-12 rounded-full" />` : ''}
         <div>
             <div class="font-semibold">${props.author || ''}</div>
-            <div class="text-sm opacity-75">${props.role || ''}</div>
+            <div class="text-sm opacity-75">${props.role || ''}${props.company ? ` at ${props.company}` : ''}</div>
         </div>
     </div>
 </div>`;
