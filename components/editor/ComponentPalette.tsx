@@ -3,8 +3,9 @@
 import { useDraggable } from "@dnd-kit/core";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { Search } from "lucide-react";
+import { Search, Star } from "lucide-react";
 import { useState } from "react";
+import { useComponentFavorites } from "@/hooks/useComponentFavorites";
 
 interface ComponentCategory {
   name: string;
@@ -200,7 +201,15 @@ const componentCategories: ComponentCategory[] = [
   },
 ];
 
-function DraggableComponent({ component }: { component: ComponentItem }) {
+function DraggableComponent({
+  component,
+  isFavorite,
+  onToggleFavorite,
+}: {
+  component: ComponentItem;
+  isFavorite: boolean;
+  onToggleFavorite: () => void;
+}) {
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({
       id: `palette-${component.type}`,
@@ -217,21 +226,39 @@ function DraggableComponent({ component }: { component: ComponentItem }) {
     <div
       ref={setNodeRef}
       style={style}
-      {...listeners}
-      {...attributes}
       className={cn(
-        "p-3 border border-gray-200 rounded-lg cursor-grab hover:border-blue-300 hover:shadow-sm transition-all",
+        "p-3 border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-sm transition-all relative group",
         "flex flex-col items-center text-center space-y-2",
         isDragging && "opacity-50"
       )}
     >
-      <span className="text-2xl">{component.icon}</span>
-      <div>
-        <div className="text-xs font-medium text-gray-900">
-          {component.name}
-        </div>
-        <div className="text-xs text-gray-500 mt-1">
-          {component.description}
+      {/* Favorite Button */}
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onToggleFavorite();
+        }}
+        className="absolute top-1 right-1 p-1 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+        title={isFavorite ? "Remove from favorites" : "Add to favorites"}
+      >
+        <Star
+          className={cn(
+            "w-3 h-3",
+            isFavorite ? "fill-yellow-400 text-yellow-400" : "text-gray-400"
+          )}
+        />
+      </button>
+
+      {/* Draggable area */}
+      <div {...listeners} {...attributes} className="cursor-grab w-full">
+        <span className="text-2xl">{component.icon}</span>
+        <div>
+          <div className="text-xs font-medium text-gray-900">
+            {component.name}
+          </div>
+          <div className="text-xs text-gray-500 mt-1">
+            {component.description}
+          </div>
         </div>
       </div>
     </div>
@@ -241,8 +268,14 @@ function DraggableComponent({ component }: { component: ComponentItem }) {
 export function ComponentPalette() {
   const [searchTerm, setSearchTerm] = useState("");
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
-    new Set(componentCategories.map((cat) => cat.name))
+    new Set([
+      "Favorites",
+      "Recent",
+      ...componentCategories.map((cat) => cat.name),
+    ])
   );
+  const { favorites, recent, toggleFavorite, isFavorite } =
+    useComponentFavorites();
 
   const toggleCategory = (categoryName: string) => {
     const newExpanded = new Set(expandedCategories);
@@ -253,6 +286,17 @@ export function ComponentPalette() {
     }
     setExpandedCategories(newExpanded);
   };
+
+  // Get all components as flat list for favorites/recent
+  const allComponents = componentCategories.flatMap((cat) => cat.components);
+
+  const favoriteComponents = allComponents.filter((comp) =>
+    favorites.includes(comp.type)
+  );
+
+  const recentComponents = recent
+    .map((type) => allComponents.find((comp) => comp.type === type))
+    .filter(Boolean) as ComponentItem[];
 
   const filteredCategories = componentCategories
     .map((category) => ({
@@ -285,6 +329,68 @@ export function ComponentPalette() {
 
       {/* Component Categories */}
       <div className="flex-1 overflow-auto p-4 space-y-4">
+        {/* Favorites Section */}
+        {!searchTerm && favoriteComponents.length > 0 && (
+          <div>
+            <button
+              onClick={() => toggleCategory("Favorites")}
+              className="flex items-center justify-between w-full text-left mb-3"
+            >
+              <span className="text-xs font-semibold text-yellow-600 uppercase tracking-wide flex items-center gap-1">
+                <Star className="w-3 h-3 fill-yellow-400" />
+                Favorites
+              </span>
+              <span className="text-xs text-gray-500">
+                {expandedCategories.has("Favorites") ? "−" : "+"}
+              </span>
+            </button>
+
+            {expandedCategories.has("Favorites") && (
+              <div className="grid grid-cols-2 gap-2 mb-4">
+                {favoriteComponents.map((component) => (
+                  <DraggableComponent
+                    key={component.type}
+                    component={component}
+                    isFavorite={true}
+                    onToggleFavorite={() => toggleFavorite(component.type)}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Recent Section */}
+        {!searchTerm && recentComponents.length > 0 && (
+          <div>
+            <button
+              onClick={() => toggleCategory("Recent")}
+              className="flex items-center justify-between w-full text-left mb-3"
+            >
+              <span className="text-xs font-semibold text-blue-600 uppercase tracking-wide">
+                Recent
+              </span>
+              <span className="text-xs text-gray-500">
+                {expandedCategories.has("Recent") ? "−" : "+"}
+              </span>
+            </button>
+
+            {expandedCategories.has("Recent") && (
+              <div className="grid grid-cols-2 gap-2 mb-4">
+                {recentComponents.map((component) => (
+                  <DraggableComponent
+                    key={component.type}
+                    component={component}
+                    isFavorite={isFavorite(component.type)}
+                    onToggleFavorite={() => toggleFavorite(component.type)}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Regular Categories */}
         {filteredCategories.map((category) => (
           <div key={category.name}>
             {/* Category Header */}
@@ -307,6 +413,8 @@ export function ComponentPalette() {
                   <DraggableComponent
                     key={component.type}
                     component={component}
+                    isFavorite={isFavorite(component.type)}
+                    onToggleFavorite={() => toggleFavorite(component.type)}
                   />
                 ))}
               </div>
@@ -314,12 +422,14 @@ export function ComponentPalette() {
           </div>
         ))}
 
-        {filteredCategories.length === 0 && (
-          <div className="text-center py-8 text-gray-500">
-            <div className="text-4xl mb-2">🔍</div>
-            <div className="text-sm">No components found</div>
-          </div>
-        )}
+        {filteredCategories.length === 0 &&
+          !favoriteComponents.length &&
+          !recentComponents.length && (
+            <div className="text-center py-8 text-gray-500">
+              <div className="text-4xl mb-2">🔍</div>
+              <div className="text-sm">No components found</div>
+            </div>
+          )}
       </div>
     </div>
   );

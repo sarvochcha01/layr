@@ -16,6 +16,9 @@ import { useProject, useUpdateProject } from "@/hooks/useProjects";
 import { toast } from "sonner";
 import { Loading } from "@/components/ui/loading";
 import { useHistory } from "@/hooks/useHistory";
+import { useComponentFavorites } from "@/hooks/useComponentFavorites";
+import { useComponentClipboard } from "@/hooks/useComponentClipboard";
+import { ShortcutsPanel } from "@/components/editor/ShortcutsPanel";
 
 const placeholderComponents: ComponentDefinition[] = [
   {
@@ -88,6 +91,11 @@ export default function EditorPage() {
   const [redirecting, setRedirecting] = useState(false);
   const [projectName, setProjectName] = useState<string>("");
   const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [showShortcuts, setShowShortcuts] = useState(false);
+
+  const { addToRecent } = useComponentFavorites();
+  const { copyComponent, pasteComponent, hasClipboard } =
+    useComponentClipboard();
 
   // Get current page
   const currentPage = pages.find((p) => p.id === currentPageId) || pages[0];
@@ -208,6 +216,33 @@ export default function EditorPage() {
     toast.success("Page deleted");
   };
 
+  const handlePageDuplicate = (pageId: string) => {
+    const pageToDuplicate = pages.find((p) => p.id === pageId);
+    if (!pageToDuplicate) return;
+
+    // Deep clone components with new IDs
+    const cloneComponentsWithNewIds = (
+      comps: ComponentDefinition[]
+    ): ComponentDefinition[] => {
+      return comps.map((comp) => ({
+        ...comp,
+        id: generateId(),
+        children: cloneComponentsWithNewIds(comp.children),
+      }));
+    };
+
+    const newPage: Page = {
+      id: generateId(),
+      name: `${pageToDuplicate.name} (Copy)`,
+      slug: `${pageToDuplicate.slug}-copy-${Date.now()}`,
+      components: cloneComponentsWithNewIds(pageToDuplicate.components),
+    };
+
+    setPages((prev) => [...prev, newPage]);
+    setCurrentPageId(newPage.id);
+    toast.success(`Page "${pageToDuplicate.name}" duplicated`);
+  };
+
   const handlePageSelect = (pageId: string) => {
     setCurrentPageId(pageId);
     setSelectedComponentIds([]);
@@ -246,6 +281,7 @@ export default function EditorPage() {
         updateCurrentPageComponents((prev) =>
           insertComponent(prev, newComponent, targetId, position)
         );
+        addToRecent(componentType); // Track in recent
       }
     }
 
@@ -336,6 +372,7 @@ export default function EditorPage() {
       children: [],
     };
     updateCurrentPageComponents((prev) => [...prev, newComponent]);
+    addToRecent(componentType); // Track in recent
     toast.success(`${componentType} added to page`);
   };
 
@@ -348,6 +385,13 @@ export default function EditorPage() {
         target.tagName === "INPUT" ||
         target.tagName === "TEXTAREA" ||
         target.isContentEditable;
+
+      // Show shortcuts panel with ?
+      if (event.key === "?" && !isInputField) {
+        event.preventDefault();
+        setShowShortcuts((prev) => !prev);
+        return;
+      }
 
       if (
         event.target === document.body ||
@@ -369,6 +413,44 @@ export default function EditorPage() {
           event.preventDefault();
           redo();
           toast.success("Redo");
+          return;
+        }
+
+        // Copy component
+        if (
+          event.ctrlKey &&
+          event.key === "c" &&
+          selectedComponentIds.length === 1
+        ) {
+          event.preventDefault();
+          const component = findComponentInTree(
+            components,
+            selectedComponentIds[0]
+          );
+          if (component) {
+            copyComponent(component);
+            toast.success("Component copied");
+          }
+          return;
+        }
+
+        // Paste component
+        if (event.ctrlKey && event.key === "v" && hasClipboard) {
+          event.preventDefault();
+          const copiedComponent = pasteComponent();
+          if (copiedComponent) {
+            // Deep clone with new IDs
+            const cloneWithNewIds = (
+              comp: ComponentDefinition
+            ): ComponentDefinition => ({
+              ...comp,
+              id: generateId(),
+              children: comp.children.map(cloneWithNewIds),
+            });
+            const newComponent = cloneWithNewIds(copiedComponent);
+            updateCurrentPageComponents((prev) => [...prev, newComponent]);
+            toast.success("Component pasted");
+          }
           return;
         }
 
@@ -407,7 +489,15 @@ export default function EditorPage() {
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [components, selectedComponentIds, undo, redo]);
+  }, [
+    components,
+    selectedComponentIds,
+    undo,
+    redo,
+    hasClipboard,
+    copyComponent,
+    pasteComponent,
+  ]);
 
   if (redirecting || projectLoading || (projectId && authLoading)) {
     return (
@@ -421,43 +511,51 @@ export default function EditorPage() {
   }
 
   return (
-    <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-      <EditorLayout
-        components={components}
-        selectedComponentIds={selectedComponentIds}
-        onSelectComponent={(id) => setSelectedComponentIds(id ? [id] : [])}
-        onUpdateComponent={updateComponent}
-        onDeleteComponent={deleteComponent}
-        onDuplicateComponent={duplicateComponent}
-        onAddComponent={addComponent}
-        projectName={projectName}
-        onProjectNameChange={handleProjectNameChange}
-        pages={pages}
-        currentPageId={currentPageId}
-        onPageSelect={handlePageSelect}
-        onPageAdd={handlePageAdd}
-        onPageDelete={handlePageDelete}
-        onUndo={undo}
-        onRedo={redo}
-        canUndo={canUndo}
-        canRedo={canRedo}
-      />
+    <>
+      <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+        <EditorLayout
+          components={components}
+          selectedComponentIds={selectedComponentIds}
+          onSelectComponent={(id) => setSelectedComponentIds(id ? [id] : [])}
+          onUpdateComponent={updateComponent}
+          onDeleteComponent={deleteComponent}
+          onDuplicateComponent={duplicateComponent}
+          onAddComponent={addComponent}
+          projectName={projectName}
+          onProjectNameChange={handleProjectNameChange}
+          pages={pages}
+          currentPageId={currentPageId}
+          onPageSelect={handlePageSelect}
+          onPageAdd={handlePageAdd}
+          onPageDelete={handlePageDelete}
+          onPageDuplicate={handlePageDuplicate}
+          onUndo={undo}
+          onRedo={redo}
+          canUndo={canUndo}
+          canRedo={canRedo}
+        />
 
-      <DragOverlay>
-        {draggedComponent ? (
-          <div className="bg-white border-2 border-blue-500 rounded-lg p-3 shadow-xl flex flex-col items-center space-y-2 min-w-[100px]">
-            <span className="text-2xl">
-              {getComponentIcon(
-                draggedComponent.componentType || draggedComponent.type
-              )}
-            </span>
-            <span className="text-xs font-medium text-gray-900">
-              {draggedComponent.componentType || draggedComponent.type}
-            </span>
-          </div>
-        ) : null}
-      </DragOverlay>
-    </DndContext>
+        <DragOverlay>
+          {draggedComponent ? (
+            <div className="bg-white border-2 border-blue-500 rounded-lg p-3 shadow-xl flex flex-col items-center space-y-2 min-w-[100px]">
+              <span className="text-2xl">
+                {getComponentIcon(
+                  draggedComponent.componentType || draggedComponent.type
+                )}
+              </span>
+              <span className="text-xs font-medium text-gray-900">
+                {draggedComponent.componentType || draggedComponent.type}
+              </span>
+            </div>
+          ) : null}
+        </DragOverlay>
+      </DndContext>
+
+      {/* Shortcuts Panel */}
+      {showShortcuts && (
+        <ShortcutsPanel onClose={() => setShowShortcuts(false)} />
+      )}
+    </>
   );
 }
 

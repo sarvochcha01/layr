@@ -13,7 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Plus, FileText, Trash2, Home } from "lucide-react";
+import { Plus, FileText, Trash2, Home, Copy } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface PagesPanelProps {
@@ -23,6 +23,7 @@ interface PagesPanelProps {
   onPageAdd: (name: string, slug: string) => void;
   onPageDelete: (pageId: string) => void;
   onPageRename: (pageId: string, name: string, slug: string) => void;
+  onPageDuplicate?: (pageId: string) => void;
 }
 
 export function PagesPanel({
@@ -32,6 +33,7 @@ export function PagesPanel({
   onPageAdd,
   onPageDelete,
   onPageRename,
+  onPageDuplicate,
 }: PagesPanelProps) {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [newPageName, setNewPageName] = useState("");
@@ -92,18 +94,32 @@ export function PagesPanel({
                 </div>
               </div>
             </div>
-            {page.slug !== "index" && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onPageDelete(page.id);
-                }}
-                className="opacity-0 group-hover:opacity-100 p-1 hover:bg-red-100 rounded transition-opacity"
-                title="Delete page"
-              >
-                <Trash2 className="w-4 h-4 text-red-600" />
-              </button>
-            )}
+            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100">
+              {onPageDuplicate && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onPageDuplicate(page.id);
+                  }}
+                  className="p-1 hover:bg-blue-100 rounded transition-colors"
+                  title="Duplicate page"
+                >
+                  <Copy className="w-4 h-4 text-blue-600" />
+                </button>
+              )}
+              {page.slug !== "index" && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onPageDelete(page.id);
+                  }}
+                  className="p-1 hover:bg-red-100 rounded transition-colors"
+                  title="Delete page"
+                >
+                  <Trash2 className="w-4 h-4 text-red-600" />
+                </button>
+              )}
+            </div>
           </div>
         ))}
       </div>

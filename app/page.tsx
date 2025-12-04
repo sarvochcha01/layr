@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Move, LayoutTemplate, Download, Github, X } from "lucide-react";
 
-// Updated Logo component to better match the design (circle with letter)
 const Logo = () => (
   <Link href="/" className="flex items-center space-x-3">
     <div className="w-7 h-7 bg-foreground rounded-full flex items-center justify-center">

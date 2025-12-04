@@ -27,6 +27,7 @@ interface EditorLayoutProps {
   onPageSelect: (pageId: string) => void;
   onPageAdd: (name: string, slug: string) => void;
   onPageDelete: (pageId: string) => void;
+  onPageDuplicate?: (pageId: string) => void;
   onUndo?: () => void;
   onRedo?: () => void;
   canUndo?: boolean;
@@ -48,6 +49,7 @@ export function EditorLayout({
   onPageSelect,
   onPageAdd,
   onPageDelete,
+  onPageDuplicate,
   onUndo,
   onRedo,
   canUndo = false,
@@ -58,6 +60,7 @@ export function EditorLayout({
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedName, setEditedName] = useState(projectName || "");
+  const [showExportMenu, setShowExportMenu] = useState(false);
 
   const selectedComponent =
     selectedComponentIds.length === 1
@@ -76,15 +79,21 @@ export function EditorLayout({
     }
   };
 
-  const exportToZip = async () => {
+  const exportToZip = async (format: "html" | "react" = "html") => {
     try {
+      setShowExportMenu(false);
+
       // Call the export API with pages
       const response = await fetch("/api/export", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ pages }),
+        body: JSON.stringify({
+          pages,
+          format,
+          projectName: projectName || "my-website",
+        }),
       });
 
       if (!response.ok) {
@@ -98,7 +107,8 @@ export function EditorLayout({
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "website-export.zip";
+      a.download =
+        format === "react" ? "react-project.zip" : "website-export.zip";
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -122,6 +132,7 @@ export function EditorLayout({
               onPageSelect={onPageSelect}
               onPageAdd={onPageAdd}
               onPageDelete={onPageDelete}
+              onPageDuplicate={onPageDuplicate}
               onPageRename={(id, name, slug) => {
                 // TODO: Implement page rename
               }}
@@ -299,13 +310,36 @@ export function EditorLayout({
               )}
             </button>
 
-            <button
-              onClick={exportToZip}
-              className="flex items-center space-x-2 px-3 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
-            >
-              <Download className="w-3 h-3" />
-              <span>Export</span>
-            </button>
+            {/* Export Button with Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setShowExportMenu(!showExportMenu)}
+                className="flex items-center space-x-2 px-3 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+              >
+                <Download className="w-3 h-3" />
+                <span>Export</span>
+                <span className="text-xs">▼</span>
+              </button>
+
+              {showExportMenu && (
+                <div className="absolute right-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                  <button
+                    onClick={() => exportToZip("html")}
+                    className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 rounded-t-lg"
+                  >
+                    <div className="font-medium">Export as HTML</div>
+                    <div className="text-xs text-gray-500">Static website</div>
+                  </button>
+                  <button
+                    onClick={() => exportToZip("react")}
+                    className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 rounded-b-lg border-t"
+                  >
+                    <div className="font-medium">Export as React</div>
+                    <div className="text-xs text-gray-500">Next.js project</div>
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
