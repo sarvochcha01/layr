@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+export const dynamic = "force-dynamic";
+
+import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
   DndContext,

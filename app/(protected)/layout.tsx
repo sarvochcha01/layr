@@ -1,4 +1,6 @@
-import { AuthGuard } from "@/components/auth/AuthGuard";
+export const dynamic = "force-dynamic";
+export const dynamicParams = true;
+
 import { SideNav } from "@/components/navigation/SideNav";
 
 export default function ProtectedLayout({
@@ -7,13 +9,11 @@ export default function ProtectedLayout({
   children: React.ReactNode;
 }) {
   return (
-    <AuthGuard>
-      <div className="flex h-screen bg-background">
-        <SideNav />
-        <main className="flex-1 overflow-auto">
-          <div className="p-6">{children}</div>
-        </main>
-      </div>
-    </AuthGuard>
+    <div className="flex h-screen w-full overflow-hidden bg-background">
+      <SideNav />
+      <main className="flex-1 overflow-y-auto">
+        {children}
+      </main>
+    </div>
   );
 }
