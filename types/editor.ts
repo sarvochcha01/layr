@@ -13,6 +13,20 @@ export interface Page {
     components: ComponentDefinition[];
 }
 
+export interface GlobalComponents {
+    navbar?: ComponentDefinition;
+    footer?: ComponentDefinition;
+}
+
+export interface Project {
+    id: string;
+    name: string;
+    pages: Page[];
+    globalComponents?: GlobalComponents;
+    createdAt: any;
+    updatedAt: any;
+}
+
 export interface EditorState {
     components: ComponentDefinition[];
     selectedComponentId: string | null;

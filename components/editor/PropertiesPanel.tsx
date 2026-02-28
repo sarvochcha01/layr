@@ -5,26 +5,17 @@ import { ComponentDefinition, Page } from "@/types/editor";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-// import { Textarea } from "@/components/ui/textarea";
-// import { Switch } from "@/components/ui/switch";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Settings2, Type, Paintbrush, Scissors, Link as LinkIcon, Image as ImageIcon } from "lucide-react";
 
-// Temporary textarea component
-const Textarea = ({ className, ...props }: any) => (
-  <textarea
-    className={`w-full p-2 border rounded-md ${className}`}
-    {...props}
-  />
-);
 
-// Temporary switch component
-const Switch = ({ checked, onCheckedChange, ...props }: any) => (
-  <input
-    type="checkbox"
-    checked={checked}
-    onChange={(e) => onCheckedChange?.(e.target.checked)}
-    {...props}
-  />
-);
 
 interface PropertiesPanelProps {
   selectedComponent: ComponentDefinition | null;
@@ -96,35 +87,56 @@ export function PropertiesPanel({
     // Common color fields for all components
     const renderColorFields = () => {
       return (
-        <div className="space-y-3 pb-4 border-b border-gray-200">
-          <div className="text-xs font-semibold text-gray-700 uppercase">
-            Colors
-          </div>
-          <div className="space-y-3">
-            <div>
-              <Label htmlFor="backgroundColor" className="mb-2 block">
-                Background Color
-              </Label>
-              <Input
-                id="backgroundColor"
-                type="color"
-                value={props.backgroundColor || "#ffffff"}
-                onChange={(e) => updateProp("backgroundColor", e.target.value)}
-              />
+        <AccordionItem value="colors" className="border-b-0">
+          <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold text-gray-700 uppercase tracking-wide data-[state=open]:bg-gray-50/50">
+            <div className="flex items-center gap-2">
+              <Paintbrush className="w-4 h-4 text-gray-500" />
+              Colors
             </div>
-            <div>
-              <Label htmlFor="textColor" className="mb-2 block">
+          </AccordionTrigger>
+          <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="backgroundColor" className="text-xs font-medium text-gray-600">
+                Background
+              </Label>
+              <div className="flex gap-2 items-center">
+                <Input
+                  id="backgroundColor"
+                  type="color"
+                  value={props.backgroundColor || "#ffffff"}
+                  onChange={(e) => updateProp("backgroundColor", e.target.value)}
+                  className="w-8 h-8 p-0.5 min-h-0 cursor-pointer"
+                />
+                <Input
+                  type="text"
+                  value={props.backgroundColor || "#ffffff"}
+                  onChange={(e) => updateProp("backgroundColor", e.target.value)}
+                  className="flex-1 h-8 text-xs font-mono"
+                />
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="textColor" className="text-xs font-medium text-gray-600">
                 Text Color
               </Label>
-              <Input
-                id="textColor"
-                type="color"
-                value={props.textColor || "#000000"}
-                onChange={(e) => updateProp("textColor", e.target.value)}
-              />
+              <div className="flex gap-2 items-center">
+                <Input
+                  id="textColor"
+                  type="color"
+                  value={props.textColor || "#000000"}
+                  onChange={(e) => updateProp("textColor", e.target.value)}
+                  className="w-8 h-8 p-0.5 min-h-0 cursor-pointer"
+                />
+                <Input
+                  type="text"
+                  value={props.textColor || "#000000"}
+                  onChange={(e) => updateProp("textColor", e.target.value)}
+                  className="flex-1 h-8 text-xs font-mono"
+                />
+              </div>
             </div>
-          </div>
-        </div>
+          </AccordionContent>
+        </AccordionItem>
       );
     };
 
@@ -134,631 +146,531 @@ export function PropertiesPanel({
       const height = parseDimension(props.height || "");
 
       return (
-        <div className="space-y-3 pb-4 border-b border-gray-200">
-          <div className="text-xs font-semibold text-gray-700 uppercase">
-            Dimensions
-          </div>
-          <div className="space-y-3">
-            <div>
-              <Label htmlFor="width" className="mb-2 block">
-                Width
-              </Label>
-              <div className="flex gap-2">
-                <Input
-                  id="width"
-                  type="number"
-                  value={width.value}
-                  onChange={(e) =>
-                    updateProp(
-                      "width",
-                      combineDimensionAllowEmpty(e.target.value, width.unit)
-                    )
-                  }
-                  onBlur={(e) => {
-                    // Convert to auto if empty on blur
-                    if (!e.target.value && width.unit !== "auto") {
-                      updateProp("width", "auto");
-                    }
-                  }}
-                  placeholder="auto"
-                  className="flex-1"
-                  disabled={width.unit === "auto"}
-                />
-                <select
-                  value={width.unit}
-                  onChange={(e) => {
-                    const newUnit = e.target.value;
-                    updateProp(
-                      "width",
-                      newUnit === "auto"
-                        ? "auto"
-                        : combineDimension(width.value || "100", newUnit)
-                    );
-                  }}
-                  className="w-20 px-2 py-2 border rounded-md text-sm"
-                >
-                  <option value="auto">auto</option>
-                  <option value="px">px</option>
-                  <option value="%">%</option>
-                  <option value="rem">rem</option>
-                  <option value="em">em</option>
-                </select>
+        <AccordionItem value="dimensions" className="border-b-0 border-t border-gray-100">
+          <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold text-gray-700 uppercase tracking-wide data-[state=open]:bg-gray-50/50">
+            <div className="flex items-center gap-2">
+              <Scissors className="w-4 h-4 text-gray-500" />
+              Layout
+            </div>
+          </AccordionTrigger>
+          <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="width" className="text-xs font-medium text-gray-600">Width</Label>
+                <div className="flex gap-0 border rounded-md overflow-hidden focus-within:ring-1 focus-within:ring-blue-500">
+                  <Input
+                    id="width"
+                    type="number"
+                    value={width.value}
+                    onChange={(e) => updateProp("width", combineDimensionAllowEmpty(e.target.value, width.unit))}
+                    onBlur={(e) => {
+                      if (!e.target.value && width.unit !== "auto") updateProp("width", "auto");
+                    }}
+                    placeholder="auto"
+                    className="flex-1 h-8 text-xs border-0 rounded-none shadow-none focus-visible:ring-0 px-2"
+                    disabled={width.unit === "auto"}
+                  />
+                  <select
+                    value={width.unit}
+                    onChange={(e) => {
+                      const newUnit = e.target.value;
+                      updateProp("width", newUnit === "auto" ? "auto" : combineDimension(width.value || "100", newUnit));
+                    }}
+                    className="w-14 bg-gray-50 border-l text-xs text-gray-600 px-1 focus:outline-none"
+                  >
+                    <option value="auto">auto</option>
+                    <option value="px">px</option>
+                    <option value="%">%</option>
+                    <option value="rem">rem</option>
+                  </select>
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="height" className="text-xs font-medium text-gray-600">Height</Label>
+                <div className="flex gap-0 border rounded-md overflow-hidden focus-within:ring-1 focus-within:ring-blue-500">
+                  <Input
+                    id="height"
+                    type="number"
+                    value={height.value}
+                    onChange={(e) => updateProp("height", combineDimensionAllowEmpty(e.target.value, height.unit))}
+                    onBlur={(e) => {
+                      if (!e.target.value && height.unit !== "auto") updateProp("height", "auto");
+                    }}
+                    placeholder="auto"
+                    className="flex-1 h-8 text-xs border-0 rounded-none shadow-none focus-visible:ring-0 px-2"
+                    disabled={height.unit === "auto"}
+                  />
+                  <select
+                    value={height.unit}
+                    onChange={(e) => {
+                      const newUnit = e.target.value;
+                      updateProp("height", newUnit === "auto" ? "auto" : combineDimension(height.value || "100", newUnit));
+                    }}
+                    className="w-14 bg-gray-50 border-l text-xs text-gray-600 px-1 focus:outline-none"
+                  >
+                    <option value="auto">auto</option>
+                    <option value="px">px</option>
+                    <option value="%">%</option>
+                    <option value="rem">rem</option>
+                  </select>
+                </div>
               </div>
             </div>
-            <div>
-              <Label htmlFor="height" className="mb-2 block">
-                Height
-              </Label>
-              <div className="flex gap-2">
-                <Input
-                  id="height"
-                  type="number"
-                  value={height.value}
-                  onChange={(e) =>
-                    updateProp(
-                      "height",
-                      combineDimensionAllowEmpty(e.target.value, height.unit)
-                    )
-                  }
-                  onBlur={(e) => {
-                    // Convert to auto if empty on blur
-                    if (!e.target.value && height.unit !== "auto") {
-                      updateProp("height", "auto");
-                    }
-                  }}
-                  placeholder="auto"
-                  className="flex-1"
-                  disabled={height.unit === "auto"}
-                />
-                <select
-                  value={height.unit}
-                  onChange={(e) => {
-                    const newUnit = e.target.value;
-                    updateProp(
-                      "height",
-                      newUnit === "auto"
-                        ? "auto"
-                        : combineDimension(height.value || "100", newUnit)
-                    );
-                  }}
-                  className="w-20 px-2 py-2 border rounded-md text-sm"
-                >
-                  <option value="auto">auto</option>
-                  <option value="px">px</option>
-                  <option value="%">%</option>
-                  <option value="rem">rem</option>
-                  <option value="em">em</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
+          </AccordionContent>
+        </AccordionItem>
       );
     };
 
     switch (type) {
       case "Hero":
         return (
-          <div className="space-y-4">
+          <Accordion type="multiple" defaultValue={["content", "colors", "dimensions"]} className="w-full">
+            <AccordionItem value="content" className="border-b-0 border-t border-gray-100 first:border-t-0">
+              <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold text-gray-700 uppercase tracking-wide data-[state=open]:bg-gray-50/50">
+                <div className="flex items-center gap-2">
+                  <Type className="w-4 h-4 text-gray-500" />
+                  Content
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="title" className="text-xs font-medium text-gray-600">Title</Label>
+                  <Input id="title" value={props.title || ""} onChange={(e) => updateProp("title", e.target.value)} placeholder="Enter hero title" className="h-8 text-sm" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="subtitle" className="text-xs font-medium text-gray-600">Subtitle</Label>
+                  <Input id="subtitle" value={props.subtitle || ""} onChange={(e) => updateProp("subtitle", e.target.value)} placeholder="Enter subtitle" className="h-8 text-sm" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="description" className="text-xs font-medium text-gray-600">Description</Label>
+                  <Textarea id="description" value={props.description || ""} onChange={(e) => updateProp("description", e.target.value)} placeholder="Enter description" rows={3} className="text-sm resize-none" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="primaryButtonText" className="text-xs font-medium text-gray-600">Primary Button Text</Label>
+                  <Input id="primaryButtonText" value={props.primaryButtonText || ""} onChange={(e) => updateProp("primaryButtonText", e.target.value)} placeholder="Button text" className="h-8 text-sm" />
+                </div>
+              </AccordionContent>
+            </AccordionItem>
             {renderColorFields()}
             {renderDimensionFields()}
-            <div>
-              <Label htmlFor="title" className="mb-2 block">
-                Title
-              </Label>
-              <Input
-                id="title"
-                value={props.title || ""}
-                onChange={(e) => updateProp("title", e.target.value)}
-                placeholder="Enter hero title"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="subtitle" className="mb-2 block">
-                Subtitle
-              </Label>
-              <Input
-                id="subtitle"
-                value={props.subtitle || ""}
-                onChange={(e) => updateProp("subtitle", e.target.value)}
-                placeholder="Enter subtitle"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="description" className="mb-2 block">
-                Description
-              </Label>
-              <Textarea
-                id="description"
-                value={props.description || ""}
-                onChange={(e) => updateProp("description", e.target.value)}
-                placeholder="Enter description"
-                rows={3}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="primaryButtonText" className="mb-2 block">
-                Primary Button Text
-              </Label>
-              <Input
-                id="primaryButtonText"
-                value={props.primaryButtonText || ""}
-                onChange={(e) =>
-                  updateProp("primaryButtonText", e.target.value)
-                }
-                placeholder="Button text"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="backgroundColor" className="mb-2 block">
-                Background Color
-              </Label>
-              <Input
-                id="backgroundColor"
-                type="color"
-                value={props.backgroundColor || "#f8fafc"}
-                onChange={(e) => updateProp("backgroundColor", e.target.value)}
-              />
-            </div>
-          </div>
+          </Accordion>
         );
 
       case "Text":
         return (
-          <div className="space-y-4">
+          <Accordion type="multiple" defaultValue={["content", "colors", "dimensions"]} className="w-full">
+            <AccordionItem value="content" className="border-b-0 border-t border-gray-100 first:border-t-0">
+              <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold text-gray-700 uppercase tracking-wide data-[state=open]:bg-gray-50/50">
+                <div className="flex items-center gap-2">
+                  <Type className="w-4 h-4 text-gray-500" />
+                  Content
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="content" className="text-xs font-medium text-gray-600">Content</Label>
+                  <Textarea id="content" value={props.content || ""} onChange={(e) => updateProp("content", e.target.value)} placeholder="Enter text content" rows={4} className="text-sm resize-none" />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="tag" className="text-xs font-medium text-gray-600">HTML Tag</Label>
+                    <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-blue-500">
+                      <select id="tag" value={props.tag || "p"} onChange={(e) => updateProp("tag", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
+                        <option value="h1">H1</option>
+                        <option value="h2">H2</option>
+                        <option value="h3">H3</option>
+                        <option value="h4">H4</option>
+                        <option value="h5">H5</option>
+                        <option value="h6">H6</option>
+                        <option value="p">Paragraph</option>
+                        <option value="span">Span</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="size" className="text-xs font-medium text-gray-600">Size</Label>
+                    <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-blue-500">
+                      <select id="size" value={props.size || "base"} onChange={(e) => updateProp("size", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
+                        <option value="xs">Extra Small</option>
+                        <option value="sm">Small</option>
+                        <option value="base">Base</option>
+                        <option value="lg">Large</option>
+                        <option value="xl">Extra Large</option>
+                        <option value="2xl">2X Large</option>
+                        <option value="3xl">3X Large</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
             {renderColorFields()}
             {renderDimensionFields()}
-            <div>
-              <Label htmlFor="content" className="mb-2 block">
-                Content
-              </Label>
-              <Textarea
-                id="content"
-                value={props.content || ""}
-                onChange={(e) => updateProp("content", e.target.value)}
-                placeholder="Enter text content"
-                rows={4}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="tag" className="mb-2 block">
-                HTML Tag
-              </Label>
-              <select
-                id="tag"
-                value={props.tag || "p"}
-                onChange={(e) => updateProp("tag", e.target.value)}
-                className="w-full p-2 border rounded-md"
-              >
-                <option value="h1">H1</option>
-                <option value="h2">H2</option>
-                <option value="h3">H3</option>
-                <option value="h4">H4</option>
-                <option value="h5">H5</option>
-                <option value="h6">H6</option>
-                <option value="p">Paragraph</option>
-                <option value="span">Span</option>
-              </select>
-            </div>
-
-            <div>
-              <Label htmlFor="size" className="mb-2 block">
-                Size
-              </Label>
-              <select
-                id="size"
-                value={props.size || "base"}
-                onChange={(e) => updateProp("size", e.target.value)}
-                className="w-full p-2 border rounded-md"
-              >
-                <option value="xs">Extra Small</option>
-                <option value="sm">Small</option>
-                <option value="base">Base</option>
-                <option value="lg">Large</option>
-                <option value="xl">Extra Large</option>
-                <option value="2xl">2X Large</option>
-                <option value="3xl">3X Large</option>
-              </select>
-            </div>
-
-            <div>
-              <Label htmlFor="color" className="mb-2 block">
-                Text Color
-              </Label>
-              <Input
-                id="color"
-                type="color"
-                value={props.color || "#000000"}
-                onChange={(e) => updateProp("color", e.target.value)}
-              />
-            </div>
-          </div>
+          </Accordion>
         );
 
       case "Button":
         return (
-          <div className="space-y-4">
-            {renderColorFields()}
-            {renderDimensionFields()}
-            <div>
-              <Label htmlFor="text" className="mb-2 block">
-                Button Text
-              </Label>
-              <Input
-                id="text"
-                value={props.text || ""}
-                onChange={(e) => updateProp("text", e.target.value)}
-                placeholder="Button text"
-              />
-            </div>
+          <Accordion type="multiple" defaultValue={["content", "links", "colors", "dimensions"]} className="w-full">
+            <AccordionItem value="content" className="border-b-0 border-t border-gray-100 first:border-t-0">
+              <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold text-gray-700 uppercase tracking-wide data-[state=open]:bg-gray-50/50">
+                <div className="flex items-center gap-2">
+                  <Type className="w-4 h-4 text-gray-500" />
+                  Content
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="text" className="text-xs font-medium text-gray-600">Button Text</Label>
+                  <Input id="text" value={props.text || ""} onChange={(e) => updateProp("text", e.target.value)} placeholder="Button text" className="h-8 text-sm" />
+                </div>
+                
+                <div className="space-y-1.5">
+                  <Label htmlFor="variant" className="text-xs font-medium text-gray-600">Variant</Label>
+                  <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-blue-500">
+                    <select id="variant" value={props.variant || "default"} onChange={(e) => updateProp("variant", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
+                      <option value="default">Default</option>
+                      <option value="destructive">Destructive</option>
+                      <option value="outline">Outline</option>
+                      <option value="secondary">Secondary</option>
+                      <option value="ghost">Ghost</option>
+                      <option value="link">Link</option>
+                    </select>
+                  </div>
+                </div>
 
-            <div>
-              <Label htmlFor="linkType" className="mb-2 block">
-                Link Type
-              </Label>
-              <select
-                id="linkType"
-                value={props.href?.startsWith("page:") ? "page" : "url"}
-                onChange={(e) => {
-                  if (e.target.value === "page" && pages.length > 0) {
-                    updateProp("href", `page:${pages[0].id}`);
-                  } else {
-                    updateProp("href", "");
-                  }
-                }}
-                className="w-full p-2 border rounded-md mb-2"
-              >
-                <option value="url">External URL</option>
-                <option value="page">Internal Page</option>
-              </select>
+                <div className="flex items-center justify-between p-2 rounded-md bg-gray-50 border border-gray-100">
+                  <Label htmlFor="fullWidth" className="text-xs font-medium text-gray-600 cursor-pointer">Full Width</Label>
+                  <Switch id="fullWidth" checked={props.fullWidth || false} onCheckedChange={(checked) => updateProp("fullWidth", checked)} className="scale-75 origin-right" />
+                </div>
+              </AccordionContent>
+            </AccordionItem>
 
-              {props.href?.startsWith("page:") ? (
-                <>
-                  <Label htmlFor="href" className="mb-2 block">
-                    Select Page
-                  </Label>
-                  <select
-                    id="href"
-                    value={props.href}
-                    onChange={(e) => updateProp("href", e.target.value)}
-                    className="w-full p-2 border rounded-md"
-                  >
-                    {pages.map((page) => (
-                      <option key={page.id} value={`page:${page.id}`}>
-                        {page.name}
-                      </option>
-                    ))}
-                  </select>
-                </>
-              ) : (
-                <>
-                  <Label htmlFor="href" className="mb-2 block">
-                    Link URL
-                  </Label>
-                  <Input
-                    id="href"
-                    value={props.href || ""}
-                    onChange={(e) => updateProp("href", e.target.value)}
-                    placeholder="https://example.com"
-                  />
-                </>
-              )}
-            </div>
-
-            <div>
-              <Label htmlFor="variant" className="mb-2 block">
-                Variant
-              </Label>
-              <select
-                id="variant"
-                value={props.variant || "default"}
-                onChange={(e) => updateProp("variant", e.target.value)}
-                className="w-full p-2 border rounded-md"
-              >
-                <option value="default">Default</option>
-                <option value="destructive">Destructive</option>
-                <option value="outline">Outline</option>
-                <option value="secondary">Secondary</option>
-                <option value="ghost">Ghost</option>
-                <option value="link">Link</option>
-              </select>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="fullWidth"
-                checked={props.fullWidth || false}
-                onCheckedChange={(checked) => updateProp("fullWidth", checked)}
-              />
-              <Label htmlFor="fullWidth">Full Width</Label>
-            </div>
-
-            {props.href && (
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="external"
-                  checked={props.external || false}
-                  onCheckedChange={(checked) => updateProp("external", checked)}
-                />
-                <Label htmlFor="external">External Link</Label>
-              </div>
-            )}
-          </div>
-        );
-
-      case "Image":
-        return (
-          <div className="space-y-4">
-            {renderColorFields()}
-            {renderDimensionFields()}
-            <div>
-              <Label htmlFor="src" className="mb-2 block">
-                Image URL
-              </Label>
-              <Input
-                id="src"
-                value={props.src || ""}
-                onChange={(e) => updateProp("src", e.target.value)}
-                placeholder="https://example.com/image.jpg"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="alt" className="mb-2 block">
-                Alt Text
-              </Label>
-              <Input
-                id="alt"
-                value={props.alt || ""}
-                onChange={(e) => updateProp("alt", e.target.value)}
-                placeholder="Describe the image"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="rounded" className="mb-2 block">
-                Border Radius
-              </Label>
-              <select
-                id="rounded"
-                value={props.rounded || "md"}
-                onChange={(e) => updateProp("rounded", e.target.value)}
-                className="w-full p-2 border rounded-md"
-              >
-                <option value="none">None</option>
-                <option value="sm">Small</option>
-                <option value="md">Medium</option>
-                <option value="lg">Large</option>
-                <option value="full">Full</option>
-              </select>
-            </div>
-          </div>
-        );
-
-      case "Card":
-        return (
-          <div className="space-y-4">
-            {renderColorFields()}
-            {renderDimensionFields()}
-            <div>
-              <Label htmlFor="title" className="mb-2 block">
-                Title
-              </Label>
-              <Input
-                id="title"
-                value={props.title || ""}
-                onChange={(e) => updateProp("title", e.target.value)}
-                placeholder="Card title"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="description" className="mb-2 block">
-                Description
-              </Label>
-              <Textarea
-                id="description"
-                value={props.description || ""}
-                onChange={(e) => updateProp("description", e.target.value)}
-                placeholder="Card description"
-                rows={3}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="buttonText" className="mb-2 block">
-                Button Text
-              </Label>
-              <Input
-                id="buttonText"
-                value={props.buttonText || ""}
-                onChange={(e) => updateProp("buttonText", e.target.value)}
-                placeholder="Learn More"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="variant" className="mb-2 block">
-                Card Style
-              </Label>
-              <select
-                id="variant"
-                value={props.variant || "default"}
-                onChange={(e) => updateProp("variant", e.target.value)}
-                className="w-full p-2 border rounded-md"
-              >
-                <option value="default">Default</option>
-                <option value="bordered">Bordered</option>
-                <option value="shadow">Shadow</option>
-                <option value="elevated">Elevated</option>
-              </select>
-            </div>
-          </div>
-        );
-
-      case "Header":
-        return (
-          <div className="space-y-4">
-            {renderColorFields()}
-            {renderDimensionFields()}
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="sticky"
-                checked={props.sticky || false}
-                onCheckedChange={(checked) => updateProp("sticky", checked)}
-              />
-              <Label htmlFor="sticky">Sticky Header</Label>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="shadow"
-                checked={props.shadow || false}
-                onCheckedChange={(checked) => updateProp("shadow", checked)}
-              />
-              <Label htmlFor="shadow">Drop Shadow</Label>
-            </div>
-
-            <div>
-              <Label htmlFor="backgroundColor" className="mb-2 block">
-                Background Color
-              </Label>
-              <Input
-                id="backgroundColor"
-                type="color"
-                value={props.backgroundColor || "#ffffff"}
-                onChange={(e) => updateProp("backgroundColor", e.target.value)}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="padding" className="mb-2 block">
-                Padding
-              </Label>
-              <select
-                id="padding"
-                value={props.padding || "md"}
-                onChange={(e) => updateProp("padding", e.target.value)}
-                className="w-full p-2 border rounded-md"
-              >
-                <option value="sm">Small</option>
-                <option value="md">Medium</option>
-                <option value="lg">Large</option>
-                <option value="xl">Extra Large</option>
-              </select>
-            </div>
-          </div>
-        );
-
-      case "Navbar":
-        return (
-          <div className="space-y-4">
-            {renderColorFields()}
-            {renderDimensionFields()}
-            <div>
-              <Label htmlFor="logoText" className="mb-2 block">
-                Logo Text
-              </Label>
-              <Input
-                id="logoText"
-                value={props.logoText || ""}
-                onChange={(e) => updateProp("logoText", e.target.value)}
-                placeholder="Brand Name"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="ctaText" className="mb-2 block">
-                CTA Button Text
-              </Label>
-              <Input
-                id="ctaText"
-                value={props.ctaText || ""}
-                onChange={(e) => updateProp("ctaText", e.target.value)}
-                placeholder="Get Started"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="ctaLink" className="mb-2 block">
-                CTA Button Link
-              </Label>
-              <Input
-                id="ctaLink"
-                value={props.ctaLink || ""}
-                onChange={(e) => updateProp("ctaLink", e.target.value)}
-                placeholder="https://example.com"
-              />
-            </div>
-
-            <div>
-              <Label className="mb-2 block">Navigation Links</Label>
-              <div className="space-y-2">
-                {(props.links || []).map((link: any, index: number) => (
-                  <div key={index} className="space-y-2 p-3 border rounded">
-                    <Input
-                      value={link.text || ""}
-                      onChange={(e) => {
-                        const newLinks = [...(props.links || [])];
-                        newLinks[index] = { ...link, text: e.target.value };
-                        updateProp("links", newLinks);
-                      }}
-                      placeholder="Link text"
-                      className="mb-2"
-                    />
+            <AccordionItem value="links" className="border-b-0 border-t border-gray-100 first:border-t-0">
+              <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold text-gray-700 uppercase tracking-wide data-[state=open]:bg-gray-50/50">
+                <div className="flex items-center gap-2">
+                  <LinkIcon className="w-4 h-4 text-gray-500" />
+                  Link Settings
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="linkType" className="text-xs font-medium text-gray-600">Link Type</Label>
+                  <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-blue-500">
                     <select
-                      value={link.href?.startsWith("page:") ? "page" : "url"}
+                      id="linkType"
+                      value={props.href?.startsWith("page:") ? "page" : "url"}
                       onChange={(e) => {
-                        const newLinks = [...(props.links || [])];
                         if (e.target.value === "page" && pages.length > 0) {
-                          newLinks[index] = {
-                            ...link,
-                            href: `page:${pages[0].id}`,
-                          };
+                          updateProp("href", `page:${pages[0].id}`);
                         } else {
-                          newLinks[index] = { ...link, href: "" };
+                          updateProp("href", "");
                         }
-                        updateProp("links", newLinks);
                       }}
-                      className="w-full p-2 border rounded-md mb-2"
+                      className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none"
                     >
                       <option value="url">External URL</option>
                       <option value="page">Internal Page</option>
                     </select>
-                    {link.href?.startsWith("page:") ? (
-                      <select
-                        value={link.href}
-                        onChange={(e) => {
-                          const newLinks = [...(props.links || [])];
-                          newLinks[index] = { ...link, href: e.target.value };
-                          updateProp("links", newLinks);
-                        }}
-                        className="w-full p-2 border rounded-md"
-                      >
+                  </div>
+                </div>
+
+                {props.href?.startsWith("page:") ? (
+                  <div className="space-y-1.5">
+                    <Label htmlFor="href" className="text-xs font-medium text-gray-600">Select Page</Label>
+                    <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-blue-500">
+                      <select id="href" value={props.href} onChange={(e) => updateProp("href", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
                         {pages.map((page) => (
                           <option key={page.id} value={`page:${page.id}`}>
                             {page.name}
                           </option>
                         ))}
                       </select>
-                    ) : (
-                      <Input
-                        value={link.href || ""}
-                        onChange={(e) => {
-                          const newLinks = [...(props.links || [])];
-                          newLinks[index] = { ...link, href: e.target.value };
-                          updateProp("links", newLinks);
-                        }}
-                        placeholder="URL"
-                      />
-                    )}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-1.5">
+                    <Label htmlFor="href" className="text-xs font-medium text-gray-600">Link URL</Label>
+                    <Input id="href" value={props.href || ""} onChange={(e) => updateProp("href", e.target.value)} placeholder="https://example.com" className="h-8 text-sm" />
+                  </div>
+                )}
+
+                {props.href && !props.href.startsWith("page:") && (
+                  <div className="flex items-center justify-between p-2 rounded-md bg-gray-50 border border-gray-100">
+                    <Label htmlFor="external" className="text-xs font-medium text-gray-600 cursor-pointer">Open in new tab</Label>
+                    <Switch id="external" checked={props.external || false} onCheckedChange={(checked) => updateProp("external", checked)} className="scale-75 origin-right" />
+                  </div>
+                )}
+              </AccordionContent>
+            </AccordionItem>
+            {renderColorFields()}
+            {renderDimensionFields()}
+          </Accordion>
+        );
+
+      case "Image":
+        return (
+          <Accordion type="multiple" defaultValue={["content", "dimensions"]} className="w-full">
+            <AccordionItem value="content" className="border-b-0 border-t border-gray-100 first:border-t-0">
+              <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold text-gray-700 uppercase tracking-wide data-[state=open]:bg-gray-50/50">
+                <div className="flex items-center gap-2">
+                  <ImageIcon className="w-4 h-4 text-gray-500" />
+                  Image Source
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="src" className="text-xs font-medium text-gray-600">Image URL</Label>
+                  <Input id="src" value={props.src || ""} onChange={(e) => updateProp("src", e.target.value)} placeholder="https://example.com/image.jpg" className="h-8 text-sm" />
+                </div>
+                
+                <div className="space-y-1.5">
+                  <Label htmlFor="alt" className="text-xs font-medium text-gray-600">Alt Text</Label>
+                  <Input id="alt" value={props.alt || ""} onChange={(e) => updateProp("alt", e.target.value)} placeholder="Describe the image" className="h-8 text-sm" />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="rounded" className="text-xs font-medium text-gray-600">Border Radius Corners</Label>
+                  <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-blue-500">
+                    <select id="rounded" value={props.rounded || "md"} onChange={(e) => updateProp("rounded", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
+                      <option value="none">None</option>
+                      <option value="sm">Small</option>
+                      <option value="md">Medium</option>
+                      <option value="lg">Large</option>
+                      <option value="xl">Extra Large</option>
+                      <option value="full">Full (Circle)</option>
+                    </select>
+                  </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+            {renderColorFields()}
+            {renderDimensionFields()}
+          </Accordion>
+        );
+
+      case "Card":
+        return (
+          <Accordion type="multiple" defaultValue={["content", "colors", "dimensions"]} className="w-full">
+            <AccordionItem value="content" className="border-b-0 border-t border-gray-100 first:border-t-0">
+              <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold text-gray-700 uppercase tracking-wide data-[state=open]:bg-gray-50/50">
+                <div className="flex items-center gap-2">
+                  <Type className="w-4 h-4 text-gray-500" />
+                  Card Content
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="title" className="text-xs font-medium text-gray-600">Title</Label>
+                  <Input id="title" value={props.title || ""} onChange={(e) => updateProp("title", e.target.value)} placeholder="Card title" className="h-8 text-sm" />
+                </div>
+                
+                <div className="space-y-1.5">
+                  <Label htmlFor="description" className="text-xs font-medium text-gray-600">Description</Label>
+                  <Textarea id="description" value={props.description || ""} onChange={(e) => updateProp("description", e.target.value)} placeholder="Card description" rows={3} className="text-sm resize-none" />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="buttonText" className="text-xs font-medium text-gray-600">Button Text</Label>
+                  <Input id="buttonText" value={props.buttonText || ""} onChange={(e) => updateProp("buttonText", e.target.value)} placeholder="Learn More" className="h-8 text-sm" />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="variant" className="text-xs font-medium text-gray-600">Card Style</Label>
+                  <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-blue-500">
+                    <select id="variant" value={props.variant || "default"} onChange={(e) => updateProp("variant", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
+                      <option value="default">Default</option>
+                      <option value="bordered">Bordered</option>
+                      <option value="shadow">Shadow</option>
+                      <option value="elevated">Elevated</option>
+                    </select>
+                  </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+            {renderColorFields()}
+            {renderDimensionFields()}
+          </Accordion>
+        );
+
+      case "Header":
+        return (
+          <Accordion type="multiple" defaultValue={["settings", "colors", "dimensions"]} className="w-full">
+            <AccordionItem value="settings" className="border-b-0 border-t border-gray-100 first:border-t-0">
+              <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold text-gray-700 uppercase tracking-wide data-[state=open]:bg-gray-50/50">
+                <div className="flex items-center gap-2">
+                  <Settings2 className="w-4 h-4 text-gray-500" />
+                  Header Settings
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
+                <div className="flex items-center justify-between p-2 rounded-md bg-gray-50 border border-gray-100">
+                  <Label htmlFor="sticky" className="text-xs font-medium text-gray-600 cursor-pointer">Sticky Header</Label>
+                  <Switch id="sticky" checked={props.sticky || false} onCheckedChange={(checked) => updateProp("sticky", checked)} className="scale-75 origin-right" />
+                </div>
+
+                <div className="flex items-center justify-between p-2 rounded-md bg-gray-50 border border-gray-100">
+                  <Label htmlFor="shadow" className="text-xs font-medium text-gray-600 cursor-pointer">Drop Shadow</Label>
+                  <Switch id="shadow" checked={props.shadow || false} onCheckedChange={(checked) => updateProp("shadow", checked)} className="scale-75 origin-right" />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="padding" className="text-xs font-medium text-gray-600">Padding</Label>
+                  <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-blue-500">
+                    <select id="padding" value={props.padding || "md"} onChange={(e) => updateProp("padding", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
+                      <option value="sm">Small</option>
+                      <option value="md">Medium</option>
+                      <option value="lg">Large</option>
+                      <option value="xl">Extra Large</option>
+                    </select>
+                  </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+            {renderColorFields()}
+            {renderDimensionFields()}
+          </Accordion>
+        );
+
+      case "Navbar":
+        return (
+          <Accordion type="multiple" defaultValue={["brand", "links", "colors", "dimensions"]} className="w-full">
+            <AccordionItem value="brand" className="border-b-0 border-t border-gray-100 first:border-t-0">
+              <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold text-gray-700 uppercase tracking-wide data-[state=open]:bg-gray-50/50">
+                <div className="flex items-center gap-2">
+                  <Settings2 className="w-4 h-4 text-gray-500" />
+                  Brand & CTA
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="logoText" className="text-xs font-medium text-gray-600">Logo Text</Label>
+                  <Input id="logoText" value={props.logoText || ""} onChange={(e) => updateProp("logoText", e.target.value)} placeholder="Brand Name" className="h-8 text-sm" />
+                </div>
+                
+                <div className="space-y-1.5">
+                  <Label htmlFor="ctaText" className="text-xs font-medium text-gray-600">CTA Button Text</Label>
+                  <Input id="ctaText" value={props.ctaText || ""} onChange={(e) => updateProp("ctaText", e.target.value)} placeholder="Get Started" className="h-8 text-sm" />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="ctaLink" className="text-xs font-medium text-gray-600">CTA Button Link</Label>
+                  <Input id="ctaLink" value={props.ctaLink || ""} onChange={(e) => updateProp("ctaLink", e.target.value)} placeholder="https://example.com" className="h-8 text-sm" />
+                </div>
+
+                <div className="flex items-center justify-between p-2 rounded-md bg-gray-50 border border-gray-100">
+                  <Label htmlFor="ctaExternal" className="text-xs font-medium text-gray-600 cursor-pointer">CTA is External Link</Label>
+                  <Switch
+                    id="ctaExternal"
+                    checked={props.ctaExternal || false}
+                    onCheckedChange={(checked) =>
+                      updateProp("ctaExternal", checked)
+                    }
+                    className="scale-75 origin-right"
+                  />
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="links" className="border-b-0 border-t border-gray-100 first:border-t-0">
+              <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold text-gray-700 uppercase tracking-wide data-[state=open]:bg-gray-50/50">
+                <div className="flex items-center gap-2">
+                  <LinkIcon className="w-4 h-4 text-gray-500" />
+                  Navigation Links
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
+                <div className="space-y-3">
+                  {(props.links || []).map((link: any, index: number) => (
+                    <div key={index} className="space-y-3 p-3 bg-gray-50 border border-gray-200 rounded-md">
+                      <div className="flex items-center justify-between pointer-events-none">
+                        <span className="text-xs font-semibold text-gray-500">Link #{index + 1}</span>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6 text-red-500 hover:text-red-700 hover:bg-red-50 pointer-events-auto"
+                          onClick={() => {
+                            const newLinks = (props.links || []).filter((_: any, i: number) => i !== index);
+                            updateProp("links", newLinks);
+                          }}
+                        >
+                          <span className="sr-only">Delete</span>
+                          &times;
+                        </Button>
+                      </div>
+                      
+                      <div className="space-y-1.5">
+                        <Label className="text-[10px] uppercase text-gray-500 font-semibold">Label</Label>
+                        <Input
+                          value={link.text || ""}
+                          onChange={(e) => {
+                            const newLinks = [...(props.links || [])];
+                            newLinks[index] = { ...link, text: e.target.value };
+                            updateProp("links", newLinks);
+                          }}
+                          placeholder="Link text"
+                          className="h-7 text-xs bg-white"
+                        />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <Label className="text-[10px] uppercase text-gray-500 font-semibold">Destination</Label>
+                        <div className="grid grid-cols-[1fr_2fr] gap-2 items-start">
+                          <div className="relative border border-gray-200 rounded-md focus-within:ring-1 focus-within:ring-blue-500 bg-white">
+                            <select
+                              value={link.href?.startsWith("page:") ? "page" : "url"}
+                              onChange={(e) => {
+                                const newLinks = [...(props.links || [])];
+                                if (e.target.value === "page" && pages.length > 0) {
+                                  newLinks[index] = { ...link, href: `page:${pages[0].id}` };
+                                } else {
+                                  newLinks[index] = { ...link, href: "" };
+                                }
+                                updateProp("links", newLinks);
+                              }}
+                              className="w-full h-7 px-1 text-xs bg-transparent appearance-none focus:outline-none"
+                            >
+                              <option value="url">URL</option>
+                              <option value="page">Page</option>
+                            </select>
+                          </div>
+                          
+                          {link.href?.startsWith("page:") ? (
+                            <div className="relative border border-gray-200 rounded-md focus-within:ring-1 focus-within:ring-blue-500 bg-white">
+                              <select
+                                value={link.href}
+                                onChange={(e) => {
+                                  const newLinks = [...(props.links || [])];
+                                  newLinks[index] = { ...link, href: e.target.value };
+                                  updateProp("links", newLinks);
+                                }}
+                                className="w-full h-7 px-1 text-xs bg-transparent appearance-none focus:outline-none"
+                              >
+                                {pages.map((page) => (
+                                  <option key={page.id} value={`page:${page.id}`}>
+                                    {page.name}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+                          ) : (
+                            <Input
+                              value={link.href || ""}
+                              onChange={(e) => {
+                                const newLinks = [...(props.links || [])];
+                                newLinks[index] = { ...link, href: e.target.value };
+                                updateProp("links", newLinks);
+                              }}
+                              placeholder="URL"
+                              className="h-7 text-xs bg-white"
+                            />
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between pt-2">
+                        <Label htmlFor={`external-${index}`} className="text-[10px] uppercase text-gray-500 font-semibold cursor-pointer">Open in new tab</Label>
                         <Switch
                           id={`external-${index}`}
                           checked={link.external || false}
@@ -767,636 +679,536 @@ export function PropertiesPanel({
                             newLinks[index] = { ...link, external: checked };
                             updateProp("links", newLinks);
                           }}
+                          className="scale-75 origin-right"
                         />
-                        <Label htmlFor={`external-${index}`}>
-                          External Link
-                        </Label>
                       </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          const newLinks = (props.links || []).filter(
-                            (_: any, i: number) => i !== index
-                          );
-                          updateProp("links", newLinks);
-                        }}
-                      >
-                        Remove
-                      </Button>
                     </div>
+                  ))}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full text-xs h-8 border-dashed"
+                    onClick={() => {
+                      const newLinks = [...(props.links || []), { text: "New Link", href: "#", external: false }];
+                      updateProp("links", newLinks);
+                    }}
+                  >
+                    + Add Link
+                  </Button>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="styling" className="border-b-0 border-t border-gray-100 first:border-t-0">
+              <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold text-gray-700 uppercase tracking-wide data-[state=open]:bg-gray-50/50">
+                <div className="flex items-center gap-2">
+                  <Paintbrush className="w-4 h-4 text-gray-500" />
+                  Link Styling
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="linkColor" className="text-xs font-medium text-gray-600">Link Color</Label>
+                  <div className="flex gap-2 items-center">
+                    <Input id="linkColor" type="color" value={props.linkColor || "#000000"} onChange={(e) => updateProp("linkColor", e.target.value)} className="w-8 h-8 p-0.5 min-h-0 cursor-pointer" />
+                    <Input type="text" value={props.linkColor || "#000000"} onChange={(e) => updateProp("linkColor", e.target.value)} className="flex-1 h-8 text-xs font-mono" />
                   </div>
-                ))}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    const newLinks = [
-                      ...(props.links || []),
-                      { text: "New Link", href: "#", external: false },
-                    ];
-                    updateProp("links", newLinks);
-                  }}
-                >
-                  Add Link
-                </Button>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="ctaExternal"
-                checked={props.ctaExternal || false}
-                onCheckedChange={(checked) =>
-                  updateProp("ctaExternal", checked)
-                }
-              />
-              <Label htmlFor="ctaExternal">CTA is External Link</Label>
-            </div>
-
-            <div className="space-y-3 pt-4 border-t border-gray-200">
-              <div className="text-xs font-semibold text-gray-700 uppercase">
-                Link Styling
-              </div>
-              <div>
-                <Label htmlFor="linkColor" className="mb-2 block">
-                  Link Color
-                </Label>
-                <Input
-                  id="linkColor"
-                  type="color"
-                  value={props.linkColor || "#000000"}
-                  onChange={(e) => updateProp("linkColor", e.target.value)}
-                />
-              </div>
-              <div>
-                <Label htmlFor="linkHoverColor" className="mb-2 block">
-                  Link Hover Color
-                </Label>
-                <Input
-                  id="linkHoverColor"
-                  type="color"
-                  value={props.linkHoverColor || "#3b82f6"}
-                  onChange={(e) => updateProp("linkHoverColor", e.target.value)}
-                />
-              </div>
-            </div>
-          </div>
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="linkHoverColor" className="text-xs font-medium text-gray-600">Link Hover Color</Label>
+                  <div className="flex gap-2 items-center">
+                    <Input id="linkHoverColor" type="color" value={props.linkHoverColor || "#3b82f6"} onChange={(e) => updateProp("linkHoverColor", e.target.value)} className="w-8 h-8 p-0.5 min-h-0 cursor-pointer" />
+                    <Input type="text" value={props.linkHoverColor || "#3b82f6"} onChange={(e) => updateProp("linkHoverColor", e.target.value)} className="flex-1 h-8 text-xs font-mono" />
+                  </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+            {renderColorFields()}
+            {renderDimensionFields()}
+          </Accordion>
         );
 
       case "Footer":
         return (
-          <div className="space-y-4">
-            {renderColorFields()}
-            {renderDimensionFields()}
-            <div>
-              <Label htmlFor="logoText" className="mb-2 block">
-                Logo Text
-              </Label>
-              <Input
-                id="logoText"
-                value={props.logoText || ""}
-                onChange={(e) => updateProp("logoText", e.target.value)}
-                placeholder="Brand Name"
-              />
-            </div>
+          <Accordion type="multiple" defaultValue={["brand", "colors", "dimensions"]} className="w-full">
+            <AccordionItem value="brand" className="border-b-0 border-t border-gray-100 first:border-t-0">
+              <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold text-gray-700 uppercase tracking-wide data-[state=open]:bg-gray-50/50">
+                <div className="flex items-center gap-2">
+                  <Settings2 className="w-4 h-4 text-gray-500" />
+                  Footer Content
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="logoText" className="text-xs font-medium text-gray-600">Logo Text</Label>
+                  <Input id="logoText" value={props.logoText || ""} onChange={(e) => updateProp("logoText", e.target.value)} placeholder="Brand Name" className="h-8 text-sm" />
+                </div>
+                
+                <div className="space-y-1.5">
+                  <Label htmlFor="description" className="text-xs font-medium text-gray-600">Description</Label>
+                  <Textarea id="description" value={props.description || ""} onChange={(e) => updateProp("description", e.target.value)} placeholder="Brief description about your brand" rows={3} className="text-sm resize-none" />
+                </div>
+              </AccordionContent>
+            </AccordionItem>
 
-            <div>
-              <Label htmlFor="description" className="mb-2 block">
-                Description
-              </Label>
-              <Textarea
-                id="description"
-                value={props.description || ""}
-                onChange={(e) => updateProp("description", e.target.value)}
-                placeholder="Brief description about your brand"
-                rows={3}
-              />
-            </div>
+            <AccordionItem value="links" className="border-b-0 border-t border-gray-100 first:border-t-0">
+              <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold text-gray-700 uppercase tracking-wide data-[state=open]:bg-gray-50/50">
+                <div className="flex items-center gap-2">
+                  <LinkIcon className="w-4 h-4 text-gray-500" />
+                  Footer Links
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="copyright" className="text-xs font-medium text-gray-600">Copyright Text</Label>
+                  <Input id="copyright" value={props.copyright || ""} onChange={(e) => updateProp("copyright", e.target.value)} placeholder="© 2024 All rights reserved" className="h-8 text-sm" />
+                </div>
+                
+                <div className="space-y-3 pt-2">
+                  <div className="text-xs font-medium text-gray-600">Footer Sections</div>
+                  <div className="space-y-3">
+                    {(props.sections || []).map((section: any, sectionIndex: number) => (
+                      <div key={sectionIndex} className="space-y-3 p-3 bg-gray-50 border border-gray-200 rounded-md">
+                        <div className="flex items-center justify-between pointer-events-none">
+                          <span className="text-xs font-semibold text-gray-500">Section {sectionIndex + 1}</span>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 text-red-500 hover:text-red-700 hover:bg-red-50 pointer-events-auto"
+                            onClick={() => {
+                              const newSections = (props.sections || []).filter((_: any, i: number) => i !== sectionIndex);
+                              updateProp("sections", newSections);
+                            }}
+                          >
+                            <span className="sr-only">Delete</span>
+                            &times;
+                          </Button>
+                        </div>
+                        
+                        <div className="space-y-1.5">
+                          <Label className="text-[10px] uppercase text-gray-500 font-semibold">Title</Label>
+                          <Input
+                            value={section.title || ""}
+                            onChange={(e) => {
+                              const newSections = [...(props.sections || [])];
+                              newSections[sectionIndex] = { ...section, title: e.target.value };
+                              updateProp("sections", newSections);
+                            }}
+                            placeholder="Section title (e.g., Products)"
+                            className="h-7 text-xs bg-white"
+                          />
+                        </div>
 
-            <div>
-              <Label htmlFor="copyright" className="mb-2 block">
-                Copyright Text
-              </Label>
-              <Input
-                id="copyright"
-                value={props.copyright || ""}
-                onChange={(e) => updateProp("copyright", e.target.value)}
-                placeholder="© 2024 All rights reserved"
-              />
-            </div>
-
-            {/* Footer Sections */}
-            <div className="space-y-3 pt-4 border-t border-gray-200">
-              <div className="text-xs font-semibold text-gray-700 uppercase">
-                Footer Sections
-              </div>
-              <div className="space-y-3">
-                {(props.sections || []).map(
-                  (section: any, sectionIndex: number) => (
-                    <div
-                      key={sectionIndex}
-                      className="space-y-2 p-3 border rounded"
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <Label className="text-sm font-semibold">
-                          Section {sectionIndex + 1}
-                        </Label>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            const newSections = (props.sections || []).filter(
-                              (_: any, i: number) => i !== sectionIndex
-                            );
-                            updateProp("sections", newSections);
-                          }}
-                        >
-                          Remove Section
-                        </Button>
+                        <div className="space-y-2 pt-1 border-t border-gray-200">
+                          <Label className="text-[10px] uppercase text-gray-500 font-semibold">Links</Label>
+                          <div className="space-y-2">
+                            {(section.links || []).map((link: any, linkIndex: number) => (
+                              <div key={linkIndex} className="grid grid-cols-[1fr_1fr_auto] gap-2 items-start bg-white p-2 rounded border border-gray-100">
+                                <Input
+                                  value={link.text || ""}
+                                  onChange={(e) => {
+                                    const newSections = [...(props.sections || [])];
+                                    const newLinks = [...(section.links || [])];
+                                    newLinks[linkIndex] = { ...link, text: e.target.value };
+                                    newSections[sectionIndex] = { ...section, links: newLinks };
+                                    updateProp("sections", newSections);
+                                  }}
+                                  placeholder="Link text"
+                                  className="h-7 text-xs"
+                                />
+                                <Input
+                                  value={link.href || ""}
+                                  onChange={(e) => {
+                                    const newSections = [...(props.sections || [])];
+                                    const newLinks = [...(section.links || [])];
+                                    newLinks[linkIndex] = { ...link, href: e.target.value };
+                                    newSections[sectionIndex] = { ...section, links: newLinks };
+                                    updateProp("sections", newSections);
+                                  }}
+                                  placeholder="URL"
+                                  className="h-7 text-xs"
+                                />
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-7 w-7 text-red-500 hover:text-red-700 hover:bg-red-50"
+                                  onClick={() => {
+                                    const newSections = [...(props.sections || [])];
+                                    const newLinks = (section.links || []).filter((_: any, i: number) => i !== linkIndex);
+                                    newSections[sectionIndex] = { ...section, links: newLinks };
+                                    updateProp("sections", newSections);
+                                  }}
+                                >
+                                  &times;
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                          
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="w-full text-[10px] h-6 border-dashed mt-2"
+                            onClick={() => {
+                              const newSections = [...(props.sections || [])];
+                              const newLinks = [...(section.links || []), { text: "Link", href: "#" }];
+                              newSections[sectionIndex] = { ...section, links: newLinks };
+                              updateProp("sections", newSections);
+                            }}
+                          >
+                            + Add section link
+                          </Button>
+                        </div>
                       </div>
-                      <Input
-                        value={section.title || ""}
-                        onChange={(e) => {
-                          const newSections = [...(props.sections || [])];
-                          newSections[sectionIndex] = {
-                            ...section,
-                            title: e.target.value,
-                          };
-                          updateProp("sections", newSections);
-                        }}
-                        placeholder="Section title (e.g., Products, Company)"
-                        className="mb-2"
-                      />
-
-                      {/* Links within section */}
-                      <div className="ml-2 space-y-2">
-                        <Label className="text-xs">Links</Label>
-                        {(section.links || []).map(
-                          (link: any, linkIndex: number) => (
-                            <div
-                              key={linkIndex}
-                              className="space-y-2 p-2 bg-gray-50 rounded"
-                            >
-                              <Input
-                                value={link.text || ""}
-                                onChange={(e) => {
-                                  const newSections = [
-                                    ...(props.sections || []),
-                                  ];
-                                  const newLinks = [...(section.links || [])];
-                                  newLinks[linkIndex] = {
-                                    ...link,
-                                    text: e.target.value,
-                                  };
-                                  newSections[sectionIndex] = {
-                                    ...section,
-                                    links: newLinks,
-                                  };
-                                  updateProp("sections", newSections);
-                                }}
-                                placeholder="Link text"
-                                className="mb-1"
-                              />
-                              <Input
-                                value={link.href || ""}
-                                onChange={(e) => {
-                                  const newSections = [
-                                    ...(props.sections || []),
-                                  ];
-                                  const newLinks = [...(section.links || [])];
-                                  newLinks[linkIndex] = {
-                                    ...link,
-                                    href: e.target.value,
-                                  };
-                                  newSections[sectionIndex] = {
-                                    ...section,
-                                    links: newLinks,
-                                  };
-                                  updateProp("sections", newSections);
-                                }}
-                                placeholder="URL"
-                              />
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => {
-                                  const newSections = [
-                                    ...(props.sections || []),
-                                  ];
-                                  const newLinks = (section.links || []).filter(
-                                    (_: any, i: number) => i !== linkIndex
-                                  );
-                                  newSections[sectionIndex] = {
-                                    ...section,
-                                    links: newLinks,
-                                  };
-                                  updateProp("sections", newSections);
-                                }}
-                                className="w-full"
-                              >
-                                Remove Link
-                              </Button>
-                            </div>
-                          )
-                        )}
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            const newSections = [...(props.sections || [])];
-                            const newLinks = [
-                              ...(section.links || []),
-                              { text: "New Link", href: "#" },
-                            ];
-                            newSections[sectionIndex] = {
-                              ...section,
-                              links: newLinks,
-                            };
-                            updateProp("sections", newSections);
-                          }}
-                          className="w-full"
-                        >
-                          Add Link
-                        </Button>
-                      </div>
-                    </div>
-                  )
-                )}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    const newSections = [
-                      ...(props.sections || []),
-                      { title: "New Section", links: [] },
-                    ];
-                    updateProp("sections", newSections);
-                  }}
-                >
-                  Add Section
-                </Button>
-              </div>
-            </div>
-
-            {/* Social Links */}
-            <div className="space-y-3 pt-4 border-t border-gray-200">
-              <div className="text-xs font-semibold text-gray-700 uppercase">
-                Social Links
-              </div>
-              <div className="space-y-2">
-                {(props.socialLinks || []).map((social: any, index: number) => (
-                  <div key={index} className="space-y-2 p-3 border rounded">
-                    <Input
-                      value={social.platform || ""}
-                      onChange={(e) => {
-                        const newSocials = [...(props.socialLinks || [])];
-                        newSocials[index] = {
-                          ...social,
-                          platform: e.target.value,
-                        };
-                        updateProp("socialLinks", newSocials);
-                      }}
-                      placeholder="Platform name (e.g., Twitter, LinkedIn)"
-                      className="mb-2"
-                    />
-                    <Input
-                      value={social.href || ""}
-                      onChange={(e) => {
-                        const newSocials = [...(props.socialLinks || [])];
-                        newSocials[index] = { ...social, href: e.target.value };
-                        updateProp("socialLinks", newSocials);
-                      }}
-                      placeholder="URL"
-                      className="mb-2"
-                    />
-                    <Input
-                      value={social.icon || ""}
-                      onChange={(e) => {
-                        const newSocials = [...(props.socialLinks || [])];
-                        newSocials[index] = { ...social, icon: e.target.value };
-                        updateProp("socialLinks", newSocials);
-                      }}
-                      placeholder="Icon (emoji or text)"
-                    />
+                    ))}
+                    
                     <Button
                       variant="outline"
                       size="sm"
+                      className="w-full text-xs h-8 border-dashed"
                       onClick={() => {
-                        const newSocials = (props.socialLinks || []).filter(
-                          (_: any, i: number) => i !== index
-                        );
-                        updateProp("socialLinks", newSocials);
+                        const newSections = [...(props.sections || []), { title: "New Section", links: [] }];
+                        updateProp("sections", newSections);
                       }}
-                      className="w-full"
                     >
-                      Remove
+                      + Add List
                     </Button>
                   </div>
-                ))}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    const newSocials = [
-                      ...(props.socialLinks || []),
-                      { platform: "Social", href: "#", icon: "🔗" },
-                    ];
-                    updateProp("socialLinks", newSocials);
-                  }}
-                >
-                  Add Social Link
-                </Button>
-              </div>
-            </div>
-          </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+            
+            <AccordionItem value="socials" className="border-b-0 border-t border-gray-100 first:border-t-0">
+              <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold text-gray-700 uppercase tracking-wide data-[state=open]:bg-gray-50/50">
+                <div className="flex items-center gap-2">
+                  <LinkIcon className="w-4 h-4 text-gray-500" />
+                  Social Links
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
+                <div className="space-y-3">
+                  {(props.socialLinks || []).map((social: any, index: number) => (
+                    <div key={index} className="space-y-3 p-3 bg-gray-50 border border-gray-200 rounded-md">
+                      <div className="flex items-center justify-between pointer-events-none">
+                        <span className="text-xs font-semibold text-gray-500">Link #{index + 1}</span>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6 text-red-500 hover:text-red-700 hover:bg-red-50 pointer-events-auto"
+                          onClick={() => {
+                            const newSocials = (props.socialLinks || []).filter((_: any, i: number) => i !== index);
+                            updateProp("socialLinks", newSocials);
+                          }}
+                        >
+                          <span className="sr-only">Delete</span>
+                          &times;
+                        </Button>
+                      </div>
+                      
+                      <div className="space-y-1.5">
+                        <Label className="text-[10px] uppercase text-gray-500 font-semibold">Platform</Label>
+                        <Input
+                          value={social.platform || ""}
+                          onChange={(e) => {
+                            const newSocials = [...(props.socialLinks || [])];
+                            newSocials[index] = { ...social, platform: e.target.value };
+                            updateProp("socialLinks", newSocials);
+                          }}
+                          placeholder="Platform name (e.g., Twitter)"
+                          className="h-7 text-xs bg-white"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="space-y-1.5">
+                          <Label className="text-[10px] uppercase text-gray-500 font-semibold">URL</Label>
+                          <Input
+                            value={social.href || ""}
+                            onChange={(e) => {
+                              const newSocials = [...(props.socialLinks || [])];
+                              newSocials[index] = { ...social, href: e.target.value };
+                              updateProp("socialLinks", newSocials);
+                            }}
+                            placeholder="URL"
+                            className="h-7 text-xs bg-white"
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label className="text-[10px] uppercase text-gray-500 font-semibold">Icon</Label>
+                          <Input
+                            value={social.icon || ""}
+                            onChange={(e) => {
+                              const newSocials = [...(props.socialLinks || [])];
+                              newSocials[index] = { ...social, icon: e.target.value };
+                              updateProp("socialLinks", newSocials);
+                            }}
+                            placeholder="Emoji or text"
+                            className="h-7 text-xs bg-white"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full text-xs h-8 border-dashed"
+                    onClick={() => {
+                      const newSocials = [...(props.socialLinks || []), { platform: "Social", href: "#", icon: "🔗" }];
+                      updateProp("socialLinks", newSocials);
+                    }}
+                  >
+                    + Add Social Link
+                  </Button>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+            {renderColorFields()}
+            {renderDimensionFields()}
+          </Accordion>
         );
 
       case "Container":
         return (
-          <div className="space-y-4">
+          <Accordion type="multiple" defaultValue={["layout", "colors", "dimensions"]} className="w-full">
+            <AccordionItem value="layout" className="border-b-0 border-t border-gray-100 first:border-t-0">
+              <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold text-gray-700 uppercase tracking-wide data-[state=open]:bg-gray-50/50">
+                <div className="flex items-center gap-2">
+                  <Layout className="w-4 h-4 text-gray-500" />
+                  Layout Settings
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="maxWidth" className="text-xs font-medium text-gray-600">Max Width</Label>
+                  <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-blue-500">
+                    <select id="maxWidth" value={props.maxWidth || "xl"} onChange={(e) => updateProp("maxWidth", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
+                      <option value="sm">Small (640px)</option>
+                      <option value="md">Medium (768px)</option>
+                      <option value="lg">Large (1024px)</option>
+                      <option value="xl">Extra Large (1280px)</option>
+                      <option value="2xl">2X Large (1536px)</option>
+                      <option value="full">Full Width</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="padding" className="text-xs font-medium text-gray-600">Padding</Label>
+                  <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-blue-500">
+                    <select id="padding" value={props.padding || "md"} onChange={(e) => updateProp("padding", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
+                      <option value="none">None</option>
+                      <option value="sm">Small</option>
+                      <option value="md">Medium</option>
+                      <option value="lg">Large</option>
+                      <option value="xl">Extra Large</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="display" className="text-xs font-medium text-gray-600">Display</Label>
+                  <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-blue-500">
+                    <select id="display" value={props.display || "block"} onChange={(e) => updateProp("display", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
+                      <option value="block">Block</option>
+                      <option value="flex">Flex</option>
+                    </select>
+                  </div>
+                </div>
+
+                {props.display === "flex" && (
+                  <>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <Label htmlFor="flexDirection" className="text-xs font-medium text-gray-600">Direction</Label>
+                        <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-blue-500">
+                          <select id="flexDirection" value={props.flexDirection || "row"} onChange={(e) => updateProp("flexDirection", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
+                            <option value="row">Row</option>
+                            <option value="column">Column</option>
+                            <option value="row-reverse">Row Reverse</option>
+                            <option value="column-reverse">Column Reverse</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <Label htmlFor="flexWrap" className="text-xs font-medium text-gray-600">Wrap</Label>
+                        <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-blue-500">
+                          <select id="flexWrap" value={props.flexWrap || "nowrap"} onChange={(e) => updateProp("flexWrap", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
+                            <option value="nowrap">No Wrap</option>
+                            <option value="wrap">Wrap</option>
+                            <option value="wrap-reverse">Wrap Reverse</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <Label htmlFor="justifyContent" className="text-xs font-medium text-gray-600">Justify</Label>
+                        <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-blue-500">
+                          <select id="justifyContent" value={props.justifyContent || "start"} onChange={(e) => updateProp("justifyContent", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
+                            <option value="start">Start</option>
+                            <option value="center">Center</option>
+                            <option value="end">End</option>
+                            <option value="between">Space Between</option>
+                            <option value="around">Space Around</option>
+                            <option value="evenly">Space Evenly</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <Label htmlFor="alignItems" className="text-xs font-medium text-gray-600">Align</Label>
+                        <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-blue-500">
+                          <select id="alignItems" value={props.alignItems || "start"} onChange={(e) => updateProp("alignItems", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
+                            <option value="start">Start</option>
+                            <option value="center">Center</option>
+                            <option value="end">End</option>
+                            <option value="stretch">Stretch</option>
+                            <option value="baseline">Baseline</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label htmlFor="gap" className="text-xs font-medium text-gray-600">Gap</Label>
+                      <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-blue-500">
+                        <select id="gap" value={props.gap || "none"} onChange={(e) => updateProp("gap", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
+                          <option value="none">None</option>
+                          <option value="sm">Small</option>
+                          <option value="md">Medium</option>
+                          <option value="lg">Large</option>
+                          <option value="xl">Extra Large</option>
+                        </select>
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="overflowX" className="text-xs font-medium text-gray-600">Overflow X</Label>
+                    <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-blue-500">
+                      <select id="overflowX" value={props.overflowX || "visible"} onChange={(e) => updateProp("overflowX", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
+                        <option value="visible">Visible</option>
+                        <option value="hidden">Hidden</option>
+                        <option value="scroll">Scroll</option>
+                        <option value="auto">Auto</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label htmlFor="overflowY" className="text-xs font-medium text-gray-600">Overflow Y</Label>
+                    <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-blue-500">
+                      <select id="overflowY" value={props.overflowY || "visible"} onChange={(e) => updateProp("overflowY", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
+                        <option value="visible">Visible</option>
+                        <option value="hidden">Hidden</option>
+                        <option value="scroll">Scroll</option>
+                        <option value="auto">Auto</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
             {renderColorFields()}
             {renderDimensionFields()}
-            <div>
-              <Label htmlFor="maxWidth" className="mb-2 block">
-                Max Width
-              </Label>
-              <select
-                id="maxWidth"
-                value={props.maxWidth || "xl"}
-                onChange={(e) => updateProp("maxWidth", e.target.value)}
-                className="w-full p-2 border rounded-md"
-              >
-                <option value="sm">Small (640px)</option>
-                <option value="md">Medium (768px)</option>
-                <option value="lg">Large (1024px)</option>
-                <option value="xl">Extra Large (1280px)</option>
-                <option value="2xl">2X Large (1536px)</option>
-                <option value="full">Full Width</option>
-              </select>
-            </div>
-
-            <div>
-              <Label htmlFor="padding" className="mb-2 block">
-                Padding
-              </Label>
-              <select
-                id="padding"
-                value={props.padding || "md"}
-                onChange={(e) => updateProp("padding", e.target.value)}
-                className="w-full p-2 border rounded-md"
-              >
-                <option value="none">None</option>
-                <option value="sm">Small</option>
-                <option value="md">Medium</option>
-                <option value="lg">Large</option>
-                <option value="xl">Extra Large</option>
-              </select>
-            </div>
-
-            <div>
-              <Label htmlFor="display" className="mb-2 block">
-                Display
-              </Label>
-              <select
-                id="display"
-                value={props.display || "block"}
-                onChange={(e) => updateProp("display", e.target.value)}
-                className="w-full p-2 border rounded-md"
-              >
-                <option value="block">Block</option>
-                <option value="flex">Flex</option>
-              </select>
-            </div>
-
-            {props.display === "flex" && (
-              <>
-                <div>
-                  <Label htmlFor="flexDirection" className="mb-2 block">
-                    Flex Direction
-                  </Label>
-                  <select
-                    id="flexDirection"
-                    value={props.flexDirection || "row"}
-                    onChange={(e) =>
-                      updateProp("flexDirection", e.target.value)
-                    }
-                    className="w-full p-2 border rounded-md"
-                  >
-                    <option value="row">Row</option>
-                    <option value="column">Column</option>
-                    <option value="row-reverse">Row Reverse</option>
-                    <option value="column-reverse">Column Reverse</option>
-                  </select>
-                </div>
-
-                <div>
-                  <Label htmlFor="flexWrap" className="mb-2 block">
-                    Flex Wrap
-                  </Label>
-                  <select
-                    id="flexWrap"
-                    value={props.flexWrap || "nowrap"}
-                    onChange={(e) => updateProp("flexWrap", e.target.value)}
-                    className="w-full p-2 border rounded-md"
-                  >
-                    <option value="nowrap">No Wrap</option>
-                    <option value="wrap">Wrap</option>
-                    <option value="wrap-reverse">Wrap Reverse</option>
-                  </select>
-                </div>
-
-                <div>
-                  <Label htmlFor="justifyContent" className="mb-2 block">
-                    Justify Content
-                  </Label>
-                  <select
-                    id="justifyContent"
-                    value={props.justifyContent || "start"}
-                    onChange={(e) =>
-                      updateProp("justifyContent", e.target.value)
-                    }
-                    className="w-full p-2 border rounded-md"
-                  >
-                    <option value="start">Start</option>
-                    <option value="center">Center</option>
-                    <option value="end">End</option>
-                    <option value="between">Space Between</option>
-                    <option value="around">Space Around</option>
-                    <option value="evenly">Space Evenly</option>
-                  </select>
-                </div>
-
-                <div>
-                  <Label htmlFor="alignItems" className="mb-2 block">
-                    Align Items
-                  </Label>
-                  <select
-                    id="alignItems"
-                    value={props.alignItems || "start"}
-                    onChange={(e) => updateProp("alignItems", e.target.value)}
-                    className="w-full p-2 border rounded-md"
-                  >
-                    <option value="start">Start</option>
-                    <option value="center">Center</option>
-                    <option value="end">End</option>
-                    <option value="stretch">Stretch</option>
-                    <option value="baseline">Baseline</option>
-                  </select>
-                </div>
-
-                <div>
-                  <Label htmlFor="gap" className="mb-2 block">
-                    Gap
-                  </Label>
-                  <select
-                    id="gap"
-                    value={props.gap || "none"}
-                    onChange={(e) => updateProp("gap", e.target.value)}
-                    className="w-full p-2 border rounded-md"
-                  >
-                    <option value="none">None</option>
-                    <option value="sm">Small</option>
-                    <option value="md">Medium</option>
-                    <option value="lg">Large</option>
-                    <option value="xl">Extra Large</option>
-                  </select>
-                </div>
-              </>
-            )}
-
-            <div>
-              <Label htmlFor="overflowX" className="mb-2 block">
-                Overflow X
-              </Label>
-              <select
-                id="overflowX"
-                value={props.overflowX || "visible"}
-                onChange={(e) => updateProp("overflowX", e.target.value)}
-                className="w-full p-2 border rounded-md"
-              >
-                <option value="visible">Visible</option>
-                <option value="hidden">Hidden</option>
-                <option value="scroll">Scroll</option>
-                <option value="auto">Auto</option>
-              </select>
-            </div>
-
-            <div>
-              <Label htmlFor="overflowY" className="mb-2 block">
-                Overflow Y
-              </Label>
-              <select
-                id="overflowY"
-                value={props.overflowY || "visible"}
-                onChange={(e) => updateProp("overflowY", e.target.value)}
-                className="w-full p-2 border rounded-md"
-              >
-                <option value="visible">Visible</option>
-                <option value="hidden">Hidden</option>
-                <option value="scroll">Scroll</option>
-                <option value="auto">Auto</option>
-              </select>
-            </div>
-          </div>
+          </Accordion>
         );
 
       case "Grid":
         return (
-          <div className="space-y-4">
+          <Accordion type="multiple" defaultValue={["layout", "colors", "dimensions"]} className="w-full">
+            <AccordionItem value="layout" className="border-b-0 border-t border-gray-100 first:border-t-0">
+              <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold text-gray-700 uppercase tracking-wide data-[state=open]:bg-gray-50/50">
+                <div className="flex items-center gap-2">
+                  <Layout className="w-4 h-4 text-gray-500" />
+                  Grid Settings
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="columns" className="text-xs font-medium text-gray-600">Columns</Label>
+                  <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-blue-500">
+                    <select id="columns" value={props.columns || 3} onChange={(e) => updateProp("columns", parseInt(e.target.value))} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
+                      <option value={1}>1 Column</option>
+                      <option value={2}>2 Columns</option>
+                      <option value={3}>3 Columns</option>
+                      <option value={4}>4 Columns</option>
+                      <option value={6}>6 Columns</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="gap" className="text-xs font-medium text-gray-600">Gap</Label>
+                  <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-blue-500">
+                    <select id="gap" value={props.gap || "md"} onChange={(e) => updateProp("gap", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
+                      <option value="none">None</option>
+                      <option value="sm">Small</option>
+                      <option value="md">Medium</option>
+                      <option value="lg">Large</option>
+                      <option value="xl">Extra Large</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between p-2 rounded-md bg-gray-50 border border-gray-100">
+                  <Label htmlFor="responsive" className="text-xs font-medium text-gray-600 cursor-pointer">Responsive (Stack on mobile)</Label>
+                  <Switch id="responsive" checked={props.responsive !== false} onCheckedChange={(checked) => updateProp("responsive", checked)} className="scale-75 origin-right" />
+                </div>
+              </AccordionContent>
+            </AccordionItem>
             {renderColorFields()}
             {renderDimensionFields()}
-            <div>
-              <Label htmlFor="columns" className="mb-2 block">
-                Columns
-              </Label>
-              <select
-                id="columns"
-                value={props.columns || 3}
-                onChange={(e) =>
-                  updateProp("columns", parseInt(e.target.value))
-                }
-                className="w-full p-2 border rounded-md"
-              >
-                <option value={1}>1 Column</option>
-                <option value={2}>2 Columns</option>
-                <option value={3}>3 Columns</option>
-                <option value={4}>4 Columns</option>
-                <option value={6}>6 Columns</option>
-              </select>
-            </div>
-
-            <div>
-              <Label htmlFor="gap" className="mb-2 block">
-                Gap
-              </Label>
-              <select
-                id="gap"
-                value={props.gap || "md"}
-                onChange={(e) => updateProp("gap", e.target.value)}
-                className="w-full p-2 border rounded-md"
-              >
-                <option value="none">None</option>
-                <option value="sm">Small</option>
-                <option value="md">Medium</option>
-                <option value="lg">Large</option>
-                <option value="xl">Extra Large</option>
-              </select>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="responsive"
-                checked={props.responsive !== false}
-                onCheckedChange={(checked) => updateProp("responsive", checked)}
-              />
-              <Label htmlFor="responsive">Responsive (Stack on mobile)</Label>
-            </div>
-          </div>
+          </Accordion>
         );
 
       case "Section":
         return (
-          <div className="space-y-4">
+          <Accordion type="multiple" defaultValue={["layout", "colors", "dimensions"]} className="w-full">
+            <AccordionItem value="layout" className="border-b-0 border-t border-gray-100 first:border-t-0">
+              <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold text-gray-700 uppercase tracking-wide data-[state=open]:bg-gray-50/50">
+                <div className="flex items-center gap-2">
+                  <Layout className="w-4 h-4 text-gray-500" />
+                  Section Settings
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="padding" className="text-xs font-medium text-gray-600">Padding</Label>
+                  <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-blue-500">
+                    <select id="padding" value={props.padding || "lg"} onChange={(e) => updateProp("padding", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
+                      <option value="none">None</option>
+                      <option value="sm">Small</option>
+                      <option value="md">Medium</option>
+                      <option value="lg">Large</option>
+                      <option value="xl">Extra Large</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="maxWidth" className="text-xs font-medium text-gray-600">Max Width</Label>
+                  <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-blue-500">
+                    <select id="maxWidth" value={props.maxWidth || "xl"} onChange={(e) => updateProp("maxWidth", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
+                      <option value="sm">Small (640px)</option>
+                      <option value="md">Medium (768px)</option>
+                      <option value="lg">Large (1024px)</option>
+                      <option value="xl">Extra Large (1280px)</option>
+                      <option value="2xl">2X Large (1536px)</option>
+                      <option value="full">Full Width</option>
+                    </select>
+                  </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
             {renderColorFields()}
             {renderDimensionFields()}
-            <div>
-              <Label htmlFor="padding" className="mb-2 block">
-                Padding
-              </Label>
-              <select
-                id="padding"
-                value={props.padding || "lg"}
-                onChange={(e) => updateProp("padding", e.target.value)}
-                className="w-full p-2 border rounded-md"
-              >
-                <option value="none">None</option>
-                <option value="sm">Small</option>
-                <option value="md">Medium</option>
-                <option value="lg">Large</option>
-                <option value="xl">Extra Large</option>
-              </select>
-            </div>
-
-            <div>
-              <Label htmlFor="maxWidth" className="mb-2 block">
-                Max Width
-              </Label>
-              <select
-                id="maxWidth"
-                value={props.maxWidth || "xl"}
-                onChange={(e) => updateProp("maxWidth", e.target.value)}
-                className="w-full p-2 border rounded-md"
-              >
-                <option value="sm">Small (640px)</option>
-                <option value="md">Medium (768px)</option>
-                <option value="lg">Large (1024px)</option>
-                <option value="xl">Extra Large (1280px)</option>
-                <option value="2xl">2X Large (1536px)</option>
-                <option value="full">Full Width</option>
-              </select>
-            </div>
-          </div>
+          </Accordion>
         );
 
       case "Video":
@@ -2084,95 +1896,81 @@ export function PropertiesPanel({
 
       case "Badge":
         return (
-          <div className="space-y-4">
+          <Accordion type="multiple" defaultValue={["content", "colors", "dimensions"]} className="w-full">
+            <AccordionItem value="content" className="border-b-0 border-t border-gray-100 first:border-t-0">
+              <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold text-gray-700 uppercase tracking-wide data-[state=open]:bg-gray-50/50">
+                <div className="flex items-center gap-2">
+                  <Type className="w-4 h-4 text-gray-500" />
+                  Badge Content
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="text" className="text-xs font-medium text-gray-600">Text</Label>
+                  <Input id="text" value={props.text || ""} onChange={(e) => updateProp("text", e.target.value)} placeholder="New" className="h-8 text-sm" />
+                </div>
+                
+                <div className="space-y-1.5">
+                  <Label htmlFor="variant" className="text-xs font-medium text-gray-600">Variant</Label>
+                  <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-blue-500">
+                    <select id="variant" value={props.variant || "default"} onChange={(e) => updateProp("variant", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
+                      <option value="default">Default</option>
+                      <option value="success">Success</option>
+                      <option value="warning">Warning</option>
+                      <option value="error">Error</option>
+                      <option value="info">Info</option>
+                    </select>
+                  </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
             {renderColorFields()}
             {renderDimensionFields()}
-            <div>
-              <Label htmlFor="text" className="mb-2 block">
-                Text
-              </Label>
-              <Input
-                id="text"
-                value={props.text || ""}
-                onChange={(e) => updateProp("text", e.target.value)}
-                placeholder="New"
-              />
-            </div>
-            <div>
-              <Label htmlFor="variant" className="mb-2 block">
-                Variant
-              </Label>
-              <select
-                id="variant"
-                value={props.variant || "default"}
-                onChange={(e) => updateProp("variant", e.target.value)}
-                className="w-full p-2 border rounded-md"
-              >
-                <option value="default">Default</option>
-                <option value="success">Success</option>
-                <option value="warning">Warning</option>
-                <option value="error">Error</option>
-                <option value="info">Info</option>
-              </select>
-            </div>
-          </div>
+          </Accordion>
         );
 
       case "Alert":
         return (
-          <div className="space-y-4">
+          <Accordion type="multiple" defaultValue={["content", "colors", "dimensions"]} className="w-full">
+            <AccordionItem value="content" className="border-b-0 border-t border-gray-100 first:border-t-0">
+              <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold text-gray-700 uppercase tracking-wide data-[state=open]:bg-gray-50/50">
+                <div className="flex items-center gap-2">
+                  <Type className="w-4 h-4 text-gray-500" />
+                  Alert Content
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="title" className="text-xs font-medium text-gray-600">Title</Label>
+                  <Input id="title" value={props.title || ""} onChange={(e) => updateProp("title", e.target.value)} placeholder="Alert title" className="h-8 text-sm" />
+                </div>
+                
+                <div className="space-y-1.5">
+                  <Label htmlFor="message" className="text-xs font-medium text-gray-600">Message</Label>
+                  <Textarea id="message" value={props.message || ""} onChange={(e) => updateProp("message", e.target.value)} placeholder="Alert message" rows={2} className="text-sm resize-none" />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="variant" className="text-xs font-medium text-gray-600">Variant</Label>
+                  <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-blue-500">
+                    <select id="variant" value={props.variant || "info"} onChange={(e) => updateProp("variant", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
+                      <option value="info">Info</option>
+                      <option value="success">Success</option>
+                      <option value="warning">Warning</option>
+                      <option value="error">Error</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <div className="flex items-center justify-between p-2 rounded-md bg-gray-50 border border-gray-100">
+                  <Label htmlFor="dismissible" className="text-xs font-medium text-gray-600 cursor-pointer">Dismissible</Label>
+                  <Switch id="dismissible" checked={props.dismissible || false} onCheckedChange={(checked) => updateProp("dismissible", checked)} className="scale-75 origin-right" />
+                </div>
+              </AccordionContent>
+            </AccordionItem>
             {renderColorFields()}
             {renderDimensionFields()}
-            <div>
-              <Label htmlFor="title" className="mb-2 block">
-                Title
-              </Label>
-              <Input
-                id="title"
-                value={props.title || ""}
-                onChange={(e) => updateProp("title", e.target.value)}
-                placeholder="Alert title"
-              />
-            </div>
-            <div>
-              <Label htmlFor="message" className="mb-2 block">
-                Message
-              </Label>
-              <Textarea
-                id="message"
-                value={props.message || ""}
-                onChange={(e) => updateProp("message", e.target.value)}
-                placeholder="Alert message"
-                rows={2}
-              />
-            </div>
-            <div>
-              <Label htmlFor="variant" className="mb-2 block">
-                Variant
-              </Label>
-              <select
-                id="variant"
-                value={props.variant || "info"}
-                onChange={(e) => updateProp("variant", e.target.value)}
-                className="w-full p-2 border rounded-md"
-              >
-                <option value="info">Info</option>
-                <option value="success">Success</option>
-                <option value="warning">Warning</option>
-                <option value="error">Error</option>
-              </select>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="dismissible"
-                checked={props.dismissible || false}
-                onCheckedChange={(checked) =>
-                  updateProp("dismissible", checked)
-                }
-              />
-              <Label htmlFor="dismissible">Dismissible</Label>
-            </div>
-          </div>
+          </Accordion>
         );
 
       default:

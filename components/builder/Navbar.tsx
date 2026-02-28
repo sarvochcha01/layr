@@ -27,6 +27,8 @@ interface NavbarProps {
   textColor?: string;
   linkColor?: string;
   linkHoverColor?: string;
+  onNavigate?: (slug: string) => void;
+  pages?: any[];
 }
 
 export function Navbar({
@@ -46,6 +48,8 @@ export function Navbar({
   textColor,
   linkColor,
   linkHoverColor = "#3b82f6",
+  onNavigate,
+  pages,
 }: NavbarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -63,7 +67,7 @@ export function Navbar({
         className={cn(
           "flex items-center w-full",
           !textColor && (theme === "dark" ? "text-white" : "text-gray-900"),
-          className
+          className,
         )}
         style={{
           width: width || undefined,
@@ -85,12 +89,45 @@ export function Navbar({
         {viewport === "desktop" && (
           <div className="flex items-center space-x-4 xl:space-x-8 ml-auto mr-4">
             {links.map((link, index) => {
+              const handleClick = (e: React.MouseEvent) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log("Link clicked:", {
+                  isPreviewMode,
+                  hasOnNavigate: !!onNavigate,
+                  linkExternal: link.external,
+                  linkHref: link.href,
+                });
+
+                // Handle internal navigation (works in both edit and preview mode)
+                if (onNavigate && !link.external) {
+                  let slug = link.href;
+
+                  // Handle "page:slug" format
+                  if (slug.startsWith("page:")) {
+                    slug = slug.replace("page:", "");
+                  } else {
+                    // Handle "/slug" or "/slug.html" format
+                    slug = slug.replace(/^\//, "").replace(/\.html$/, "");
+                  }
+
+                  // If href is just "#" or empty, try to infer from link text
+                  if (!slug || slug === "#") {
+                    slug = link.text.toLowerCase().replace(/\s+/g, "-");
+                    if (slug === "home") slug = "index";
+                  }
+
+                  console.log("Navigating to slug:", slug);
+                  onNavigate(slug);
+                }
+              };
+
               const linkProps = {
-                href: "#",
+                href: link.external ? link.href : "#",
                 className: cn(
                   "transition-colors text-sm lg:text-base cursor-pointer",
                   !linkColor &&
-                    (theme === "dark" ? "text-white" : "text-gray-700")
+                    (theme === "dark" ? "text-white" : "text-gray-700"),
                 ),
                 style: {
                   color: linkColor || undefined,
@@ -105,7 +142,12 @@ export function Navbar({
                     e.currentTarget.style.color = linkColor;
                   }
                 },
-                onClick: (e: React.MouseEvent) => e.preventDefault(),
+                onClick: handleClick,
+                ...(link.external &&
+                  isPreviewMode && {
+                    target: "_blank",
+                    rel: "noopener noreferrer",
+                  }),
               };
 
               return (
@@ -164,30 +206,49 @@ export function Navbar({
         <div className="absolute top-full left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
           <div className="py-2">
             {links.map((link, index) => {
+              const handleClick = (e: React.MouseEvent) => {
+                closeMobileMenu();
+                if (onNavigate && !link.external) {
+                  e.preventDefault();
+
+                  let slug = link.href;
+
+                  // Handle "page:slug" format
+                  if (slug.startsWith("page:")) {
+                    slug = slug.replace("page:", "");
+                  } else {
+                    // Handle "/slug" or "/slug.html" format
+                    slug = slug.replace(/^\//, "").replace(/\.html$/, "");
+                  }
+
+                  // If href is just "#" or empty, try to infer from link text
+                  if (!slug || slug === "#") {
+                    slug = link.text.toLowerCase().replace(/\s+/g, "-");
+                    if (slug === "home") slug = "index";
+                  }
+
+                  onNavigate(slug);
+                }
+              };
+
               const linkProps = {
-                href: isPreviewMode ? link.href : "#",
+                href: link.external ? link.href : "#",
                 className: cn(
                   "block px-4 py-3 text-sm hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0",
-                  theme === "dark" ? "text-gray-900" : "text-gray-700"
+                  theme === "dark" ? "text-gray-900" : "text-gray-700",
                 ),
-                onClick: isPreviewMode
-                  ? closeMobileMenu
-                  : (e: React.MouseEvent) => e.preventDefault(),
-                ...(isPreviewMode &&
-                  link.external && {
+                onClick: handleClick,
+                ...(link.external &&
+                  isPreviewMode && {
                     target: "_blank",
                     rel: "noopener noreferrer",
                   }),
               };
 
-              return link.external && isPreviewMode ? (
+              return (
                 <a key={index} {...linkProps}>
                   {link.text}
                 </a>
-              ) : (
-                <Link key={index} {...linkProps}>
-                  {link.text}
-                </Link>
               );
             })}
 

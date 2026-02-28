@@ -75,7 +75,7 @@ export function PagesPanel({
               "flex items-center justify-between p-3 rounded-lg mb-2 cursor-pointer group",
               currentPageId === page.id
                 ? "bg-blue-50 border-2 border-blue-500"
-                : "hover:bg-gray-50 border-2 border-transparent"
+                : "hover:bg-gray-50 border-2 border-transparent",
             )}
             onClick={() => onPageSelect(page.id)}
           >
@@ -85,14 +85,12 @@ export function PagesPanel({
               ) : (
                 <FileText className="w-4 h-4 text-gray-500 flex-shrink-0" />
               )}
-              <div className="flex-1 min-w-0">
-                <div className="text-sm font-medium text-gray-900 truncate">
-                  {page.name}
-                </div>
-                <div className="text-xs text-gray-500 truncate">
-                  /{page.slug}.html
-                </div>
-              </div>
+              <span className="text-sm font-medium text-gray-900 truncate">
+                {page.name}
+              </span>
+              <span className="text-xs text-gray-500 truncate">
+                /{page.slug}.html
+              </span>
             </div>
             <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100">
               {onPageDuplicate && (

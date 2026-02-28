@@ -3,7 +3,13 @@
 import { useDraggable } from "@dnd-kit/core";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { Search, Star } from "lucide-react";
+import { 
+  Search, Star, LayoutTemplate, Navigation, SplitSquareVertical, 
+  Square, Box, Grid3X3, Target, CreditCard, Type, Pointer, 
+  Image as ImageIcon, Video, FileText, ListCollapse, FolderTree, 
+  MessageSquare, DollarSign, Sparkles, BarChart, 
+  Megaphone, Minus, ArrowUpDown, Tag, AlertCircle 
+} from "lucide-react";
 import { useState } from "react";
 import { useComponentFavorites } from "@/hooks/useComponentFavorites";
 
@@ -15,7 +21,7 @@ interface ComponentCategory {
 interface ComponentItem {
   type: string;
   name: string;
-  icon: string;
+  icon: React.ReactNode;
   description: string;
 }
 
@@ -26,37 +32,37 @@ const componentCategories: ComponentCategory[] = [
       {
         type: "Header",
         name: "Header",
-        icon: "📦",
+        icon: <LayoutTemplate className="w-5 h-5" />,
         description: "Page header with navigation",
       },
       {
         type: "Navbar",
         name: "Navbar",
-        icon: "�",
+        icon: <Navigation className="w-5 h-5" />,
         description: "Navigation bar with menu items",
       },
       {
         type: "Footer",
         name: "Footer",
-        icon: "🦶",
+        icon: <SplitSquareVertical className="w-5 h-5" />,
         description: "Page footer with links",
       },
       {
         type: "Section",
         name: "Section",
-        icon: "�",
+        icon: <Square className="w-5 h-5" />,
         description: "Content section container",
       },
       {
         type: "Container",
         name: "Container",
-        icon: "📦",
+        icon: <Box className="w-5 h-5" />,
         description: "Responsive container",
       },
       {
         type: "Grid",
         name: "Grid",
-        icon: "🏗️",
+        icon: <Grid3X3 className="w-5 h-5" />,
         description: "Responsive grid layout",
       },
     ],
@@ -67,25 +73,25 @@ const componentCategories: ComponentCategory[] = [
       {
         type: "Hero",
         name: "Hero",
-        icon: "🎯",
+        icon: <Target className="w-5 h-5" />,
         description: "Hero section with CTA",
       },
       {
         type: "Card",
         name: "Card",
-        icon: "🃏",
+        icon: <CreditCard className="w-5 h-5" />,
         description: "Content card with image",
       },
       {
         type: "Text",
         name: "Text",
-        icon: "📝",
+        icon: <Type className="w-5 h-5" />,
         description: "Text content block",
       },
       {
         type: "Button",
         name: "Button",
-        icon: "🔘",
+        icon: <Pointer className="w-5 h-5" />,
         description: "Call-to-action button",
       },
     ],
@@ -96,13 +102,13 @@ const componentCategories: ComponentCategory[] = [
       {
         type: "Image",
         name: "Image",
-        icon: "🖼️",
+        icon: <ImageIcon className="w-5 h-5" />,
         description: "Responsive image",
       },
       {
         type: "Video",
         name: "Video",
-        icon: "🎥",
+        icon: <Video className="w-5 h-5" />,
         description: "Video player or embed",
       },
     ],
@@ -113,7 +119,7 @@ const componentCategories: ComponentCategory[] = [
       {
         type: "Form",
         name: "Form",
-        icon: "📋",
+        icon: <FileText className="w-5 h-5" />,
         description: "Contact or signup form",
       },
     ],
@@ -124,13 +130,13 @@ const componentCategories: ComponentCategory[] = [
       {
         type: "Accordion",
         name: "Accordion",
-        icon: "📑",
+        icon: <ListCollapse className="w-5 h-5" />,
         description: "Collapsible content sections",
       },
       {
         type: "Tabs",
         name: "Tabs",
-        icon: "📂",
+        icon: <FolderTree className="w-5 h-5" />,
         description: "Tabbed content switcher",
       },
     ],
@@ -141,31 +147,31 @@ const componentCategories: ComponentCategory[] = [
       {
         type: "Testimonial",
         name: "Testimonial",
-        icon: "💬",
+        icon: <MessageSquare className="w-5 h-5" />,
         description: "Customer review with rating",
       },
       {
         type: "PricingCard",
         name: "Pricing Card",
-        icon: "💰",
+        icon: <DollarSign className="w-5 h-5" />,
         description: "Pricing plan with features",
       },
       {
         type: "Feature",
         name: "Feature",
-        icon: "✨",
+        icon: <Sparkles className="w-5 h-5" />,
         description: "Feature showcase with icon",
       },
       {
         type: "Stats",
         name: "Stats",
-        icon: "📊",
+        icon: <BarChart className="w-5 h-5" />,
         description: "Statistics and numbers",
       },
       {
         type: "CTA",
         name: "CTA",
-        icon: "🎯",
+        icon: <Megaphone className="w-5 h-5" />,
         description: "Call-to-action section",
       },
     ],
@@ -176,25 +182,25 @@ const componentCategories: ComponentCategory[] = [
       {
         type: "Divider",
         name: "Divider",
-        icon: "➖",
+        icon: <Minus className="w-5 h-5" />,
         description: "Visual separator line",
       },
       {
         type: "Spacer",
         name: "Spacer",
-        icon: "⬜",
+        icon: <ArrowUpDown className="w-5 h-5" />,
         description: "Vertical spacing",
       },
       {
         type: "Badge",
         name: "Badge",
-        icon: "🏷️",
+        icon: <Tag className="w-5 h-5" />,
         description: "Small label or tag",
       },
       {
         type: "Alert",
         name: "Alert",
-        icon: "⚠️",
+        icon: <AlertCircle className="w-5 h-5" />,
         description: "Notification message",
       },
     ],
@@ -250,8 +256,10 @@ function DraggableComponent({
       </button>
 
       {/* Draggable area */}
-      <div {...listeners} {...attributes} className="cursor-grab w-full">
-        <span className="text-2xl">{component.icon}</span>
+      <div {...listeners} {...attributes} className="cursor-grab w-full flex flex-col items-center">
+        <div className="text-gray-500 mb-2 p-2 bg-gray-50 rounded-md group-hover:bg-gray-100 group-hover:text-gray-900 transition-colors">
+          {component.icon}
+        </div>
         <div>
           <div className="text-xs font-medium text-gray-900">
             {component.name}

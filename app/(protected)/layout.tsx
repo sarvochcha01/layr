@@ -11,9 +11,7 @@ export default function ProtectedLayout({
   return (
     <div className="flex h-screen w-full overflow-hidden bg-background">
       <SideNav />
-      <main className="flex-1 overflow-y-auto">
-        {children}
-      </main>
+      <main className="flex-1 overflow-y-auto p-4">{children}</main>
     </div>
   );
 }
