@@ -94,6 +94,7 @@ export default function EditorPage() {
   const [projectName, setProjectName] = useState<string>("");
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [showShortcuts, setShowShortcuts] = useState(false);
+  const [isSavingManual, setIsSavingManual] = useState(false);
 
   // Global components state
   const [globalComponents, setGlobalComponents] = useState<{
@@ -165,11 +166,11 @@ export default function EditorPage() {
           const pageComponents: ComponentDefinition[] = [];
 
           // Separate global components from page components
-          firstPage.components.forEach((comp) => {
+          firstPage.components.forEach((comp: ComponentDefinition) => {
             if (comp.type === "Header" && comp.children.length > 0) {
               // Check if Header contains a Navbar
               const navbarChild = comp.children.find(
-                (c) => c.type === "Navbar",
+                (c: ComponentDefinition) => c.type === "Navbar",
               );
               if (navbarChild) {
                 extractedGlobal.navbar = comp; // Store the whole Header with Navbar
@@ -188,7 +189,7 @@ export default function EditorPage() {
           setGlobalComponents(extractedGlobal);
 
           // Update pages to remove global components
-          const updatedPages = projectData.pages.map((page, index) => {
+          const updatedPages = projectData.pages.map((page: Page, index: number) => {
             if (index === 0) {
               return { ...page, components: pageComponents };
             }
@@ -196,12 +197,12 @@ export default function EditorPage() {
             return {
               ...page,
               components: page.components.filter(
-                (c) =>
+                (c: ComponentDefinition) =>
                   c.type !== "Navbar" &&
                   c.type !== "Footer" &&
                   !(
                     c.type === "Header" &&
-                    c.children.some((child) => child.type === "Navbar")
+                    c.children.some((child: ComponentDefinition) => child.type === "Navbar")
                   ),
               ),
             };
@@ -262,6 +263,40 @@ export default function EditorPage() {
 
     return () => clearTimeout(timeoutId);
   }, [pages, globalComponents, projectName, projectId, user, isInitialLoad]);
+
+  // Manual save handler
+  const handleManualSave = async () => {
+    if (!projectId || !user || isInitialLoad) return;
+    setIsSavingManual(true);
+    
+    try {
+      const pagesWithGlobal = pages.map((page, index) => {
+        if (index === 0) {
+          return {
+            ...page,
+            components: [
+              ...(globalComponents.navbar ? [globalComponents.navbar] : []),
+              ...page.components,
+              ...(globalComponents.footer ? [globalComponents.footer] : []),
+            ],
+          };
+        }
+        return page;
+      });
+
+      await updateProjectMutation.mutateAsync({
+        projectId,
+        updates: { pages: pagesWithGlobal, name: projectName },
+        userId: user.uid,
+      });
+      toast.success("Project saved manually!");
+    } catch (error) {
+      console.error("Save failed:", error);
+      toast.error("Failed to save project");
+    } finally {
+      setIsSavingManual(false);
+    }
+  };
 
   // Helper to update current page components
   const updateCurrentPageComponents = (
@@ -652,6 +687,8 @@ export default function EditorPage() {
           onRedo={redo}
           canUndo={canUndo}
           canRedo={canRedo}
+          onSave={handleManualSave}
+          isSaving={isSavingManual}
         />
 
         <DragOverlay>

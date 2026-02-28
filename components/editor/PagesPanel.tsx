@@ -59,11 +59,10 @@ export function PagesPanel({
   };
 
   return (
-    <div className="h-full flex flex-col bg-white border-r border-gray-200">
+    <div className="h-full flex flex-col">
       {/* Header */}
-      <div className="p-4 border-b border-gray-200">
-        <h3 className="text-sm font-semibold text-gray-900">Pages</h3>
-        <p className="text-xs text-gray-500 mt-1">Manage your website pages</p>
+      <div className="p-3 border-b border-border">
+        <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider">Pages</h3>
       </div>
 
       {/* Pages List */}
@@ -72,23 +71,23 @@ export function PagesPanel({
           <div
             key={page.id}
             className={cn(
-              "flex items-center justify-between p-3 rounded-lg mb-2 cursor-pointer group",
+              "flex items-center justify-between p-2 rounded-md mb-1 cursor-pointer group",
               currentPageId === page.id
-                ? "bg-blue-50 border-2 border-blue-500"
-                : "hover:bg-gray-50 border-2 border-transparent",
+                ? "bg-primary/10 border border-primary text-primary"
+                : "hover:bg-muted border border-transparent text-foreground",
             )}
             onClick={() => onPageSelect(page.id)}
           >
             <div className="flex items-center gap-2 flex-1 min-w-0">
               {page.slug === "index" ? (
-                <Home className="w-4 h-4 text-gray-500 flex-shrink-0" />
+                <Home className="w-3.5 h-3.5 flex-shrink-0 opacity-70" />
               ) : (
-                <FileText className="w-4 h-4 text-gray-500 flex-shrink-0" />
+                <FileText className="w-3.5 h-3.5 flex-shrink-0 opacity-70" />
               )}
-              <span className="text-sm font-medium text-gray-900 truncate">
+              <span className="text-sm font-medium truncate">
                 {page.name}
               </span>
-              <span className="text-xs text-gray-500 truncate">
+              <span className="text-[10px] opacity-50 truncate">
                 /{page.slug}.html
               </span>
             </div>
@@ -99,10 +98,10 @@ export function PagesPanel({
                     e.stopPropagation();
                     onPageDuplicate(page.id);
                   }}
-                  className="p-1 hover:bg-blue-100 rounded transition-colors"
+                  className="p-1 hover:bg-primary/20 rounded transition-colors"
                   title="Duplicate page"
                 >
-                  <Copy className="w-4 h-4 text-blue-600" />
+                  <Copy className="w-3.5 h-3.5 text-primary" />
                 </button>
               )}
               {page.slug !== "index" && (
@@ -111,10 +110,10 @@ export function PagesPanel({
                     e.stopPropagation();
                     onPageDelete(page.id);
                   }}
-                  className="p-1 hover:bg-red-100 rounded transition-colors"
+                  className="p-1 hover:bg-destructive/20 rounded transition-colors"
                   title="Delete page"
                 >
-                  <Trash2 className="w-4 h-4 text-red-600" />
+                  <Trash2 className="w-3.5 h-3.5 text-destructive" />
                 </button>
               )}
             </div>
@@ -123,7 +122,7 @@ export function PagesPanel({
       </div>
 
       {/* Add Page Button */}
-      <div className="p-4 border-t border-gray-200">
+      <div className="p-3 border-t border-border">
         <Button
           variant="outline"
           size="sm"
@@ -164,7 +163,7 @@ export function PagesPanel({
                 onChange={(e) => setNewPageSlug(e.target.value)}
                 placeholder="about-us"
               />
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 Will be accessible at: /{newPageSlug || "page-name"}.html
               </p>
             </div>

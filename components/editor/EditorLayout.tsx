@@ -7,8 +7,9 @@ import { ComponentPalette } from "./ComponentPalette";
 import { Canvas } from "./Canvas";
 import { PropertiesPanel } from "./PropertiesPanel";
 import { PagesPanel } from "./PagesPanel";
-import { Download, Eye, Edit, X, Undo, Redo, Monitor, Tablet, Smartphone } from "lucide-react";
+import { Download, Eye, Edit, X, Undo, Redo, Monitor, Tablet, Smartphone, Layers, LayoutTemplate, FileBox, Save } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 type Viewport = "desktop" | "tablet" | "mobile";
 
@@ -32,6 +33,8 @@ interface EditorLayoutProps {
   onRedo?: () => void;
   canUndo?: boolean;
   canRedo?: boolean;
+  onSave?: () => void;
+  isSaving?: boolean;
 }
 
 export function EditorLayout({
@@ -54,6 +57,8 @@ export function EditorLayout({
   onRedo,
   canUndo = false,
   canRedo = false,
+  onSave,
+  isSaving = false,
 }: EditorLayoutProps) {
   const router = useRouter();
   const [viewport, setViewport] = useState<Viewport>("desktop");
@@ -194,84 +199,76 @@ export function EditorLayout({
   };
 
   return (
-    <div className="h-screen flex bg-gray-50">
-      {/* Left Panel - Pages, Hierarchy, and Components */}
+    <div className="dark h-screen flex bg-background text-foreground overflow-hidden">
+      {/* Left Panel - Tabs for Pages, Layers, Assets */}
       {!isPreviewMode && (
         <>
           <div
-            className="flex-shrink-0 bg-white border-r border-gray-200 flex flex-col h-full"
+            className="flex-shrink-0 bg-card border-r border-border flex flex-col h-full"
             style={{ width: `${leftPanelWidth}px` }}
           >
-            {/* Pages Panel */}
-            <div
-              className="border-b border-gray-200 flex-shrink-0 overflow-hidden"
-              style={{ height: `${pagesPanelHeight}px` }}
-            >
-              <PagesPanel
-                pages={pages}
-                currentPageId={currentPageId}
-                onPageSelect={onPageSelect}
-                onPageAdd={onPageAdd}
-                onPageDelete={onPageDelete}
-                onPageDuplicate={onPageDuplicate}
-                onPageRename={(id, name, slug) => {
-                  // TODO: Implement page rename
-                }}
-              />
-            </div>
+            <Tabs defaultValue="layers" className="flex flex-col h-full w-full">
+              <div className="flex-shrink-0 p-2 border-b border-border">
+                <TabsList className="w-full grid grid-cols-3 bg-muted">
+                  <TabsTrigger value="pages" className="text-xs py-1.5"><LayoutTemplate className="w-3 h-3 mr-1.5" /> Pages</TabsTrigger>
+                  <TabsTrigger value="layers" className="text-xs py-1.5"><Layers className="w-3 h-3 mr-1.5" /> Layers</TabsTrigger>
+                  <TabsTrigger value="assets" className="text-xs py-1.5"><FileBox className="w-3 h-3 mr-1.5" /> Assets</TabsTrigger>
+                </TabsList>
+              </div>
 
-            {/* Resize Handle for Pages Panel */}
-            <div
-              className="h-1 bg-gray-200 hover:bg-blue-400 cursor-ns-resize transition-colors flex-shrink-0"
-              onMouseDown={(e) => startResize("pages", e)}
-            />
+              {/* Pages Tab */}
+              <TabsContent value="pages" className="flex-1 min-h-0 m-0 p-0 border-none data-[state=inactive]:hidden overflow-y-auto">
+                <PagesPanel
+                  pages={pages}
+                  currentPageId={currentPageId}
+                  onPageSelect={onPageSelect}
+                  onPageAdd={onPageAdd}
+                  onPageDelete={onPageDelete}
+                  onPageDuplicate={onPageDuplicate}
+                  onPageRename={(id, name, slug) => {
+                    // TODO: Implement page rename
+                  }}
+                />
+              </TabsContent>
 
-            {/* Hierarchy Panel */}
-            <div
-              className="border-b border-gray-200 min-h-0 overflow-hidden"
-              style={{ height: `${hierarchyPanelHeight}px` }}
-            >
-              <HierarchyPanel
-                components={components}
-                selectedComponentIds={selectedComponentIds}
-                onSelectComponent={onSelectComponent}
-                onDeleteComponent={onDeleteComponent}
-                onAddComponent={onAddComponent}
-              />
-            </div>
+              {/* Layers Tab (Hierarchy) */}
+              <TabsContent value="layers" className="flex-1 min-h-0 m-0 p-0 border-none data-[state=inactive]:hidden overflow-y-auto">
+                <HierarchyPanel
+                  components={components}
+                  selectedComponentIds={selectedComponentIds}
+                  onSelectComponent={onSelectComponent}
+                  onDeleteComponent={onDeleteComponent}
+                  onAddComponent={onAddComponent}
+                />
+              </TabsContent>
 
-            {/* Resize Handle for Hierarchy Panel */}
-            <div
-              className="h-1 bg-gray-200 hover:bg-blue-400 cursor-ns-resize transition-colors flex-shrink-0"
-              onMouseDown={(e) => startResize("hierarchy", e)}
-            />
-
-            {/* Component Palette */}
-            <div className="flex-1 min-h-0 overflow-hidden">
-              <ComponentPalette />
-            </div>
+              {/* Assets Tab (Components) */}
+              <TabsContent value="assets" className="flex-1 min-h-0 m-0 p-0 border-none data-[state=inactive]:hidden overflow-y-auto">
+                <ComponentPalette />
+              </TabsContent>
+            </Tabs>
           </div>
 
           {/* Resize Handle for Left Panel */}
           <div
-            className="w-1 bg-gray-200 hover:bg-blue-400 cursor-ew-resize transition-colors flex-shrink-0"
+            className="w-1 bg-border hover:bg-primary cursor-ew-resize transition-colors flex-shrink-0 z-10 relative"
             onMouseDown={(e) => startResize("left", e)}
           />
         </>
       )}
 
       {/* Canvas - Center */}
-      <div className="flex-1 flex flex-col" style={{ minWidth: 0 }}>
+      <div className="flex-1 flex flex-col min-w-0 bg-muted/30">
         {/* Toolbar */}
-        <div className="h-10 bg-white border-b border-gray-200 flex items-center px-4 justify-between">
+        <div className="h-12 bg-card border-b border-border flex items-center px-4 justify-between shrink-0">
           <div className="flex items-center space-x-4">
             {/* Close Button */}
             <button
               onClick={() => router.back()}
-              className="p-2 hover:bg-gray-100 rounded-md transition-colors"
+              className="p-1.5 hover:bg-muted rounded-md transition-colors text-muted-foreground hover:text-foreground"
               title="Close Editor"
             >
-              <X className="w-5 h-5 text-gray-600" />
+              <X className="w-4 h-4" />
             </button>
             {projectName && onProjectNameChange ? (
               isEditingName ? (
@@ -301,7 +298,7 @@ export function EditorLayout({
                     }
                   }}
                   autoFocus
-                  className="text-sm font-medium px-2 py-1 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="text-sm font-medium px-2 py-1 border border-border bg-background rounded focus:outline-none focus:ring-1 focus:ring-primary"
                 />
               ) : (
                 <button
@@ -309,93 +306,108 @@ export function EditorLayout({
                     setEditedName(projectName);
                     setIsEditingName(true);
                   }}
-                  className="text-sm font-medium hover:text-blue-600 transition-colors"
+                  className="text-sm font-medium text-foreground hover:text-primary transition-colors"
                 >
                   {projectName}
                 </button>
               )
             ) : (
-              <span className="text-sm font-medium">Canvas</span>
+              <span className="text-sm font-medium text-foreground">Canvas</span>
             )}
-            <div className="flex items-center space-x-1 border border-gray-200 rounded p-0.5 bg-gray-50">
+            <div className="flex items-center space-x-1 border border-border rounded p-0.5 bg-background">
               <button
                 onClick={() => setViewport("desktop")}
                 className={`p-1.5 rounded transition-colors ${
                   viewport === "desktop"
-                    ? "bg-white text-gray-900 shadow-sm"
-                    : "text-gray-500 hover:text-gray-900"
+                    ? "bg-muted text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 }`}
                 title="Desktop (1200px+)"
               >
-                <Monitor className="w-4 h-4" />
+                <Monitor className="w-3.5 h-3.5" />
               </button>
               <button
                 onClick={() => setViewport("tablet")}
                 className={`p-1.5 rounded transition-colors ${
                   viewport === "tablet"
-                    ? "bg-white text-gray-900 shadow-sm"
-                    : "text-gray-500 hover:text-gray-900"
+                    ? "bg-muted text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 }`}
                 title="Tablet (768px)"
               >
-                <Tablet className="w-4 h-4" />
+                <Tablet className="w-3.5 h-3.5" />
               </button>
               <button
                 onClick={() => setViewport("mobile")}
                 className={`p-1.5 rounded transition-colors ${
                   viewport === "mobile"
-                    ? "bg-white text-gray-900 shadow-sm"
-                    : "text-gray-500 hover:text-gray-900"
+                    ? "bg-muted text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 }`}
                 title="Mobile (375px)"
               >
-                <Smartphone className="w-4 h-4" />
+                <Smartphone className="w-3.5 h-3.5" />
               </button>
             </div>
-
-
           </div>
 
-          {/* Undo/Redo, Preview & Export Buttons */}
+          {/* Action Buttons */}
           <div className="ml-auto flex items-center space-x-2">
+            {/* Save Button */}
+            {onSave && (
+              <button
+                onClick={onSave}
+                disabled={isSaving}
+                className={`flex items-center justify-center space-x-1.5 px-3 h-8 rounded text-xs font-medium transition-colors ${
+                  isSaving 
+                    ? "bg-muted text-muted-foreground cursor-not-allowed" 
+                    : "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm"
+                }`}
+                title="Save Project (Ctrl+S)"
+              >
+                <Save className="w-3.5 h-3.5" />
+                <span>{isSaving ? "Saving..." : "Save"}</span>
+              </button>
+            )}
+
+            <div className="w-px h-4 bg-border mx-1"></div>
+
             {/* Undo Button */}
             <button
               onClick={onUndo}
               disabled={!canUndo}
-              className={`flex items-center space-x-1 px-3 py-1 text-xs rounded transition-colors ${
+              className={`flex items-center justify-center w-8 h-8 rounded transition-colors ${
                 canUndo
-                  ? "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                  : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                  ? "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  : "text-muted-foreground/30 cursor-not-allowed"
               }`}
               title="Undo (Ctrl+Z)"
             >
-              <Undo className="w-3 h-3" />
-              <span>Undo</span>
+              <Undo className="w-4 h-4" />
             </button>
 
             {/* Redo Button */}
             <button
               onClick={onRedo}
               disabled={!canRedo}
-              className={`flex items-center space-x-1 px-3 py-1 text-xs rounded transition-colors ${
+              className={`flex items-center justify-center w-8 h-8 rounded transition-colors ${
                 canRedo
-                  ? "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                  : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                  ? "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  : "text-muted-foreground/30 cursor-not-allowed"
               }`}
               title="Redo (Ctrl+Y)"
             >
-              <Redo className="w-3 h-3" />
-              <span>Redo</span>
+              <Redo className="w-4 h-4" />
             </button>
 
-            <div className="w-px h-6 bg-gray-300"></div>
+            <div className="w-px h-4 bg-border mx-1"></div>
 
             <button
               onClick={() => setIsPreviewMode(!isPreviewMode)}
               className={`flex items-center justify-center w-8 h-8 rounded transition-colors ${
                 isPreviewMode
-                  ? "bg-blue-50 text-blue-600 shadow-sm border border-blue-200"
-                  : "text-gray-500 hover:bg-gray-100 hover:text-gray-900"
+                  ? "bg-primary/10 text-primary hover:bg-primary/20"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
               title={isPreviewMode ? "Edit Mode" : "Preview Mode"}
             >
@@ -410,27 +422,27 @@ export function EditorLayout({
             <div className="relative">
               <button
                 onClick={() => setShowExportMenu(!showExportMenu)}
-                className="flex items-center justify-center w-8 h-8 text-gray-500 hover:bg-gray-100 hover:text-gray-900 rounded transition-colors"
+                className="flex items-center justify-center w-8 h-8 text-muted-foreground hover:bg-muted hover:text-foreground rounded transition-colors"
                 title="Export Panel"
               >
                 <Download className="w-4 h-4" />
               </button>
 
               {showExportMenu && (
-                <div className="absolute right-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                <div className="absolute right-0 mt-1 w-48 bg-card rounded-lg shadow-lg border border-border z-50">
                   <button
                     onClick={() => exportToZip("html")}
-                    className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 rounded-t-lg"
+                    className="w-full text-left px-4 py-2 text-sm hover:bg-muted rounded-t-lg"
                   >
                     <div className="font-medium">Export as HTML</div>
-                    <div className="text-xs text-gray-500">Static website</div>
+                    <div className="text-xs text-muted-foreground">Static website</div>
                   </button>
                   <button
                     onClick={() => exportToZip("react")}
-                    className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 rounded-b-lg border-t"
+                    className="w-full text-left px-4 py-2 text-sm hover:bg-muted rounded-b-lg border-t border-border"
                   >
                     <div className="font-medium">Export as React</div>
-                    <div className="text-xs text-gray-500">Next.js project</div>
+                    <div className="text-xs text-muted-foreground">Next.js project</div>
                   </button>
                 </div>
               )}
@@ -441,8 +453,8 @@ export function EditorLayout({
         {/* Canvas Area */}
         <div
           className={`flex-1 overflow-auto transition-all duration-300 ${
-            isPreviewMode ? "bg-white p-0" : "bg-gray-100 p-8"
-          }`}
+            isPreviewMode ? "bg-white p-0" : "bg-muted p-8"
+          } light`}
           style={{
             maxHeight: "calc(100vh - 3rem)",
             minWidth: 0,
@@ -485,12 +497,12 @@ export function EditorLayout({
         <>
           {/* Resize Handle for Right Panel */}
           <div
-            className="w-1 bg-gray-200 hover:bg-blue-400 cursor-ew-resize transition-colors flex-shrink-0"
+            className="w-1 bg-border hover:bg-primary cursor-ew-resize transition-colors flex-shrink-0 z-10 relative"
             onMouseDown={(e) => startResize("right", e)}
           />
 
           <div
-            className="flex-shrink-0 bg-white border-l border-gray-200 h-full overflow-hidden"
+            className="flex-shrink-0 bg-card border-l border-border h-full overflow-y-auto"
             style={{ width: `${rightPanelWidth}px` }}
           >
             <PropertiesPanel

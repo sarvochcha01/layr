@@ -233,7 +233,7 @@ function DraggableComponent({
       ref={setNodeRef}
       style={style}
       className={cn(
-        "p-3 border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-sm transition-all relative group",
+        "p-3 border border-border rounded-lg hover:border-primary hover:shadow-sm transition-all relative group bg-card",
         "flex flex-col items-center text-center space-y-2",
         isDragging && "opacity-50"
       )}
@@ -250,21 +250,21 @@ function DraggableComponent({
         <Star
           className={cn(
             "w-3 h-3",
-            isFavorite ? "fill-yellow-400 text-yellow-400" : "text-gray-400"
+            isFavorite ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground"
           )}
         />
       </button>
 
       {/* Draggable area */}
       <div {...listeners} {...attributes} className="cursor-grab w-full flex flex-col items-center">
-        <div className="text-gray-500 mb-2 p-2 bg-gray-50 rounded-md group-hover:bg-gray-100 group-hover:text-gray-900 transition-colors">
+        <div className="text-muted-foreground mb-2 p-2 bg-muted rounded-md group-hover:bg-primary/20 group-hover:text-primary transition-colors">
           {component.icon}
         </div>
         <div>
-          <div className="text-xs font-medium text-gray-900">
+          <div className="text-xs font-medium text-foreground">
             {component.name}
           </div>
-          <div className="text-xs text-gray-500 mt-1">
+          <div className="text-[10px] text-muted-foreground mt-1 leading-tight">
             {component.description}
           </div>
         </div>
@@ -320,17 +320,17 @@ export function ComponentPalette() {
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
-      <div className="p-4 border-b border-gray-200">
-        <h3 className="text-sm font-semibold text-gray-900 mb-3">Components</h3>
+      <div className="p-3 border-b border-border">
+        <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider mb-3">Components</h3>
 
         {/* Search */}
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
           <Input
             placeholder="Search components..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-9 h-8 text-sm"
+            className="pl-9 h-8 text-xs bg-background border-border"
           />
         </div>
       </div>
@@ -348,7 +348,7 @@ export function ComponentPalette() {
                 <Star className="w-3 h-3 fill-yellow-400" />
                 Favorites
               </span>
-              <span className="text-xs text-gray-500">
+              <span className="text-[10px] text-muted-foreground">
                 {expandedCategories.has("Favorites") ? "−" : "+"}
               </span>
             </button>
@@ -375,10 +375,10 @@ export function ComponentPalette() {
               onClick={() => toggleCategory("Recent")}
               className="flex items-center justify-between w-full text-left mb-3"
             >
-              <span className="text-xs font-semibold text-blue-600 uppercase tracking-wide">
+              <span className="text-xs font-semibold text-primary uppercase tracking-wide">
                 Recent
               </span>
-              <span className="text-xs text-gray-500">
+              <span className="text-[10px] text-muted-foreground">
                 {expandedCategories.has("Recent") ? "−" : "+"}
               </span>
             </button>
@@ -406,10 +406,10 @@ export function ComponentPalette() {
               onClick={() => toggleCategory(category.name)}
               className="flex items-center justify-between w-full text-left mb-3"
             >
-              <span className="text-xs font-semibold text-gray-700 uppercase tracking-wide">
+              <span className="text-xs font-semibold text-foreground opacity-80 uppercase tracking-wide">
                 {category.name}
               </span>
-              <span className="text-xs text-gray-500">
+              <span className="text-[10px] text-muted-foreground">
                 {expandedCategories.has(category.name) ? "−" : "+"}
               </span>
             </button>
@@ -433,8 +433,8 @@ export function ComponentPalette() {
         {filteredCategories.length === 0 &&
           !favoriteComponents.length &&
           !recentComponents.length && (
-            <div className="text-center py-8 text-gray-500">
-              <div className="text-4xl mb-2">🔍</div>
+            <div className="text-center py-8 text-muted-foreground">
+              <div className="text-4xl mb-2 opacity-30">🔍</div>
               <div className="text-sm">No components found</div>
             </div>
           )}
