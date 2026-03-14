@@ -1,5 +1,6 @@
 import { AlertCircle, CheckCircle, Info, XCircle, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { buildComponentStyle } from "@/lib/buildStyle";
 
 interface AlertProps {
   title?: string;
@@ -10,6 +11,7 @@ interface AlertProps {
   backgroundColor?: string;
   textColor?: string;
   width?: string;
+  [key: string]: any;
 }
 
 export function Alert({
@@ -21,6 +23,7 @@ export function Alert({
   backgroundColor,
   textColor,
   width,
+  ...rest
 }: AlertProps) {
   const variantConfig = {
     info: {
@@ -52,6 +55,8 @@ export function Alert({
   const config = variantConfig[variant];
   const Icon = config.icon;
 
+  const baseStyle = buildComponentStyle({ backgroundColor, textColor, width, ...rest });
+
   return (
     <div
       className={cn(
@@ -59,11 +64,7 @@ export function Alert({
         !backgroundColor && config.bgClass,
         !textColor && config.textClass
       )}
-      style={{
-        width: width || undefined,
-        backgroundColor: backgroundColor || undefined,
-        color: textColor || undefined,
-      }}
+      style={baseStyle}
     >
       <Icon className={cn("w-5 h-5 flex-shrink-0", config.iconClass)} />
 

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { buildComponentStyle } from "@/lib/buildStyle";
 
 interface Tab {
   label: string;
@@ -15,6 +16,7 @@ interface TabsProps {
   activeColor?: string;
   width?: string;
   height?: string;
+  [key: string]: any;
 }
 
 export function Tabs({
@@ -30,18 +32,14 @@ export function Tabs({
   activeColor = "#3b82f6",
   width,
   height,
+  ...rest
 }: TabsProps) {
   const [activeTab, setActiveTab] = useState(defaultTab);
 
+  const baseStyle = buildComponentStyle({ backgroundColor, textColor, width, height, ...rest });
+
   return (
-    <div
-      style={{
-        width: width || undefined,
-        height: height || undefined,
-        backgroundColor: backgroundColor || undefined,
-        color: textColor || undefined,
-      }}
-    >
+    <div style={baseStyle}>
       {/* Tab Headers */}
       <div className={cn("flex gap-2", variant === "bordered" && "border-b")}>
         {tabs.map((tab, index) => (
@@ -55,7 +53,7 @@ export function Tabs({
               variant === "bordered" && "border-b-2 -mb-px",
               activeTab === index
                 ? variant === "pills"
-                  ? "bg-blue-100"
+                  ? ""
                   : ""
                 : "opacity-60 hover:opacity-100"
             )}

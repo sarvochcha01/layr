@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { buildComponentStyle } from "@/lib/buildStyle";
 
 interface FormField {
   id: string;
@@ -9,7 +10,7 @@ interface FormField {
   label: string;
   placeholder?: string;
   required?: boolean;
-  options?: string[]; // For select, radio
+  options?: string[];
 }
 
 interface FormProps {
@@ -25,6 +26,7 @@ interface FormProps {
   height?: string;
   backgroundColor?: string;
   textColor?: string;
+  [key: string]: any;
 }
 
 export function Form({
@@ -40,7 +42,10 @@ export function Form({
   height,
   backgroundColor,
   textColor,
+  ...rest
 }: FormProps) {
+  const baseStyle = buildComponentStyle({ backgroundColor, textColor, width, height, ...rest });
+
   const renderField = (field: FormField) => {
     const fieldId = `field-${field.id}`;
 
@@ -54,7 +59,7 @@ export function Form({
               name={field.id}
               placeholder={field.placeholder}
               required={field.required}
-              className="w-full min-h-[100px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+              className="w-full min-h-[100px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-transparent"
             />
           </div>
         );
@@ -67,7 +72,7 @@ export function Form({
               id={fieldId}
               name={field.id}
               required={field.required}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-transparent"
             >
               <option value="">Select an option</option>
               {field.options?.map((option, index) => (
@@ -134,19 +139,12 @@ export function Form({
   return (
     <div
       className={cn("w-full max-w-md mx-auto", className)}
-      style={{
-        width: width || undefined,
-        height: height || undefined,
-        backgroundColor: backgroundColor || undefined,
-        color: textColor || undefined,
-      }}
+      style={baseStyle}
     >
       {title && <h2 className="text-2xl font-bold mb-2">{title}</h2>}
 
       {description && (
-        <p className="mb-6" style={{ color: textColor || undefined }}>
-          {description}
-        </p>
+        <p className="mb-6 opacity-80">{description}</p>
       )}
 
       <form action={action} method={method} className="space-y-4">

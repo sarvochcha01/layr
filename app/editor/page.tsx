@@ -11,7 +11,7 @@ import {
   DragStartEvent,
 } from "@dnd-kit/core";
 import { EditorLayout } from "@/components/editor/EditorLayout";
-import { ComponentDefinition, Page } from "@/types/editor";
+import { ComponentDefinition, Page, GlobalComponents } from "@/types/editor";
 import { generateId } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProject, useUpdateProject } from "@/hooks/useProjects";
@@ -21,6 +21,25 @@ import { useHistory } from "@/hooks/useHistory";
 import { useComponentFavorites } from "@/hooks/useComponentFavorites";
 import { useComponentClipboard } from "@/hooks/useComponentClipboard";
 import { ShortcutsPanel } from "@/components/editor/ShortcutsPanel";
+import { componentCategories } from "@/components/editor/config/components";
+import { Component as ComponentIcon, Globe } from "lucide-react";
+
+// Utility to recursively remove undefined values so Firebase doesn't complain
+const sanitizeForFirestore = (obj: any): any => {
+  if (Array.isArray(obj)) {
+    return obj.map(sanitizeForFirestore);
+  }
+  if (obj && typeof obj === "object" && !(obj instanceof Date)) {
+    return Object.keys(obj).reduce((acc: any, key) => {
+      const val = obj[key];
+      if (val !== undefined) {
+        acc[key] = sanitizeForFirestore(val);
+      }
+      return acc;
+    }, {});
+  }
+  return obj;
+};
 
 const placeholderComponents: ComponentDefinition[] = [
   {
@@ -97,10 +116,7 @@ export default function EditorPage() {
   const [isSavingManual, setIsSavingManual] = useState(false);
 
   // Global components state
-  const [globalComponents, setGlobalComponents] = useState<{
-    navbar?: ComponentDefinition;
-    footer?: ComponentDefinition;
-  }>({});
+  const [globalComponents, setGlobalComponents] = useState<GlobalComponents>({});
 
   const { addToRecent } = useComponentFavorites();
   const { copyComponent, pasteComponent, hasClipboard } =
@@ -109,12 +125,10 @@ export default function EditorPage() {
   // Get current page
   const currentPage = pages.find((p) => p.id === currentPageId) || pages[0];
 
-  // Merge global components with page components
-  const components: ComponentDefinition[] = [
-    ...(globalComponents.navbar ? [globalComponents.navbar] : []),
-    ...currentPage.components,
-    ...(globalComponents.footer ? [globalComponents.footer] : []),
-  ];
+  // Merge components. We no longer inject global templates directly.
+  // Global component instances already exist inside `currentPage.components` with `isGlobal` flags
+  // and are kept in sync with the `globalComponents` dictionary.
+  const components: ComponentDefinition[] = [...currentPage.components];
 
   // React Query hooks - disable refetching to prevent overwriting local changes
   const {
@@ -156,62 +170,11 @@ export default function EditorPage() {
     if (projectData && isInitialLoad) {
       // Load pages from project data, or create default home page
       if (projectData.pages && Array.isArray(projectData.pages)) {
-        // Extract global components (Navbar/Footer) from first page
-        const firstPage = projectData.pages[0];
-        if (firstPage) {
-          const extractedGlobal: {
-            navbar?: ComponentDefinition;
-            footer?: ComponentDefinition;
-          } = {};
-          const pageComponents: ComponentDefinition[] = [];
+            const globalComps = projectData.globalComponents || {};
+            setGlobalComponents(globalComps);
 
-          // Separate global components from page components
-          firstPage.components.forEach((comp: ComponentDefinition) => {
-            if (comp.type === "Header" && comp.children.length > 0) {
-              // Check if Header contains a Navbar
-              const navbarChild = comp.children.find(
-                (c: ComponentDefinition) => c.type === "Navbar",
-              );
-              if (navbarChild) {
-                extractedGlobal.navbar = comp; // Store the whole Header with Navbar
-              } else {
-                pageComponents.push(comp);
-              }
-            } else if (comp.type === "Navbar") {
-              extractedGlobal.navbar = comp;
-            } else if (comp.type === "Footer") {
-              extractedGlobal.footer = comp;
-            } else {
-              pageComponents.push(comp);
-            }
-          });
-
-          setGlobalComponents(extractedGlobal);
-
-          // Update pages to remove global components
-          const updatedPages = projectData.pages.map((page: Page, index: number) => {
-            if (index === 0) {
-              return { ...page, components: pageComponents };
-            }
-            // Remove Navbar/Footer from other pages too
-            return {
-              ...page,
-              components: page.components.filter(
-                (c: ComponentDefinition) =>
-                  c.type !== "Navbar" &&
-                  c.type !== "Footer" &&
-                  !(
-                    c.type === "Header" &&
-                    c.children.some((child: ComponentDefinition) => child.type === "Navbar")
-                  ),
-              ),
-            };
-          });
-
-          setPages(updatedPages, false);
-        } else {
-          setPages(projectData.pages, false);
-        }
+            // Just load pages as they are
+            setPages(projectData.pages, false);
         setCurrentPageId(projectData.pages[0]?.id || "home");
       } else {
         // Legacy support: convert old components array to pages
@@ -240,23 +203,14 @@ export default function EditorPage() {
     const timeoutId = setTimeout(() => {
       // Merge global components back into first page for saving
       const pagesWithGlobal = pages.map((page, index) => {
-        if (index === 0) {
-          // Add global components to first page
-          return {
-            ...page,
-            components: [
-              ...(globalComponents.navbar ? [globalComponents.navbar] : []),
-              ...page.components,
-              ...(globalComponents.footer ? [globalComponents.footer] : []),
-            ],
-          };
-        }
         return page;
       });
 
+      const updates = sanitizeForFirestore({ pages: pagesWithGlobal, name: projectName, globalComponents });
+
       updateProjectMutation.mutate({
         projectId,
-        updates: { pages: pagesWithGlobal, name: projectName },
+        updates,
         userId: user.uid,
       });
     }, 2000);
@@ -271,22 +225,14 @@ export default function EditorPage() {
     
     try {
       const pagesWithGlobal = pages.map((page, index) => {
-        if (index === 0) {
-          return {
-            ...page,
-            components: [
-              ...(globalComponents.navbar ? [globalComponents.navbar] : []),
-              ...page.components,
-              ...(globalComponents.footer ? [globalComponents.footer] : []),
-            ],
-          };
-        }
         return page;
       });
 
+      const updates = sanitizeForFirestore({ pages: pagesWithGlobal, name: projectName, globalComponents });
+
       await updateProjectMutation.mutateAsync({
         projectId,
-        updates: { pages: pagesWithGlobal, name: projectName },
+        updates,
         userId: user.uid,
       });
       toast.success("Project saved manually!");
@@ -403,6 +349,30 @@ export default function EditorPage() {
         );
         addToRecent(componentType); // Track in recent
       }
+    } else if (active.data.current?.type === "palette-global") {
+      const { globalName, componentType } = active.data.current;
+      const template = globalComponents[globalName];
+      
+      if (template) {
+        // Deep clone the global component with new IDs
+        const cloneComponent = (comp: ComponentDefinition): ComponentDefinition => ({
+          ...comp,
+          id: generateId(),
+          isGlobal: comp.id === template.id ? globalName : undefined,
+          children: comp.children.map(cloneComponent),
+        });
+
+        const newGlobalComponent = cloneComponent(template);
+
+        if (over.data.current?.type === "drop-zone") {
+          const targetId = over.data.current.targetId;
+          const position = over.data.current.position;
+
+          updateCurrentPageComponents((prev) =>
+            insertComponent(prev, newGlobalComponent, targetId, position),
+          );
+        }
+      }
     }
 
     setDraggedComponent(null);
@@ -413,84 +383,153 @@ export default function EditorPage() {
     updates: Partial<ComponentDefinition["props"]>,
   ) => {
     const component = findComponentInTree(components, componentId);
+    if (!component) return;
 
-    console.log("Update component called:", {
-      componentId,
-      component,
-      updates,
-    });
-
-    // Check if this is a Navbar or Footer (could be standalone or inside Header)
-    if (component && component.type === "Navbar") {
-      // Check if this Navbar is the global one
-      if (globalComponents.navbar) {
-        // Check if it's a direct Navbar or inside a Header
-        if (
-          globalComponents.navbar.type === "Navbar" &&
-          globalComponents.navbar.id === componentId
-        ) {
-          // Direct Navbar
-          console.log("Updating direct global Navbar");
-          setGlobalComponents((prev) => ({
-            ...prev,
-            navbar: {
-              ...prev.navbar!,
-              props: { ...prev.navbar!.props, ...updates },
-            },
-          }));
-          return;
-        } else if (globalComponents.navbar.type === "Header") {
-          // Navbar inside Header - need to update the child
-          const navbarChild = globalComponents.navbar.children.find(
-            (c) => c.id === componentId,
-          );
-          if (navbarChild) {
-            console.log("Updating Navbar inside global Header");
-            setGlobalComponents((prev) => ({
-              ...prev,
-              navbar: {
-                ...prev.navbar!,
-                children: prev.navbar!.children.map((child) =>
-                  child.id === componentId
-                    ? { ...child, props: { ...child.props, ...updates } }
-                    : child,
-                ),
-              },
-            }));
-            return;
-          }
-        }
-      }
-    } else if (component && component.type === "Footer") {
-      if (globalComponents.footer?.id === componentId) {
-        console.log("Updating global Footer");
-        setGlobalComponents((prev) => ({
-          ...prev,
-          footer: {
-            ...prev.footer!,
-            props: { ...prev.footer!.props, ...updates },
-          },
-        }));
-        return;
-      }
-    }
-
-    // Update regular page component
-    console.log("Updating regular page component");
+    // Update the component in the current page
     updateCurrentPageComponents((prev) =>
       updateComponentInTree(prev, componentId, updates),
     );
+
+    // If this component is global, sync the change to ALL pages
+    const globalName = component.isGlobal;
+    if (globalName) {
+      // Update the global template
+      setGlobalComponents((prev) => ({
+        ...prev,
+        [globalName]: {
+          ...prev[globalName],
+          props: { ...prev[globalName]?.props, ...updates },
+        },
+      }));
+
+      // Sync updates to ALL other pages that have a component with the same isGlobal name
+      setPages((prevPages) =>
+        prevPages.map((page) => {
+          if (page.id === currentPageId) return page; // Already updated above
+          return {
+            ...page,
+            components: syncGlobalInComponents(page.components, globalName, updates),
+          };
+        })
+      );
+    }
+  };
+
+  const moveComponentUp = (componentId: string) => {
+    updateCurrentPageComponents((prev) => moveComponentInTree(prev, componentId, "up"));
+  };
+
+  const moveComponentDown = (componentId: string) => {
+    updateCurrentPageComponents((prev) => moveComponentInTree(prev, componentId, "down"));
+  };
+
+  // Recursively find and update components with matching isGlobal name
+  const syncGlobalInComponents = (
+    components: ComponentDefinition[],
+    globalName: string,
+    updates: Record<string, any>,
+  ): ComponentDefinition[] => {
+    return components.map((comp) => {
+      let updated = comp;
+      if (comp.isGlobal === globalName) {
+        updated = { ...comp, props: { ...comp.props, ...updates } };
+      }
+      if (comp.children.length > 0) {
+        updated = { ...updated, children: syncGlobalInComponents(comp.children, globalName, updates) };
+      }
+      return updated;
+    });
+  };
+
+  const markAsGlobal = (componentId: string, globalName: string) => {
+    const component = findComponentInTree(components, componentId);
+    if (!component) return;
+
+    // 1. Save the current state of the component as the global template
+    setGlobalComponents((prev) => ({
+      ...prev,
+      [globalName]: { ...component, isGlobal: globalName },
+    }));
+
+    // 2. Mark the current instance as global 
+    updateCurrentPageComponents((prev) => 
+      setGlobalFlagInTree(prev, componentId, globalName)
+    );
+    toast.success(`Component marked as global: ${globalName}`);
+  };
+
+  const unmarkGlobal = (componentId: string) => {
+    updateCurrentPageComponents((prev) => 
+      clearGlobalFlagInTree(prev, componentId)
+    );
+    toast.success("Removed global sync from component");
+  };
+
+  const applyGlobalTemplate = (componentId: string, globalName: string) => {
+    const template = globalComponents[globalName];
+    if (!template) return;
+
+    updateCurrentPageComponents((prev) => {
+      // Find the component and update all its props with the template's props
+      return updateComponentInTree(prev, componentId, template.props);
+    });
+    
+    // Also mark it as pointing to this global group
+    updateCurrentPageComponents((prev) => 
+      setGlobalFlagInTree(prev, componentId, globalName)
+    );
+
+    toast.success(`Applied global style "${globalName}"`);
   };
 
   const deleteComponent = (componentId: string) => {
-    updateCurrentPageComponents((prev) =>
-      removeComponentFromTree(prev, componentId),
+    // Check if it's a global component template
+    const isGlobalTemplate = Object.values(globalComponents).some(
+      (comp) => comp.id === componentId
     );
+
+    if (isGlobalTemplate) {
+      // Find its global name and remove from global state
+      const globalName = Object.entries(globalComponents).find(
+        ([_, comp]) => comp.id === componentId
+      )?.[0];
+
+      if (globalName) {
+        setGlobalComponents((prev) => {
+          const next = { ...prev };
+          delete next[globalName];
+          return next;
+        });
+
+        // Also remove instances from the current page tree
+        updateCurrentPageComponents((prev) =>
+          removeComponentFromTree(prev, componentId),
+        );
+      }
+    } else {
+      updateCurrentPageComponents((prev) =>
+        removeComponentFromTree(prev, componentId),
+      );
+    }
+
     setSelectedComponentIds((prev) => prev.filter((id) => id !== componentId));
   };
 
   const deleteSelectedComponents = () => {
     selectedComponentIds.forEach((id) => {
+      // Check if it's a global component template
+      const globalName = Object.entries(globalComponents).find(
+        ([_, comp]) => comp.id === id
+      )?.[0];
+
+      if (globalName) {
+        setGlobalComponents((prev) => {
+          const next = { ...prev };
+          delete next[globalName];
+          return next;
+        });
+      }
+
       updateCurrentPageComponents((prev: ComponentDefinition[]) =>
         removeComponentFromTree(prev, id),
       );
@@ -689,18 +728,35 @@ export default function EditorPage() {
           canRedo={canRedo}
           onSave={handleManualSave}
           isSaving={isSavingManual}
+          globalComponents={globalComponents}
+          onMarkAsGlobal={markAsGlobal}
+          onUnmarkGlobal={unmarkGlobal}
+          onApplyGlobalTemplate={applyGlobalTemplate}
+          onMoveComponentUp={moveComponentUp}
+          onMoveComponentDown={moveComponentDown}
         />
 
         <DragOverlay>
           {draggedComponent ? (
-            <div className="bg-white border-2 border-blue-500 rounded-lg p-3 shadow-xl flex flex-col items-center space-y-2 min-w-[100px]">
-              <span className="text-2xl">
-                {getComponentIcon(
-                  draggedComponent.componentType || draggedComponent.type,
+            <div className="bg-card border border-primary rounded-lg p-3 shadow-xl flex flex-col items-center justify-center space-y-2 min-w-[120px] opacity-90 scale-105 transition-transform cursor-grabbing">
+              <span className="text-muted-foreground p-2 bg-muted rounded-md text-primary">
+                {draggedComponent.type === "palette-global" ? (
+                  <Globe className="w-5 h-5" />
+                ) : (
+                  (() => {
+                    const type = draggedComponent.componentType || draggedComponent.type;
+                    for (const cat of componentCategories) {
+                      const found = cat.components.find((c) => c.type === type);
+                      if (found) return found.icon;
+                    }
+                    return <ComponentIcon className="w-5 h-5" />;
+                  })()
                 )}
               </span>
-              <span className="text-xs font-medium text-gray-900">
-                {draggedComponent.componentType || draggedComponent.type}
+              <span className="text-xs font-medium text-foreground">
+                {draggedComponent.type === "palette-global" 
+                  ? draggedComponent.globalName 
+                  : (draggedComponent.componentType || draggedComponent.type)}
               </span>
             </div>
           ) : null}
@@ -716,25 +772,6 @@ export default function EditorPage() {
 }
 
 // Helper functions
-function getComponentIcon(type: string): string {
-  const icons: Record<string, string> = {
-    Header: "📦",
-    Footer: "🦶",
-    Hero: "🎯",
-    Section: "📄",
-    Container: "📦",
-    Grid: "🏗️",
-    Card: "🃏",
-    Button: "🔘",
-    Text: "📝",
-    Image: "🖼️",
-    Video: "🎥",
-    Form: "📋",
-    Navbar: "🧭",
-  };
-  return icons[type] || "📦";
-}
-
 function getDefaultProps(componentType: string): Record<string, any> {
   const defaults: Record<string, any> = {
     Header: { sticky: false, shadow: true },
@@ -822,10 +859,17 @@ function getDefaultProps(componentType: string): Record<string, any> {
 function insertComponent(
   components: ComponentDefinition[],
   newComponent: ComponentDefinition,
-  targetId?: string,
-  position?: "before" | "after" | "inside",
+  targetId?: string | null,
+  position?: "before" | "after" | "inside" | "root-start" | string,
 ): ComponentDefinition[] {
-  if (!targetId) {
+  if (position === "root-start" || targetId === "root-start") {
+    return [newComponent, ...components];
+  }
+  
+  if (!targetId || targetId === "root") {
+    if (position === "before") {
+      return [newComponent, ...components];
+    }
     return [...components, newComponent];
   }
 
@@ -980,4 +1024,88 @@ function duplicateComponentInTree(
   }
 
   return duplicateInTree(components);
+}
+
+// Move a component up or down within its current siblings
+function moveComponentInTree(
+  components: ComponentDefinition[],
+  componentId: string,
+  direction: "up" | "down",
+): ComponentDefinition[] {
+  const result: ComponentDefinition[] = [];
+
+  for (let i = 0; i < components.length; i++) {
+    const comp = components[i];
+    
+    // Check if the target is one of the siblings at the current level
+    if (components.some(c => c.id === componentId)) {
+      const idx = components.findIndex(c => c.id === componentId);
+      
+      // If we're at the very top and trying to move up, ignore
+      if (idx === 0 && direction === "up") return [...components];
+      // If we're at the very bottom and trying to move down, ignore
+      if (idx === components.length - 1 && direction === "down") return [...components];
+
+      // Perform the swap
+      const newArray = [...components];
+      const swapIdx = direction === "up" ? idx - 1 : idx + 1;
+      const temp = newArray[idx];
+      newArray[idx] = newArray[swapIdx];
+      newArray[swapIdx] = temp;
+      
+      return newArray;
+    }
+
+    if (comp.children.length > 0) {
+      result.push({
+        ...comp,
+        children: moveComponentInTree(comp.children, componentId, direction),
+      });
+    } else {
+      result.push(comp);
+    }
+  }
+
+  return result;
+}
+
+// Set isGlobal flag on a specific component in the tree
+function setGlobalFlagInTree(
+  components: ComponentDefinition[],
+  componentId: string,
+  globalName: string,
+): ComponentDefinition[] {
+  return components.map((comp) => {
+    if (comp.id === componentId) {
+      return { ...comp, isGlobal: globalName };
+    }
+    if (comp.children.length > 0) {
+      return {
+        ...comp,
+        children: setGlobalFlagInTree(comp.children, componentId, globalName),
+      };
+    }
+    return comp;
+  });
+}
+
+// Clear isGlobal flag on a specific component in the tree
+function clearGlobalFlagInTree(
+  components: ComponentDefinition[],
+  componentId: string,
+): ComponentDefinition[] {
+  return components.map((comp) => {
+    if (comp.id === componentId) {
+      const copy = { ...comp };
+      delete copy.isGlobal;
+      return copy;
+    }
+    if (comp.children.length > 0) {
+      return {
+        ...comp,
+        children: clearGlobalFlagInTree(comp.children, componentId),
+      };
+    }
+    return comp;
+  });
 }

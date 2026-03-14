@@ -15,7 +15,7 @@ export default function PublicLayout({
 
   useEffect(() => {
     if (!loading && user) {
-      router.push("/dashboard");
+      router.push("/projects");
     }
   }, [user, loading, router]);
 

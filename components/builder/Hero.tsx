@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { buildComponentStyle } from "@/lib/buildStyle";
 
 interface HeroProps {
   title?: string;
@@ -17,6 +18,7 @@ interface HeroProps {
   className?: string;
   width?: string;
   height?: string;
+  [key: string]: any;
 }
 
 export function Hero({
@@ -35,6 +37,7 @@ export function Hero({
   className,
   width,
   height,
+  ...rest
 }: HeroProps) {
   const sizeClasses = {
     sm: "py-12 sm:py-16 px-4",
@@ -49,6 +52,16 @@ export function Hero({
     right: "text-right",
   };
 
+  const baseStyle = buildComponentStyle({ backgroundColor, textColor, width, height, ...rest });
+
+  // Override background for image if set
+  if (backgroundImage) {
+    baseStyle.backgroundImage = `url(${backgroundImage})`;
+    baseStyle.backgroundSize = "cover";
+    baseStyle.backgroundPosition = "center";
+    baseStyle.backgroundColor = undefined;
+  }
+
   return (
     <section
       className={cn(
@@ -57,17 +70,7 @@ export function Hero({
         alignmentClasses[alignment],
         className
       )}
-      style={{
-        backgroundImage: backgroundImage
-          ? `url(${backgroundImage})`
-          : undefined,
-        backgroundColor: !backgroundImage ? backgroundColor : undefined,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        color: textColor || "#1f2937",
-        width: width || undefined,
-        height: height || undefined,
-      }}
+      style={baseStyle}
     >
       {/* Overlay for background images */}
       {backgroundImage && (

@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { buildComponentStyle } from "@/lib/buildStyle";
 
 interface HeaderProps {
   children?: React.ReactNode;
@@ -9,6 +10,7 @@ interface HeaderProps {
   shadow?: boolean;
   width?: string;
   height?: string;
+  [key: string]: any;
 }
 
 export function Header({
@@ -20,7 +22,12 @@ export function Header({
   shadow = true,
   width,
   height,
+  ...rest
 }: HeaderProps) {
+  const baseStyle = buildComponentStyle({ backgroundColor, width, height, ...rest });
+  // Header uses its own padding prop (string CSS value), not the shared enum
+  baseStyle.padding = padding;
+
   return (
     <header
       className={cn(
@@ -29,12 +36,7 @@ export function Header({
         shadow && "shadow-sm",
         className
       )}
-      style={{
-        backgroundColor,
-        padding,
-        width: width || undefined,
-        height: height || undefined,
-      }}
+      style={baseStyle}
     >
       {children}
     </header>

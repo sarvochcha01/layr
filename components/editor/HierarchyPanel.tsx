@@ -11,7 +11,12 @@ import {
   Lock,
   Trash2,
   MoreHorizontal,
+  Component as ComponentIcon,
+  Globe,
+  ArrowUp,
+  ArrowDown,
 } from "lucide-react";
+import { componentCategories } from "./config/components";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -23,62 +28,34 @@ import {
 
 interface HierarchyPanelProps {
   components: ComponentDefinition[];
-  selectedComponentIds: string[];
+  selectedComponentIds?: string[];
+  selectedComponentId?: string | null;
   onSelectComponent: (id: string | null) => void;
   onDeleteComponent: (id: string) => void;
+  onDuplicateComponent?: (id: string) => void;
   onAddComponent?: (componentType: string) => void;
+  onMoveComponentUp?: (id: string) => void;
+  onMoveComponentDown?: (id: string) => void;
 }
 
 export function HierarchyPanel({
   components,
   selectedComponentIds,
+  selectedComponentId,
   onSelectComponent,
   onDeleteComponent,
+  onDuplicateComponent,
   onAddComponent,
+  onMoveComponentUp,
+  onMoveComponentDown,
 }: HierarchyPanelProps) {
   const [expandedItems, setExpandedItems] = useState<Set<string>>(
     new Set(["root"])
   );
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
-  const componentTypes = [
-    { type: "Header", icon: "📦", description: "Page header with navigation" },
-    {
-      type: "Hero",
-      icon: "🎯",
-      description: "Hero section with title and CTA",
-    },
-    { type: "Section", icon: "📄", description: "Generic content section" },
-    { type: "Container", icon: "📦", description: "Container for content" },
-    { type: "Grid", icon: "🏗️", description: "Grid layout" },
-    { type: "Card", icon: "🃏", description: "Card component" },
-    { type: "Button", icon: "🔘", description: "Button element" },
-    { type: "Text", icon: "📝", description: "Text content" },
-    { type: "Image", icon: "🖼️", description: "Image element" },
-    { type: "Video", icon: "🎥", description: "Video player" },
-    { type: "Form", icon: "📋", description: "Form with inputs" },
-    { type: "Navbar", icon: "🧭", description: "Navigation bar" },
-    { type: "Footer", icon: "🦶", description: "Page footer" },
-    {
-      type: "Accordion",
-      icon: "📑",
-      description: "Collapsible accordion items",
-    },
-    { type: "Tabs", icon: "📂", description: "Tabbed content sections" },
-    {
-      type: "Testimonial",
-      icon: "💬",
-      description: "Customer testimonial with rating",
-    },
-    { type: "PricingCard", icon: "💰", description: "Pricing plan card" },
-    { type: "Feature", icon: "✨", description: "Feature highlight with icon" },
-    { type: "Stats", icon: "📊", description: "Statistics display" },
-    { type: "CTA", icon: "🎯", description: "Call-to-action section" },
-    { type: "Divider", icon: "➖", description: "Horizontal divider line" },
-    { type: "Spacer", icon: "⬜", description: "Vertical spacing element" },
-    { type: "Badge", icon: "🏷️", description: "Label or status badge" },
-    { type: "Alert", icon: "⚠️", description: "Alert or notification box" },
-  ];
+  // Determine selected ID for backward compatibility
+  const currentSelectedId = selectedComponentId || (selectedComponentIds && selectedComponentIds[0]) || null;
 
   const handleAddComponent = (componentType: string) => {
     if (onAddComponent) {
@@ -98,40 +75,18 @@ export function HierarchyPanel({
   };
 
   const getComponentIcon = (type: string) => {
-    const icons: Record<string, string> = {
-      Header: "📦",
-      Footer: "🦶",
-      Hero: "🎯",
-      Section: "📄",
-      Container: "📦",
-      Grid: "🏗️",
-      Card: "🃏",
-      Button: "🔘",
-      Text: "📝",
-      Image: "🖼️",
-      Video: "🎥",
-      Form: "📋",
-      Navbar: "🧭",
-      Accordion: "📑",
-      Tabs: "📂",
-      Testimonial: "💬",
-      PricingCard: "💰",
-      Feature: "✨",
-      Stats: "📊",
-      CTA: "🎯",
-      Divider: "➖",
-      Spacer: "⬜",
-      Badge: "🏷️",
-      Alert: "⚠️",
-    };
-    return icons[type] || "📦";
+    for (const category of componentCategories) {
+      const found = category.components.find((c) => c.type === type);
+      if (found) return found.icon;
+    }
+    return <ComponentIcon className="w-4 h-4" />;
   };
 
   const renderComponent = (
     component: ComponentDefinition,
     level: number = 0
   ) => {
-    const isSelected = selectedComponentIds.includes(component.id);
+    const isSelected = currentSelectedId === component.id;
     const isExpanded = expandedItems.has(component.id);
     const hasChildren = component.children.length > 0;
 
@@ -169,16 +124,47 @@ export function HierarchyPanel({
             {getComponentIcon(component.type)}
           </span>
 
-          {/* Component Name */}
-          <span className="flex-1 text-sm text-muted-foreground truncate">
-            {component.props.title ||
-              component.props.text ||
-              component.props.logoText ||
-              component.type}
-          </span>
+          {/* Component Name & Global Badge */}
+          <div className="flex-1 flex items-center min-w-0 pr-2">
+            <span className="text-sm text-muted-foreground truncate">
+              {component.props.title ||
+                component.props.text ||
+                component.props.logoText ||
+                component.type}
+            </span>
+            {component.isGlobal && (
+              <span title={`Global: ${component.isGlobal}`}>
+                <Globe className="w-3 h-3 text-blue-400 ml-1.5 flex-shrink-0" />
+              </span>
+            )}
+          </div>
 
           {/* Actions */}
           <div className="opacity-0 group-hover:opacity-100 flex items-center space-x-1">
+            {onMoveComponentUp && (
+              <button
+                className="w-5 h-5 flex items-center justify-center hover:bg-muted rounded"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onMoveComponentUp(component.id);
+                }}
+                title="Move up"
+              >
+                <ArrowUp className="w-3 h-3 text-muted-foreground hover:text-foreground transition-colors" />
+              </button>
+            )}
+            {onMoveComponentDown && (
+              <button
+                className="w-5 h-5 flex items-center justify-center hover:bg-muted rounded"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onMoveComponentDown(component.id);
+                }}
+                title="Move down"
+              >
+                <ArrowDown className="w-3 h-3 text-muted-foreground hover:text-foreground transition-colors" />
+              </button>
+            )}
             <button className="w-4 h-4 flex items-center justify-center hover:bg-muted rounded">
               <Eye className="w-3 h-3 text-muted-foreground" />
             </button>
@@ -235,7 +221,7 @@ export function HierarchyPanel({
                 <ChevronRight className="w-3 h-3 text-muted-foreground" />
               )}
             </button>
-            <span className="mr-2 text-sm">📄</span>
+            <span className="mr-2 text-sm text-primary">📄</span>
             <span className="flex-1 text-sm font-medium text-foreground">
               Page
             </span>
@@ -272,21 +258,34 @@ export function HierarchyPanel({
             </DialogDescription>
           </DialogHeader>
 
-          <div className="grid grid-cols-2 gap-3 mt-4">
-            {componentTypes.map((component) => (
-              <button
-                key={component.type}
-                onClick={() => handleAddComponent(component.type)}
-                className="flex items-start gap-3 p-4 border rounded-lg hover:bg-accent hover:border-primary transition-colors text-left"
-              >
-                <span className="text-2xl">{component.icon}</span>
-                <div className="flex-1">
-                  <div className="font-medium text-sm">{component.type}</div>
-                  <div className="text-xs text-muted-foreground mt-1">
-                    {component.description}
-                  </div>
+          <div className="space-y-6 mt-4">
+            {componentCategories.map((category) => (
+              <div key={category.name}>
+                <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+                  {category.name}
+                </h4>
+                <div className="grid grid-cols-2 gap-3">
+                  {category.components.map((component) => (
+                    <button
+                      key={component.type}
+                      onClick={() => handleAddComponent(component.type)}
+                      className="flex items-start gap-3 p-3 border rounded-lg hover:bg-muted hover:border-primary/50 transition-colors text-left group/item"
+                    >
+                      <div className="p-2 rounded-md bg-background border border-border group-hover/item:border-primary/30 group-hover/item:text-primary transition-colors">
+                        {component.icon}
+                      </div>
+                      <div className="flex-1">
+                        <div className="font-medium text-sm text-foreground">
+                          {component.name}
+                        </div>
+                        <div className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
+                          {component.description}
+                        </div>
+                      </div>
+                    </button>
+                  ))}
                 </div>
-              </button>
+              </div>
             ))}
           </div>
         </DialogContent>

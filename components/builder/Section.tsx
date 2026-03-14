@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { buildComponentStyle } from "@/lib/buildStyle";
 
 interface SectionProps {
   children?: React.ReactNode;
@@ -10,6 +11,7 @@ interface SectionProps {
   id?: string;
   width?: string;
   height?: string;
+  [key: string]: any;
 }
 
 export function Section({
@@ -22,6 +24,7 @@ export function Section({
   id,
   width,
   height,
+  ...rest
 }: SectionProps) {
   const paddingClasses = {
     none: "",
@@ -40,16 +43,13 @@ export function Section({
     full: "max-w-full",
   };
 
+  const baseStyle = buildComponentStyle({ backgroundColor, textColor, width, height, ...rest });
+
   return (
     <section
       id={id}
       className={cn("w-full", paddingClasses[padding], className)}
-      style={{
-        backgroundColor,
-        color: textColor,
-        width: width || undefined,
-        height: height || undefined,
-      }}
+      style={baseStyle}
     >
       <div className={cn("mx-auto", maxWidthClasses[maxWidth])}>{children}</div>
     </section>

@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
+import { buildComponentStyle } from "@/lib/buildStyle";
 
 interface NavLink {
   text: string;
@@ -29,6 +30,7 @@ interface NavbarProps {
   linkHoverColor?: string;
   onNavigate?: (slug: string) => void;
   pages?: any[];
+  [key: string]: any;
 }
 
 export function Navbar({
@@ -50,6 +52,7 @@ export function Navbar({
   linkHoverColor = "#3b82f6",
   onNavigate,
   pages,
+  ...rest
 }: NavbarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -61,6 +64,8 @@ export function Navbar({
     setIsMobileMenuOpen(false);
   };
 
+  const baseStyle = buildComponentStyle({ backgroundColor, textColor, width, height, ...rest });
+
   return (
     <div className="relative">
       <nav
@@ -69,12 +74,7 @@ export function Navbar({
           !textColor && (theme === "dark" ? "text-white" : "text-gray-900"),
           className,
         )}
-        style={{
-          width: width || undefined,
-          height: height || undefined,
-          backgroundColor: backgroundColor || undefined,
-          color: textColor || undefined,
-        }}
+        style={baseStyle}
       >
         {/* Logo */}
         <div className="flex items-center space-x-2">
@@ -92,32 +92,21 @@ export function Navbar({
               const handleClick = (e: React.MouseEvent) => {
                 e.preventDefault();
                 e.stopPropagation();
-                console.log("Link clicked:", {
-                  isPreviewMode,
-                  hasOnNavigate: !!onNavigate,
-                  linkExternal: link.external,
-                  linkHref: link.href,
-                });
 
-                // Handle internal navigation (works in both edit and preview mode)
                 if (onNavigate && !link.external) {
                   let slug = link.href;
 
-                  // Handle "page:slug" format
                   if (slug.startsWith("page:")) {
                     slug = slug.replace("page:", "");
                   } else {
-                    // Handle "/slug" or "/slug.html" format
                     slug = slug.replace(/^\//, "").replace(/\.html$/, "");
                   }
 
-                  // If href is just "#" or empty, try to infer from link text
                   if (!slug || slug === "#") {
                     slug = link.text.toLowerCase().replace(/\s+/g, "-");
                     if (slug === "home") slug = "index";
                   }
 
-                  console.log("Navigating to slug:", slug);
                   onNavigate(slug);
                 }
               };
@@ -161,7 +150,6 @@ export function Navbar({
 
         {/* Desktop CTA & Mobile Menu Button */}
         <div className="flex items-center space-x-2">
-          {/* Desktop CTA */}
           {ctaText && ctaLink && viewport === "desktop" && (
             <div style={isPreviewMode ? undefined : { pointerEvents: "none" }}>
               <Button asChild size="sm" className="text-sm">
@@ -183,7 +171,6 @@ export function Navbar({
             </div>
           )}
 
-          {/* Mobile Menu Button */}
           {links.length > 0 && viewport !== "desktop" && (
             <Button
               variant="ghost"
@@ -213,15 +200,12 @@ export function Navbar({
 
                   let slug = link.href;
 
-                  // Handle "page:slug" format
                   if (slug.startsWith("page:")) {
                     slug = slug.replace("page:", "");
                   } else {
-                    // Handle "/slug" or "/slug.html" format
                     slug = slug.replace(/^\//, "").replace(/\.html$/, "");
                   }
 
-                  // If href is just "#" or empty, try to infer from link text
                   if (!slug || slug === "#") {
                     slug = link.text.toLowerCase().replace(/\s+/g, "-");
                     if (slug === "home") slug = "index";
@@ -252,7 +236,6 @@ export function Navbar({
               );
             })}
 
-            {/* Mobile CTA */}
             {ctaText && ctaLink && (
               <div
                 className="px-4 py-3"

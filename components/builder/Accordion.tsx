@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { buildComponentStyle } from "@/lib/buildStyle";
 
 interface AccordionItem {
   title: string;
@@ -16,6 +17,7 @@ interface AccordionProps {
   borderColor?: string;
   width?: string;
   height?: string;
+  [key: string]: any;
 }
 
 export function Accordion({
@@ -30,6 +32,7 @@ export function Accordion({
   borderColor = "#e5e7eb",
   width,
   height,
+  ...rest
 }: AccordionProps) {
   const [openItems, setOpenItems] = useState<number[]>([defaultOpen]);
 
@@ -45,14 +48,12 @@ export function Accordion({
     }
   };
 
+  const outerStyle = buildComponentStyle({ width: width || "100%", height, ...rest });
+
   return (
     <div
       className="w-full space-y-2"
-      style={{
-        width: width || "100%",
-        height: height || undefined,
-        display: "block",
-      }}
+      style={{ ...outerStyle, display: "block" }}
     >
       {items.map((item, index) => (
         <div
@@ -66,7 +67,8 @@ export function Accordion({
         >
           <button
             onClick={() => toggleItem(index)}
-            className="w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors"
+            className="w-full px-4 py-3 flex items-center justify-between transition-colors"
+            style={{ backgroundColor: "transparent" }}
           >
             <span className="font-medium text-left">{item.title}</span>
             <ChevronDown

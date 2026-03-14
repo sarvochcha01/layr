@@ -31,8 +31,8 @@ export default function Signup() {
     setIsLoading(true);
     try {
       await signupWithEmail(data.email, data.password);
-      toast.success("Account created successfully!");
-      router.push("/dashboard");
+      toast.success("Account created!");
+      router.push("/projects");
     } catch (err: any) {
       toast.error("Sign up failed. Please try again.");
     } finally {
@@ -44,76 +44,94 @@ export default function Signup() {
     setIsLoading(true);
     try {
       await loginWithGoogle();
-      toast.success("Login successful!");
-      router.push("/dashboard");
+      router.push("/projects");
     } catch (err: any) {
-      toast.error("Google login failed. Please try again.");
+      toast.error("Google sign-in failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <div className="space-y-6 p-8 w-full max-w-md border rounded-lg">
-        <h1 className="text-2xl font-bold">Sign Up</h1>
-
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div className="space-y-1">
-            <Label>Email</Label>
-            <Input
-              type="email"
-              {...register("email", { required: "Email is required" })}
-            />
-            {errors.email && (
-              <p className="text-red-600 text-sm">{errors.email.message}</p>
-            )}
+    <div className="flex min-h-screen items-center justify-center bg-background">
+      <div className="w-full max-w-sm space-y-8">
+        {/* App logo */}
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-10 h-10 bg-foreground rounded-xl flex items-center justify-center shadow-lg">
+            <span className="font-bold text-lg text-background">L</span>
           </div>
-
-          <div className="space-y-1">
-            <Label>Password</Label>
-            <Input
-              type="password"
-              {...register("password", { required: "Password is required" })}
-            />
-            {errors.password && (
-              <p className="text-red-600 text-sm">{errors.password.message}</p>
-            )}
+          <div className="text-center">
+            <h1 className="text-xl font-semibold tracking-tight">Create your account</h1>
+            <p className="text-sm text-muted-foreground mt-1">Start building with Layr</p>
           </div>
+        </div>
 
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? "Signing up..." : "Sign Up"}
+        {/* Auth card */}
+        <div className="bg-card border rounded-xl p-6 space-y-4 shadow-sm">
+          {/* Google */}
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleGoogleLogin}
+            disabled={isLoading}
+            className="w-full flex items-center justify-center gap-2 h-10"
+          >
+            <FcGoogle className="text-lg" />
+            Continue with Google
           </Button>
-        </form>
 
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t" />
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs">
+              <span className="bg-card px-3 text-muted-foreground">or</span>
+            </div>
           </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-background px-2 text-muted-foreground">
-              Or continue with
-            </span>
-          </div>
+
+          {/* Email / Password form */}
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
+            <div className="space-y-1.5">
+              <Label className="text-xs font-medium">Email</Label>
+              <Input
+                type="email"
+                placeholder="you@example.com"
+                className="h-9"
+                {...register("email", { required: "Email is required" })}
+              />
+              {errors.email && (
+                <p className="text-destructive text-xs">{errors.email.message}</p>
+              )}
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-xs font-medium">Password</Label>
+              <Input
+                type="password"
+                placeholder="••••••••"
+                className="h-9"
+                {...register("password", {
+                  required: "Password is required",
+                  minLength: { value: 6, message: "Minimum 6 characters" },
+                })}
+              />
+              {errors.password && (
+                <p className="text-destructive text-xs">{errors.password.message}</p>
+              )}
+            </div>
+
+            <Button type="submit" className="w-full h-9" disabled={isLoading}>
+              {isLoading ? "Creating account…" : "Create account"}
+            </Button>
+          </form>
         </div>
 
-        <Button
-          type="button"
-          variant="outline"
-          onClick={handleGoogleLogin}
-          disabled={isLoading}
-          className="w-full flex items-center justify-center gap-2"
-        >
-          <FcGoogle />
-          {isLoading ? "Signing up..." : "Continue with Google"}
-        </Button>
-
-        <div className="text-sm text-center">
+        <p className="text-center text-xs text-muted-foreground">
           Already have an account?{" "}
-          <Link href="/login" className="text-blue-600 hover:underline">
-            Login
+          <Link href="/login" className="text-foreground hover:underline font-medium">
+            Sign in
           </Link>
-        </div>
+        </p>
       </div>
     </div>
   );

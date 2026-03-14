@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { buildComponentStyle } from "@/lib/buildStyle";
 
 interface GridProps {
   children?: React.ReactNode;
@@ -10,6 +11,7 @@ interface GridProps {
   height?: string;
   backgroundColor?: string;
   textColor?: string;
+  [key: string]: any;
 }
 
 export function Grid({
@@ -22,6 +24,7 @@ export function Grid({
   height,
   backgroundColor,
   textColor,
+  ...rest
 }: GridProps) {
   const gapClasses = {
     sm: "gap-4",
@@ -39,15 +42,12 @@ export function Grid({
     6: responsive ? "grid-cols-1 md:grid-cols-3 lg:grid-cols-6" : "grid-cols-6",
   };
 
+  const baseStyle = buildComponentStyle({ backgroundColor, textColor, width, height, ...rest });
+
   return (
     <div
       className={cn("grid", columnClasses[columns], gapClasses[gap], className)}
-      style={{
-        width: width || undefined,
-        height: height || undefined,
-        backgroundColor: backgroundColor || undefined,
-        color: textColor || undefined,
-      }}
+      style={baseStyle}
     >
       {children}
     </div>

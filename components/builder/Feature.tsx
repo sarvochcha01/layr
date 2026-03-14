@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { buildComponentStyle } from "@/lib/buildStyle";
 
 interface FeatureProps {
   icon?: string;
@@ -11,6 +12,7 @@ interface FeatureProps {
   iconColor?: string;
   width?: string;
   height?: string;
+  [key: string]: any;
 }
 
 export function Feature({
@@ -24,6 +26,7 @@ export function Feature({
   iconColor = "#3b82f6",
   width,
   height,
+  ...rest
 }: FeatureProps) {
   const iconSizes = {
     sm: "text-2xl w-10 h-10",
@@ -31,18 +34,15 @@ export function Feature({
     lg: "text-4xl w-16 h-16",
   };
 
+  const baseStyle = buildComponentStyle({ backgroundColor, textColor, width, height, ...rest });
+
   return (
     <div
       className={cn(
         "p-6",
         layout === "vertical" ? "text-center" : "flex gap-4 items-start"
       )}
-      style={{
-        width: width || undefined,
-        height: height || undefined,
-        backgroundColor: backgroundColor || undefined,
-        color: textColor || undefined,
-      }}
+      style={baseStyle}
     >
       <div
         className={cn(

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { ComponentDefinition, Page } from "@/types/editor";
+import { ComponentDefinition, Page, GlobalComponents } from "@/types/editor";
 import { HierarchyPanel } from "./HierarchyPanel";
 import { ComponentPalette } from "./ComponentPalette";
 import { Canvas } from "./Canvas";
@@ -35,6 +35,12 @@ interface EditorLayoutProps {
   canRedo?: boolean;
   onSave?: () => void;
   isSaving?: boolean;
+  globalComponents?: GlobalComponents;
+  onMarkAsGlobal?: (componentId: string, globalName: string) => void;
+  onUnmarkGlobal?: (componentId: string) => void;
+  onApplyGlobalTemplate?: (componentId: string, globalName: string) => void;
+  onMoveComponentUp?: (componentId: string) => void;
+  onMoveComponentDown?: (componentId: string) => void;
 }
 
 export function EditorLayout({
@@ -59,6 +65,12 @@ export function EditorLayout({
   canRedo = false,
   onSave,
   isSaving = false,
+  globalComponents = {},
+  onMarkAsGlobal,
+  onUnmarkGlobal,
+  onApplyGlobalTemplate,
+  onMoveComponentUp,
+  onMoveComponentDown,
 }: EditorLayoutProps) {
   const router = useRouter();
   const [viewport, setViewport] = useState<Viewport>("desktop");
@@ -244,7 +256,7 @@ export function EditorLayout({
 
               {/* Assets Tab (Components) */}
               <TabsContent value="assets" className="flex-1 min-h-0 m-0 p-0 border-none data-[state=inactive]:hidden overflow-y-auto">
-                <ComponentPalette />
+                <ComponentPalette globalComponents={globalComponents} />
               </TabsContent>
             </Tabs>
           </div>
@@ -511,6 +523,10 @@ export function EditorLayout({
               onDeleteComponent={onDeleteComponent}
               onDuplicateComponent={onDuplicateComponent}
               pages={pages}
+              globalComponents={globalComponents}
+              onMarkAsGlobal={onMarkAsGlobal}
+              onUnmarkGlobal={onUnmarkGlobal}
+              onApplyGlobalTemplate={onApplyGlobalTemplate}
             />
           </div>
         </>

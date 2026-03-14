@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { buildComponentStyle } from "@/lib/buildStyle";
 
 interface ImageProps {
   src?: string;
@@ -10,6 +11,7 @@ interface ImageProps {
   objectFit?: "cover" | "contain" | "fill" | "none" | "scale-down";
   loading?: "lazy" | "eager";
   link?: string;
+  [key: string]: any;
 }
 
 export function Image({
@@ -22,6 +24,7 @@ export function Image({
   objectFit = "cover",
   loading = "lazy",
   link,
+  ...rest
 }: ImageProps) {
   const roundedClasses = {
     none: "",
@@ -39,6 +42,10 @@ export function Image({
     "scale-down": "object-scale-down",
   };
 
+  const baseStyle = buildComponentStyle(rest);
+  if (width) baseStyle.width = `${width}px`;
+  if (height) baseStyle.height = `${height}px`;
+
   const imageElement = (
     <img
       src={src}
@@ -52,10 +59,7 @@ export function Image({
         objectFitClasses[objectFit],
         className
       )}
-      style={{
-        width: width ? `${width}px` : undefined,
-        height: height ? `${height}px` : undefined,
-      }}
+      style={baseStyle}
     />
   );
 

@@ -4,6 +4,7 @@ import { useDroppable } from "@dnd-kit/core";
 import { ComponentDefinition } from "@/types/editor";
 import { COMPONENT_REGISTRY } from "@/components/builder";
 import { cn } from "@/lib/utils";
+import { buildComponentStyle } from "@/lib/buildStyle";
 
 interface CanvasProps {
   components: ComponentDefinition[];
@@ -115,6 +116,9 @@ function ComponentWrapper({
   ];
   const shouldTakeFullHeight = fullHeightComponents.includes(component.type);
 
+  // Compute CSS style from component props — guarantees panel CSS changes render
+  const wrapperStyle = buildComponentStyle(component.props || {});
+
   return (
     <div
       className={cn(
@@ -123,7 +127,7 @@ function ComponentWrapper({
         shouldTakeFullWidth && "w-full",
       )}
     >
-      {/* Component wrapper */}
+      {/* Component wrapper — receives inline styles from properties panel */}
       <div
         className={cn(
           "relative transition-all duration-200",
@@ -133,6 +137,7 @@ function ComponentWrapper({
           !isPreviewMode &&
             "hover:ring-1 hover:ring-blue-300 hover:ring-offset-1",
         )}
+        style={wrapperStyle}
         onClick={
           isPreviewMode
             ? undefined

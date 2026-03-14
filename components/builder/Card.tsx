@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { buildComponentStyle } from "@/lib/buildStyle";
 
 interface CardProps {
   title?: string;
@@ -14,6 +15,7 @@ interface CardProps {
   height?: string;
   backgroundColor?: string;
   textColor?: string;
+  [key: string]: any;
 }
 
 export function Card({
@@ -29,6 +31,7 @@ export function Card({
   height,
   backgroundColor,
   textColor,
+  ...rest
 }: CardProps) {
   const variantClasses = {
     default: !backgroundColor && "bg-white",
@@ -39,6 +42,8 @@ export function Card({
       "bg-white shadow-lg hover:shadow-xl transition-shadow",
   };
 
+  const baseStyle = buildComponentStyle({ backgroundColor, textColor, width: width || "250px", height, ...rest });
+
   return (
     <div
       className={cn(
@@ -46,12 +51,7 @@ export function Card({
         variantClasses[variant],
         className
       )}
-      style={{
-        width: width || "250px",
-        height: height || undefined,
-        backgroundColor: backgroundColor || undefined,
-        color: textColor || undefined,
-      }}
+      style={baseStyle}
     >
       {/* Image */}
       {image && (
@@ -76,11 +76,11 @@ export function Card({
       {/* Content */}
       <div className="space-y-3">
         {title && (
-          <h3 className="text-xl font-semibold text-gray-900">{title}</h3>
+          <h3 className="text-xl font-semibold" style={{ color: textColor || undefined }}>{title}</h3>
         )}
 
         {description && (
-          <p className="text-gray-600 leading-relaxed">{description}</p>
+          <p className="opacity-75 leading-relaxed">{description}</p>
         )}
 
         {buttonText && (

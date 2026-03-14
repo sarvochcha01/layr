@@ -1,7 +1,8 @@
 // @ts-nocheck
 "use client";
 import React from "react";
-import { ComponentDefinition, Page } from "@/types/editor";
+import { useState } from "react";
+import { ComponentDefinition, Page, GlobalComponents } from "@/types/editor";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -13,7 +14,15 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Settings2, Type, Paintbrush, Scissors, Link as LinkIcon, Image as ImageIcon, Layout } from "lucide-react";
+import { Settings2, Type, Paintbrush, Scissors, Link as LinkIcon, Image as ImageIcon, Layout, Globe, X } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 
 
@@ -23,6 +32,10 @@ interface PropertiesPanelProps {
   onDeleteComponent: (id: string) => void;
   onDuplicateComponent: (id: string) => void;
   pages?: Page[];
+  globalComponents?: GlobalComponents;
+  onMarkAsGlobal?: (componentId: string, globalName: string) => void;
+  onUnmarkGlobal?: (componentId: string) => void;
+  onApplyGlobalTemplate?: (componentId: string, globalName: string) => void;
 }
 
 export function PropertiesPanel({
@@ -31,7 +44,14 @@ export function PropertiesPanel({
   onDeleteComponent,
   onDuplicateComponent,
   pages = [],
+  globalComponents = {},
+  onMarkAsGlobal,
+  onUnmarkGlobal,
+  onApplyGlobalTemplate,
 }: PropertiesPanelProps) {
+  const [showGlobalDialog, setShowGlobalDialog] = useState(false);
+  const [globalName, setGlobalName] = useState("");
+
   if (!selectedComponent) {
     return (
       <div className="h-full flex flex-col">
@@ -52,6 +72,22 @@ export function PropertiesPanel({
 
   const updateProp = (key: string, value: any) => {
     onUpdateComponent(selectedComponent.id, { [key]: value });
+  };
+
+  const isGlobal = !!selectedComponent.isGlobal;
+  const existingGlobalNames = Object.keys(globalComponents);
+
+  const handleMarkAsGlobal = () => {
+    if (!globalName.trim() || !onMarkAsGlobal) return;
+    onMarkAsGlobal(selectedComponent.id, globalName.trim());
+    setShowGlobalDialog(false);
+    setGlobalName("");
+  };
+
+  const handleApplyExistingGlobal = (name: string) => {
+    if (!onApplyGlobalTemplate) return;
+    onApplyGlobalTemplate(selectedComponent.id, name);
+    setShowGlobalDialog(false);
   };
 
   const renderPropertyFields = () => {
@@ -84,55 +120,109 @@ export function PropertiesPanel({
       return `${value}${unit}`;
     };
 
-    // Common color fields for all components
-    const renderColorFields = () => {
+    // ═══════════════════════════════════════════════════════════
+    // SHARED STYLE SECTIONS — available to all components
+    // ═══════════════════════════════════════════════════════════
+
+    const sectionTriggerClass = "hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50";
+    const sectionContentClass = "px-4 pb-4 pt-2 space-y-4";
+    const labelClass = "text-xs font-medium text-muted-foreground";
+    const selectClass = "w-full h-8 px-2 text-xs bg-transparent appearance-none focus:outline-none";
+
+    // ── Fill (Background + Text Color) ──
+    const renderFillFields = () => {
+      const bgType = props.backgroundType || "solid";
       return (
-        <AccordionItem value="colors" className="border-b-0">
-          <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
+        <AccordionItem value="fill" className="border-b-0 border-t border-border/50">
+          <AccordionTrigger className={sectionTriggerClass}>
             <div className="flex items-center gap-2">
               <Paintbrush className="w-4 h-4 text-muted-foreground" />
-              Colors
+              Fill
             </div>
           </AccordionTrigger>
-          <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
+          <AccordionContent className={sectionContentClass}>
+            {/* Background Type Selector */}
             <div className="space-y-1.5">
-              <Label htmlFor="backgroundColor" className="text-xs font-medium text-muted-foreground">
-                Background
-              </Label>
-              <div className="flex gap-2 items-center">
-                <Input
-                  id="backgroundColor"
-                  type="color"
-                  value={props.backgroundColor || "#ffffff"}
-                  onChange={(e) => updateProp("backgroundColor", e.target.value)}
-                  className="w-8 h-8 p-0.5 min-h-0 cursor-pointer"
-                />
-                <Input
-                  type="text"
-                  value={props.backgroundColor || "#ffffff"}
-                  onChange={(e) => updateProp("backgroundColor", e.target.value)}
-                  className="flex-1 h-8 text-xs font-mono"
-                />
+              <Label className={labelClass}>Background Type</Label>
+              <div className="flex gap-1 border rounded-md p-0.5">
+                {(["solid", "gradient", "image"] as const).map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => updateProp("backgroundType", t)}
+                    className={`flex-1 px-2 py-1 text-xs rounded capitalize transition-colors ${bgType === t ? "bg-secondary text-foreground font-medium" : "text-muted-foreground hover:text-foreground"}`}
+                  >
+                    {t}
+                  </button>
+                ))}
               </div>
             </div>
+
+            {/* Solid Color */}
+            {bgType === "solid" && (
+              <div className="space-y-1.5">
+                <Label className={labelClass}>Background Color</Label>
+                <div className="flex gap-2 items-center">
+                  <Input type="color" value={props.backgroundColor || "#ffffff"} onChange={(e) => updateProp("backgroundColor", e.target.value)} className="w-8 h-8 p-0.5 min-h-0 cursor-pointer" />
+                  <Input type="text" value={props.backgroundColor || "#ffffff"} onChange={(e) => updateProp("backgroundColor", e.target.value)} className="flex-1 h-8 text-xs font-mono" />
+                </div>
+              </div>
+            )}
+
+            {/* Gradient */}
+            {bgType === "gradient" && (
+              <div className="space-y-1.5">
+                <Label className={labelClass}>CSS Gradient</Label>
+                <Input
+                  value={props.backgroundGradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"}
+                  onChange={(e) => updateProp("backgroundGradient", e.target.value)}
+                  placeholder="linear-gradient(135deg, #667eea, #764ba2)"
+                  className="h-8 text-xs font-mono"
+                />
+                <div className="h-8 rounded border" style={{ backgroundImage: props.backgroundGradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" }} />
+              </div>
+            )}
+
+            {/* Background Image */}
+            {bgType === "image" && (
+              <>
+                <div className="space-y-1.5">
+                  <Label className={labelClass}>Image URL</Label>
+                  <Input value={props.backgroundImageUrl || ""} onChange={(e) => updateProp("backgroundImageUrl", e.target.value)} placeholder="https://example.com/bg.jpg" className="h-8 text-xs" />
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-1.5">
+                    <Label className={labelClass}>Size</Label>
+                    <div className="relative border rounded-md">
+                      <select value={props.backgroundSize || "cover"} onChange={(e) => updateProp("backgroundSize", e.target.value)} className={selectClass}>
+                        <option value="cover">Cover</option>
+                        <option value="contain">Contain</option>
+                        <option value="auto">Auto</option>
+                        <option value="100% 100%">Stretch</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className={labelClass}>Position</Label>
+                    <div className="relative border rounded-md">
+                      <select value={props.backgroundPosition || "center"} onChange={(e) => updateProp("backgroundPosition", e.target.value)} className={selectClass}>
+                        <option value="center">Center</option>
+                        <option value="top">Top</option>
+                        <option value="bottom">Bottom</option>
+                        <option value="left">Left</option>
+                        <option value="right">Right</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* Text Color — always shown */}
             <div className="space-y-1.5">
-              <Label htmlFor="textColor" className="text-xs font-medium text-muted-foreground">
-                Text Color
-              </Label>
+              <Label className={labelClass}>Text Color</Label>
               <div className="flex gap-2 items-center">
-                <Input
-                  id="textColor"
-                  type="color"
-                  value={props.textColor || "#000000"}
-                  onChange={(e) => updateProp("textColor", e.target.value)}
-                  className="w-8 h-8 p-0.5 min-h-0 cursor-pointer"
-                />
-                <Input
-                  type="text"
-                  value={props.textColor || "#000000"}
-                  onChange={(e) => updateProp("textColor", e.target.value)}
-                  className="flex-1 h-8 text-xs font-mono"
-                />
+                <Input type="color" value={props.textColor || "#000000"} onChange={(e) => updateProp("textColor", e.target.value)} className="w-8 h-8 p-0.5 min-h-0 cursor-pointer" />
+                <Input type="text" value={props.textColor || "#000000"} onChange={(e) => updateProp("textColor", e.target.value)} className="flex-1 h-8 text-xs font-mono" />
               </div>
             </div>
           </AccordionContent>
@@ -140,78 +230,36 @@ export function PropertiesPanel({
       );
     };
 
-    // Common dimension fields for all components
+    // ── Layout (Width + Height) ──
     const renderDimensionFields = () => {
       const width = parseDimension(props.width || "");
       const height = parseDimension(props.height || "");
 
       return (
         <AccordionItem value="dimensions" className="border-b-0 border-t border-border/50">
-          <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
+          <AccordionTrigger className={sectionTriggerClass}>
             <div className="flex items-center gap-2">
               <Scissors className="w-4 h-4 text-muted-foreground" />
-              Layout
+              Size
             </div>
           </AccordionTrigger>
-          <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
+          <AccordionContent className={sectionContentClass}>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label htmlFor="width" className="text-xs font-medium text-muted-foreground">Width</Label>
+                <Label className={labelClass}>Width</Label>
                 <div className="flex gap-0 border rounded-md overflow-hidden focus-within:ring-1 focus-within:ring-primary">
-                  <Input
-                    id="width"
-                    type="number"
-                    value={width.value}
-                    onChange={(e) => updateProp("width", combineDimensionAllowEmpty(e.target.value, width.unit))}
-                    onBlur={(e) => {
-                      if (!e.target.value && width.unit !== "auto") updateProp("width", "auto");
-                    }}
-                    placeholder="auto"
-                    className="flex-1 h-8 text-xs border-0 rounded-none shadow-none focus-visible:ring-0 px-2"
-                    disabled={width.unit === "auto"}
-                  />
-                  <select
-                    value={width.unit}
-                    onChange={(e) => {
-                      const newUnit = e.target.value;
-                      updateProp("width", newUnit === "auto" ? "auto" : combineDimension(width.value || "100", newUnit));
-                    }}
-                    className="w-14 bg-muted border-l text-xs text-muted-foreground px-1 focus:outline-none"
-                  >
-                    <option value="auto">auto</option>
-                    <option value="px">px</option>
-                    <option value="%">%</option>
-                    <option value="rem">rem</option>
+                  <Input type="number" value={width.value} onChange={(e) => updateProp("width", combineDimensionAllowEmpty(e.target.value, width.unit))} onBlur={(e) => { if (!e.target.value && width.unit !== "auto") updateProp("width", "auto"); }} placeholder="auto" className="flex-1 h-8 text-xs border-0 rounded-none shadow-none focus-visible:ring-0 px-2" disabled={width.unit === "auto"} />
+                  <select value={width.unit} onChange={(e) => { const u = e.target.value; updateProp("width", u === "auto" ? "auto" : combineDimension(width.value || "100", u)); }} className="w-14 bg-muted border-l text-xs text-muted-foreground px-1 focus:outline-none">
+                    <option value="auto">auto</option><option value="px">px</option><option value="%">%</option><option value="rem">rem</option><option value="vw">vw</option>
                   </select>
                 </div>
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="height" className="text-xs font-medium text-muted-foreground">Height</Label>
+                <Label className={labelClass}>Height</Label>
                 <div className="flex gap-0 border rounded-md overflow-hidden focus-within:ring-1 focus-within:ring-primary">
-                  <Input
-                    id="height"
-                    type="number"
-                    value={height.value}
-                    onChange={(e) => updateProp("height", combineDimensionAllowEmpty(e.target.value, height.unit))}
-                    onBlur={(e) => {
-                      if (!e.target.value && height.unit !== "auto") updateProp("height", "auto");
-                    }}
-                    placeholder="auto"
-                    className="flex-1 h-8 text-xs border-0 rounded-none shadow-none focus-visible:ring-0 px-2"
-                    disabled={height.unit === "auto"}
-                  />
-                  <select
-                    value={height.unit}
-                    onChange={(e) => {
-                      const newUnit = e.target.value;
-                      updateProp("height", newUnit === "auto" ? "auto" : combineDimension(height.value || "100", newUnit));
-                    }}
-                    className="w-14 bg-muted border-l text-xs text-muted-foreground px-1 focus:outline-none"
-                  >
-                    <option value="auto">auto</option>
-                    <option value="px">px</option>
-                    <option value="%">%</option>
-                    <option value="rem">rem</option>
+                  <Input type="number" value={height.value} onChange={(e) => updateProp("height", combineDimensionAllowEmpty(e.target.value, height.unit))} onBlur={(e) => { if (!e.target.value && height.unit !== "auto") updateProp("height", "auto"); }} placeholder="auto" className="flex-1 h-8 text-xs border-0 rounded-none shadow-none focus-visible:ring-0 px-2" disabled={height.unit === "auto"} />
+                  <select value={height.unit} onChange={(e) => { const u = e.target.value; updateProp("height", u === "auto" ? "auto" : combineDimension(height.value || "100", u)); }} className="w-14 bg-muted border-l text-xs text-muted-foreground px-1 focus:outline-none">
+                    <option value="auto">auto</option><option value="px">px</option><option value="%">%</option><option value="rem">rem</option><option value="vh">vh</option>
                   </select>
                 </div>
               </div>
@@ -221,10 +269,265 @@ export function PropertiesPanel({
       );
     };
 
+    // ── Spacing (Padding + Margin) ──
+    const renderSpacingFields = () => {
+      const spacingSides = ["Top", "Right", "Bottom", "Left"] as const;
+      return (
+        <AccordionItem value="spacing" className="border-b-0 border-t border-border/50">
+          <AccordionTrigger className={sectionTriggerClass}>
+            <div className="flex items-center gap-2">
+              <Layout className="w-4 h-4 text-muted-foreground" />
+              Spacing
+            </div>
+          </AccordionTrigger>
+          <AccordionContent className={sectionContentClass}>
+            <div className="space-y-1.5">
+              <Label className={labelClass}>Padding</Label>
+              <div className="grid grid-cols-4 gap-1">
+                {spacingSides.map((side) => {
+                  const key = `padding${side}`;
+                  return (
+                    <div key={key} className="space-y-0.5">
+                      <span className="text-[10px] text-muted-foreground block text-center">{side[0]}</span>
+                      <Input value={props[key] || ""} onChange={(e) => updateProp(key, e.target.value)} placeholder="0" className="h-7 text-xs text-center px-1" />
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label className={labelClass}>Margin</Label>
+              <div className="grid grid-cols-4 gap-1">
+                {spacingSides.map((side) => {
+                  const key = `margin${side}`;
+                  return (
+                    <div key={key} className="space-y-0.5">
+                      <span className="text-[10px] text-muted-foreground block text-center">{side[0]}</span>
+                      <Input value={props[key] || ""} onChange={(e) => updateProp(key, e.target.value)} placeholder="0" className="h-7 text-xs text-center px-1" />
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+      );
+    };
+
+    // ── Typography ──
+    const renderTypographyFields = () => {
+      return (
+        <AccordionItem value="typography" className="border-b-0 border-t border-border/50">
+          <AccordionTrigger className={sectionTriggerClass}>
+            <div className="flex items-center gap-2">
+              <Type className="w-4 h-4 text-muted-foreground" />
+              Typography
+            </div>
+          </AccordionTrigger>
+          <AccordionContent className={sectionContentClass}>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label className={labelClass}>Font Size</Label>
+                <Input value={props.fontSize_css || ""} onChange={(e) => updateProp("fontSize_css", e.target.value)} placeholder="16px" className="h-8 text-xs" />
+              </div>
+              <div className="space-y-1.5">
+                <Label className={labelClass}>Font Weight</Label>
+                <div className="relative border rounded-md">
+                  <select value={props.fontWeight_css || ""} onChange={(e) => updateProp("fontWeight_css", e.target.value)} className={selectClass}>
+                    <option value="">Default</option>
+                    <option value="100">Thin (100)</option>
+                    <option value="300">Light (300)</option>
+                    <option value="400">Normal (400)</option>
+                    <option value="500">Medium (500)</option>
+                    <option value="600">Semi Bold (600)</option>
+                    <option value="700">Bold (700)</option>
+                    <option value="800">Extra Bold (800)</option>
+                    <option value="900">Black (900)</option>
+                  </select>
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                <Label className={labelClass}>Line Height</Label>
+                <Input value={props.lineHeight_css || ""} onChange={(e) => updateProp("lineHeight_css", e.target.value)} placeholder="1.5" className="h-8 text-xs" />
+              </div>
+              <div className="space-y-1.5">
+                <Label className={labelClass}>Letter Spacing</Label>
+                <Input value={props.letterSpacing_css || ""} onChange={(e) => updateProp("letterSpacing_css", e.target.value)} placeholder="0px" className="h-8 text-xs" />
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label className={labelClass}>Text Align</Label>
+              <div className="flex gap-1 border rounded-md p-0.5">
+                {(["left", "center", "right", "justify"] as const).map((a) => (
+                  <button key={a} onClick={() => updateProp("textAlign_css", a)} className={`flex-1 px-2 py-1 text-xs rounded capitalize transition-colors ${(props.textAlign_css || "") === a ? "bg-secondary text-foreground font-medium" : "text-muted-foreground hover:text-foreground"}`}>
+                    {a}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+      );
+    };
+
+    // ── Borders ──
+    const renderBorderFields = () => {
+      return (
+        <AccordionItem value="borders" className="border-b-0 border-t border-border/50">
+          <AccordionTrigger className={sectionTriggerClass}>
+            <div className="flex items-center gap-2">
+              <Scissors className="w-4 h-4 text-muted-foreground" />
+              Borders
+            </div>
+          </AccordionTrigger>
+          <AccordionContent className={sectionContentClass}>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label className={labelClass}>Radius</Label>
+                <Input value={props.borderRadius_css || ""} onChange={(e) => updateProp("borderRadius_css", e.target.value)} placeholder="0px" className="h-8 text-xs" />
+              </div>
+              <div className="space-y-1.5">
+                <Label className={labelClass}>Width</Label>
+                <Input value={props.borderWidth_css || ""} onChange={(e) => updateProp("borderWidth_css", e.target.value)} placeholder="0px" className="h-8 text-xs" />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label className={labelClass}>Color</Label>
+                <div className="flex gap-2 items-center">
+                  <Input type="color" value={props.borderColor || "#000000"} onChange={(e) => updateProp("borderColor", e.target.value)} className="w-8 h-8 p-0.5 min-h-0 cursor-pointer" />
+                  <Input type="text" value={props.borderColor || ""} onChange={(e) => updateProp("borderColor", e.target.value)} className="flex-1 h-8 text-xs font-mono" />
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                <Label className={labelClass}>Style</Label>
+                <div className="relative border rounded-md">
+                  <select value={props.borderStyle_css || ""} onChange={(e) => updateProp("borderStyle_css", e.target.value)} className={selectClass}>
+                    <option value="">None</option>
+                    <option value="solid">Solid</option>
+                    <option value="dashed">Dashed</option>
+                    <option value="dotted">Dotted</option>
+                    <option value="double">Double</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+      );
+    };
+
+    // ── Effects (Opacity + Shadow) ──
+    const renderEffectsFields = () => {
+      return (
+        <AccordionItem value="effects" className="border-b-0 border-t border-border/50">
+          <AccordionTrigger className={sectionTriggerClass}>
+            <div className="flex items-center gap-2">
+              <Paintbrush className="w-4 h-4 text-muted-foreground" />
+              Effects
+            </div>
+          </AccordionTrigger>
+          <AccordionContent className={sectionContentClass}>
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <Label className={labelClass}>Opacity</Label>
+                <span className="text-xs text-muted-foreground">{Math.round((props.opacity_css ?? 1) * 100)}%</span>
+              </div>
+              <input type="range" min="0" max="1" step="0.01" value={props.opacity_css ?? 1} onChange={(e) => updateProp("opacity_css", parseFloat(e.target.value))} className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary" />
+            </div>
+            <div className="space-y-1.5">
+              <Label className={labelClass}>Box Shadow</Label>
+              <div className="relative border rounded-md">
+                <select value={props.boxShadow || ""} onChange={(e) => updateProp("boxShadow", e.target.value)} className={selectClass}>
+                  <option value="">None</option>
+                  <option value="0 1px 2px 0 rgba(0,0,0,0.05)">XS</option>
+                  <option value="0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1)">SM</option>
+                  <option value="0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1)">MD</option>
+                  <option value="0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)">LG</option>
+                  <option value="0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)">XL</option>
+                  <option value="0 25px 50px -12px rgba(0,0,0,0.25)">2XL</option>
+                </select>
+              </div>
+              <Input value={props.boxShadow || ""} onChange={(e) => updateProp("boxShadow", e.target.value)} placeholder="Custom: 0 4px 6px rgba(0,0,0,0.1)" className="h-8 text-xs font-mono" />
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+      );
+    };
+
+    // ── Position & Overflow ──
+    const renderPositionFields = () => {
+      const posType = props.position_css || "static";
+      return (
+        <AccordionItem value="position" className="border-b-0 border-t border-border/50">
+          <AccordionTrigger className={sectionTriggerClass}>
+            <div className="flex items-center gap-2">
+              <Layout className="w-4 h-4 text-muted-foreground" />
+              Position
+            </div>
+          </AccordionTrigger>
+          <AccordionContent className={sectionContentClass}>
+            <div className="space-y-1.5">
+              <Label className={labelClass}>Position</Label>
+              <div className="relative border rounded-md">
+                <select value={posType} onChange={(e) => updateProp("position_css", e.target.value)} className={selectClass}>
+                  <option value="static">Static</option>
+                  <option value="relative">Relative</option>
+                  <option value="absolute">Absolute</option>
+                  <option value="fixed">Fixed</option>
+                  <option value="sticky">Sticky</option>
+                </select>
+              </div>
+            </div>
+            {posType !== "static" && (
+              <div className="grid grid-cols-2 gap-2">
+                {(["posTop", "posRight", "posBottom", "posLeft"] as const).map((key) => (
+                  <div key={key} className="space-y-1">
+                    <Label className={labelClass}>{key.replace("pos", "")}</Label>
+                    <Input value={props[key] || ""} onChange={(e) => updateProp(key, e.target.value)} placeholder="auto" className="h-7 text-xs" />
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label className={labelClass}>Z-Index</Label>
+                <Input type="number" value={props.zIndex || ""} onChange={(e) => updateProp("zIndex", e.target.value)} placeholder="auto" className="h-8 text-xs" />
+              </div>
+              <div className="space-y-1.5">
+                <Label className={labelClass}>Overflow</Label>
+                <div className="relative border rounded-md">
+                  <select value={props.overflow_css || "visible"} onChange={(e) => updateProp("overflow_css", e.target.value)} className={selectClass}>
+                    <option value="visible">Visible</option>
+                    <option value="hidden">Hidden</option>
+                    <option value="scroll">Scroll</option>
+                    <option value="auto">Auto</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+      );
+    };
+
+    // Combined style sections shortcut — renders all shared style controls
+    const renderAllStyleSections = () => (
+      <>
+        {renderFillFields()}
+        {renderDimensionFields()}
+        {renderSpacingFields()}
+        {renderTypographyFields()}
+        {renderBorderFields()}
+        {renderEffectsFields()}
+        {renderPositionFields()}
+      </>
+    );
+
     switch (type) {
       case "Hero":
         return (
-          <Accordion type="multiple" defaultValue={["content", "colors", "dimensions"]} className="w-full">
+          <Accordion type="multiple" defaultValue={["content", "fill", "dimensions"]} className="w-full">
             <AccordionItem value="content" className="border-b-0 border-t border-border/50 first:border-t-0">
               <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
                 <div className="flex items-center gap-2">
@@ -251,14 +554,13 @@ export function PropertiesPanel({
                 </div>
               </AccordionContent>
             </AccordionItem>
-            {renderColorFields()}
-            {renderDimensionFields()}
+            {renderAllStyleSections()}
           </Accordion>
         );
 
       case "Text":
         return (
-          <Accordion type="multiple" defaultValue={["content", "colors", "dimensions"]} className="w-full">
+          <Accordion type="multiple" defaultValue={["content", "fill", "dimensions"]} className="w-full">
             <AccordionItem value="content" className="border-b-0 border-t border-border/50 first:border-t-0">
               <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
                 <div className="flex items-center gap-2">
@@ -305,8 +607,7 @@ export function PropertiesPanel({
                 </div>
               </AccordionContent>
             </AccordionItem>
-            {renderColorFields()}
-            {renderDimensionFields()}
+            {renderAllStyleSections()}
           </Accordion>
         );
 
@@ -404,8 +705,7 @@ export function PropertiesPanel({
                 )}
               </AccordionContent>
             </AccordionItem>
-            {renderColorFields()}
-            {renderDimensionFields()}
+            {renderAllStyleSections()}
           </Accordion>
         );
 
@@ -445,14 +745,13 @@ export function PropertiesPanel({
                 </div>
               </AccordionContent>
             </AccordionItem>
-            {renderColorFields()}
-            {renderDimensionFields()}
+            {renderAllStyleSections()}
           </Accordion>
         );
 
       case "Card":
         return (
-          <Accordion type="multiple" defaultValue={["content", "colors", "dimensions"]} className="w-full">
+          <Accordion type="multiple" defaultValue={["content", "fill", "dimensions"]} className="w-full">
             <AccordionItem value="content" className="border-b-0 border-t border-border/50 first:border-t-0">
               <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
                 <div className="flex items-center gap-2">
@@ -489,8 +788,7 @@ export function PropertiesPanel({
                 </div>
               </AccordionContent>
             </AccordionItem>
-            {renderColorFields()}
-            {renderDimensionFields()}
+            {renderAllStyleSections()}
           </Accordion>
         );
 
@@ -528,8 +826,7 @@ export function PropertiesPanel({
                 </div>
               </AccordionContent>
             </AccordionItem>
-            {renderColorFields()}
-            {renderDimensionFields()}
+            {renderAllStyleSections()}
           </Accordion>
         );
 
@@ -723,8 +1020,7 @@ export function PropertiesPanel({
                 </div>
               </AccordionContent>
             </AccordionItem>
-            {renderColorFields()}
-            {renderDimensionFields()}
+            {renderAllStyleSections()}
           </Accordion>
         );
 
@@ -963,8 +1259,7 @@ export function PropertiesPanel({
                 </div>
               </AccordionContent>
             </AccordionItem>
-            {renderColorFields()}
-            {renderDimensionFields()}
+            {renderAllStyleSections()}
           </Accordion>
         );
 
@@ -1114,8 +1409,7 @@ export function PropertiesPanel({
                 </div>
               </AccordionContent>
             </AccordionItem>
-            {renderColorFields()}
-            {renderDimensionFields()}
+            {renderAllStyleSections()}
           </Accordion>
         );
 
@@ -1162,8 +1456,7 @@ export function PropertiesPanel({
                 </div>
               </AccordionContent>
             </AccordionItem>
-            {renderColorFields()}
-            {renderDimensionFields()}
+            {renderAllStyleSections()}
           </Accordion>
         );
 
@@ -1206,146 +1499,163 @@ export function PropertiesPanel({
                 </div>
               </AccordionContent>
             </AccordionItem>
-            {renderColorFields()}
-            {renderDimensionFields()}
+            {renderAllStyleSections()}
           </Accordion>
         );
 
       case "Video":
         return (
-          <div className="space-y-4">
-            {renderColorFields()}
-            {renderDimensionFields()}
-            <div>
-              <Label htmlFor="src" className="mb-2 block">
-                Video URL
-              </Label>
-              <Input
-                id="src"
-                value={props.src || ""}
-                onChange={(e) => updateProp("src", e.target.value)}
-                placeholder="https://youtube.com/watch?v=..."
-              />
-            </div>
+          <Accordion type="multiple" defaultValue={["settings", "fill", "dimensions"]} className="w-full">
+            <AccordionItem value="settings" className="border-b-0 border-t border-border/50 first:border-t-0">
+              <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
+                <div className="flex items-center gap-2">
+                  <Settings2 className="w-4 h-4 text-muted-foreground" />
+                  Video Settings
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
+                <div>
+                  <Label htmlFor="src" className="mb-2 block">
+                    Video URL
+                  </Label>
+                  <Input
+                    id="src"
+                    value={props.src || ""}
+                    onChange={(e) => updateProp("src", e.target.value)}
+                    placeholder="https://youtube.com/watch?v=..."
+                  />
+                </div>
 
-            <div>
-              <Label htmlFor="title" className="mb-2 block">
-                Video Title
-              </Label>
-              <Input
-                id="title"
-                value={props.title || ""}
-                onChange={(e) => updateProp("title", e.target.value)}
-                placeholder="Video title"
-              />
-            </div>
+                <div>
+                  <Label htmlFor="title" className="mb-2 block">
+                    Video Title
+                  </Label>
+                  <Input
+                    id="title"
+                    value={props.title || ""}
+                    onChange={(e) => updateProp("title", e.target.value)}
+                    placeholder="Video title"
+                  />
+                </div>
 
-            <div>
-              <Label htmlFor="aspectRatio" className="mb-2 block">
-                Aspect Ratio
-              </Label>
-              <select
-                id="aspectRatio"
-                value={props.aspectRatio || "16/9"}
-                onChange={(e) => updateProp("aspectRatio", e.target.value)}
-                className="w-full p-2 border rounded-md"
-              >
-                <option value="16/9">16:9 (Widescreen)</option>
-                <option value="4/3">4:3 (Standard)</option>
-                <option value="1/1">1:1 (Square)</option>
-                <option value="21/9">21:9 (Ultrawide)</option>
-              </select>
-            </div>
+                <div>
+                  <Label htmlFor="aspectRatio" className="mb-2 block">
+                    Aspect Ratio
+                  </Label>
+                  <select
+                    id="aspectRatio"
+                    value={props.aspectRatio || "16/9"}
+                    onChange={(e) => updateProp("aspectRatio", e.target.value)}
+                    className="w-full p-2 border rounded-md"
+                  >
+                    <option value="16/9">16:9 (Widescreen)</option>
+                    <option value="4/3">4:3 (Standard)</option>
+                    <option value="1/1">1:1 (Square)</option>
+                    <option value="21/9">21:9 (Ultrawide)</option>
+                  </select>
+                </div>
 
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="autoplay"
-                checked={props.autoplay || false}
-                onCheckedChange={(checked) => updateProp("autoplay", checked)}
-              />
-              <Label htmlFor="autoplay">Autoplay</Label>
-            </div>
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="autoplay"
+                    checked={props.autoplay || false}
+                    onCheckedChange={(checked) => updateProp("autoplay", checked)}
+                  />
+                  <Label htmlFor="autoplay">Autoplay</Label>
+                </div>
 
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="controls"
-                checked={props.controls !== false}
-                onCheckedChange={(checked) => updateProp("controls", checked)}
-              />
-              <Label htmlFor="controls">Show Controls</Label>
-            </div>
-          </div>
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="controls"
+                    checked={props.controls !== false}
+                    onCheckedChange={(checked) => updateProp("controls", checked)}
+                  />
+                  <Label htmlFor="controls">Show Controls</Label>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+            {renderAllStyleSections()}
+          </Accordion>
         );
 
       case "Form":
         return (
-          <div className="space-y-4">
-            {renderColorFields()}
-            {renderDimensionFields()}
-            <div>
-              <Label htmlFor="title" className="mb-2 block">
-                Form Title
-              </Label>
-              <Input
-                id="title"
-                value={props.title || ""}
-                onChange={(e) => updateProp("title", e.target.value)}
-                placeholder="Contact Form"
-              />
-            </div>
+          <Accordion type="multiple" defaultValue={["settings", "fill", "dimensions"]} className="w-full">
+            <AccordionItem value="settings" className="border-b-0 border-t border-border/50 first:border-t-0">
+              <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
+                <div className="flex items-center gap-2">
+                  <Settings2 className="w-4 h-4 text-muted-foreground" />
+                  Form Settings
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
+                <div>
+                  <Label htmlFor="title" className="mb-2 block">
+                    Form Title
+                  </Label>
+                  <Input
+                    id="title"
+                    value={props.title || ""}
+                    onChange={(e) => updateProp("title", e.target.value)}
+                    placeholder="Contact Form"
+                  />
+                </div>
 
-            <div>
-              <Label htmlFor="description" className="mb-2 block">
-                Description
-              </Label>
-              <Textarea
-                id="description"
-                value={props.description || ""}
-                onChange={(e) => updateProp("description", e.target.value)}
-                placeholder="Form description"
-                rows={2}
-              />
-            </div>
+                <div>
+                  <Label htmlFor="description" className="mb-2 block">
+                    Description
+                  </Label>
+                  <Textarea
+                    id="description"
+                    value={props.description || ""}
+                    onChange={(e) => updateProp("description", e.target.value)}
+                    placeholder="Form description"
+                    rows={2}
+                  />
+                </div>
 
-            <div>
-              <Label htmlFor="submitText" className="mb-2 block">
-                Submit Button Text
-              </Label>
-              <Input
-                id="submitText"
-                value={props.submitText || ""}
-                onChange={(e) => updateProp("submitText", e.target.value)}
-                placeholder="Submit"
-              />
-            </div>
+                <div>
+                  <Label htmlFor="submitText" className="mb-2 block">
+                    Submit Button Text
+                  </Label>
+                  <Input
+                    id="submitText"
+                    value={props.submitText || ""}
+                    onChange={(e) => updateProp("submitText", e.target.value)}
+                    placeholder="Submit"
+                  />
+                </div>
 
-            <div>
-              <Label htmlFor="action" className="mb-2 block">
-                Form Action URL
-              </Label>
-              <Input
-                id="action"
-                value={props.action || ""}
-                onChange={(e) => updateProp("action", e.target.value)}
-                placeholder="https://example.com/submit"
-              />
-            </div>
+                <div>
+                  <Label htmlFor="action" className="mb-2 block">
+                    Form Action URL
+                  </Label>
+                  <Input
+                    id="action"
+                    value={props.action || ""}
+                    onChange={(e) => updateProp("action", e.target.value)}
+                    placeholder="https://example.com/submit"
+                  />
+                </div>
 
-            <div>
-              <Label htmlFor="method" className="mb-2 block">
-                Method
-              </Label>
-              <select
-                id="method"
-                value={props.method || "POST"}
-                onChange={(e) => updateProp("method", e.target.value)}
-                className="w-full p-2 border rounded-md"
-              >
-                <option value="POST">POST</option>
-                <option value="GET">GET</option>
-              </select>
-            </div>
-          </div>
+                <div>
+                  <Label htmlFor="method" className="mb-2 block">
+                    Method
+                  </Label>
+                  <select
+                    id="method"
+                    value={props.method || "POST"}
+                    onChange={(e) => updateProp("method", e.target.value)}
+                    className="w-full p-2 border rounded-md"
+                  >
+                    <option value="POST">POST</option>
+                    <option value="GET">GET</option>
+                  </select>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+            {renderAllStyleSections()}
+          </Accordion>
         );
 
       case "Accordion":
@@ -1419,419 +1729,472 @@ export function PropertiesPanel({
                 </div>
               </AccordionContent>
             </AccordionItem>
-            {renderColorFields()}
-            {renderDimensionFields()}
+            {renderAllStyleSections()}
           </Accordion>
         );
 
       case "Tabs":
         return (
-          <div className="space-y-4">
-            {renderColorFields()}
-            {renderDimensionFields()}
-            <div>
-              <Label className="mb-2 block">Tab Items</Label>
-              <div className="space-y-2">
-                {(props.tabs || []).map((tab: any, index: number) => (
-                  <div key={index} className="space-y-2 p-3 border rounded">
-                    <Input
-                      value={tab.label || ""}
-                      onChange={(e) => {
-                        const newTabs = [...(props.tabs || [])];
-                        newTabs[index] = { ...tab, label: e.target.value };
-                        updateProp("tabs", newTabs);
-                      }}
-                      placeholder="Tab label"
-                    />
-                    <Textarea
-                      value={tab.content || ""}
-                      onChange={(e) => {
-                        const newTabs = [...(props.tabs || [])];
-                        newTabs[index] = { ...tab, content: e.target.value };
-                        updateProp("tabs", newTabs);
-                      }}
-                      placeholder="Tab content"
-                      rows={2}
-                    />
+          <Accordion type="multiple" defaultValue={["settings", "fill", "dimensions"]} className="w-full">
+            <AccordionItem value="settings" className="border-b-0 border-t border-border/50 first:border-t-0">
+              <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
+                <div className="flex items-center gap-2">
+                  <Settings2 className="w-4 h-4 text-muted-foreground" />
+                  Tabs Settings
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
+                <div>
+                  <Label className="mb-2 block">Tab Items</Label>
+                  <div className="space-y-2">
+                    {(props.tabs || []).map((tab: any, index: number) => (
+                      <div key={index} className="space-y-2 p-3 border rounded">
+                        <Input
+                          value={tab.label || ""}
+                          onChange={(e) => {
+                            const newTabs = [...(props.tabs || [])];
+                            newTabs[index] = { ...tab, label: e.target.value };
+                            updateProp("tabs", newTabs);
+                          }}
+                          placeholder="Tab label"
+                        />
+                        <Textarea
+                          value={tab.content || ""}
+                          onChange={(e) => {
+                            const newTabs = [...(props.tabs || [])];
+                            newTabs[index] = { ...tab, content: e.target.value };
+                            updateProp("tabs", newTabs);
+                          }}
+                          placeholder="Tab content"
+                          rows={2}
+                        />
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            const newTabs = (props.tabs || []).filter(
+                              (_: any, i: number) => i !== index
+                            );
+                            updateProp("tabs", newTabs);
+                          }}
+                        >
+                          Remove
+                        </Button>
+                      </div>
+                    ))}
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => {
-                        const newTabs = (props.tabs || []).filter(
-                          (_: any, i: number) => i !== index
-                        );
+                        const newTabs = [
+                          ...(props.tabs || []),
+                          { label: "New Tab", content: "Content here" },
+                        ];
                         updateProp("tabs", newTabs);
                       }}
                     >
-                      Remove
+                      Add Tab
                     </Button>
                   </div>
-                ))}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    const newTabs = [
-                      ...(props.tabs || []),
-                      { label: "New Tab", content: "Content here" },
-                    ];
-                    updateProp("tabs", newTabs);
-                  }}
-                >
-                  Add Tab
-                </Button>
-              </div>
-            </div>
-          </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+            {renderAllStyleSections()}
+          </Accordion>
         );
 
       case "Testimonial":
         return (
-          <div className="space-y-4">
-            {renderColorFields()}
-            {renderDimensionFields()}
-            <div>
-              <Label htmlFor="quote" className="mb-2 block">
-                Quote
-              </Label>
-              <Textarea
-                id="quote"
-                value={props.quote || ""}
-                onChange={(e) => updateProp("quote", e.target.value)}
-                placeholder="Enter testimonial quote"
-                rows={3}
-              />
-            </div>
-            <div>
-              <Label htmlFor="author" className="mb-2 block">
-                Author Name
-              </Label>
-              <Input
-                id="author"
-                value={props.author || ""}
-                onChange={(e) => updateProp("author", e.target.value)}
-                placeholder="John Doe"
-              />
-            </div>
-            <div>
-              <Label htmlFor="role" className="mb-2 block">
-                Author Role
-              </Label>
-              <Input
-                id="role"
-                value={props.role || ""}
-                onChange={(e) => updateProp("role", e.target.value)}
-                placeholder="CEO, Company"
-              />
-            </div>
-            <div>
-              <Label htmlFor="avatar" className="mb-2 block">
-                Avatar URL
-              </Label>
-              <Input
-                id="avatar"
-                value={props.avatar || ""}
-                onChange={(e) => updateProp("avatar", e.target.value)}
-                placeholder="https://example.com/avatar.jpg"
-              />
-            </div>
-            <div>
-              <Label htmlFor="rating" className="mb-2 block">
-                Rating (1-5)
-              </Label>
-              <Input
-                id="rating"
-                type="number"
-                min="1"
-                max="5"
-                value={props.rating || 5}
-                onChange={(e) => updateProp("rating", parseInt(e.target.value))}
-              />
-            </div>
-          </div>
+          <Accordion type="multiple" defaultValue={["settings", "colors", "dimensions"]} className="w-full">
+            <AccordionItem value="settings" className="border-b-0 border-t border-border/50 first:border-t-0">
+              <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
+                <div className="flex items-center gap-2">
+                  <Settings2 className="w-4 h-4 text-muted-foreground" />
+                  Testimonial Details
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
+                <div>
+                  <Label htmlFor="quote" className="mb-2 block">
+                    Quote
+                  </Label>
+                  <Textarea
+                    id="quote"
+                    value={props.quote || ""}
+                    onChange={(e) => updateProp("quote", e.target.value)}
+                    placeholder="Enter testimonial quote"
+                    rows={3}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="author" className="mb-2 block">
+                    Author Name
+                  </Label>
+                  <Input
+                    id="author"
+                    value={props.author || ""}
+                    onChange={(e) => updateProp("author", e.target.value)}
+                    placeholder="John Doe"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="role" className="mb-2 block">
+                    Author Role
+                  </Label>
+                  <Input
+                    id="role"
+                    value={props.role || ""}
+                    onChange={(e) => updateProp("role", e.target.value)}
+                    placeholder="CEO, Company"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="avatar" className="mb-2 block">
+                    Avatar URL
+                  </Label>
+                  <Input
+                    id="avatar"
+                    value={props.avatar || ""}
+                    onChange={(e) => updateProp("avatar", e.target.value)}
+                    placeholder="https://example.com/avatar.jpg"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="rating" className="mb-2 block">
+                    Rating (1-5)
+                  </Label>
+                  <Input
+                    id="rating"
+                    type="number"
+                    min="1"
+                    max="5"
+                    value={props.rating || 5}
+                    onChange={(e) => updateProp("rating", parseInt(e.target.value))}
+                  />
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+            {renderAllStyleSections()}
+          </Accordion>
         );
 
       case "PricingCard":
         return (
-          <div className="space-y-4">
-            {renderColorFields()}
-            {renderDimensionFields()}
-            <div>
-              <Label htmlFor="title" className="mb-2 block">
-                Plan Name
-              </Label>
-              <Input
-                id="title"
-                value={props.title || ""}
-                onChange={(e) => updateProp("title", e.target.value)}
-                placeholder="Pro Plan"
-              />
-            </div>
-            <div>
-              <Label htmlFor="price" className="mb-2 block">
-                Price
-              </Label>
-              <Input
-                id="price"
-                value={props.price || ""}
-                onChange={(e) => updateProp("price", e.target.value)}
-                placeholder="$29"
-              />
-            </div>
-            <div>
-              <Label htmlFor="period" className="mb-2 block">
-                Billing Period
-              </Label>
-              <Input
-                id="period"
-                value={props.period || ""}
-                onChange={(e) => updateProp("period", e.target.value)}
-                placeholder="/month"
-              />
-            </div>
-            <div>
-              <Label htmlFor="description" className="mb-2 block">
-                Description
-              </Label>
-              <Textarea
-                id="description"
-                value={props.description || ""}
-                onChange={(e) => updateProp("description", e.target.value)}
-                placeholder="Plan description"
-                rows={2}
-              />
-            </div>
-            <div>
-              <Label className="mb-2 block">Features</Label>
-              <div className="space-y-2">
-                {(props.features || []).map(
-                  (feature: string, index: number) => (
-                    <div key={index} className="flex gap-2">
-                      <Input
-                        value={feature}
-                        onChange={(e) => {
-                          const newFeatures = [...(props.features || [])];
-                          newFeatures[index] = e.target.value;
-                          updateProp("features", newFeatures);
-                        }}
-                        placeholder="Feature"
-                      />
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          const newFeatures = (props.features || []).filter(
-                            (_: any, i: number) => i !== index
-                          );
-                          updateProp("features", newFeatures);
-                        }}
-                      >
-                        Remove
-                      </Button>
-                    </div>
-                  )
-                )}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    const newFeatures = [
-                      ...(props.features || []),
-                      "New feature",
-                    ];
-                    updateProp("features", newFeatures);
-                  }}
-                >
-                  Add Feature
-                </Button>
-              </div>
-            </div>
-            <div>
-              <Label htmlFor="buttonText" className="mb-2 block">
-                Button Text
-              </Label>
-              <Input
-                id="buttonText"
-                value={props.buttonText || ""}
-                onChange={(e) => updateProp("buttonText", e.target.value)}
-                placeholder="Get Started"
-              />
-            </div>
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="featured"
-                checked={props.featured || false}
-                onCheckedChange={(checked) => updateProp("featured", checked)}
-              />
-              <Label htmlFor="featured">Featured Plan</Label>
-            </div>
-          </div>
-        );
-
-      case "Feature":
-        return (
-          <div className="space-y-4">
-            {renderColorFields()}
-            {renderDimensionFields()}
-            <div>
-              <Label htmlFor="icon" className="mb-2 block">
-                Icon (Emoji)
-              </Label>
-              <Input
-                id="icon"
-                value={props.icon || ""}
-                onChange={(e) => updateProp("icon", e.target.value)}
-                placeholder="⭐"
-              />
-            </div>
-            <div>
-              <Label htmlFor="title" className="mb-2 block">
-                Title
-              </Label>
-              <Input
-                id="title"
-                value={props.title || ""}
-                onChange={(e) => updateProp("title", e.target.value)}
-                placeholder="Feature title"
-              />
-            </div>
-            <div>
-              <Label htmlFor="description" className="mb-2 block">
-                Description
-              </Label>
-              <Textarea
-                id="description"
-                value={props.description || ""}
-                onChange={(e) => updateProp("description", e.target.value)}
-                placeholder="Feature description"
-                rows={3}
-              />
-            </div>
-          </div>
-        );
-
-      case "Stats":
-        return (
-          <div className="space-y-4">
-            {renderColorFields()}
-            {renderDimensionFields()}
-            <div>
-              <Label htmlFor="accentColor" className="mb-2 block">
-                Accent Color (for values)
-              </Label>
-              <Input
-                id="accentColor"
-                type="color"
-                value={props.accentColor || "#3b82f6"}
-                onChange={(e) => updateProp("accentColor", e.target.value)}
-              />
-            </div>
-            <div>
-              <Label className="mb-2 block">Statistics</Label>
-              <div className="space-y-2">
-                {(props.stats || []).map((stat: any, index: number) => (
-                  <div key={index} className="space-y-2 p-3 border rounded">
-                    <Input
-                      value={stat.value || ""}
-                      onChange={(e) => {
-                        const newStats = [...(props.stats || [])];
-                        newStats[index] = { ...stat, value: e.target.value };
-                        updateProp("stats", newStats);
-                      }}
-                      placeholder="100+"
-                    />
-                    <Input
-                      value={stat.label || ""}
-                      onChange={(e) => {
-                        const newStats = [...(props.stats || [])];
-                        newStats[index] = { ...stat, label: e.target.value };
-                        updateProp("stats", newStats);
-                      }}
-                      placeholder="Customers"
-                    />
+          <Accordion type="multiple" defaultValue={["settings", "colors", "dimensions"]} className="w-full">
+            <AccordionItem value="settings" className="border-b-0 border-t border-border/50 first:border-t-0">
+              <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
+                <div className="flex items-center gap-2">
+                  <Settings2 className="w-4 h-4 text-muted-foreground" />
+                  Pricing Details
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
+                <div>
+                  <Label htmlFor="title" className="mb-2 block">
+                    Plan Name
+                  </Label>
+                  <Input
+                    id="title"
+                    value={props.title || ""}
+                    onChange={(e) => updateProp("title", e.target.value)}
+                    placeholder="Pro Plan"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="price" className="mb-2 block">
+                    Price
+                  </Label>
+                  <Input
+                    id="price"
+                    value={props.price || ""}
+                    onChange={(e) => updateProp("price", e.target.value)}
+                    placeholder="$29"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="period" className="mb-2 block">
+                    Billing Period
+                  </Label>
+                  <Input
+                    id="period"
+                    value={props.period || ""}
+                    onChange={(e) => updateProp("period", e.target.value)}
+                    placeholder="/month"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="description" className="mb-2 block">
+                    Description
+                  </Label>
+                  <Textarea
+                    id="description"
+                    value={props.description || ""}
+                    onChange={(e) => updateProp("description", e.target.value)}
+                    placeholder="Plan description"
+                    rows={2}
+                  />
+                </div>
+                <div>
+                  <Label className="mb-2 block">Features</Label>
+                  <div className="space-y-2">
+                    {(props.features || []).map(
+                      (feature: string, index: number) => (
+                        <div key={index} className="flex gap-2">
+                          <Input
+                            value={feature}
+                            onChange={(e) => {
+                              const newFeatures = [...(props.features || [])];
+                              newFeatures[index] = e.target.value;
+                              updateProp("features", newFeatures);
+                            }}
+                            placeholder="Feature"
+                          />
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              const newFeatures = (props.features || []).filter(
+                                (_: any, i: number) => i !== index
+                              );
+                              updateProp("features", newFeatures);
+                            }}
+                          >
+                            Remove
+                          </Button>
+                        </div>
+                      )
+                    )}
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => {
-                        const newStats = (props.stats || []).filter(
-                          (_: any, i: number) => i !== index
-                        );
+                        const newFeatures = [
+                          ...(props.features || []),
+                          "New feature",
+                        ];
+                        updateProp("features", newFeatures);
+                      }}
+                    >
+                      Add Feature
+                    </Button>
+                  </div>
+                </div>
+                <div>
+                  <Label htmlFor="buttonText" className="mb-2 block">
+                    Button Text
+                  </Label>
+                  <Input
+                    id="buttonText"
+                    value={props.buttonText || ""}
+                    onChange={(e) => updateProp("buttonText", e.target.value)}
+                    placeholder="Get Started"
+                  />
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="featured"
+                    checked={props.featured || false}
+                    onCheckedChange={(checked) => updateProp("featured", checked)}
+                  />
+                  <Label htmlFor="featured">Featured Plan</Label>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+            {renderAllStyleSections()}
+          </Accordion>
+        );
+
+      case "Feature":
+        return (
+          <Accordion type="multiple" defaultValue={["settings", "colors", "dimensions"]} className="w-full">
+            <AccordionItem value="settings" className="border-b-0 border-t border-border/50 first:border-t-0">
+              <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
+                <div className="flex items-center gap-2">
+                  <Settings2 className="w-4 h-4 text-muted-foreground" />
+                  Feature Settings
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
+                <div>
+                  <Label htmlFor="icon" className="mb-2 block">
+                    Icon (Emoji)
+                  </Label>
+                  <Input
+                    id="icon"
+                    value={props.icon || ""}
+                    onChange={(e) => updateProp("icon", e.target.value)}
+                    placeholder="✨"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="title" className="mb-2 block">
+                    Title
+                  </Label>
+                  <Input
+                    id="title"
+                    value={props.title || ""}
+                    onChange={(e) => updateProp("title", e.target.value)}
+                    placeholder="Feature title"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="description" className="mb-2 block">
+                    Description
+                  </Label>
+                  <Textarea
+                    id="description"
+                    value={props.description || ""}
+                    onChange={(e) => updateProp("description", e.target.value)}
+                    placeholder="Feature description"
+                    rows={3}
+                  />
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+            {renderAllStyleSections()}
+          </Accordion>
+        );
+
+      case "Stats":
+        return (
+          <Accordion type="multiple" defaultValue={["settings", "colors", "dimensions"]} className="w-full">
+            <AccordionItem value="settings" className="border-b-0 border-t border-border/50 first:border-t-0">
+              <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
+                <div className="flex items-center gap-2">
+                  <Settings2 className="w-4 h-4 text-muted-foreground" />
+                  Stats Configuration
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
+                <div>
+                  <Label htmlFor="accentColor" className="mb-2 block">
+                    Accent Color (for values)
+                  </Label>
+                  <Input
+                    id="accentColor"
+                    type="color"
+                    value={props.accentColor || "#3b82f6"}
+                    onChange={(e) => updateProp("accentColor", e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label className="mb-2 block">Statistics</Label>
+                  <div className="space-y-2">
+                    {(props.stats || []).map((stat: any, index: number) => (
+                      <div key={index} className="space-y-2 p-3 border rounded">
+                        <Input
+                          value={stat.value || ""}
+                          onChange={(e) => {
+                            const newStats = [...(props.stats || [])];
+                            newStats[index] = { ...stat, value: e.target.value };
+                            updateProp("stats", newStats);
+                          }}
+                          placeholder="100+"
+                        />
+                        <Input
+                          value={stat.label || ""}
+                          onChange={(e) => {
+                            const newStats = [...(props.stats || [])];
+                            newStats[index] = { ...stat, label: e.target.value };
+                            updateProp("stats", newStats);
+                          }}
+                          placeholder="Customers"
+                        />
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            const newStats = (props.stats || []).filter(
+                              (_: any, i: number) => i !== index
+                            );
+                            updateProp("stats", newStats);
+                          }}
+                        >
+                          Remove
+                        </Button>
+                      </div>
+                    ))}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const newStats = [
+                          ...(props.stats || []),
+                          { value: "100+", label: "Stat" },
+                        ];
                         updateProp("stats", newStats);
                       }}
                     >
-                      Remove
+                      Add Stat
                     </Button>
                   </div>
-                ))}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    const newStats = [
-                      ...(props.stats || []),
-                      { value: "100+", label: "Stat" },
-                    ];
-                    updateProp("stats", newStats);
-                  }}
-                >
-                  Add Stat
-                </Button>
-              </div>
-            </div>
-          </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+            {renderAllStyleSections()}
+          </Accordion>
         );
 
       case "CTA":
         return (
-          <div className="space-y-4">
-            {renderColorFields()}
-            {renderDimensionFields()}
-            <div>
-              <Label htmlFor="title" className="mb-2 block">
-                Title
-              </Label>
-              <Input
-                id="title"
-                value={props.title || ""}
-                onChange={(e) => updateProp("title", e.target.value)}
-                placeholder="Ready to get started?"
-              />
-            </div>
-            <div>
-              <Label htmlFor="description" className="mb-2 block">
-                Description
-              </Label>
-              <Textarea
-                id="description"
-                value={props.description || ""}
-                onChange={(e) => updateProp("description", e.target.value)}
-                placeholder="Join thousands of users today"
-                rows={2}
-              />
-            </div>
-            <div>
-              <Label htmlFor="buttonText" className="mb-2 block">
-                Button Text
-              </Label>
-              <Input
-                id="buttonText"
-                value={props.buttonText || ""}
-                onChange={(e) => updateProp("buttonText", e.target.value)}
-                placeholder="Get Started"
-              />
-            </div>
-            <div>
-              <Label htmlFor="buttonLink" className="mb-2 block">
-                Button Link
-              </Label>
-              <Input
-                id="buttonLink"
-                value={props.buttonLink || ""}
-                onChange={(e) => updateProp("buttonLink", e.target.value)}
-                placeholder="https://example.com"
-              />
-            </div>
-          </div>
+          <Accordion type="multiple" defaultValue={["settings", "colors", "dimensions"]} className="w-full">
+            <AccordionItem value="settings" className="border-b-0 border-t border-border/50 first:border-t-0">
+              <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
+                <div className="flex items-center gap-2">
+                  <Settings2 className="w-4 h-4 text-muted-foreground" />
+                  CTA Configuration
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
+                <div>
+                  <Label htmlFor="title" className="mb-2 block">
+                    Title
+                  </Label>
+                  <Input
+                    id="title"
+                    value={props.title || ""}
+                    onChange={(e) => updateProp("title", e.target.value)}
+                    placeholder="Ready to get started?"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="description" className="mb-2 block">
+                    Description
+                  </Label>
+                  <Textarea
+                    id="description"
+                    value={props.description || ""}
+                    onChange={(e) => updateProp("description", e.target.value)}
+                    placeholder="Join thousands of users today"
+                    rows={2}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="buttonText" className="mb-2 block">
+                    Button Text
+                  </Label>
+                  <Input
+                    id="buttonText"
+                    value={props.buttonText || ""}
+                    onChange={(e) => updateProp("buttonText", e.target.value)}
+                    placeholder="Get Started"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="buttonLink" className="mb-2 block">
+                    Button Link
+                  </Label>
+                  <Input
+                    id="buttonLink"
+                    value={props.buttonLink || ""}
+                    onChange={(e) => updateProp("buttonLink", e.target.value)}
+                    placeholder="https://example.com"
+                  />
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+            {renderAllStyleSections()}
+          </Accordion>
         );
 
       case "Divider":
@@ -1890,8 +2253,7 @@ export function PropertiesPanel({
                 </div>
               </AccordionContent>
             </AccordionItem>
-            {renderColorFields()}
-            {renderDimensionFields()}
+            {renderAllStyleSections()}
           </Accordion>
         );
 
@@ -1925,14 +2287,13 @@ export function PropertiesPanel({
                 </div>
               </AccordionContent>
             </AccordionItem>
-            {renderColorFields()}
-            {renderDimensionFields()}
+            {renderAllStyleSections()}
           </Accordion>
         );
 
       case "Badge":
         return (
-          <Accordion type="multiple" defaultValue={["content", "colors", "dimensions"]} className="w-full">
+          <Accordion type="multiple" defaultValue={["content", "fill", "dimensions"]} className="w-full">
             <AccordionItem value="content" className="border-b-0 border-t border-border/50 first:border-t-0">
               <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
                 <div className="flex items-center gap-2">
@@ -1960,14 +2321,13 @@ export function PropertiesPanel({
                 </div>
               </AccordionContent>
             </AccordionItem>
-            {renderColorFields()}
-            {renderDimensionFields()}
+            {renderAllStyleSections()}
           </Accordion>
         );
 
       case "Alert":
         return (
-          <Accordion type="multiple" defaultValue={["content", "colors", "dimensions"]} className="w-full">
+          <Accordion type="multiple" defaultValue={["content", "fill", "dimensions"]} className="w-full">
             <AccordionItem value="content" className="border-b-0 border-t border-border/50 first:border-t-0">
               <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
                 <div className="flex items-center gap-2">
@@ -2004,8 +2364,7 @@ export function PropertiesPanel({
                 </div>
               </AccordionContent>
             </AccordionItem>
-            {renderColorFields()}
-            {renderDimensionFields()}
+            {renderAllStyleSections()}
           </Accordion>
         );
 
@@ -2033,10 +2392,35 @@ export function PropertiesPanel({
     <div className="h-full flex flex-col">
       {/* Header */}
       <div className="p-4 border-b border-border">
-        <h3 className="text-sm font-semibold text-foreground">Properties</h3>
-        <p className="text-xs text-muted-foreground mt-1">
-          {selectedComponent.type} Component
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-sm font-semibold text-foreground">Properties</h3>
+            <p className="text-xs text-muted-foreground mt-1">
+              {selectedComponent.type} Component
+            </p>
+          </div>
+          {/* Global toggle button */}
+          {isGlobal ? (
+            <button
+              onClick={() => onUnmarkGlobal?.(selectedComponent.id)}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-500/15 text-blue-400 text-xs font-medium hover:bg-blue-500/25 transition-colors"
+              title={`Global: ${selectedComponent.isGlobal} — Click to unmark`}
+            >
+              <Globe className="w-3 h-3" />
+              {selectedComponent.isGlobal}
+              <X className="w-3 h-3 opacity-60" />
+            </button>
+          ) : (
+            <button
+              onClick={() => setShowGlobalDialog(true)}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-border text-xs text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
+              title="Mark as Global Component"
+            >
+              <Globe className="w-3 h-3" />
+              Make Global
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Properties Form */}
@@ -2065,6 +2449,79 @@ export function PropertiesPanel({
           Delete Component
         </Button>
       </div>
+
+      {/* Global Name Dialog */}
+      <Dialog open={showGlobalDialog} onOpenChange={setShowGlobalDialog}>
+        <DialogContent className="dark">
+          <DialogHeader>
+            <DialogTitle>Mark as Global Component</DialogTitle>
+            <DialogDescription>
+              Global components sync their styles across all pages. Give this component a global name, or select an existing global group to join.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-2">
+            {/* Existing global groups */}
+            {existingGlobalNames.length > 0 && (
+              <div className="space-y-2">
+                <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  Join Existing Global Group
+                </Label>
+                <div className="space-y-1">
+                  {existingGlobalNames.map((name) => (
+                    <button
+                      key={name}
+                      onClick={() => handleApplyExistingGlobal(name)}
+                      className="w-full flex items-center gap-2 p-2 rounded-md border border-border hover:bg-muted text-sm text-left transition-colors"
+                    >
+                      <Globe className="w-3.5 h-3.5 text-blue-400" />
+                      <span className="font-medium">{name}</span>
+                      <span className="text-xs text-muted-foreground ml-auto">
+                        ({globalComponents[name]?.type})
+                      </span>
+                    </button>
+                  ))}
+                </div>
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t border-border" />
+                  </div>
+                  <div className="relative flex justify-center text-xs">
+                    <span className="bg-background px-2 text-muted-foreground">or create new</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* New global name input */}
+            <div className="space-y-2">
+              <Label htmlFor="globalName">Global Name</Label>
+              <Input
+                id="globalName"
+                value={globalName}
+                onChange={(e) => setGlobalName(e.target.value)}
+                placeholder={`e.g. "Main Navbar", "Site Footer"`}
+                onKeyDown={(e) => e.key === "Enter" && handleMarkAsGlobal()}
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowGlobalDialog(false);
+                setGlobalName("");
+              }}
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleMarkAsGlobal} disabled={!globalName.trim()}>
+              Mark as Global
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

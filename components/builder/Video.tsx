@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { buildComponentStyle } from "@/lib/buildStyle";
 
 interface VideoProps {
   src?: string;
@@ -15,6 +16,7 @@ interface VideoProps {
   aspectRatio?: "16:9" | "4:3" | "1:1" | "21:9";
   backgroundColor?: string;
   textColor?: string;
+  [key: string]: any;
 }
 
 export function Video({
@@ -32,6 +34,7 @@ export function Video({
   aspectRatio = "16:9",
   backgroundColor,
   textColor,
+  ...rest
 }: VideoProps) {
   const aspectRatioClasses = {
     "16:9": "aspect-video",
@@ -39,6 +42,8 @@ export function Video({
     "1:1": "aspect-square",
     "21:9": "aspect-[21/9]",
   };
+
+  const baseStyle = buildComponentStyle({ width, height, ...rest });
 
   // YouTube embed
   if (youtubeId) {
@@ -52,10 +57,7 @@ export function Video({
     return (
       <div
         className={cn("w-full", aspectRatioClasses[aspectRatio], className)}
-        style={{
-          width: width || undefined,
-          height: height || undefined,
-        }}
+        style={baseStyle}
       >
         <iframe
           src={`https://www.youtube.com/embed/${youtubeId}?${youtubeParams}`}
@@ -79,10 +81,7 @@ export function Video({
     return (
       <div
         className={cn("w-full", aspectRatioClasses[aspectRatio], className)}
-        style={{
-          width: width || undefined,
-          height: height || undefined,
-        }}
+        style={baseStyle}
       >
         <iframe
           src={`https://player.vimeo.com/video/${vimeoId}?${vimeoParams}`}
@@ -110,13 +109,12 @@ export function Video({
           !width && !height && aspectRatioClasses[aspectRatio],
           className
         )}
-        style={{
-          width: width || undefined,
-          height: height || undefined,
-        }}
+        style={baseStyle}
       />
     );
   }
+
+  const placeholderStyle = buildComponentStyle({ backgroundColor, textColor, width, height, ...rest });
 
   return (
     <div
@@ -126,14 +124,9 @@ export function Video({
         aspectRatioClasses[aspectRatio],
         className
       )}
-      style={{
-        width: width || undefined,
-        height: height || undefined,
-        backgroundColor: backgroundColor || undefined,
-        color: textColor || undefined,
-      }}
+      style={placeholderStyle}
     >
-      <p className={cn(!textColor && "text-gray-500")}>
+      <p className={cn(!textColor && "opacity-50")}>
         No video source provided
       </p>
     </div>

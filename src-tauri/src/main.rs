@@ -83,22 +83,24 @@ async fn open_url(url: String) -> Result<(), String> {
 }
 
 fn main() {
-    // Start Next.js server
+    // Next.js server child process (only used in release builds)
     let mut server_process: Option<Child> = None;
-
     
-    let port = 3000;
-    match server::start_server(port) {
-        Ok(child) => {
-            server_process = Some(child);
-            // Wait a bit for server to start
-            std::thread::sleep(std::time::Duration::from_secs(2));
-        }
-        Err(e) => {
-            let msg = format!("Failed to start Next.js server: {}\n\nPlease ensure Node.js is installed and the app is installed correctly.", e);
-            dialog::blocking::MessageDialogBuilder::new("Startup Error", msg)
-                .kind(dialog::MessageDialogKind::Error)
-                .show();
+    #[cfg(not(debug_assertions))]
+    {
+        let port = 3000;
+        match server::start_server(port) {
+            Ok(child) => {
+                server_process = Some(child);
+                // Wait a bit for server to start
+                std::thread::sleep(std::time::Duration::from_secs(2));
+            }
+            Err(e) => {
+                let msg = format!("Failed to start Next.js server: {}\n\nPlease ensure Node.js is installed and the app is installed correctly.", e);
+                dialog::blocking::MessageDialogBuilder::new("Startup Error", msg)
+                    .kind(dialog::MessageDialogKind::Error)
+                    .show();
+            }
         }
     }
 
