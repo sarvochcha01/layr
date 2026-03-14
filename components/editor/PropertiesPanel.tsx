@@ -2368,6 +2368,74 @@ export function PropertiesPanel({
           </Accordion>
         );
 
+      case "Video":
+        return (
+          <Accordion type="multiple" defaultValue={["settings", "fill", "dimensions"]} className="w-full">
+            <AccordionItem value="settings" className="border-b-0 border-t border-border/50 first:border-t-0">
+              <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
+                <div className="flex items-center gap-2">
+                  <Settings2 className="w-4 h-4 text-muted-foreground" />
+                  Video Settings
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="youtubeId" className="text-xs font-medium text-muted-foreground">YouTube ID</Label>
+                  <Input id="youtubeId" value={props.youtubeId || ""} onChange={(e) => updateProp("youtubeId", e.target.value)} placeholder="e.g. dQw4w9WgXcQ" className="h-8 text-sm" />
+                </div>
+                
+                <div className="space-y-1.5">
+                  <Label htmlFor="vimeoId" className="text-xs font-medium text-muted-foreground">Vimeo ID</Label>
+                  <Input id="vimeoId" value={props.vimeoId || ""} onChange={(e) => updateProp("vimeoId", e.target.value)} placeholder="e.g. 76979871" className="h-8 text-sm" />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="src" className="text-xs font-medium text-muted-foreground">Direct Video URL (MP4, WebM)</Label>
+                  <Input id="src" value={props.src || ""} onChange={(e) => updateProp("src", e.target.value)} placeholder="https://example.com/video.mp4" className="h-8 text-sm" />
+                </div>
+                
+                <div className="space-y-1.5">
+                  <Label htmlFor="poster" className="text-xs font-medium text-muted-foreground">Poster Image URL</Label>
+                  <Input id="poster" value={props.poster || ""} onChange={(e) => updateProp("poster", e.target.value)} placeholder="https://example.com/poster.jpg" className="h-8 text-sm" />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="aspectRatio" className="text-xs font-medium text-muted-foreground">Aspect Ratio</Label>
+                  <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
+                    <select id="aspectRatio" value={props.aspectRatio || "16:9"} onChange={(e) => updateProp("aspectRatio", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
+                      <option className="bg-background text-foreground" value="16:9">16:9</option>
+                      <option className="bg-background text-foreground" value="4:3">4:3</option>
+                      <option className="bg-background text-foreground" value="1:1">1:1</option>
+                      <option className="bg-background text-foreground" value="21:9">21:9</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between p-2 rounded-md bg-muted border border-border/50">
+                  <Label htmlFor="autoplay" className="text-xs font-medium text-muted-foreground cursor-pointer">Autoplay</Label>
+                  <Switch id="autoplay" checked={props.autoplay || false} onCheckedChange={(checked) => updateProp("autoplay", checked)} className="scale-75 origin-right" />
+                </div>
+
+                <div className="flex items-center justify-between p-2 rounded-md bg-muted border border-border/50">
+                  <Label htmlFor="loop" className="text-xs font-medium text-muted-foreground cursor-pointer">Loop</Label>
+                  <Switch id="loop" checked={props.loop || false} onCheckedChange={(checked) => updateProp("loop", checked)} className="scale-75 origin-right" />
+                </div>
+
+                <div className="flex items-center justify-between p-2 rounded-md bg-muted border border-border/50">
+                  <Label htmlFor="muted" className="text-xs font-medium text-muted-foreground cursor-pointer">Muted</Label>
+                  <Switch id="muted" checked={props.muted || false} onCheckedChange={(checked) => updateProp("muted", checked)} className="scale-75 origin-right" />
+                </div>
+
+                <div className="flex items-center justify-between p-2 rounded-md bg-muted border border-border/50">
+                  <Label htmlFor="controls" className="text-xs font-medium text-muted-foreground cursor-pointer">Controls</Label>
+                  <Switch id="controls" checked={props.controls !== false} onCheckedChange={(checked) => updateProp("controls", checked)} className="scale-75 origin-right" />
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+            {renderAllStyleSections()}
+          </Accordion>
+        );
+
       default:
         // By default, if a component type isn't specifically handled above,
         // it still invokes renderColorFields() and renderDimensionFields().

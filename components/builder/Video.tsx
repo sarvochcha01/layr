@@ -45,8 +45,31 @@ export function Video({
 
   const baseStyle = buildComponentStyle({ width, height, ...rest });
 
+  // YouTube / Vimeo URL Parsers
+  const extractYoutubeId = (urlOrId?: string) => {
+    if (!urlOrId) return null;
+    // If it's just an alphanumeric string (11 chars typical for YT), assume it's already an ID
+    if (/^[a-zA-Z0-9_-]{11}$/.test(urlOrId)) return urlOrId;
+    
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = urlOrId.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : null;
+  };
+
+  const extractVimeoId = (urlOrId?: string) => {
+    if (!urlOrId) return null;
+    if (/^[0-9]+$/.test(urlOrId)) return urlOrId;
+    
+    const regExp = /(?:www\.|player\.)?vimeo.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|album\/(?:\d+)\/video\/|video\/|)(\d+)(?:[a-zA-Z0-9_\-]+)?/i;
+    const match = urlOrId.match(regExp);
+    return match ? match[1] : null;
+  };
+
+  const activeYoutubeId = extractYoutubeId(youtubeId) || extractYoutubeId(src);
+  const activeVimeoId = extractVimeoId(vimeoId) || extractVimeoId(src);
+
   // YouTube embed
-  if (youtubeId) {
+  if (activeYoutubeId) {
     const youtubeParams = new URLSearchParams({
       autoplay: autoplay ? "1" : "0",
       mute: muted ? "1" : "0",
@@ -60,7 +83,7 @@ export function Video({
         style={baseStyle}
       >
         <iframe
-          src={`https://www.youtube.com/embed/${youtubeId}?${youtubeParams}`}
+          src={`https://www.youtube.com/embed/${activeYoutubeId}?${youtubeParams}`}
           title="YouTube video"
           className="w-full h-full rounded-lg"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -71,7 +94,7 @@ export function Video({
   }
 
   // Vimeo embed
-  if (vimeoId) {
+  if (activeVimeoId) {
     const vimeoParams = new URLSearchParams({
       autoplay: autoplay ? "1" : "0",
       muted: muted ? "1" : "0",
@@ -84,7 +107,7 @@ export function Video({
         style={baseStyle}
       >
         <iframe
-          src={`https://player.vimeo.com/video/${vimeoId}?${vimeoParams}`}
+          src={`https://player.vimeo.com/video/${activeVimeoId}?${vimeoParams}`}
           title="Vimeo video"
           className="w-full h-full rounded-lg"
           allow="autoplay; fullscreen; picture-in-picture"
@@ -95,7 +118,7 @@ export function Video({
   }
 
   // Regular video
-  if (src) {
+  if (src && !activeYoutubeId && !activeVimeoId) {
     return (
       <video
         src={src}

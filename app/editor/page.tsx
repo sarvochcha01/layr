@@ -803,6 +803,14 @@ function getDefaultProps(componentType: string): Record<string, any> {
       src: "https://placehold.co/400x200/e5e7eb/6b7280?text=Image",
       alt: "Placeholder image",
     },
+    Video: {
+      youtubeId: "dQw4w9WgXcQ",
+      aspectRatio: "16:9",
+      autoplay: false,
+      controls: true,
+      loop: false,
+      muted: false
+    },
     Grid: { columns: 3, gap: "md" },
     Container: { maxWidth: "xl", padding: "md" },
     Form: { title: "Contact Form", submitText: "Submit" },
