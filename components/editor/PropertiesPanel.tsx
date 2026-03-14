@@ -194,10 +194,10 @@ export function PropertiesPanel({
                     <Label className={labelClass}>Size</Label>
                     <div className="relative border rounded-md">
                       <select value={props.backgroundSize || "cover"} onChange={(e) => updateProp("backgroundSize", e.target.value)} className={selectClass}>
-                        <option value="cover">Cover</option>
-                        <option value="contain">Contain</option>
-                        <option value="auto">Auto</option>
-                        <option value="100% 100%">Stretch</option>
+                        <option className="bg-background text-foreground" value="cover">Cover</option>
+                        <option className="bg-background text-foreground" value="contain">Contain</option>
+                        <option className="bg-background text-foreground" value="auto">Auto</option>
+                        <option className="bg-background text-foreground" value="100% 100%">Stretch</option>
                       </select>
                     </div>
                   </div>
@@ -205,11 +205,11 @@ export function PropertiesPanel({
                     <Label className={labelClass}>Position</Label>
                     <div className="relative border rounded-md">
                       <select value={props.backgroundPosition || "center"} onChange={(e) => updateProp("backgroundPosition", e.target.value)} className={selectClass}>
-                        <option value="center">Center</option>
-                        <option value="top">Top</option>
-                        <option value="bottom">Bottom</option>
-                        <option value="left">Left</option>
-                        <option value="right">Right</option>
+                        <option className="bg-background text-foreground" value="center">Center</option>
+                        <option className="bg-background text-foreground" value="top">Top</option>
+                        <option className="bg-background text-foreground" value="bottom">Bottom</option>
+                        <option className="bg-background text-foreground" value="left">Left</option>
+                        <option className="bg-background text-foreground" value="right">Right</option>
                       </select>
                     </div>
                   </div>
@@ -250,7 +250,7 @@ export function PropertiesPanel({
                 <div className="flex gap-0 border rounded-md overflow-hidden focus-within:ring-1 focus-within:ring-primary">
                   <Input type="number" value={width.value} onChange={(e) => updateProp("width", combineDimensionAllowEmpty(e.target.value, width.unit))} onBlur={(e) => { if (!e.target.value && width.unit !== "auto") updateProp("width", "auto"); }} placeholder="auto" className="flex-1 h-8 text-xs border-0 rounded-none shadow-none focus-visible:ring-0 px-2" disabled={width.unit === "auto"} />
                   <select value={width.unit} onChange={(e) => { const u = e.target.value; updateProp("width", u === "auto" ? "auto" : combineDimension(width.value || "100", u)); }} className="w-14 bg-muted border-l text-xs text-muted-foreground px-1 focus:outline-none">
-                    <option value="auto">auto</option><option value="px">px</option><option value="%">%</option><option value="rem">rem</option><option value="vw">vw</option>
+                    <option className="bg-background text-foreground" value="auto">auto</option><option className="bg-background text-foreground" value="px">px</option><option className="bg-background text-foreground" value="%">%</option><option className="bg-background text-foreground" value="rem">rem</option><option className="bg-background text-foreground" value="vw">vw</option>
                   </select>
                 </div>
               </div>
@@ -259,7 +259,7 @@ export function PropertiesPanel({
                 <div className="flex gap-0 border rounded-md overflow-hidden focus-within:ring-1 focus-within:ring-primary">
                   <Input type="number" value={height.value} onChange={(e) => updateProp("height", combineDimensionAllowEmpty(e.target.value, height.unit))} onBlur={(e) => { if (!e.target.value && height.unit !== "auto") updateProp("height", "auto"); }} placeholder="auto" className="flex-1 h-8 text-xs border-0 rounded-none shadow-none focus-visible:ring-0 px-2" disabled={height.unit === "auto"} />
                   <select value={height.unit} onChange={(e) => { const u = e.target.value; updateProp("height", u === "auto" ? "auto" : combineDimension(height.value || "100", u)); }} className="w-14 bg-muted border-l text-xs text-muted-foreground px-1 focus:outline-none">
-                    <option value="auto">auto</option><option value="px">px</option><option value="%">%</option><option value="rem">rem</option><option value="vh">vh</option>
+                    <option className="bg-background text-foreground" value="auto">auto</option><option className="bg-background text-foreground" value="px">px</option><option className="bg-background text-foreground" value="%">%</option><option className="bg-background text-foreground" value="rem">rem</option><option className="bg-background text-foreground" value="vh">vh</option>
                   </select>
                 </div>
               </div>
@@ -334,15 +334,15 @@ export function PropertiesPanel({
                 <Label className={labelClass}>Font Weight</Label>
                 <div className="relative border rounded-md">
                   <select value={props.fontWeight_css || ""} onChange={(e) => updateProp("fontWeight_css", e.target.value)} className={selectClass}>
-                    <option value="">Default</option>
-                    <option value="100">Thin (100)</option>
-                    <option value="300">Light (300)</option>
-                    <option value="400">Normal (400)</option>
-                    <option value="500">Medium (500)</option>
-                    <option value="600">Semi Bold (600)</option>
-                    <option value="700">Bold (700)</option>
-                    <option value="800">Extra Bold (800)</option>
-                    <option value="900">Black (900)</option>
+                    <option className="bg-background text-foreground" value="">Default</option>
+                    <option className="bg-background text-foreground" value="100">Thin (100)</option>
+                    <option className="bg-background text-foreground" value="300">Light (300)</option>
+                    <option className="bg-background text-foreground" value="400">Normal (400)</option>
+                    <option className="bg-background text-foreground" value="500">Medium (500)</option>
+                    <option className="bg-background text-foreground" value="600">Semi Bold (600)</option>
+                    <option className="bg-background text-foreground" value="700">Bold (700)</option>
+                    <option className="bg-background text-foreground" value="800">Extra Bold (800)</option>
+                    <option className="bg-background text-foreground" value="900">Black (900)</option>
                   </select>
                 </div>
               </div>
@@ -403,11 +403,11 @@ export function PropertiesPanel({
                 <Label className={labelClass}>Style</Label>
                 <div className="relative border rounded-md">
                   <select value={props.borderStyle_css || ""} onChange={(e) => updateProp("borderStyle_css", e.target.value)} className={selectClass}>
-                    <option value="">None</option>
-                    <option value="solid">Solid</option>
-                    <option value="dashed">Dashed</option>
-                    <option value="dotted">Dotted</option>
-                    <option value="double">Double</option>
+                    <option className="bg-background text-foreground" value="">None</option>
+                    <option className="bg-background text-foreground" value="solid">Solid</option>
+                    <option className="bg-background text-foreground" value="dashed">Dashed</option>
+                    <option className="bg-background text-foreground" value="dotted">Dotted</option>
+                    <option className="bg-background text-foreground" value="double">Double</option>
                   </select>
                 </div>
               </div>
@@ -439,13 +439,13 @@ export function PropertiesPanel({
               <Label className={labelClass}>Box Shadow</Label>
               <div className="relative border rounded-md">
                 <select value={props.boxShadow || ""} onChange={(e) => updateProp("boxShadow", e.target.value)} className={selectClass}>
-                  <option value="">None</option>
-                  <option value="0 1px 2px 0 rgba(0,0,0,0.05)">XS</option>
-                  <option value="0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1)">SM</option>
-                  <option value="0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1)">MD</option>
-                  <option value="0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)">LG</option>
-                  <option value="0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)">XL</option>
-                  <option value="0 25px 50px -12px rgba(0,0,0,0.25)">2XL</option>
+                  <option className="bg-background text-foreground" value="">None</option>
+                  <option className="bg-background text-foreground" value="0 1px 2px 0 rgba(0,0,0,0.05)">XS</option>
+                  <option className="bg-background text-foreground" value="0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1)">SM</option>
+                  <option className="bg-background text-foreground" value="0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1)">MD</option>
+                  <option className="bg-background text-foreground" value="0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)">LG</option>
+                  <option className="bg-background text-foreground" value="0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)">XL</option>
+                  <option className="bg-background text-foreground" value="0 25px 50px -12px rgba(0,0,0,0.25)">2XL</option>
                 </select>
               </div>
               <Input value={props.boxShadow || ""} onChange={(e) => updateProp("boxShadow", e.target.value)} placeholder="Custom: 0 4px 6px rgba(0,0,0,0.1)" className="h-8 text-xs font-mono" />
@@ -471,11 +471,11 @@ export function PropertiesPanel({
               <Label className={labelClass}>Position</Label>
               <div className="relative border rounded-md">
                 <select value={posType} onChange={(e) => updateProp("position_css", e.target.value)} className={selectClass}>
-                  <option value="static">Static</option>
-                  <option value="relative">Relative</option>
-                  <option value="absolute">Absolute</option>
-                  <option value="fixed">Fixed</option>
-                  <option value="sticky">Sticky</option>
+                  <option className="bg-background text-foreground" value="static">Static</option>
+                  <option className="bg-background text-foreground" value="relative">Relative</option>
+                  <option className="bg-background text-foreground" value="absolute">Absolute</option>
+                  <option className="bg-background text-foreground" value="fixed">Fixed</option>
+                  <option className="bg-background text-foreground" value="sticky">Sticky</option>
                 </select>
               </div>
             </div>
@@ -498,10 +498,10 @@ export function PropertiesPanel({
                 <Label className={labelClass}>Overflow</Label>
                 <div className="relative border rounded-md">
                   <select value={props.overflow_css || "visible"} onChange={(e) => updateProp("overflow_css", e.target.value)} className={selectClass}>
-                    <option value="visible">Visible</option>
-                    <option value="hidden">Hidden</option>
-                    <option value="scroll">Scroll</option>
-                    <option value="auto">Auto</option>
+                    <option className="bg-background text-foreground" value="visible">Visible</option>
+                    <option className="bg-background text-foreground" value="hidden">Hidden</option>
+                    <option className="bg-background text-foreground" value="scroll">Scroll</option>
+                    <option className="bg-background text-foreground" value="auto">Auto</option>
                   </select>
                 </div>
               </div>
@@ -579,14 +579,14 @@ export function PropertiesPanel({
                     <Label htmlFor="tag" className="text-xs font-medium text-muted-foreground">HTML Tag</Label>
                     <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
                       <select id="tag" value={props.tag || "p"} onChange={(e) => updateProp("tag", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
-                        <option value="h1">H1</option>
-                        <option value="h2">H2</option>
-                        <option value="h3">H3</option>
-                        <option value="h4">H4</option>
-                        <option value="h5">H5</option>
-                        <option value="h6">H6</option>
-                        <option value="p">Paragraph</option>
-                        <option value="span">Span</option>
+                        <option className="bg-background text-foreground" value="h1">H1</option>
+                        <option className="bg-background text-foreground" value="h2">H2</option>
+                        <option className="bg-background text-foreground" value="h3">H3</option>
+                        <option className="bg-background text-foreground" value="h4">H4</option>
+                        <option className="bg-background text-foreground" value="h5">H5</option>
+                        <option className="bg-background text-foreground" value="h6">H6</option>
+                        <option className="bg-background text-foreground" value="p">Paragraph</option>
+                        <option className="bg-background text-foreground" value="span">Span</option>
                       </select>
                     </div>
                   </div>
@@ -594,13 +594,13 @@ export function PropertiesPanel({
                     <Label htmlFor="size" className="text-xs font-medium text-muted-foreground">Size</Label>
                     <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
                       <select id="size" value={props.size || "base"} onChange={(e) => updateProp("size", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
-                        <option value="xs">Extra Small</option>
-                        <option value="sm">Small</option>
-                        <option value="base">Base</option>
-                        <option value="lg">Large</option>
-                        <option value="xl">Extra Large</option>
-                        <option value="2xl">2X Large</option>
-                        <option value="3xl">3X Large</option>
+                        <option className="bg-background text-foreground" value="xs">Extra Small</option>
+                        <option className="bg-background text-foreground" value="sm">Small</option>
+                        <option className="bg-background text-foreground" value="base">Base</option>
+                        <option className="bg-background text-foreground" value="lg">Large</option>
+                        <option className="bg-background text-foreground" value="xl">Extra Large</option>
+                        <option className="bg-background text-foreground" value="2xl">2X Large</option>
+                        <option className="bg-background text-foreground" value="3xl">3X Large</option>
                       </select>
                     </div>
                   </div>
@@ -631,12 +631,12 @@ export function PropertiesPanel({
                   <Label htmlFor="variant" className="text-xs font-medium text-muted-foreground">Variant</Label>
                   <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
                     <select id="variant" value={props.variant || "default"} onChange={(e) => updateProp("variant", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
-                      <option value="default">Default</option>
-                      <option value="destructive">Destructive</option>
-                      <option value="outline">Outline</option>
-                      <option value="secondary">Secondary</option>
-                      <option value="ghost">Ghost</option>
-                      <option value="link">Link</option>
+                      <option className="bg-background text-foreground" value="default">Default</option>
+                      <option className="bg-background text-foreground" value="destructive">Destructive</option>
+                      <option className="bg-background text-foreground" value="outline">Outline</option>
+                      <option className="bg-background text-foreground" value="secondary">Secondary</option>
+                      <option className="bg-background text-foreground" value="ghost">Ghost</option>
+                      <option className="bg-background text-foreground" value="link">Link</option>
                     </select>
                   </div>
                 </div>
@@ -671,8 +671,8 @@ export function PropertiesPanel({
                       }}
                       className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none"
                     >
-                      <option value="url">External URL</option>
-                      <option value="page">Internal Page</option>
+                      <option className="bg-background text-foreground" value="url">External URL</option>
+                      <option className="bg-background text-foreground" value="page">Internal Page</option>
                     </select>
                   </div>
                 </div>
@@ -683,7 +683,7 @@ export function PropertiesPanel({
                     <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
                       <select id="href" value={props.href} onChange={(e) => updateProp("href", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
                         {pages.map((page) => (
-                          <option key={page.id} value={`page:${page.id}`}>
+                          <option className="bg-background text-foreground" key={page.id} value={`page:${page.id}`}>
                             {page.name}
                           </option>
                         ))}
@@ -734,12 +734,12 @@ export function PropertiesPanel({
                   <Label htmlFor="rounded" className="text-xs font-medium text-muted-foreground">Border Radius Corners</Label>
                   <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
                     <select id="rounded" value={props.rounded || "md"} onChange={(e) => updateProp("rounded", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
-                      <option value="none">None</option>
-                      <option value="sm">Small</option>
-                      <option value="md">Medium</option>
-                      <option value="lg">Large</option>
-                      <option value="xl">Extra Large</option>
-                      <option value="full">Full (Circle)</option>
+                      <option className="bg-background text-foreground" value="none">None</option>
+                      <option className="bg-background text-foreground" value="sm">Small</option>
+                      <option className="bg-background text-foreground" value="md">Medium</option>
+                      <option className="bg-background text-foreground" value="lg">Large</option>
+                      <option className="bg-background text-foreground" value="xl">Extra Large</option>
+                      <option className="bg-background text-foreground" value="full">Full (Circle)</option>
                     </select>
                   </div>
                 </div>
@@ -779,10 +779,10 @@ export function PropertiesPanel({
                   <Label htmlFor="variant" className="text-xs font-medium text-muted-foreground">Card Style</Label>
                   <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
                     <select id="variant" value={props.variant || "default"} onChange={(e) => updateProp("variant", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
-                      <option value="default">Default</option>
-                      <option value="bordered">Bordered</option>
-                      <option value="shadow">Shadow</option>
-                      <option value="elevated">Elevated</option>
+                      <option className="bg-background text-foreground" value="default">Default</option>
+                      <option className="bg-background text-foreground" value="bordered">Bordered</option>
+                      <option className="bg-background text-foreground" value="shadow">Shadow</option>
+                      <option className="bg-background text-foreground" value="elevated">Elevated</option>
                     </select>
                   </div>
                 </div>
@@ -817,10 +817,10 @@ export function PropertiesPanel({
                   <Label htmlFor="padding" className="text-xs font-medium text-muted-foreground">Padding</Label>
                   <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
                     <select id="padding" value={props.padding || "md"} onChange={(e) => updateProp("padding", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
-                      <option value="sm">Small</option>
-                      <option value="md">Medium</option>
-                      <option value="lg">Large</option>
-                      <option value="xl">Extra Large</option>
+                      <option className="bg-background text-foreground" value="sm">Small</option>
+                      <option className="bg-background text-foreground" value="md">Medium</option>
+                      <option className="bg-background text-foreground" value="lg">Large</option>
+                      <option className="bg-background text-foreground" value="xl">Extra Large</option>
                     </select>
                   </div>
                 </div>
@@ -926,10 +926,10 @@ export function PropertiesPanel({
                                 }
                                 updateProp("links", newLinks);
                               }}
-                              className="w-full h-7 px-1 text-xs bg-transparent appearance-none focus:outline-none"
+                              className="w-full h-7 px-1 text-xs bg-background text-foreground appearance-none focus:outline-none"
                             >
-                              <option value="url">URL</option>
-                              <option value="page">Page</option>
+                              <option className="bg-background text-foreground" value="url">URL</option>
+                              <option className="bg-background text-foreground" value="page">Page</option>
                             </select>
                           </div>
                           
@@ -942,10 +942,10 @@ export function PropertiesPanel({
                                   newLinks[index] = { ...link, href: e.target.value };
                                   updateProp("links", newLinks);
                                 }}
-                                className="w-full h-7 px-1 text-xs bg-transparent appearance-none focus:outline-none"
+                                className="w-full h-7 px-1 text-xs bg-background text-foreground appearance-none focus:outline-none"
                               >
                                 {pages.map((page) => (
-                                  <option key={page.id} value={`page:${page.id}`}>
+                                  <option className="bg-background text-foreground" key={page.id} value={`page:${page.id}`}>
                                     {page.name}
                                   </option>
                                 ))}
@@ -1278,12 +1278,12 @@ export function PropertiesPanel({
                   <Label htmlFor="maxWidth" className="text-xs font-medium text-muted-foreground">Max Width</Label>
                   <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
                     <select id="maxWidth" value={props.maxWidth || "xl"} onChange={(e) => updateProp("maxWidth", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
-                      <option value="sm">Small (640px)</option>
-                      <option value="md">Medium (768px)</option>
-                      <option value="lg">Large (1024px)</option>
-                      <option value="xl">Extra Large (1280px)</option>
-                      <option value="2xl">2X Large (1536px)</option>
-                      <option value="full">Full Width</option>
+                      <option className="bg-background text-foreground" value="sm">Small (640px)</option>
+                      <option className="bg-background text-foreground" value="md">Medium (768px)</option>
+                      <option className="bg-background text-foreground" value="lg">Large (1024px)</option>
+                      <option className="bg-background text-foreground" value="xl">Extra Large (1280px)</option>
+                      <option className="bg-background text-foreground" value="2xl">2X Large (1536px)</option>
+                      <option className="bg-background text-foreground" value="full">Full Width</option>
                     </select>
                   </div>
                 </div>
@@ -1292,11 +1292,11 @@ export function PropertiesPanel({
                   <Label htmlFor="padding" className="text-xs font-medium text-muted-foreground">Padding</Label>
                   <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
                     <select id="padding" value={props.padding || "md"} onChange={(e) => updateProp("padding", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
-                      <option value="none">None</option>
-                      <option value="sm">Small</option>
-                      <option value="md">Medium</option>
-                      <option value="lg">Large</option>
-                      <option value="xl">Extra Large</option>
+                      <option className="bg-background text-foreground" value="none">None</option>
+                      <option className="bg-background text-foreground" value="sm">Small</option>
+                      <option className="bg-background text-foreground" value="md">Medium</option>
+                      <option className="bg-background text-foreground" value="lg">Large</option>
+                      <option className="bg-background text-foreground" value="xl">Extra Large</option>
                     </select>
                   </div>
                 </div>
@@ -1305,8 +1305,8 @@ export function PropertiesPanel({
                   <Label htmlFor="display" className="text-xs font-medium text-muted-foreground">Display</Label>
                   <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
                     <select id="display" value={props.display || "block"} onChange={(e) => updateProp("display", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
-                      <option value="block">Block</option>
-                      <option value="flex">Flex</option>
+                      <option className="bg-background text-foreground" value="block">Block</option>
+                      <option className="bg-background text-foreground" value="flex">Flex</option>
                     </select>
                   </div>
                 </div>
@@ -1318,10 +1318,10 @@ export function PropertiesPanel({
                         <Label htmlFor="flexDirection" className="text-xs font-medium text-muted-foreground">Direction</Label>
                         <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
                           <select id="flexDirection" value={props.flexDirection || "row"} onChange={(e) => updateProp("flexDirection", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
-                            <option value="row">Row</option>
-                            <option value="column">Column</option>
-                            <option value="row-reverse">Row Reverse</option>
-                            <option value="column-reverse">Column Reverse</option>
+                            <option className="bg-background text-foreground" value="row">Row</option>
+                            <option className="bg-background text-foreground" value="column">Column</option>
+                            <option className="bg-background text-foreground" value="row-reverse">Row Reverse</option>
+                            <option className="bg-background text-foreground" value="column-reverse">Column Reverse</option>
                           </select>
                         </div>
                       </div>
@@ -1330,9 +1330,9 @@ export function PropertiesPanel({
                         <Label htmlFor="flexWrap" className="text-xs font-medium text-muted-foreground">Wrap</Label>
                         <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
                           <select id="flexWrap" value={props.flexWrap || "nowrap"} onChange={(e) => updateProp("flexWrap", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
-                            <option value="nowrap">No Wrap</option>
-                            <option value="wrap">Wrap</option>
-                            <option value="wrap-reverse">Wrap Reverse</option>
+                            <option className="bg-background text-foreground" value="nowrap">No Wrap</option>
+                            <option className="bg-background text-foreground" value="wrap">Wrap</option>
+                            <option className="bg-background text-foreground" value="wrap-reverse">Wrap Reverse</option>
                           </select>
                         </div>
                       </div>
@@ -1343,12 +1343,12 @@ export function PropertiesPanel({
                         <Label htmlFor="justifyContent" className="text-xs font-medium text-muted-foreground">Justify</Label>
                         <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
                           <select id="justifyContent" value={props.justifyContent || "start"} onChange={(e) => updateProp("justifyContent", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
-                            <option value="start">Start</option>
-                            <option value="center">Center</option>
-                            <option value="end">End</option>
-                            <option value="between">Space Between</option>
-                            <option value="around">Space Around</option>
-                            <option value="evenly">Space Evenly</option>
+                            <option className="bg-background text-foreground" value="start">Start</option>
+                            <option className="bg-background text-foreground" value="center">Center</option>
+                            <option className="bg-background text-foreground" value="end">End</option>
+                            <option className="bg-background text-foreground" value="between">Space Between</option>
+                            <option className="bg-background text-foreground" value="around">Space Around</option>
+                            <option className="bg-background text-foreground" value="evenly">Space Evenly</option>
                           </select>
                         </div>
                       </div>
@@ -1357,11 +1357,11 @@ export function PropertiesPanel({
                         <Label htmlFor="alignItems" className="text-xs font-medium text-muted-foreground">Align</Label>
                         <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
                           <select id="alignItems" value={props.alignItems || "start"} onChange={(e) => updateProp("alignItems", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
-                            <option value="start">Start</option>
-                            <option value="center">Center</option>
-                            <option value="end">End</option>
-                            <option value="stretch">Stretch</option>
-                            <option value="baseline">Baseline</option>
+                            <option className="bg-background text-foreground" value="start">Start</option>
+                            <option className="bg-background text-foreground" value="center">Center</option>
+                            <option className="bg-background text-foreground" value="end">End</option>
+                            <option className="bg-background text-foreground" value="stretch">Stretch</option>
+                            <option className="bg-background text-foreground" value="baseline">Baseline</option>
                           </select>
                         </div>
                       </div>
@@ -1371,11 +1371,11 @@ export function PropertiesPanel({
                       <Label htmlFor="gap" className="text-xs font-medium text-muted-foreground">Gap</Label>
                       <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
                         <select id="gap" value={props.gap || "none"} onChange={(e) => updateProp("gap", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
-                          <option value="none">None</option>
-                          <option value="sm">Small</option>
-                          <option value="md">Medium</option>
-                          <option value="lg">Large</option>
-                          <option value="xl">Extra Large</option>
+                          <option className="bg-background text-foreground" value="none">None</option>
+                          <option className="bg-background text-foreground" value="sm">Small</option>
+                          <option className="bg-background text-foreground" value="md">Medium</option>
+                          <option className="bg-background text-foreground" value="lg">Large</option>
+                          <option className="bg-background text-foreground" value="xl">Extra Large</option>
                         </select>
                       </div>
                     </div>
@@ -1387,10 +1387,10 @@ export function PropertiesPanel({
                     <Label htmlFor="overflowX" className="text-xs font-medium text-muted-foreground">Overflow X</Label>
                     <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
                       <select id="overflowX" value={props.overflowX || "visible"} onChange={(e) => updateProp("overflowX", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
-                        <option value="visible">Visible</option>
-                        <option value="hidden">Hidden</option>
-                        <option value="scroll">Scroll</option>
-                        <option value="auto">Auto</option>
+                        <option className="bg-background text-foreground" value="visible">Visible</option>
+                        <option className="bg-background text-foreground" value="hidden">Hidden</option>
+                        <option className="bg-background text-foreground" value="scroll">Scroll</option>
+                        <option className="bg-background text-foreground" value="auto">Auto</option>
                       </select>
                     </div>
                   </div>
@@ -1399,10 +1399,10 @@ export function PropertiesPanel({
                     <Label htmlFor="overflowY" className="text-xs font-medium text-muted-foreground">Overflow Y</Label>
                     <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
                       <select id="overflowY" value={props.overflowY || "visible"} onChange={(e) => updateProp("overflowY", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
-                        <option value="visible">Visible</option>
-                        <option value="hidden">Hidden</option>
-                        <option value="scroll">Scroll</option>
-                        <option value="auto">Auto</option>
+                        <option className="bg-background text-foreground" value="visible">Visible</option>
+                        <option className="bg-background text-foreground" value="hidden">Hidden</option>
+                        <option className="bg-background text-foreground" value="scroll">Scroll</option>
+                        <option className="bg-background text-foreground" value="auto">Auto</option>
                       </select>
                     </div>
                   </div>
@@ -1428,11 +1428,11 @@ export function PropertiesPanel({
                   <Label htmlFor="columns" className="text-xs font-medium text-muted-foreground">Columns</Label>
                   <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
                     <select id="columns" value={props.columns || 3} onChange={(e) => updateProp("columns", parseInt(e.target.value))} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
-                      <option value={1}>1 Column</option>
-                      <option value={2}>2 Columns</option>
-                      <option value={3}>3 Columns</option>
-                      <option value={4}>4 Columns</option>
-                      <option value={6}>6 Columns</option>
+                      <option className="bg-background text-foreground" value={1}>1 Column</option>
+                      <option className="bg-background text-foreground" value={2}>2 Columns</option>
+                      <option className="bg-background text-foreground" value={3}>3 Columns</option>
+                      <option className="bg-background text-foreground" value={4}>4 Columns</option>
+                      <option className="bg-background text-foreground" value={6}>6 Columns</option>
                     </select>
                   </div>
                 </div>
@@ -1441,11 +1441,11 @@ export function PropertiesPanel({
                   <Label htmlFor="gap" className="text-xs font-medium text-muted-foreground">Gap</Label>
                   <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
                     <select id="gap" value={props.gap || "md"} onChange={(e) => updateProp("gap", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
-                      <option value="none">None</option>
-                      <option value="sm">Small</option>
-                      <option value="md">Medium</option>
-                      <option value="lg">Large</option>
-                      <option value="xl">Extra Large</option>
+                      <option className="bg-background text-foreground" value="none">None</option>
+                      <option className="bg-background text-foreground" value="sm">Small</option>
+                      <option className="bg-background text-foreground" value="md">Medium</option>
+                      <option className="bg-background text-foreground" value="lg">Large</option>
+                      <option className="bg-background text-foreground" value="xl">Extra Large</option>
                     </select>
                   </div>
                 </div>
@@ -1475,11 +1475,11 @@ export function PropertiesPanel({
                   <Label htmlFor="padding" className="text-xs font-medium text-muted-foreground">Padding</Label>
                   <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
                     <select id="padding" value={props.padding || "lg"} onChange={(e) => updateProp("padding", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
-                      <option value="none">None</option>
-                      <option value="sm">Small</option>
-                      <option value="md">Medium</option>
-                      <option value="lg">Large</option>
-                      <option value="xl">Extra Large</option>
+                      <option className="bg-background text-foreground" value="none">None</option>
+                      <option className="bg-background text-foreground" value="sm">Small</option>
+                      <option className="bg-background text-foreground" value="md">Medium</option>
+                      <option className="bg-background text-foreground" value="lg">Large</option>
+                      <option className="bg-background text-foreground" value="xl">Extra Large</option>
                     </select>
                   </div>
                 </div>
@@ -1488,12 +1488,12 @@ export function PropertiesPanel({
                   <Label htmlFor="maxWidth" className="text-xs font-medium text-muted-foreground">Max Width</Label>
                   <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
                     <select id="maxWidth" value={props.maxWidth || "xl"} onChange={(e) => updateProp("maxWidth", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
-                      <option value="sm">Small (640px)</option>
-                      <option value="md">Medium (768px)</option>
-                      <option value="lg">Large (1024px)</option>
-                      <option value="xl">Extra Large (1280px)</option>
-                      <option value="2xl">2X Large (1536px)</option>
-                      <option value="full">Full Width</option>
+                      <option className="bg-background text-foreground" value="sm">Small (640px)</option>
+                      <option className="bg-background text-foreground" value="md">Medium (768px)</option>
+                      <option className="bg-background text-foreground" value="lg">Large (1024px)</option>
+                      <option className="bg-background text-foreground" value="xl">Extra Large (1280px)</option>
+                      <option className="bg-background text-foreground" value="2xl">2X Large (1536px)</option>
+                      <option className="bg-background text-foreground" value="full">Full Width</option>
                     </select>
                   </div>
                 </div>
@@ -1548,10 +1548,10 @@ export function PropertiesPanel({
                     onChange={(e) => updateProp("aspectRatio", e.target.value)}
                     className="w-full p-2 border rounded-md"
                   >
-                    <option value="16/9">16:9 (Widescreen)</option>
-                    <option value="4/3">4:3 (Standard)</option>
-                    <option value="1/1">1:1 (Square)</option>
-                    <option value="21/9">21:9 (Ultrawide)</option>
+                    <option className="bg-background text-foreground" value="16/9">16:9 (Widescreen)</option>
+                    <option className="bg-background text-foreground" value="4/3">4:3 (Standard)</option>
+                    <option className="bg-background text-foreground" value="1/1">1:1 (Square)</option>
+                    <option className="bg-background text-foreground" value="21/9">21:9 (Ultrawide)</option>
                   </select>
                 </div>
 
@@ -1648,8 +1648,8 @@ export function PropertiesPanel({
                     onChange={(e) => updateProp("method", e.target.value)}
                     className="w-full p-2 border rounded-md"
                   >
-                    <option value="POST">POST</option>
-                    <option value="GET">GET</option>
+                    <option className="bg-background text-foreground" value="POST">POST</option>
+                    <option className="bg-background text-foreground" value="GET">GET</option>
                   </select>
                 </div>
               </AccordionContent>
@@ -2218,10 +2218,10 @@ export function PropertiesPanel({
                     onChange={(e) => updateProp("thickness", e.target.value)}
                     className="w-full p-2 border rounded-md text-xs"
                   >
-                    <option value="1">1px</option>
-                    <option value="2">2px</option>
-                    <option value="4">4px</option>
-                    <option value="8">8px</option>
+                    <option className="bg-background text-foreground" value="1">1px</option>
+                    <option className="bg-background text-foreground" value="2">2px</option>
+                    <option className="bg-background text-foreground" value="4">4px</option>
+                    <option className="bg-background text-foreground" value="8">8px</option>
                   </select>
                 </div>
                 <div>
@@ -2246,9 +2246,9 @@ export function PropertiesPanel({
                     onChange={(e) => updateProp("style", e.target.value)}
                     className="w-full p-2 border rounded-md text-xs"
                   >
-                    <option value="solid">Solid</option>
-                    <option value="dashed">Dashed</option>
-                    <option value="dotted">Dotted</option>
+                    <option className="bg-background text-foreground" value="solid">Solid</option>
+                    <option className="bg-background text-foreground" value="dashed">Dashed</option>
+                    <option className="bg-background text-foreground" value="dotted">Dotted</option>
                   </select>
                 </div>
               </AccordionContent>
@@ -2278,11 +2278,11 @@ export function PropertiesPanel({
                     onChange={(e) => updateProp("size", e.target.value)}
                     className="w-full p-2 border rounded-md text-xs"
                   >
-                    <option value="xs">Extra Small (8px)</option>
-                    <option value="sm">Small (16px)</option>
-                    <option value="md">Medium (32px)</option>
-                    <option value="lg">Large (64px)</option>
-                    <option value="xl">Extra Large (128px)</option>
+                    <option className="bg-background text-foreground" value="xs">Extra Small (8px)</option>
+                    <option className="bg-background text-foreground" value="sm">Small (16px)</option>
+                    <option className="bg-background text-foreground" value="md">Medium (32px)</option>
+                    <option className="bg-background text-foreground" value="lg">Large (64px)</option>
+                    <option className="bg-background text-foreground" value="xl">Extra Large (128px)</option>
                   </select>
                 </div>
               </AccordionContent>
@@ -2311,11 +2311,11 @@ export function PropertiesPanel({
                   <Label htmlFor="variant" className="text-xs font-medium text-muted-foreground">Variant</Label>
                   <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
                     <select id="variant" value={props.variant || "default"} onChange={(e) => updateProp("variant", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
-                      <option value="default">Default</option>
-                      <option value="success">Success</option>
-                      <option value="warning">Warning</option>
-                      <option value="error">Error</option>
-                      <option value="info">Info</option>
+                      <option className="bg-background text-foreground" value="default">Default</option>
+                      <option className="bg-background text-foreground" value="success">Success</option>
+                      <option className="bg-background text-foreground" value="warning">Warning</option>
+                      <option className="bg-background text-foreground" value="error">Error</option>
+                      <option className="bg-background text-foreground" value="info">Info</option>
                     </select>
                   </div>
                 </div>
@@ -2350,10 +2350,10 @@ export function PropertiesPanel({
                   <Label htmlFor="variant" className="text-xs font-medium text-muted-foreground">Variant</Label>
                   <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
                     <select id="variant" value={props.variant || "info"} onChange={(e) => updateProp("variant", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
-                      <option value="info">Info</option>
-                      <option value="success">Success</option>
-                      <option value="warning">Warning</option>
-                      <option value="error">Error</option>
+                      <option className="bg-background text-foreground" value="info">Info</option>
+                      <option className="bg-background text-foreground" value="success">Success</option>
+                      <option className="bg-background text-foreground" value="warning">Warning</option>
+                      <option className="bg-background text-foreground" value="error">Error</option>
                     </select>
                   </div>
                 </div>

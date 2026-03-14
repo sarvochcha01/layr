@@ -1,6 +1,5 @@
 "use client";
-
-import { useDroppable } from "@dnd-kit/core";
+import { useDroppable, useDraggable } from "@dnd-kit/core";
 import { ComponentDefinition } from "@/types/editor";
 import { COMPONENT_REGISTRY } from "@/components/builder";
 import { cn } from "@/lib/utils";
@@ -86,6 +85,16 @@ function ComponentWrapper({
   const Component =
     COMPONENT_REGISTRY[component.type as keyof typeof COMPONENT_REGISTRY];
 
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+    id: `canvas-${component.id}`,
+    data: {
+      type: "canvas-item",
+      componentId: component.id,
+      componentType: component.type,
+    },
+    disabled: isPreviewMode,
+  });
+
   if (!Component) {
     return (
       <div className="p-4 border-2 border-red-300 bg-red-50 rounded">
@@ -116,15 +125,14 @@ function ComponentWrapper({
   ];
   const shouldTakeFullHeight = fullHeightComponents.includes(component.type);
 
-  // Compute CSS style from component props — guarantees panel CSS changes render
-  const wrapperStyle = buildComponentStyle(component.props || {});
-
   return (
     <div
+      ref={setNodeRef}
       className={cn(
         "relative group",
         shouldTakeFullHeight && "flex self-stretch",
         shouldTakeFullWidth && "w-full",
+        isDragging && "opacity-40"
       )}
     >
       {/* Component wrapper — receives inline styles from properties panel */}
@@ -137,7 +145,6 @@ function ComponentWrapper({
           !isPreviewMode &&
             "hover:ring-1 hover:ring-blue-300 hover:ring-offset-1",
         )}
-        style={wrapperStyle}
         onClick={
           isPreviewMode
             ? undefined
@@ -147,10 +154,18 @@ function ComponentWrapper({
               }
         }
       >
-        {/* Selection overlay */}
+        {/* Selection overlay and DRAG HANDLE */}
         {!isPreviewMode && isSelected && (
-          <div className="absolute -top-6 left-0 bg-blue-500 text-white text-xs px-2 py-1 rounded z-10">
-            {component.type}
+          <div 
+            {...listeners} 
+            {...attributes} 
+            className="absolute -top-6 left-0 bg-blue-500 text-white text-xs px-2 py-1 rounded z-10 cursor-grab active:cursor-grabbing hover:bg-blue-600 transition-colors"
+            title="Drag to move this component"
+          >
+            <div className="flex items-center gap-1">
+              <span className="opacity-75">⋮⋮</span>
+              {component.type}
+            </div>
           </div>
         )}
 

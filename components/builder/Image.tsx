@@ -47,20 +47,20 @@ export function Image({
   if (height) baseStyle.height = `${height}px`;
 
   const imageElement = (
-    <img
-      src={src}
-      alt={alt}
-      width={width}
-      height={height}
-      loading={loading}
-      className={cn(
-        "max-w-full h-auto",
-        roundedClasses[rounded],
-        objectFitClasses[objectFit],
-        className
-      )}
-      style={baseStyle}
-    />
+    <div style={baseStyle} className={className}>
+      <img
+        src={src}
+        alt={alt}
+        width={width}
+        height={height}
+        loading={loading}
+        className={cn(
+          "w-full h-full",
+          roundedClasses[rounded],
+          objectFitClasses[objectFit]
+        )}
+      />
+    </div>
   );
 
   if (link) {
