@@ -3,6 +3,7 @@ export interface ComponentDefinition {
     type: string;
     props: Record<string, any>;
     children: ComponentDefinition[];
+    isGlobal?: string; // Global group name, e.g. "Main Navbar"
 }
 
 export interface Page {
@@ -11,6 +12,18 @@ export interface Page {
     slug?: string; // URL slug like "about-us", "contact" (legacy)
     path?: string; // URL path like "/", "/about", "/contact" (preferred)
     components: ComponentDefinition[];
+}
+
+// Flexible: keyed by global name → template component
+export type GlobalComponents = Record<string, ComponentDefinition>;
+
+export interface Project {
+    id: string;
+    name: string;
+    pages: Page[];
+    globalComponents?: GlobalComponents;
+    createdAt: any;
+    updatedAt: any;
 }
 
 export interface EditorState {

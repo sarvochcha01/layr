@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { buildComponentStyle } from "@/lib/buildStyle";
 
 interface BadgeProps {
   text?: string;
@@ -7,6 +8,7 @@ interface BadgeProps {
   rounded?: boolean;
   backgroundColor?: string;
   textColor?: string;
+  [key: string]: any;
 }
 
 export function Badge({
@@ -16,6 +18,7 @@ export function Badge({
   rounded = false,
   backgroundColor,
   textColor,
+  ...rest
 }: BadgeProps) {
   const variantClasses = {
     default: "bg-gray-100 text-gray-800",
@@ -31,6 +34,8 @@ export function Badge({
     lg: "px-4 py-1.5 text-base",
   };
 
+  const baseStyle = buildComponentStyle({ backgroundColor, textColor, ...rest });
+
   return (
     <span
       className={cn(
@@ -39,10 +44,7 @@ export function Badge({
         sizeClasses[size],
         rounded ? "rounded-full" : "rounded"
       )}
-      style={{
-        backgroundColor: backgroundColor || undefined,
-        color: textColor || undefined,
-      }}
+      style={baseStyle}
     >
       {text}
     </span>

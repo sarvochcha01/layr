@@ -68,23 +68,19 @@ export function generateHTML(components: ComponentDefinition[], allPages?: any[]
                 const links = props.links || [];
                 const linkColor = props.linkColor || '#6b7280';
                 const linkHoverColor = props.linkHoverColor || '#1f2937';
+                const ctaButton = (props.ctaText && props.ctaLink)
+                    ? `<a href="${convertLink(props.ctaLink)}" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors ml-4">${props.ctaText}</a>`
+                    : '';
+
+                const logoText = props.logoText || props.brandText || "Brand";
 
                 return `
-<nav class="flex items-center justify-between px-8 py-4 max-w-7xl mx-auto"${getInlineStyles(props)}>
-    <div class="text-xl font-bold">${props.logoText || "Brand"}</div>
-    <button class="md:hidden flex flex-col gap-1" onclick="toggleMobileMenu()">
-        <span class="w-6 h-0.5 bg-gray-800"></span>
-        <span class="w-6 h-0.5 bg-gray-800"></span>
-        <span class="w-6 h-0.5 bg-gray-800"></span>
-    </button>
-    <div id="navbar-menu" class="hidden md:flex items-center gap-8">
-        <ul class="flex gap-8">
-            ${links.map((link: any) => `
-            <li><a href="${convertLink(link.href)}" class="hover:opacity-75 transition-opacity" style="color: ${linkColor}" onmouseover="this.style.color='${linkHoverColor}'" onmouseout="this.style.color='${linkColor}'">${link.text}</a></li>
-            `).join('')}
-        </ul>
-        ${props.ctaText && props.ctaLink ? `<a href="${convertLink(props.ctaLink)}" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">${props.ctaText}</a>` : ''}
+<nav class="w-full flex items-center px-8 py-4"${getInlineStyles(props)}>
+    <div class="text-xl font-bold">${logoText}</div>
+    <div class="flex items-center space-x-8 ml-auto">
+        ${links.map((link: any) => `<a href="${convertLink(link.href)}" class="hover:opacity-75 transition-opacity" style="color: ${linkColor}" onmouseover="this.style.color='${linkHoverColor}'" onmouseout="this.style.color='${linkColor}'">${link.text}</a>`).join('')}
     </div>
+    ${ctaButton}
 </nav>`;
 
             case "Hero":
@@ -130,9 +126,9 @@ export function generateHTML(components: ComponentDefinition[], allPages?: any[]
                 const containerOverflowY = { visible: 'overflow-y-visible', hidden: 'overflow-y-hidden', scroll: 'overflow-y-scroll', auto: 'overflow-y-auto' };
 
                 const containerClasses = [
-                    containerMaxWidth[props.maxWidth as keyof typeof containerMaxWidth] || containerMaxWidth.xl,
+                    props.display !== 'flex' && (containerMaxWidth[props.maxWidth as keyof typeof containerMaxWidth] || containerMaxWidth.xl),
                     containerPadding[props.padding as keyof typeof containerPadding] || containerPadding.md,
-                    'mx-auto',
+                    props.display !== 'flex' && 'mx-auto',
                     containerDisplay,
                     props.display === 'flex' && (containerFlexDir[props.flexDirection as keyof typeof containerFlexDir] || containerFlexDir.row),
                     props.display === 'flex' && (containerFlexWrap[props.flexWrap as keyof typeof containerFlexWrap] || containerFlexWrap.nowrap),
@@ -278,40 +274,48 @@ export function generateHTML(components: ComponentDefinition[], allPages?: any[]
             case "Accordion":
                 const accordionItems = props.items || [];
                 return `
-<div class="space-y-2"${getInlineStyles(props)}>
+<div class="w-full space-y-2"${getInlineStyles(props)}>
     ${accordionItems.map((item: any, idx: number) => `
-    <details class="border rounded-lg">
-        <summary class="px-4 py-3 cursor-pointer font-medium hover:bg-gray-50">${item.title}</summary>
-        <div class="px-4 py-3 border-t">${item.content}</div>
+    <details class="w-full border rounded-lg overflow-hidden" style="background-color: ${props.backgroundColor || '#ffffff'}; border-color: ${props.borderColor || '#e5e7eb'};">
+        <summary class="px-4 py-3 cursor-pointer font-medium hover:bg-gray-50 flex items-center justify-between list-none" style="color: ${props.textColor || 'inherit'};">
+            <span>${item.title}</span>
+            <svg class="accordion-chevron w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+        </summary>
+        <div class="px-4 py-3 border-t" style="border-color: ${props.borderColor || '#e5e7eb'}; color: ${props.textColor || 'inherit'};">${item.content}</div>
     </details>
     `).join('')}
 </div>`;
 
             case "Tabs":
                 const tabs = props.tabs || [];
+                const tabsId = `tabs-${Math.random().toString(36).substr(2, 9)}`;
                 return `
-<div${getInlineStyles(props)}>
+<div class="tabs-container" data-tabs-id="${tabsId}"${getInlineStyles(props)}>
     <div class="flex border-b">
         ${tabs.map((tab: any, idx: number) => `
-        <button class="px-4 py-2 font-medium ${idx === 0 ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600 hover:text-gray-900'}" onclick="showTab(${idx})">${tab.label}</button>
+        <button class="tab-button px-4 py-2 font-medium ${idx === 0 ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600 hover:text-gray-900'}" data-tab-index="${idx}" data-tabs-id="${tabsId}">${tab.label}</button>
         `).join('')}
     </div>
     ${tabs.map((tab: any, idx: number) => `
-    <div id="tab-${idx}" class="p-4 ${idx !== 0 ? 'hidden' : ''}">${tab.content}</div>
+    <div class="tab-content p-4 ${idx !== 0 ? 'hidden' : ''}" data-tab-index="${idx}" data-tabs-id="${tabsId}">${tab.content}</div>
     `).join('')}
 </div>`;
 
             case "Testimonial":
                 const stars = '★'.repeat(props.rating || 5) + '☆'.repeat(5 - (props.rating || 5));
+                const variant = props.variant || 'card';
+                const testimonialClasses = `p-6 rounded-lg ${variant === 'card' ? 'bg-white shadow-md' : ''} ${variant === 'featured' ? 'bg-white shadow-lg border-l-4 border-blue-500' : ''}`;
                 return `
-<div class="p-6 rounded-lg"${getInlineStyles(props)}>
+<div class="${testimonialClasses}"${getInlineStyles(props)}>
     <div class="text-yellow-400 text-xl mb-3">${stars}</div>
     <p class="text-lg mb-4 italic">"${props.quote || ''}"</p>
     <div class="flex items-center gap-3">
         ${props.avatar ? `<img src="${props.avatar}" alt="${props.author}" class="w-12 h-12 rounded-full" />` : ''}
         <div>
             <div class="font-semibold">${props.author || ''}</div>
-            <div class="text-sm opacity-75">${props.role || ''}</div>
+            <div class="text-sm opacity-75">${props.role || ''}${props.company ? ` at ${props.company}` : ''}</div>
         </div>
     </div>
 </div>`;
@@ -319,7 +323,7 @@ export function generateHTML(components: ComponentDefinition[], allPages?: any[]
             case "PricingCard":
                 const features = props.features || [];
                 return `
-<div class="p-8 rounded-lg border-2 ${props.featured ? 'border-blue-500 shadow-xl' : 'border-gray-200 shadow-md'}"${getInlineStyles(props)}>
+<div class="p-8 rounded-lg border-2 flex flex-col ${props.featured ? 'border-blue-500 shadow-xl' : 'border-gray-200 shadow-md'}" style="width: 320px; min-width: 280px; max-width: 400px; ${props.backgroundColor ? 'background-color: ' + props.backgroundColor + ';' : ''} ${props.textColor ? 'color: ' + props.textColor + ';' : ''}"${getInlineStyles(props)}>
     ${props.featured ? '<div class="text-center mb-4"><span class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium">Most Popular</span></div>' : ''}
     <div class="text-center mb-6">
         <h3 class="text-2xl font-bold mb-2">${props.title || ''}</h3>
@@ -329,7 +333,7 @@ export function generateHTML(components: ComponentDefinition[], allPages?: any[]
         </div>
         <p class="text-sm opacity-75">${props.description || ''}</p>
     </div>
-    <ul class="space-y-3 mb-6">
+    <ul class="space-y-3 mb-6 flex-grow">
         ${features.map((feature: string) => `
         <li class="flex items-center gap-2">
             <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
@@ -337,7 +341,9 @@ export function generateHTML(components: ComponentDefinition[], allPages?: any[]
         </li>
         `).join('')}
     </ul>
-    <button class="w-full ${props.featured ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-200 hover:bg-gray-300'} text-${props.featured ? 'white' : 'gray-900'} px-6 py-3 rounded-md font-medium transition-colors">${props.buttonText || 'Get Started'}</button>
+    <div class="mt-auto">
+        <button class="w-full ${props.featured ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-200 hover:bg-gray-300'} text-${props.featured ? 'white' : 'gray-900'} px-6 py-3 rounded-md font-medium transition-colors">${props.buttonText || 'Get Started'}</button>
+    </div>
 </div>`;
 
             case "Feature":
@@ -418,6 +424,7 @@ export function generateHTML(components: ComponentDefinition[], allPages?: any[]
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Exported Website</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
@@ -431,8 +438,28 @@ export function generateHTML(components: ComponentDefinition[], allPages?: any[]
 }
 
 export function generateCSS(): string {
-    // Tailwind handles all CSS via CDN
-    return `/* Tailwind CSS is loaded via CDN in the HTML file */`;
+    return `/* Tailwind CSS is loaded via CDN in the HTML file */
+
+/* Accordion styles */
+details summary::-webkit-details-marker {
+    display: none;
+}
+
+details summary::marker {
+    display: none;
+}
+
+details summary {
+    list-style: none;
+}
+
+.accordion-chevron {
+    transition: transform 0.2s ease-in-out;
+}
+
+details[open] .accordion-chevron {
+    transform: rotate(180deg);
+}`;
 }
 
 export function generateJS(): string {
@@ -444,6 +471,37 @@ function toggleMobileMenu() {
         menu.classList.toggle('flex');
     }
 }
+
+// Tab switching
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.tab-button').forEach(button => {
+        button.addEventListener('click', function() {
+            const tabsId = this.getAttribute('data-tabs-id');
+            const tabIndex = this.getAttribute('data-tab-index');
+            
+            // Hide all tab contents in this tabs container
+            document.querySelectorAll('.tab-content[data-tabs-id="' + tabsId + '"]').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            // Remove active state from all buttons in this tabs container
+            document.querySelectorAll('.tab-button[data-tabs-id="' + tabsId + '"]').forEach(btn => {
+                btn.classList.remove('border-b-2', 'border-blue-600', 'text-blue-600');
+                btn.classList.add('text-gray-600');
+            });
+            
+            // Show selected tab content
+            const selectedContent = document.querySelector('.tab-content[data-tabs-id="' + tabsId + '"][data-tab-index="' + tabIndex + '"]');
+            if (selectedContent) {
+                selectedContent.classList.remove('hidden');
+            }
+            
+            // Activate selected button
+            this.classList.add('border-b-2', 'border-blue-600', 'text-blue-600');
+            this.classList.remove('text-gray-600');
+        });
+    });
+});
 
 // Smooth scrolling
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {

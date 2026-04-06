@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { buildComponentStyle } from "@/lib/buildStyle";
 
 interface DividerProps {
   text?: string;
@@ -7,6 +8,7 @@ interface DividerProps {
   color?: string;
   width?: string;
   spacing?: "sm" | "md" | "lg";
+  [key: string]: any;
 }
 
 export function Divider({
@@ -16,6 +18,7 @@ export function Divider({
   color = "#e5e7eb",
   width,
   spacing = "md",
+  ...rest
 }: DividerProps) {
   const thicknessMap = {
     thin: "1px",
@@ -35,9 +38,11 @@ export function Divider({
     dotted: "dotted",
   };
 
+  const baseStyle = buildComponentStyle({ width, ...rest });
+
   if (text) {
     return (
-      <div className={cn("flex items-center gap-4", spacingMap[spacing])}>
+      <div className={cn("flex items-center gap-4", spacingMap[spacing])} style={baseStyle}>
         <div
           className="flex-1"
           style={{
@@ -46,7 +51,7 @@ export function Divider({
             borderStyle: borderStyle[variant],
           }}
         />
-        <span className="text-sm text-gray-500 px-2">{text}</span>
+        <span className="text-sm opacity-60 px-2">{text}</span>
         <div
           className="flex-1"
           style={{
@@ -63,6 +68,7 @@ export function Divider({
     <div
       className={spacingMap[spacing]}
       style={{
+        ...baseStyle,
         width: width || "100%",
         height: thicknessMap[thickness],
         backgroundColor: color,

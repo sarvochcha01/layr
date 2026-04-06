@@ -6,6 +6,7 @@ interface Project {
     userId: string;
     components?: any[]; // Legacy support
     pages?: any[]; // New multi-page support
+    globalComponents?: Record<string, any>; // Global component templates
     createdAt: any;
     updatedAt: any;
 }
@@ -91,6 +92,8 @@ export function useUpdateProject() {
         onSuccess: (data, variables) => {
             // Only invalidate projects list, NOT the current project to avoid overwriting local state
             queryClient.invalidateQueries({ queryKey: ["projects"] });
+            // Keep specific project cache fresh so opening it again doesn't load stale data
+            queryClient.setQueryData(["project", variables.projectId], data.project);
         },
     });
 }

@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { buildComponentStyle } from "@/lib/buildStyle";
 
 interface Stat {
   value: string;
@@ -15,6 +16,7 @@ interface StatsProps {
   accentColor?: string;
   width?: string;
   height?: string;
+  [key: string]: any;
 }
 
 export function Stats({
@@ -30,12 +32,15 @@ export function Stats({
   accentColor = "#3b82f6",
   width,
   height,
+  ...rest
 }: StatsProps) {
   const gridCols = {
     2: "grid-cols-2",
     3: "grid-cols-3",
     4: "grid-cols-4",
   };
+
+  const baseStyle = buildComponentStyle({ backgroundColor, textColor, width, height, ...rest });
 
   return (
     <div
@@ -45,12 +50,7 @@ export function Stats({
           ? `grid ${gridCols[columns]} gap-8`
           : "flex justify-around items-center flex-wrap gap-8"
       )}
-      style={{
-        width: width || undefined,
-        height: height || undefined,
-        backgroundColor: backgroundColor || undefined,
-        color: textColor || undefined,
-      }}
+      style={baseStyle}
     >
       {stats.map((stat, index) => (
         <div key={index} className="text-center">

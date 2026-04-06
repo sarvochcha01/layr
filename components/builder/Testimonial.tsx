@@ -1,5 +1,6 @@
 import { Star } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { buildComponentStyle } from "@/lib/buildStyle";
 
 interface TestimonialProps {
   quote?: string;
@@ -13,6 +14,7 @@ interface TestimonialProps {
   textColor?: string;
   width?: string;
   height?: string;
+  [key: string]: any;
 }
 
 export function Testimonial({
@@ -27,21 +29,19 @@ export function Testimonial({
   textColor,
   width,
   height,
+  ...rest
 }: TestimonialProps) {
+  const baseStyle = buildComponentStyle({ backgroundColor, textColor, width, height, ...rest });
+
   return (
     <div
       className={cn(
         "p-6",
-        variant === "card" && "bg-white rounded-lg shadow-md",
-        variant === "featured" &&
+        variant === "card" && !backgroundColor && "bg-white rounded-lg shadow-md",
+        variant === "featured" && !backgroundColor &&
           "bg-white rounded-lg shadow-lg border-l-4 border-blue-500"
       )}
-      style={{
-        width: width || undefined,
-        height: height || undefined,
-        backgroundColor: backgroundColor || undefined,
-        color: textColor || undefined,
-      }}
+      style={baseStyle}
     >
       {/* Rating */}
       {rating > 0 && (
@@ -51,7 +51,7 @@ export function Testimonial({
               key={i}
               className={cn(
                 "w-5 h-5",
-                i < rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
+                i < rating ? "fill-yellow-400 text-yellow-400" : "opacity-30"
               )}
             />
           ))}

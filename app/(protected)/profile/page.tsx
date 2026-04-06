@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,12 +10,14 @@ import { toast } from "sonner";
 
 export default function ProfilePage() {
   const { user, logout } = useAuth();
+  const router = useRouter();
   const [displayName, setDisplayName] = useState(user?.displayName || "");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleLogout = async () => {
     try {
       await logout();
+      router.push("/login");
     } catch (error) {
       console.error("Logout failed:", error);
       toast.error("Failed to sign out");

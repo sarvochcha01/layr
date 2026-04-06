@@ -1,0 +1,98 @@
+{
+    "build": {
+        "beforeDevCommand": "npm run dev",
+        "beforeBuildCommand": "",
+        "devPath": "http://localhost:3000",
+        "distDir": "http://localhost:3000",
+        "withGlobalTauri": true
+    },
+    "package": {
+        "productName": "LAYR",
+        "version": "1.0.0"
+    },
+    "tauri": {
+        "allowlist": {
+            "all": false,
+            "shell": {
+                "all": false,
+                "open": true
+            },
+            "dialog": {
+                "all": true,
+                "ask": true,
+                "confirm": true,
+                "message": true,
+                "open": true,
+                "save": true
+            },
+            "fs": {
+                "all": true,
+                "readFile": true,
+                "writeFile": true,
+                "readDir": true,
+                "copyFile": true,
+                "createDir": true,
+                "removeDir": true,
+                "removeFile": true,
+                "renameFile": true,
+                "exists": true,
+                "scope": [
+                    "$DOWNLOAD/*",
+                    "$DOWNLOAD/**"
+                ]
+            },
+            "path": {
+                "all": true
+            },
+            "http": {
+                "all": true,
+                "request": true,
+                "scope": [
+                    "http://localhost:3000/*",
+                    "https://*.firebaseio.com/*",
+                    "https://*.googleapis.com/*"
+                ]
+            },
+            "window": {
+                "all": false,
+                "close": true,
+                "hide": true,
+                "show": true,
+                "maximize": true,
+                "minimize": true,
+                "unmaximize": true,
+                "unminimize": true,
+                "startDragging": true
+            }
+        },
+        "bundle": {
+            "active": true,
+            "targets": "all",
+            "identifier": "com.websitebuilder.app",
+            "icon": [
+                "icons/32x32.png",
+                "icons/128x128.png",
+                "icons/128x128@2x.png",
+                "icons/icon.icns",
+                "icons/icon.ico"
+            ],
+            "externalBin": [],
+            "resources": []
+        },
+        "security": {
+            "csp": null
+        },
+        "windows": [
+            {
+                "fullscreen": false,
+                "resizable": true,
+                "title": "LAYR",
+                "width": 1400,
+                "height": 900,
+                "minWidth": 1200,
+                "minHeight": 700,
+                "url": "http://localhost:3000"
+            }
+        ]
+    }
+}

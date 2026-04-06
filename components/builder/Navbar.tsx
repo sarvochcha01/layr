@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
+import { buildComponentStyle } from "@/lib/buildStyle";
 
 interface NavLink {
   text: string;
@@ -27,6 +28,9 @@ interface NavbarProps {
   textColor?: string;
   linkColor?: string;
   linkHoverColor?: string;
+  onNavigate?: (slug: string) => void;
+  pages?: any[];
+  [key: string]: any;
 }
 
 export function Navbar({
@@ -46,6 +50,9 @@ export function Navbar({
   textColor,
   linkColor,
   linkHoverColor = "#3b82f6",
+  onNavigate,
+  pages,
+  ...rest
 }: NavbarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -57,20 +64,17 @@ export function Navbar({
     setIsMobileMenuOpen(false);
   };
 
+  const baseStyle = buildComponentStyle({ backgroundColor, textColor, width, height, ...rest });
+
   return (
     <div className="relative">
       <nav
         className={cn(
-          "flex items-center justify-between w-full",
+          "flex items-center w-full",
           !textColor && (theme === "dark" ? "text-white" : "text-gray-900"),
-          className
+          className,
         )}
-        style={{
-          width: width || undefined,
-          height: height || undefined,
-          backgroundColor: backgroundColor || undefined,
-          color: textColor || undefined,
-        }}
+        style={baseStyle}
       >
         {/* Logo */}
         <div className="flex items-center space-x-2">
@@ -83,14 +87,36 @@ export function Navbar({
 
         {/* Navigation Links - Hidden on mobile */}
         {viewport === "desktop" && (
-          <div className="flex items-center space-x-4 xl:space-x-8">
+          <div className="flex items-center space-x-4 xl:space-x-8 ml-auto mr-4">
             {links.map((link, index) => {
+              const handleClick = (e: React.MouseEvent) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                if (onNavigate && !link.external) {
+                  let slug = link.href;
+
+                  if (slug.startsWith("page:")) {
+                    slug = slug.replace("page:", "");
+                  } else {
+                    slug = slug.replace(/^\//, "").replace(/\.html$/, "");
+                  }
+
+                  if (!slug || slug === "#") {
+                    slug = link.text.toLowerCase().replace(/\s+/g, "-");
+                    if (slug === "home") slug = "index";
+                  }
+
+                  onNavigate(slug);
+                }
+              };
+
               const linkProps = {
-                href: isPreviewMode ? link.href : "#",
+                href: link.external ? link.href : "#",
                 className: cn(
                   "transition-colors text-sm lg:text-base cursor-pointer",
                   !linkColor &&
-                    (theme === "dark" ? "text-white" : "text-gray-700")
+                    (theme === "dark" ? "text-white" : "text-gray-700"),
                 ),
                 style: {
                   color: linkColor || undefined,
@@ -105,24 +131,18 @@ export function Navbar({
                     e.currentTarget.style.color = linkColor;
                   }
                 },
-                onClick: isPreviewMode
-                  ? undefined
-                  : (e: React.MouseEvent) => e.preventDefault(),
-                ...(isPreviewMode &&
-                  link.external && {
+                onClick: handleClick,
+                ...(link.external &&
+                  isPreviewMode && {
                     target: "_blank",
                     rel: "noopener noreferrer",
                   }),
               };
 
-              return link.external && isPreviewMode ? (
+              return (
                 <a key={index} {...linkProps}>
                   {link.text}
                 </a>
-              ) : (
-                <Link key={index} {...linkProps}>
-                  {link.text}
-                </Link>
               );
             })}
           </div>
@@ -130,7 +150,6 @@ export function Navbar({
 
         {/* Desktop CTA & Mobile Menu Button */}
         <div className="flex items-center space-x-2">
-          {/* Desktop CTA */}
           {ctaText && ctaLink && viewport === "desktop" && (
             <div style={isPreviewMode ? undefined : { pointerEvents: "none" }}>
               <Button asChild size="sm" className="text-sm">
@@ -152,7 +171,6 @@ export function Navbar({
             </div>
           )}
 
-          {/* Mobile Menu Button */}
           {links.length > 0 && viewport !== "desktop" && (
             <Button
               variant="ghost"
@@ -175,34 +193,49 @@ export function Navbar({
         <div className="absolute top-full left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
           <div className="py-2">
             {links.map((link, index) => {
+              const handleClick = (e: React.MouseEvent) => {
+                closeMobileMenu();
+                if (onNavigate && !link.external) {
+                  e.preventDefault();
+
+                  let slug = link.href;
+
+                  if (slug.startsWith("page:")) {
+                    slug = slug.replace("page:", "");
+                  } else {
+                    slug = slug.replace(/^\//, "").replace(/\.html$/, "");
+                  }
+
+                  if (!slug || slug === "#") {
+                    slug = link.text.toLowerCase().replace(/\s+/g, "-");
+                    if (slug === "home") slug = "index";
+                  }
+
+                  onNavigate(slug);
+                }
+              };
+
               const linkProps = {
-                href: isPreviewMode ? link.href : "#",
+                href: link.external ? link.href : "#",
                 className: cn(
                   "block px-4 py-3 text-sm hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0",
-                  theme === "dark" ? "text-gray-900" : "text-gray-700"
+                  theme === "dark" ? "text-gray-900" : "text-gray-700",
                 ),
-                onClick: isPreviewMode
-                  ? closeMobileMenu
-                  : (e: React.MouseEvent) => e.preventDefault(),
-                ...(isPreviewMode &&
-                  link.external && {
+                onClick: handleClick,
+                ...(link.external &&
+                  isPreviewMode && {
                     target: "_blank",
                     rel: "noopener noreferrer",
                   }),
               };
 
-              return link.external && isPreviewMode ? (
+              return (
                 <a key={index} {...linkProps}>
                   {link.text}
                 </a>
-              ) : (
-                <Link key={index} {...linkProps}>
-                  {link.text}
-                </Link>
               );
             })}
 
-            {/* Mobile CTA */}
             {ctaText && ctaLink && (
               <div
                 className="px-4 py-3"

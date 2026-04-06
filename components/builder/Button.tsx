@@ -1,5 +1,6 @@
 import { Button as ShadcnButton } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { buildComponentStyle } from "@/lib/buildStyle";
 
 interface ButtonProps {
   children?: React.ReactNode;
@@ -23,6 +24,7 @@ interface ButtonProps {
   height?: string;
   backgroundColor?: string;
   textColor?: string;
+  [key: string]: any;
 }
 
 export function Button({
@@ -41,8 +43,10 @@ export function Button({
   height,
   backgroundColor,
   textColor,
+  ...rest
 }: ButtonProps) {
   const buttonContent = children || text || "Button";
+  const baseStyle = buildComponentStyle({ backgroundColor, textColor, width, height, ...rest });
 
   const buttonElement = (
     <ShadcnButton
@@ -51,12 +55,7 @@ export function Button({
       disabled={disabled}
       onClick={isPreviewMode ? onClick : (e) => e.preventDefault()}
       className={cn(fullWidth && "w-full", className)}
-      style={{
-        width: width || undefined,
-        height: height || undefined,
-        backgroundColor: backgroundColor || undefined,
-        color: textColor || undefined,
-      }}
+      style={baseStyle}
     >
       {buttonContent}
     </ShadcnButton>

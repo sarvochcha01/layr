@@ -1,36 +1,65 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Layr Website Builder
 
-## Getting Started
+A professional visual website builder powered by Next.js, React, and Tauri. Build production-ready multi-page websites through an intuitive drag-and-drop interface.
 
-First, run the development server:
+## 🚀 Overview
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Layr enables developers and designers to create sophisticated multi-page websites without writing code. It runs as a high-performance native desktop application with offline support, local storage, and native dialogs.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Key Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+*   **Visual Editor**: Real-time drag-and-drop interface with live preview.
+*   **Desktop Native**: Runs as a native app with offline support, local storage, and native dialogs.
+*   **Component Library**: Over 50 production-ready components (Layout, Content, Interactive, Marketing).
+*   **Export System**: Generate production-ready HTML/CSS or full Next.js/React projects.
+*   **Productivity Tools**: Undo/Redo, Copy/Paste, Keyboard Shortcuts, Favorites.
+*   **Theme System**: Global control over colors, fonts, and spacing.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🛠️ Getting Started
 
-## Learn More
+### Prerequisites
 
-To learn more about Next.js, take a look at the following resources:
+*   **Rust**: Required for Tauri backend. [Install Rust](https://rustup.rs/)
+*   **Node.js**: Version 18 or higher. [Install Node.js](https://nodejs.org/)
+*   **System Dependencies**:
+    *   **Windows**: Microsoft C++ Build Tools and WebView2.
+    *   **macOS**: Xcode Command Line Tools (`xcode-select --install`).
+    *   **Linux**: `build-essential`, `libwebkit2gtk-4.0-dev`, and other GTK dependencies.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Installation
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1.  **Clone the repository**:
+    ```bash
+    git clone https://github.com/yourusername/layr.git
+    cd layr
+    ```
 
-## Deploy on Vercel
+2.  **Install dependencies**:
+    ```bash
+    npm install
+    ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+3.  **Run the setup script** (optional but recommended):
+    *   **Windows (PowerShell as Admin)**: `.\scripts\setup-tauri.ps1`
+    *   **Linux/macOS**: `chmod +x scripts/setup-tauri.sh && ./scripts/setup-tauri.sh`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Running the App
+
+*   **Development Mode**:
+    ```bash
+    npm run tauri:dev
+    ```
+    This starts the Next.js dev server and the Tauri desktop window with hot-reload.
+
+*   **Production Build**:
+    ```bash
+    npm run tauri:build
+    ```
+    Creates installers in `src-tauri/target/release/bundle/`.
+
+## 📚 Documentation
+
+For detailed technical documentation, API references, architecture, and troubleshooting, please refer to [DOCUMENTATION.md](./DOCUMENTATION.md).
+
+---
+Built with [Next.js](https://nextjs.org/), [Tauri](https://tauri.app/), and [React](https://react.dev/).

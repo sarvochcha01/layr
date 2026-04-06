@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { buildComponentStyle } from "@/lib/buildStyle";
 
 interface CTAProps {
   title?: string;
@@ -14,6 +15,7 @@ interface CTAProps {
   textColor?: string;
   width?: string;
   height?: string;
+  [key: string]: any;
 }
 
 export function CTA({
@@ -29,6 +31,7 @@ export function CTA({
   textColor = "#ffffff",
   width,
   height,
+  ...rest
 }: CTAProps) {
   const sizeClasses = {
     sm: "py-8 px-6",
@@ -42,6 +45,8 @@ export function CTA({
     right: "text-right items-end",
   };
 
+  const baseStyle = buildComponentStyle({ backgroundColor, textColor, width, height, ...rest });
+
   return (
     <div
       className={cn(
@@ -49,12 +54,7 @@ export function CTA({
         sizeClasses[size],
         alignmentClasses[alignment]
       )}
-      style={{
-        width: width || undefined,
-        height: height || undefined,
-        backgroundColor,
-        color: textColor,
-      }}
+      style={baseStyle}
     >
       <div>
         <h2 className="text-3xl font-bold mb-3">{title}</h2>

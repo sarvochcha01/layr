@@ -3,204 +3,65 @@
 import { useDraggable } from "@dnd-kit/core";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { Search } from "lucide-react";
+import { Search, Star } from "lucide-react";
 import { useState } from "react";
+import { useComponentFavorites } from "@/hooks/useComponentFavorites";
+import { ComponentCategory, ComponentItem, componentCategories } from "./config/components";
+import { GlobalComponents } from "@/types/editor";
+import { Globe } from "lucide-react";
 
-interface ComponentCategory {
-  name: string;
-  components: ComponentItem[];
+function DraggableGlobalComponent({
+  globalName,
+  componentType,
+}: {
+  globalName: string;
+  componentType: string;
+}) {
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+    id: `palette-global-${globalName}`,
+    data: {
+      type: "palette-global",
+      globalName,
+      componentType,
+    },
+  });
+
+  return (
+    <div
+      ref={setNodeRef}
+      className={cn(
+        "p-3 border border-border rounded-lg hover:border-primary hover:shadow-sm transition-all relative group bg-card",
+        "flex flex-col items-center text-center space-y-2",
+        isDragging && "opacity-50"
+      )}
+    >
+      {/* Draggable area */}
+      <div {...listeners} {...attributes} className="cursor-grab w-full flex flex-col items-center">
+        <div className="text-muted-foreground mb-2 p-2 bg-muted rounded-md group-hover:bg-primary/20 group-hover:text-primary transition-colors">
+           <Globe className="w-5 h-5 text-blue-400" />
+        </div>
+        <div>
+          <div className="text-xs font-medium text-foreground line-clamp-1">
+            {globalName}
+          </div>
+          <div className="text-[10px] text-muted-foreground mt-1 leading-tight">
+            ({componentType})
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
-interface ComponentItem {
-  type: string;
-  name: string;
-  icon: string;
-  description: string;
-}
-
-const componentCategories: ComponentCategory[] = [
-  {
-    name: "Layout",
-    components: [
-      {
-        type: "Header",
-        name: "Header",
-        icon: "📦",
-        description: "Page header with navigation",
-      },
-      {
-        type: "Navbar",
-        name: "Navbar",
-        icon: "�",
-        description: "Navigation bar with menu items",
-      },
-      {
-        type: "Footer",
-        name: "Footer",
-        icon: "🦶",
-        description: "Page footer with links",
-      },
-      {
-        type: "Section",
-        name: "Section",
-        icon: "�",
-        description: "Content section container",
-      },
-      {
-        type: "Container",
-        name: "Container",
-        icon: "📦",
-        description: "Responsive container",
-      },
-      {
-        type: "Grid",
-        name: "Grid",
-        icon: "🏗️",
-        description: "Responsive grid layout",
-      },
-    ],
-  },
-  {
-    name: "Content",
-    components: [
-      {
-        type: "Hero",
-        name: "Hero",
-        icon: "🎯",
-        description: "Hero section with CTA",
-      },
-      {
-        type: "Card",
-        name: "Card",
-        icon: "🃏",
-        description: "Content card with image",
-      },
-      {
-        type: "Text",
-        name: "Text",
-        icon: "📝",
-        description: "Text content block",
-      },
-      {
-        type: "Button",
-        name: "Button",
-        icon: "🔘",
-        description: "Call-to-action button",
-      },
-    ],
-  },
-  {
-    name: "Media",
-    components: [
-      {
-        type: "Image",
-        name: "Image",
-        icon: "🖼️",
-        description: "Responsive image",
-      },
-      {
-        type: "Video",
-        name: "Video",
-        icon: "🎥",
-        description: "Video player or embed",
-      },
-    ],
-  },
-  {
-    name: "Forms",
-    components: [
-      {
-        type: "Form",
-        name: "Form",
-        icon: "📋",
-        description: "Contact or signup form",
-      },
-    ],
-  },
-  {
-    name: "Interactive",
-    components: [
-      {
-        type: "Accordion",
-        name: "Accordion",
-        icon: "📑",
-        description: "Collapsible content sections",
-      },
-      {
-        type: "Tabs",
-        name: "Tabs",
-        icon: "📂",
-        description: "Tabbed content switcher",
-      },
-    ],
-  },
-  {
-    name: "Marketing",
-    components: [
-      {
-        type: "Testimonial",
-        name: "Testimonial",
-        icon: "💬",
-        description: "Customer review with rating",
-      },
-      {
-        type: "PricingCard",
-        name: "Pricing Card",
-        icon: "💰",
-        description: "Pricing plan with features",
-      },
-      {
-        type: "Feature",
-        name: "Feature",
-        icon: "✨",
-        description: "Feature showcase with icon",
-      },
-      {
-        type: "Stats",
-        name: "Stats",
-        icon: "📊",
-        description: "Statistics and numbers",
-      },
-      {
-        type: "CTA",
-        name: "CTA",
-        icon: "🎯",
-        description: "Call-to-action section",
-      },
-    ],
-  },
-  {
-    name: "UI Elements",
-    components: [
-      {
-        type: "Divider",
-        name: "Divider",
-        icon: "➖",
-        description: "Visual separator line",
-      },
-      {
-        type: "Spacer",
-        name: "Spacer",
-        icon: "⬜",
-        description: "Vertical spacing",
-      },
-      {
-        type: "Badge",
-        name: "Badge",
-        icon: "🏷️",
-        description: "Small label or tag",
-      },
-      {
-        type: "Alert",
-        name: "Alert",
-        icon: "⚠️",
-        description: "Notification message",
-      },
-    ],
-  },
-];
-
-function DraggableComponent({ component }: { component: ComponentItem }) {
+function DraggableComponent({
+  component,
+  isFavorite,
+  onToggleFavorite,
+}: {
+  component: ComponentItem;
+  isFavorite: boolean;
+  onToggleFavorite: () => void;
+}) {
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({
       id: `palette-${component.type}`,
@@ -217,42 +78,82 @@ function DraggableComponent({ component }: { component: ComponentItem }) {
     <div
       ref={setNodeRef}
       style={style}
-      {...listeners}
-      {...attributes}
       className={cn(
-        "p-3 border border-gray-200 rounded-lg cursor-grab hover:border-blue-300 hover:shadow-sm transition-all",
+        "p-3 border border-border rounded-lg hover:border-primary hover:shadow-sm transition-all relative group bg-card",
         "flex flex-col items-center text-center space-y-2",
         isDragging && "opacity-50"
       )}
     >
-      <span className="text-2xl">{component.icon}</span>
-      <div>
-        <div className="text-xs font-medium text-gray-900">
-          {component.name}
+      {/* Favorite Button */}
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onToggleFavorite();
+        }}
+        className="absolute top-1 right-1 p-1 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+        title={isFavorite ? "Remove from favorites" : "Add to favorites"}
+      >
+        <Star
+          className={cn(
+            "w-3 h-3",
+            isFavorite ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground"
+          )}
+        />
+      </button>
+
+      {/* Draggable area */}
+      <div {...listeners} {...attributes} className="cursor-grab w-full flex flex-col items-center">
+        <div className="text-muted-foreground mb-2 p-2 bg-muted rounded-md group-hover:bg-primary/20 group-hover:text-primary transition-colors">
+          {component.icon}
         </div>
-        <div className="text-xs text-gray-500 mt-1">
-          {component.description}
+        <div>
+          <div className="text-xs font-medium text-foreground">
+            {component.name}
+          </div>
+          <div className="text-[10px] text-muted-foreground mt-1 leading-tight">
+            {component.description}
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-export function ComponentPalette() {
+export function ComponentPalette({ globalComponents = {} }: { globalComponents?: GlobalComponents }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
-    new Set(componentCategories.map((cat) => cat.name))
+    new Set([
+      "Global",
+      "Favorites",
+      "Recent",
+      ...componentCategories.map((cat) => cat.name),
+    ])
   );
+  const { favorites, recent, toggleFavorite, isFavorite } =
+    useComponentFavorites();
 
   const toggleCategory = (categoryName: string) => {
-    const newExpanded = new Set(expandedCategories);
-    if (newExpanded.has(categoryName)) {
-      newExpanded.delete(categoryName);
-    } else {
-      newExpanded.add(categoryName);
-    }
-    setExpandedCategories(newExpanded);
+    setExpandedCategories((prev) => {
+      const newExpanded = new Set(prev);
+      if (newExpanded.has(categoryName)) {
+        newExpanded.delete(categoryName);
+      } else {
+        newExpanded.add(categoryName);
+      }
+      return newExpanded;
+    });
   };
+
+  // Get all components as flat list for favorites/recent
+  const allComponents = componentCategories.flatMap((cat) => cat.components);
+
+  const favoriteComponents = allComponents.filter((comp) =>
+    favorites.includes(comp.type)
+  );
+
+  const recentComponents = recent
+    .map((type) => allComponents.find((comp) => comp.type === type))
+    .filter(Boolean) as ComponentItem[];
 
   const filteredCategories = componentCategories
     .map((category) => ({
@@ -268,23 +169,115 @@ export function ComponentPalette() {
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
-      <div className="p-4 border-b border-gray-200">
-        <h3 className="text-sm font-semibold text-gray-900 mb-3">Components</h3>
+      <div className="p-3 border-b border-border">
+        <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider mb-3">Components</h3>
 
         {/* Search */}
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
           <Input
             placeholder="Search components..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-9 h-8 text-sm"
+            className="pl-9 h-8 text-xs bg-background border-border"
           />
         </div>
       </div>
 
       {/* Component Categories */}
       <div className="flex-1 overflow-auto p-4 space-y-4">
+        {/* Global Components Section */}
+        {!searchTerm && Object.keys(globalComponents).length > 0 && (
+          <div>
+            <button
+              onClick={() => toggleCategory("Global")}
+              className="flex items-center justify-between w-full text-left mb-3"
+            >
+              <span className="text-xs font-semibold text-blue-500 uppercase tracking-wide flex items-center gap-1">
+                <Globe className="w-3 h-3 text-blue-400" />
+                Global Components
+              </span>
+              <span className="text-[10px] text-muted-foreground">
+                {expandedCategories.has("Global") ? "−" : "+"}
+              </span>
+            </button>
+
+            {expandedCategories.has("Global") && (
+              <div className="grid grid-cols-2 gap-2 mb-4">
+                {Object.entries(globalComponents).map(([name, comp]) => (
+                  <DraggableGlobalComponent
+                    key={`global-${name}`}
+                    globalName={name}
+                    componentType={comp.type}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Favorites Section */}
+        {!searchTerm && favoriteComponents.length > 0 && (
+          <div>
+            <button
+              onClick={() => toggleCategory("Favorites")}
+              className="flex items-center justify-between w-full text-left mb-3"
+            >
+              <span className="text-xs font-semibold text-yellow-600 uppercase tracking-wide flex items-center gap-1">
+                <Star className="w-3 h-3 fill-yellow-400" />
+                Favorites
+              </span>
+              <span className="text-[10px] text-muted-foreground">
+                {expandedCategories.has("Favorites") ? "−" : "+"}
+              </span>
+            </button>
+
+            {expandedCategories.has("Favorites") && (
+              <div className="grid grid-cols-2 gap-2 mb-4">
+                {favoriteComponents.map((component) => (
+                  <DraggableComponent
+                    key={component.type}
+                    component={component}
+                    isFavorite={true}
+                    onToggleFavorite={() => toggleFavorite(component.type)}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Recent Section */}
+        {!searchTerm && recentComponents.length > 0 && (
+          <div>
+            <button
+              onClick={() => toggleCategory("Recent")}
+              className="flex items-center justify-between w-full text-left mb-3"
+            >
+              <span className="text-xs font-semibold text-primary uppercase tracking-wide">
+                Recent
+              </span>
+              <span className="text-[10px] text-muted-foreground">
+                {expandedCategories.has("Recent") ? "−" : "+"}
+              </span>
+            </button>
+
+            {expandedCategories.has("Recent") && (
+              <div className="grid grid-cols-2 gap-2 mb-4">
+                {recentComponents.map((component) => (
+                  <DraggableComponent
+                    key={component.type}
+                    component={component}
+                    isFavorite={isFavorite(component.type)}
+                    onToggleFavorite={() => toggleFavorite(component.type)}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Regular Categories */}
         {filteredCategories.map((category) => (
           <div key={category.name}>
             {/* Category Header */}
@@ -292,10 +285,10 @@ export function ComponentPalette() {
               onClick={() => toggleCategory(category.name)}
               className="flex items-center justify-between w-full text-left mb-3"
             >
-              <span className="text-xs font-semibold text-gray-700 uppercase tracking-wide">
+              <span className="text-xs font-semibold text-foreground opacity-80 uppercase tracking-wide">
                 {category.name}
               </span>
-              <span className="text-xs text-gray-500">
+              <span className="text-[10px] text-muted-foreground">
                 {expandedCategories.has(category.name) ? "−" : "+"}
               </span>
             </button>
@@ -307,6 +300,8 @@ export function ComponentPalette() {
                   <DraggableComponent
                     key={component.type}
                     component={component}
+                    isFavorite={isFavorite(component.type)}
+                    onToggleFavorite={() => toggleFavorite(component.type)}
                   />
                 ))}
               </div>
@@ -314,12 +309,14 @@ export function ComponentPalette() {
           </div>
         ))}
 
-        {filteredCategories.length === 0 && (
-          <div className="text-center py-8 text-gray-500">
-            <div className="text-4xl mb-2">🔍</div>
-            <div className="text-sm">No components found</div>
-          </div>
-        )}
+        {filteredCategories.length === 0 &&
+          !favoriteComponents.length &&
+          !recentComponents.length && (
+            <div className="text-center py-8 text-muted-foreground">
+              <div className="text-4xl mb-2 opacity-30">🔍</div>
+              <div className="text-sm">No components found</div>
+            </div>
+          )}
       </div>
     </div>
   );

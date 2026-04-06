@@ -13,7 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Plus, FileText, Trash2, Home } from "lucide-react";
+import { Plus, FileText, Trash2, Home, Copy } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface PagesPanelProps {
@@ -23,6 +23,7 @@ interface PagesPanelProps {
   onPageAdd: (name: string, slug: string) => void;
   onPageDelete: (pageId: string) => void;
   onPageRename: (pageId: string, name: string, slug: string) => void;
+  onPageDuplicate?: (pageId: string) => void;
 }
 
 export function PagesPanel({
@@ -32,6 +33,7 @@ export function PagesPanel({
   onPageAdd,
   onPageDelete,
   onPageRename,
+  onPageDuplicate,
 }: PagesPanelProps) {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [newPageName, setNewPageName] = useState("");
@@ -57,11 +59,10 @@ export function PagesPanel({
   };
 
   return (
-    <div className="h-full flex flex-col bg-white border-r border-gray-200">
+    <div className="h-full flex flex-col">
       {/* Header */}
-      <div className="p-4 border-b border-gray-200">
-        <h3 className="text-sm font-semibold text-gray-900">Pages</h3>
-        <p className="text-xs text-gray-500 mt-1">Manage your website pages</p>
+      <div className="p-3 border-b border-border">
+        <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider">Pages</h3>
       </div>
 
       {/* Pages List */}
@@ -70,46 +71,58 @@ export function PagesPanel({
           <div
             key={page.id}
             className={cn(
-              "flex items-center justify-between p-3 rounded-lg mb-2 cursor-pointer group",
+              "flex items-center justify-between p-2 rounded-md mb-1 cursor-pointer group",
               currentPageId === page.id
-                ? "bg-blue-50 border-2 border-blue-500"
-                : "hover:bg-gray-50 border-2 border-transparent"
+                ? "bg-primary/10 border border-primary text-primary"
+                : "hover:bg-muted border border-transparent text-foreground",
             )}
             onClick={() => onPageSelect(page.id)}
           >
             <div className="flex items-center gap-2 flex-1 min-w-0">
               {page.slug === "index" ? (
-                <Home className="w-4 h-4 text-gray-500 flex-shrink-0" />
+                <Home className="w-3.5 h-3.5 flex-shrink-0 opacity-70" />
               ) : (
-                <FileText className="w-4 h-4 text-gray-500 flex-shrink-0" />
+                <FileText className="w-3.5 h-3.5 flex-shrink-0 opacity-70" />
               )}
-              <div className="flex-1 min-w-0">
-                <div className="text-sm font-medium text-gray-900 truncate">
-                  {page.name}
-                </div>
-                <div className="text-xs text-gray-500 truncate">
-                  /{page.slug}.html
-                </div>
-              </div>
+              <span className="text-sm font-medium truncate">
+                {page.name}
+              </span>
+              <span className="text-[10px] opacity-50 truncate">
+                /{page.slug}.html
+              </span>
             </div>
-            {page.slug !== "index" && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onPageDelete(page.id);
-                }}
-                className="opacity-0 group-hover:opacity-100 p-1 hover:bg-red-100 rounded transition-opacity"
-                title="Delete page"
-              >
-                <Trash2 className="w-4 h-4 text-red-600" />
-              </button>
-            )}
+            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100">
+              {onPageDuplicate && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onPageDuplicate(page.id);
+                  }}
+                  className="p-1 hover:bg-primary/20 rounded transition-colors"
+                  title="Duplicate page"
+                >
+                  <Copy className="w-3.5 h-3.5 text-primary" />
+                </button>
+              )}
+              {page.slug !== "index" && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onPageDelete(page.id);
+                  }}
+                  className="p-1 hover:bg-destructive/20 rounded transition-colors"
+                  title="Delete page"
+                >
+                  <Trash2 className="w-3.5 h-3.5 text-destructive" />
+                </button>
+              )}
+            </div>
           </div>
         ))}
       </div>
 
       {/* Add Page Button */}
-      <div className="p-4 border-t border-gray-200">
+      <div className="p-3 border-t border-border">
         <Button
           variant="outline"
           size="sm"
@@ -150,7 +163,7 @@ export function PagesPanel({
                 onChange={(e) => setNewPageSlug(e.target.value)}
                 placeholder="about-us"
               />
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 Will be accessible at: /{newPageSlug || "page-name"}.html
               </p>
             </div>

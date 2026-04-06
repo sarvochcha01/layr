@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { buildComponentStyle } from "@/lib/buildStyle";
 
 interface FooterLink {
   text: string;
@@ -29,6 +30,7 @@ interface FooterProps {
   className?: string;
   width?: string;
   height?: string;
+  [key: string]: any;
 }
 
 export function Footer({
@@ -43,19 +45,17 @@ export function Footer({
   className,
   width,
   height,
+  ...rest
 }: FooterProps) {
   const currentYear = new Date().getFullYear();
   const defaultCopyright = `© ${currentYear} ${logoText}. All rights reserved.`;
 
+  const baseStyle = buildComponentStyle({ backgroundColor, textColor, width, height, ...rest });
+
   return (
     <footer
       className={cn("w-full py-8 sm:py-12 px-4 sm:px-8", className)}
-      style={{
-        backgroundColor,
-        color: textColor,
-        width: width || undefined,
-        height: height || undefined,
-      }}
+      style={baseStyle}
     >
       <div className="max-w-6xl mx-auto">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
