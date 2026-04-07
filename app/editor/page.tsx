@@ -11,7 +11,7 @@ import {
   DragStartEvent,
 } from "@dnd-kit/core";
 import { EditorLayout } from "@/components/editor/EditorLayout";
-import { ComponentDefinition, Page, GlobalComponents } from "@/types/editor";
+import { ComponentDefinition, Page, GlobalComponents, CustomComponents, ChatMessage } from "@/types/editor";
 import { generateId } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProject, useUpdateProject } from "@/hooks/useProjects";
@@ -118,6 +118,12 @@ export default function EditorPage() {
   // Global components state
   const [globalComponents, setGlobalComponents] = useState<GlobalComponents>({});
 
+  // Custom reusable components
+  const [customComponents, setCustomComponents] = useState<CustomComponents>({});
+
+  // AI chat history
+  const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
+
   const { addToRecent } = useComponentFavorites();
   const { copyComponent, pasteComponent, hasClipboard } =
     useComponentClipboard();
@@ -173,6 +179,12 @@ export default function EditorPage() {
             const globalComps = projectData.globalComponents || {};
             setGlobalComponents(globalComps);
 
+            const customComps = (projectData as any).customComponents || {};
+            setCustomComponents(customComps);
+
+            const history = (projectData as any).chatHistory || [];
+            setChatHistory(history);
+
             // Just load pages as they are
             setPages(projectData.pages, false);
         setCurrentPageId(projectData.pages[0]?.id || "home");
@@ -206,7 +218,7 @@ export default function EditorPage() {
         return page;
       });
 
-      const updates = sanitizeForFirestore({ pages: pagesWithGlobal, name: projectName, globalComponents });
+      const updates = sanitizeForFirestore({ pages: pagesWithGlobal, name: projectName, globalComponents, customComponents, chatHistory });
 
       updateProjectMutation.mutate({
         projectId,
@@ -216,7 +228,7 @@ export default function EditorPage() {
     }, 2000);
 
     return () => clearTimeout(timeoutId);
-  }, [pages, globalComponents, projectName, projectId, user, isInitialLoad]);
+  }, [pages, globalComponents, customComponents, chatHistory, projectName, projectId, user, isInitialLoad]);
 
   // Manual save handler
   const handleManualSave = async () => {
@@ -228,7 +240,7 @@ export default function EditorPage() {
         return page;
       });
 
-      const updates = sanitizeForFirestore({ pages: pagesWithGlobal, name: projectName, globalComponents });
+      const updates = sanitizeForFirestore({ pages: pagesWithGlobal, name: projectName, globalComponents, customComponents, chatHistory });
 
       await updateProjectMutation.mutateAsync({
         projectId,
@@ -370,6 +382,29 @@ export default function EditorPage() {
 
           updateCurrentPageComponents((prev) =>
             insertComponent(prev, newGlobalComponent, targetId, position),
+          );
+        }
+      }
+    } else if (active.data.current?.type === "palette-custom") {
+      const { customName } = active.data.current;
+      const template = customComponents[customName];
+
+      if (template) {
+        // Deep clone the custom component with new IDs
+        const cloneComponent = (comp: ComponentDefinition): ComponentDefinition => ({
+          ...comp,
+          id: generateId(),
+          children: comp.children.map(cloneComponent),
+        });
+
+        const newCustomComponent = cloneComponent(template);
+
+        if (over.data.current?.type === "drop-zone") {
+          const targetId = over.data.current.targetId;
+          const position = over.data.current.position;
+
+          updateCurrentPageComponents((prev) =>
+            insertComponent(prev, newCustomComponent, targetId, position),
           );
         }
       }
@@ -580,6 +615,82 @@ export default function EditorPage() {
     toast.success(`${componentType} added to page`);
   };
 
+  // AI components handler
+  const handleApplyAIComponents = (aiComponents: ComponentDefinition[], mode: "add" | "replace") => {
+    if (mode === "replace") {
+      updateCurrentPageComponents(() => aiComponents);
+      toast.success(`Page replaced with ${aiComponents.length} AI-generated component${aiComponents.length !== 1 ? "s" : ""}`);
+    } else {
+      updateCurrentPageComponents((prev) => [...prev, ...aiComponents]);
+      toast.success(`${aiComponents.length} AI-generated component${aiComponents.length !== 1 ? "s" : ""} added to page`);
+    }
+    setSelectedComponentIds([]);
+  };
+
+  // AI pages handler
+  const handleApplyAIPages = (aiPages: { name: string; path: string; components: ComponentDefinition[] }[]) => {
+    if (!aiPages || aiPages.length === 0) return;
+
+    const newPages: Page[] = aiPages.map((p) => {
+      const pageId = generateId();
+      return {
+        id: pageId,
+        name: p.name || "Untitled Page",
+        slug: p.path ? p.path.replace(/^\//, "") : pageId,
+        path: p.path || `/${pageId}`,
+        components: p.components || [],
+      };
+    });
+
+    setPages((prev) => [...prev, ...newPages]);
+    // Switch to the first newly generated page
+    setCurrentPageId(newPages[0].id);
+    toast.success(`Generated ${newPages.length} new page${newPages.length > 1 ? "s" : ""}`);
+  };
+
+  // Custom component handlers
+  const handleSaveCustomComponent = (componentId: string, customName: string) => {
+    const component = findComponentInTree(components, componentId);
+    if (!component) return;
+
+    // Deep clone the component
+    const cloneComponent = (comp: ComponentDefinition): ComponentDefinition => ({
+      ...comp,
+      id: comp.id,
+      children: comp.children.map(cloneComponent),
+    });
+
+    setCustomComponents((prev) => ({
+      ...prev,
+      [customName]: cloneComponent(component),
+    }));
+    toast.success(`Saved as custom component: ${customName}`);
+  };
+
+  const handleDeleteCustomComponent = (customName: string) => {
+    setCustomComponents((prev) => {
+      const next = { ...prev };
+      delete next[customName];
+      return next;
+    });
+    toast.success(`Custom component "${customName}" deleted`);
+  };
+
+  // Code-based custom component handler
+  const handleSaveCodeComponent = (name: string, html: string, css: string) => {
+    const codeComponent: ComponentDefinition = {
+      id: generateId(),
+      type: "CustomCode",
+      props: { html, css, name },
+      children: [],
+    };
+    setCustomComponents((prev) => ({
+      ...prev,
+      [name]: codeComponent,
+    }));
+    toast.success(`Custom code component "${name}" created`);
+  };
+
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -745,6 +856,14 @@ export default function EditorPage() {
           onApplyGlobalTemplate={applyGlobalTemplate}
           onMoveComponentUp={moveComponentUp}
           onMoveComponentDown={moveComponentDown}
+          onApplyAIComponents={handleApplyAIComponents}
+          onApplyAIPages={handleApplyAIPages}
+          customComponents={customComponents}
+          onSaveCustomComponent={handleSaveCustomComponent}
+          onDeleteCustomComponent={handleDeleteCustomComponent}
+          onSaveCodeComponent={handleSaveCodeComponent}
+          chatHistory={chatHistory}
+          onChatHistoryChange={setChatHistory}
         />
 
         <DragOverlay>

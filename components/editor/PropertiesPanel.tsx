@@ -2448,8 +2448,7 @@ export function PropertiesPanel({
               <div className="text-[10px] text-muted-foreground/50 mt-1 uppercase tracking-wider">Advanced configuration coming soon</div>
             </div>
             <Accordion type="multiple" defaultValue={["colors", "dimensions"]} className="w-full">
-              {renderColorFields()}
-              {renderDimensionFields()}
+              {renderAllStyleSections()}
             </Accordion>
           </div>
         );
