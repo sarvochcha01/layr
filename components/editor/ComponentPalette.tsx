@@ -116,14 +116,16 @@ function DraggableComponent({
   component,
   isFavorite,
   onToggleFavorite,
+  idPrefix = "",
 }: {
   component: ComponentItem;
   isFavorite: boolean;
   onToggleFavorite: () => void;
+  idPrefix?: string;
 }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({
-      id: `palette-${component.type}`,
+      id: `palette-${idPrefix}${component.type}`,
       data: {
         type: "palette-item",
         componentType: component.type,
@@ -411,10 +413,11 @@ export function ComponentPalette({
               <div className="grid grid-cols-2 gap-2 mb-4">
                 {favoriteComponents.map((component) => (
                   <DraggableComponent
-                    key={component.type}
+                    key={`fav-${component.type}`}
                     component={component}
                     isFavorite={true}
                     onToggleFavorite={() => toggleFavorite(component.type)}
+                    idPrefix="fav-"
                   />
                 ))}
               </div>
@@ -441,10 +444,11 @@ export function ComponentPalette({
               <div className="grid grid-cols-2 gap-2 mb-4">
                 {recentComponents.map((component) => (
                   <DraggableComponent
-                    key={component.type}
+                    key={`recent-${component.type}`}
                     component={component}
                     isFavorite={isFavorite(component.type)}
                     onToggleFavorite={() => toggleFavorite(component.type)}
+                    idPrefix="recent-"
                   />
                 ))}
               </div>

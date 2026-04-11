@@ -4,6 +4,7 @@ import { generateCSS, generateHTML, generateJS } from "@/lib/codeGenerator";
 import {
     generateReactComponent,
     generateReactComponentsIndex,
+    generateComponentFiles,
     generatePackageJson,
     generateNextConfig,
     generateTailwindConfig,
@@ -59,6 +60,12 @@ export async function POST(request: NextRequest) {
 
             // Add component index
             componentsFolder?.file("index.ts", generateReactComponentsIndex());
+
+            // Add individual component files
+            const componentFiles = generateComponentFiles();
+            for (const [filename, content] of Object.entries(componentFiles)) {
+                componentsFolder?.file(filename, content);
+            }
 
             // Add config files
             zip.file("package.json", generatePackageJson(projectName));

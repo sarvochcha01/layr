@@ -6,16 +6,16 @@ interface TextProps {
   content?: string;
   tag?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "p" | "span" | "div";
   size?:
-    | "xs"
-    | "sm"
-    | "base"
-    | "lg"
-    | "xl"
-    | "2xl"
-    | "3xl"
-    | "4xl"
-    | "5xl"
-    | "6xl";
+  | "xs"
+  | "sm"
+  | "base"
+  | "lg"
+  | "xl"
+  | "2xl"
+  | "3xl"
+  | "4xl"
+  | "5xl"
+  | "6xl";
   weight?: "light" | "normal" | "medium" | "semibold" | "bold" | "extrabold";
   color?: string;
   align?: "left" | "center" | "right" | "justify";

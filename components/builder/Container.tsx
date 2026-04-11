@@ -5,7 +5,7 @@ interface ContainerProps {
   children?: React.ReactNode;
   className?: string;
   maxWidth?:
-    | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl" | "5xl" | "6xl" | "7xl" | "full";
+  | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl" | "5xl" | "6xl" | "7xl" | "full";
   padding?: "none" | "sm" | "md" | "lg" | "xl";
   margin?: "none" | "sm" | "md" | "lg" | "xl" | "auto";
   backgroundColor?: string;
@@ -13,7 +13,7 @@ interface ContainerProps {
   tag?: "div" | "main" | "section" | "article" | "aside" | "header" | "footer";
   width?: string;
   height?: string;
-  display?: "block" | "flex";
+  display?: "flex" | "block";
   flexDirection?: "row" | "column" | "row-reverse" | "column-reverse";
   flexWrap?: "nowrap" | "wrap" | "wrap-reverse";
   justifyContent?: "start" | "center" | "end" | "between" | "around" | "evenly";
@@ -35,8 +35,8 @@ export function Container({
   tag = "div",
   width,
   height,
-  display = "block",
-  flexDirection = "row",
+  display = "flex",
+  flexDirection = "column",
   flexWrap = "nowrap",
   justifyContent = "start",
   alignItems = "start",

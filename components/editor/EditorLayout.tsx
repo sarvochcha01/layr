@@ -9,7 +9,7 @@ import { PropertiesPanel } from "./PropertiesPanel";
 import { PagesPanel } from "./PagesPanel";
 import { AIChatPanel } from "./AIChatPanel";
 import { CodeEditorDialog } from "./CodeEditorDialog";
-import { Download, Eye, Edit, X, Undo, Redo, Monitor, Tablet, Smartphone, Layers, LayoutTemplate, FileBox, Save, Sparkles } from "lucide-react";
+import { Download, Eye, Edit, X, Undo, Redo, Monitor, Tablet, Smartphone, Layers, LayoutTemplate, FileBox, Save, Sparkles, BoxSelect } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -97,6 +97,7 @@ export function EditorLayout({
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedName, setEditedName] = useState(projectName || "");
   const [showExportMenu, setShowExportMenu] = useState(false);
+  const [showOutlines, setShowOutlines] = useState(false);
 
   // Panel widths and heights
   const [leftPanelWidth, setLeftPanelWidth] = useState(320);
@@ -455,6 +456,21 @@ export function EditorLayout({
 
             <div className="w-px h-4 bg-border mx-1"></div>
 
+            {/* Outline Toggle */}
+            <button
+              onClick={() => setShowOutlines(!showOutlines)}
+              className={`flex items-center justify-center w-8 h-8 rounded transition-colors ${
+                showOutlines
+                  ? "bg-primary/10 text-primary hover:bg-primary/20"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
+              }`}
+              title={showOutlines ? "Hide Outlines" : "Show Outlines"}
+            >
+              <BoxSelect className="w-4 h-4" />
+            </button>
+
+            <div className="w-px h-4 bg-border mx-1"></div>
+
             <button
               onClick={() => setIsPreviewMode(!isPreviewMode)}
               className={`flex items-center justify-center w-8 h-8 rounded transition-colors ${
@@ -540,6 +556,7 @@ export function EditorLayout({
                 }
               }}
               pages={pages}
+              showOutlines={!isPreviewMode && showOutlines}
             />
           </div>
         </div>
