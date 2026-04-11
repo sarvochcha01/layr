@@ -82,6 +82,13 @@ export function buildComponentStyle(props: Record<string, any>): React.CSSProper
     if (props.zIndex) style.zIndex = Number(props.zIndex);
 
     // --- Overflow ---
+    if (props.overflowX_css && props.overflowX_css !== "visible") {
+        style.overflowX = props.overflowX_css as any;
+    }
+    if (props.overflowY_css && props.overflowY_css !== "visible") {
+        style.overflowY = props.overflowY_css as any;
+    }
+    // Legacy support for old overflow_css prop
     if (props.overflow_css && props.overflow_css !== "visible") {
         style.overflow = props.overflow_css as any;
     }

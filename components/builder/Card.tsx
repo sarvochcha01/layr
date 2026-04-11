@@ -42,7 +42,7 @@ export function Card({
       "bg-white shadow-lg hover:shadow-xl transition-shadow",
   };
 
-  const baseStyle = buildComponentStyle({ backgroundColor, textColor, width: width || "250px", height, ...rest });
+  const baseStyle = buildComponentStyle({ backgroundColor, textColor, width, height, ...rest });
 
   return (
     <div

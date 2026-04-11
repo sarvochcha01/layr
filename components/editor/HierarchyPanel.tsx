@@ -99,6 +99,18 @@ export function HierarchyPanel({
           )}
           style={{ paddingLeft: `${level * 16 + 8}px` }}
           onClick={() => onSelectComponent(component.id)}
+          onDoubleClick={() => {
+            onSelectComponent(component.id);
+            // Find the component element in the canvas and scroll to it
+            const el = document.querySelector(`[data-component-id="${component.id}"]`);
+            if (el) {
+              el.scrollIntoView({ behavior: "smooth", block: "center" });
+              // Brief highlight flash
+              el.classList.add("ring-4", "ring-blue-400/50");
+              setTimeout(() => el.classList.remove("ring-4", "ring-blue-400/50"), 1000);
+            }
+          }}
+          title={component.props.title || component.props.text || component.props.logoText || component.type}
         >
           {/* Expand/Collapse Button */}
           <button
