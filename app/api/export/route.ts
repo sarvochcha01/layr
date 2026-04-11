@@ -8,6 +8,9 @@ import {
     generateNextConfig,
     generateTailwindConfig,
     generateREADME,
+    generateAppLayout,
+    generateAppPage,
+    generateComponentImplementation,
 } from "@/lib/reactGenerator";
 
 export async function POST(request: NextRequest) {
@@ -44,20 +47,46 @@ export async function POST(request: NextRequest) {
         const zip = new JSZip();
 
         if (format === "react") {
-            // React/Next.js export
-            const pagesFolder = zip.folder("pages");
+            // React/Next.js export with App Router structure
+            const appFolder = zip.folder("app");
             const componentsFolder = zip.folder("components");
 
-            // Generate page components
-            for (const page of pagesToExport) {
-                const pageName = page.name.replace(/\s+/g, "");
-                const reactComponent = generateReactComponent(page.components, pageName);
+            // Generate app/layout.tsx
+            appFolder?.file("layout.tsx", generateAppLayout(projectName));
 
-                const filename = page.slug === "index" ? "index.tsx" : `${page.slug}.tsx`;
-                pagesFolder?.file(filename, reactComponent);
+            // Generate page components using App Router structure
+            for (let i = 0; i < pagesToExport.length; i++) {
+                const page = pagesToExport[i];
+                const pageName = page.name.replace(/\s+/g, "");
+
+                // App Router uses app/page.tsx for home and app/[slug]/page.tsx for other pages
+                // First page with slug "index" OR the very first page becomes the home page
+                if (page.slug === "index" || (i === 0 && !pagesToExport.some(p => p.slug === "index"))) {
+                    // Use generateAppPage for the home page with metadata
+                    const appPageContent = generateAppPage(page.components, pageName, `${pageName} - ${projectName}`);
+                    appFolder?.file("page.tsx", appPageContent);
+                } else {
+                    // Use generateReactComponent for additional pages
+                    const reactComponent = generateReactComponent(page.components, pageName);
+                    const pageFolder = appFolder?.folder(page.slug);
+                    pageFolder?.file("page.tsx", reactComponent);
+                }
             }
 
-            // Add component index
+            // Generate all component implementation files
+            const componentNames = [
+                'Header', 'Footer', 'Hero', 'Section', 'Container', 'Grid',
+                'Card', 'Button', 'Text', 'Image', 'Video', 'Form',
+                'Navbar', 'Accordion', 'Tabs', 'Testimonial', 'PricingCard',
+                'Feature', 'Stats', 'CTA', 'Divider', 'Spacer', 'Badge', 'Alert'
+            ];
+
+            for (const componentName of componentNames) {
+                const componentCode = generateComponentImplementation(componentName);
+                componentsFolder?.file(`${componentName}.tsx`, componentCode);
+            }
+
+            // Add component index for convenient imports
             componentsFolder?.file("index.ts", generateReactComponentsIndex());
 
             // Add config files

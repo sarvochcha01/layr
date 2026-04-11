@@ -1,0 +1,134 @@
+# Implementation Plan
+
+- [x] 1. Write bug condition exploration test
+  - **Property 1: Bug Condition** - Pages Router Structure with Missing Component Implementations
+  - **CRITICAL**: This test MUST FAIL on unfixed code - failure confirms the bug exists
+  - **DO NOT attempt to fix the test or the code when it fails**
+  - **NOTE**: This test encodes the expected behavior - it will validate the fix when it passes after implementation
+  - **GOAL**: Surface counterexamples that demonstrate the bug exists
+  - **Scoped PBT Approach**: For deterministic bugs, scope the property to the concrete failing case(s) to ensure reproducibility
+  - Test that when format === "react", the export generates pages/ directory instead of app/ directory
+  - Test that when format === "react", the export generates components/index.ts without actual component implementation files
+  - Test that when format === "react", the export does NOT generate app/layout.tsx
+  - Test that when format === "react", the export does NOT generate app/page.tsx
+  - The test assertions should match the Expected Behavior Properties from design (App Router structure with complete components)
+  - Run test on UNFIXED code
+  - **EXPECTED OUTCOME**: Test FAILS (this is correct - it proves the bug exists)
+  - Document counterexamples found to understand root cause (e.g., "ZIP contains pages/ instead of app/", "components/Header.tsx missing")
+  - Mark task complete when test is written, run, and failure is documented
+  - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5_
+
+- [x] 2. Write preservation property tests (BEFORE implementing fix)
+  - **Property 2: Preservation** - HTML Export and Configuration Files
+  - **IMPORTANT**: Follow observation-first methodology
+  - Observe behavior on UNFIXED code for non-buggy inputs (format !== "react")
+  - Observe that HTML export (format === "html") generates .html files with styles.css and script.js
+  - Observe that configuration files (package.json, next.config.js, tailwind.config.js, tsconfig.json, postcss.config.js) are generated correctly
+  - Observe that multi-page exports generate separate files for each page
+  - Observe that invalid pages data returns 400 error response
+  - Observe that ZIP file generation includes proper Content-Type and Content-Disposition headers
+  - Write property-based tests capturing observed behavior patterns from Preservation Requirements
+  - Property-based testing generates many test cases for stronger guarantees
+  - Run tests on UNFIXED code
+  - **EXPECTED OUTCOME**: Tests PASS (this confirms baseline behavior to preserve)
+  - Mark task complete when tests are written, run, and passing on unfixed code
+  - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5_
+
+- [ ] 3. Fix for Next.js Export Structure
+  - [x] 3.1 Update export route to generate App Router structure
+    - Replace pages/ directory with app/ directory in route.ts
+    - Change `zip.folder("pages")` to `zip.folder("app")`
+    - Generate app/page.tsx for home page instead of pages/index.tsx
+    - Generate app/[slug]/page.tsx for additional pages (multi-page support)
+    - _Bug_Condition: isBugCondition(input) where input.format === "react" AND exportGeneratesPagesDirectory() AND NOT exportGeneratesAppDirectory()_
+    - _Expected_Behavior: Generate app/ directory structure following Next.js App Router conventions (Requirements 2.1)_
+    - _Preservation: HTML export functionality must continue to generate HTML files (Requirement 3.1)_
+    - _Requirements: 1.1, 2.1_
+
+  - [x] 3.2 Generate app/layout.tsx file
+    - Create new function `generateAppLayout()` in lib/reactGenerator.ts
+    - Generate root layout with html and body tags
+    - Import and apply global styles from @/styles/globals.css
+    - Include proper TypeScript types (children: React.ReactNode)
+    - Add metadata export for page title and description
+    - Call this function in route.ts to create app/layout.tsx in ZIP
+    - _Bug_Condition: isBugCondition(input) where NOT appLayoutExists()_
+    - _Expected_Behavior: Generate app/layout.tsx with proper root layout structure (Requirement 2.3)_
+    - _Preservation: Configuration file generation must remain unchanged (Requirement 3.3)_
+    - _Requirements: 1.3, 2.3_
+
+  - [x] 3.3 Generate app/page.tsx file
+    - Create new function `generateAppPage()` in lib/reactGenerator.ts
+    - Import components from @/components (Header, Footer, Hero, Section, etc.)
+    - Render page components based on page.components data
+    - Use proper App Router conventions (async components if needed)
+    - Export metadata for SEO (title, description)
+    - Call this function in route.ts to create app/page.tsx in ZIP
+    - _Bug_Condition: isBugCondition(input) where NOT appPageExists()_
+    - _Expected_Behavior: Generate app/page.tsx that imports and uses the page components (Requirement 2.4)_
+    - _Preservation: Multi-page export logic must continue to generate separate files (Requirement 3.2)_
+    - _Requirements: 1.4, 2.4_
+
+  - [x] 3.4 Generate component implementation files
+    - Create new function `generateComponentImplementation(componentName: string)` in lib/reactGenerator.ts
+    - Generate individual .tsx files for each component type:
+      - Header.tsx, Footer.tsx, Hero.tsx, Section.tsx, Container.tsx, Grid.tsx, Card.tsx, Button.tsx, Text.tsx, Image.tsx, Video.tsx, Form.tsx, Navbar.tsx, Accordion.tsx, Tabs.tsx, Testimonial.tsx, PricingCard.tsx, Feature.tsx, Stats.tsx, CTA.tsx, Divider.tsx, Spacer.tsx, Badge.tsx, Alert.tsx
+    - Each component should be a functional React component with TypeScript interface for props
+    - Include basic component structure with Tailwind CSS classes
+    - Include proper TypeScript types (e.g., `interface HeaderProps { title?: string; }`)
+    - Update route.ts to generate all component files in components/ folder
+    - Remove or update generateReactComponentsIndex() to work with actual implementations
+    - _Bug_Condition: isBugCondition(input) where NOT componentImplementationsExist()_
+    - _Expected_Behavior: Create components folder containing actual component implementation files (Requirement 2.2)_
+    - _Preservation: ZIP file generation and HTTP response headers must remain unchanged (Requirement 3.4)_
+    - _Requirements: 1.2, 2.2_
+
+  - [x] 3.5 Update generateReactComponent for App Router compatibility
+    - Modify generateReactComponent() in lib/reactGenerator.ts to use named exports instead of default exports
+    - Update import statements to use @/components path alias
+    - Ensure generated page components work with App Router conventions
+    - Remove references to pages/ directory in generated code
+    - _Expected_Behavior: Ensure exported project runs successfully with npm install && npm run dev (Requirement 2.5)_
+    - _Preservation: Error handling for invalid pages data must continue to return 400 error (Requirement 3.5)_
+    - _Requirements: 1.5, 2.5_
+
+  - [x] 3.6 Update configuration files for App Router
+    - Update tailwind.config.js content paths to include app/ directory
+    - Update README.md to reflect App Router structure (app/ instead of pages/)
+    - Ensure tsconfig.json paths configuration works with @/ alias
+    - Verify all configuration files are compatible with Next.js 14+ App Router
+    - _Expected_Behavior: Configuration files must support App Router structure_
+    - _Preservation: Configuration file generation must remain unchanged for non-React exports (Requirement 3.3)_
+    - _Requirements: 2.1, 2.5_
+
+  - [-] 3.7 Verify bug condition exploration test now passes
+    - **Property 1: Expected Behavior** - App Router Structure with Complete Components
+    - **IMPORTANT**: Re-run the SAME test from task 1 - do NOT write a new test
+    - The test from task 1 encodes the expected behavior
+    - When this test passes, it confirms the expected behavior is satisfied
+    - Run bug condition exploration test from step 1
+    - **EXPECTED OUTCOME**: Test PASSES (confirms bug is fixed)
+    - Verify ZIP contains app/ directory instead of pages/
+    - Verify ZIP contains app/layout.tsx and app/page.tsx
+    - Verify ZIP contains actual component implementation files (Header.tsx, Footer.tsx, etc.)
+    - Verify exported project can run with npm install && npm run dev
+    - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_
+
+  - [~] 3.8 Verify preservation tests still pass
+    - **Property 2: Preservation** - HTML Export and Configuration Files
+    - **IMPORTANT**: Re-run the SAME tests from task 2 - do NOT write new tests
+    - Run preservation property tests from step 2
+    - **EXPECTED OUTCOME**: Tests PASS (confirms no regressions)
+    - Verify HTML export (format === "html") still generates .html files with styles.css and script.js
+    - Verify configuration files are still generated correctly
+    - Verify multi-page exports still work
+    - Verify error handling for invalid data still returns 400
+    - Verify ZIP file generation and headers are unchanged
+    - Confirm all tests still pass after fix (no regressions)
+
+- [~] 4. Checkpoint - Ensure all tests pass
+  - Run all property-based tests (bug condition and preservation)
+  - Verify no regressions in HTML export functionality
+  - Verify exported React/Next.js project runs successfully with npm install && npm run dev
+  - Verify exported project builds successfully with npm run build
+  - Ensure all tests pass, ask the user if questions arise

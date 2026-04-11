@@ -130,7 +130,7 @@ function ComponentWrapper({
       ref={setNodeRef}
       data-component-id={component.id}
       className={cn(
-        "relative group",
+        "relative group min-w-0",
         shouldTakeFullHeight && "flex self-stretch",
         shouldTakeFullWidth && "w-full",
         isDragging && "opacity-40"

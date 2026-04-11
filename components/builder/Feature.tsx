@@ -18,20 +18,20 @@ interface FeatureProps {
 export function Feature({
   icon = "✨",
   title = "Feature Title",
-  description = "Feature description goes here",
+  description = "Explain the value of this feature in a way that resonates with your audience.",
   layout = "vertical",
   iconSize = "md",
   backgroundColor,
   textColor,
-  iconColor = "#3b82f6",
+  iconColor = "#6366f1",
   width,
   height,
   ...rest
 }: FeatureProps) {
   const iconSizes = {
-    sm: "text-2xl w-10 h-10",
-    md: "text-3xl w-14 h-14",
-    lg: "text-4xl w-16 h-16",
+    sm: "text-xl w-10 h-10",
+    md: "text-2xl w-12 h-12",
+    lg: "text-3xl w-14 h-14",
   };
 
   const baseStyle = buildComponentStyle({ backgroundColor, textColor, width, height, ...rest });
@@ -39,28 +39,34 @@ export function Feature({
   return (
     <div
       className={cn(
-        "p-6",
-        layout === "vertical" ? "text-center" : "flex gap-4 items-start"
+        "p-6 rounded-2xl transition-all duration-300 min-w-0 overflow-hidden",
+        "hover:bg-gray-50/80",
+        layout === "vertical" ? "text-center" : "flex gap-5 items-start"
       )}
       style={baseStyle}
     >
       <div
         className={cn(
-          "rounded-lg flex items-center justify-center flex-shrink-0",
+          "rounded-xl flex items-center justify-center flex-shrink-0",
           iconSizes[iconSize],
-          layout === "vertical" && "mx-auto mb-4"
+          layout === "vertical" && "mx-auto mb-5"
         )}
         style={{
-          backgroundColor: `${iconColor}20`,
+          background: `linear-gradient(135deg, ${iconColor}15, ${iconColor}25)`,
           color: iconColor,
         }}
       >
         {icon}
       </div>
 
-      <div className={cn(layout === "vertical" ? "text-center" : "flex-1")}>
-        <h3 className="text-xl font-semibold mb-2">{title}</h3>
-        <p className="opacity-75">{description}</p>
+      <div className={cn("min-w-0", layout === "vertical" ? "text-center" : "flex-1")}>
+        <h3
+          className="text-lg font-semibold mb-2 tracking-tight break-words"
+          style={{ fontFamily: "'Inter', sans-serif" }}
+        >
+          {title}
+        </h3>
+        <p className="text-sm leading-relaxed opacity-60 break-words">{description}</p>
       </div>
     </div>
   );

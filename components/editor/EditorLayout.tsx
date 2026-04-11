@@ -12,6 +12,16 @@ import { CodeEditorDialog } from "./CodeEditorDialog";
 import { Download, Eye, Edit, X, Undo, Redo, Monitor, Tablet, Smartphone, Layers, LayoutTemplate, FileBox, Save, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import JSZip from "jszip";
+import { generateCSS, generateHTML, generateJS } from "@/lib/codeGenerator";
+import {
+  generateReactComponent,
+  generateReactComponentsIndex,
+  generatePackageJson,
+  generateNextConfig,
+  generateTailwindConfig,
+  generateREADME,
+} from "@/lib/reactGenerator";
 
 type Viewport = "desktop" | "tablet" | "mobile";
 
@@ -193,39 +203,71 @@ export function EditorLayout({
     try {
       setShowExportMenu(false);
 
-      // Call the export API with pages
-      const response = await fetch("/api/export", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          pages,
-          format,
-          projectName: projectName || "my-website",
-        }),
-      });
+      const zip = new JSZip();
+      const pagesToExport = pages;
+      const name = projectName || "my-website";
 
-      if (!response.ok) {
-        throw new Error("Export failed");
+      if (format === "react") {
+        // React/Next.js export — fully client-side
+        const pagesFolder = zip.folder("pages");
+        const componentsFolder = zip.folder("components");
+
+        for (const page of pagesToExport) {
+          const pageName = page.name.replace(/\s+/g, "");
+          const reactComponent = generateReactComponent(page.components, pageName);
+          const filename = page.slug === "index" ? "index.tsx" : `${page.slug}.tsx`;
+          pagesFolder?.file(filename, reactComponent);
+        }
+
+        componentsFolder?.file("index.ts", generateReactComponentsIndex());
+        zip.file("package.json", generatePackageJson(name));
+        zip.file("next.config.js", generateNextConfig());
+        zip.file("tailwind.config.js", generateTailwindConfig());
+        zip.file("README.md", generateREADME(name));
+        zip.file("postcss.config.js", `module.exports = {\n  plugins: {\n    tailwindcss: {},\n    autoprefixer: {},\n  },\n}\n`);
+
+        const stylesFolder = zip.folder("styles");
+        stylesFolder?.file("globals.css", `@tailwind base;\n@tailwind components;\n@tailwind utilities;\n`);
+
+        zip.file("tsconfig.json", JSON.stringify({
+          compilerOptions: {
+            target: "es5", lib: ["dom", "dom.iterable", "esnext"], allowJs: true,
+            skipLibCheck: true, strict: true, forceConsistentCasingInFileNames: true,
+            noEmit: true, esModuleInterop: true, module: "esnext",
+            moduleResolution: "node", resolveJsonModule: true, isolatedModules: true,
+            jsx: "preserve", incremental: true, paths: { "@/*": ["./*"] },
+          },
+          include: ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+          exclude: ["node_modules"],
+        }, null, 2));
+      } else {
+        // HTML export — client-side
+        const css = generateCSS();
+        const js = generateJS();
+
+        for (const page of pagesToExport) {
+          const html = generateHTML(page.components, pagesToExport);
+          const filename = `${page.slug || page.id}.html`;
+          zip.file(filename, html);
+        }
+
+        zip.file("styles.css", css);
+        zip.file("script.js", js);
       }
 
-      // Get the blob from response
-      const blob = await response.blob();
-
-      // Create download link
+      // Generate and download the zip
+      const blob = await zip.generateAsync({ type: "blob" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download =
-        format === "react" ? "react-project.zip" : "website-export.zip";
+      a.download = format === "react" ? `${name}-nextjs.zip` : `${name}-export.zip`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     } catch (error) {
       console.error("Export failed:", error);
-      alert("Export failed. Please try again.");
+      alert("Export failed: " + (error instanceof Error ? error.message : "Unknown error"));
     }
   };
 
