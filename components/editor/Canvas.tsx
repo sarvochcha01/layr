@@ -128,6 +128,7 @@ function ComponentWrapper({
   return (
     <div
       ref={setNodeRef}
+      data-component-id={component.id}
       className={cn(
         "relative group",
         shouldTakeFullHeight && "flex self-stretch",

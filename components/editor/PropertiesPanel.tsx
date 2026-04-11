@@ -489,15 +489,26 @@ export function PropertiesPanel({
                 ))}
               </div>
             )}
+            <div className="space-y-1.5">
+              <Label className={labelClass}>Z-Index</Label>
+              <Input type="number" value={props.zIndex || ""} onChange={(e) => updateProp("zIndex", e.target.value)} placeholder="auto" className="h-8 text-xs" />
+            </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label className={labelClass}>Z-Index</Label>
-                <Input type="number" value={props.zIndex || ""} onChange={(e) => updateProp("zIndex", e.target.value)} placeholder="auto" className="h-8 text-xs" />
+                <Label className={labelClass}>Overflow X</Label>
+                <div className="relative border rounded-md">
+                  <select value={props.overflowX_css || "visible"} onChange={(e) => updateProp("overflowX_css", e.target.value)} className={selectClass}>
+                    <option className="bg-background text-foreground" value="visible">Visible</option>
+                    <option className="bg-background text-foreground" value="hidden">Hidden</option>
+                    <option className="bg-background text-foreground" value="scroll">Scroll</option>
+                    <option className="bg-background text-foreground" value="auto">Auto</option>
+                  </select>
+                </div>
               </div>
               <div className="space-y-1.5">
-                <Label className={labelClass}>Overflow</Label>
+                <Label className={labelClass}>Overflow Y</Label>
                 <div className="relative border rounded-md">
-                  <select value={props.overflow_css || "visible"} onChange={(e) => updateProp("overflow_css", e.target.value)} className={selectClass}>
+                  <select value={props.overflowY_css || "visible"} onChange={(e) => updateProp("overflowY_css", e.target.value)} className={selectClass}>
                     <option className="bg-background text-foreground" value="visible">Visible</option>
                     <option className="bg-background text-foreground" value="hidden">Hidden</option>
                     <option className="bg-background text-foreground" value="scroll">Scroll</option>
@@ -1446,9 +1457,17 @@ export function PropertiesPanel({
                       <option className="bg-background text-foreground" value="md">Medium</option>
                       <option className="bg-background text-foreground" value="lg">Large</option>
                       <option className="bg-background text-foreground" value="xl">Extra Large</option>
+                      <option className="bg-background text-foreground" value="custom">Custom</option>
                     </select>
                   </div>
                 </div>
+
+                {props.gap === "custom" && (
+                  <div className="space-y-1.5">
+                    <Label htmlFor="gapCustom" className="text-xs font-medium text-muted-foreground">Custom Gap</Label>
+                    <Input id="gapCustom" value={props.gapCustom || ""} onChange={(e) => updateProp("gapCustom", e.target.value)} placeholder="e.g. 20px, 1.5rem" className="h-8 text-xs" />
+                  </div>
+                )}
 
                 <div className="flex items-center justify-between p-2 rounded-md bg-muted border border-border/50">
                   <Label htmlFor="responsive" className="text-xs font-medium text-muted-foreground cursor-pointer">Responsive (Stack on mobile)</Label>
@@ -2448,8 +2467,7 @@ export function PropertiesPanel({
               <div className="text-[10px] text-muted-foreground/50 mt-1 uppercase tracking-wider">Advanced configuration coming soon</div>
             </div>
             <Accordion type="multiple" defaultValue={["colors", "dimensions"]} className="w-full">
-              {renderColorFields()}
-              {renderDimensionFields()}
+              {renderAllStyleSections()}
             </Accordion>
           </div>
         );

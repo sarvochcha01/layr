@@ -1,8 +1,8 @@
 {
-    "name": "E-commerce Store",
-    "description": "Complete online store with product showcase, features, testimonials - Multi-page",
+    "name": "E-commerce Store - Premium Minimalist",
+    "description": "An elegant, earthy-toned e-commerce template focusing on large imagery, breathable whitespace, and premium typography.",
     "category": "E-commerce",
-    "thumbnail": "https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=400",
+    "thumbnail": "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400",
     "featured": true,
     "pages": [
         {
@@ -14,120 +14,98 @@
                     "id": "nav-1",
                     "type": "Navbar",
                     "props": {
-                        "logoText": "ShopHub",
+                        "logoText": "AURA \u00B7 STUDIO",
                         "links": [
-                            {
-                                "text": "Shop",
-                                "href": "page:shop"
-                            },
-                            {
-                                "text": "About",
-                                "href": "page:about"
-                            },
-                            {
-                                "text": "Contact",
-                                "href": "page:contact"
-                            }
+                            { "text": "New Arrivals", "href": "#" },
+                            { "text": "Collections", "href": "#" },
+                            { "text": "Journal", "href": "#" },
+                            { "text": "About", "href": "#" }
                         ],
                         "ctaText": "Cart (0)",
-                        "ctaLink": "#cart",
-                        "backgroundColor": "#ffffff",
-                        "textColor": "#1f2937",
-                        "linkColor": "#4b5563",
-                        "linkHoverColor": "#3b82f6"
+                        "backgroundColor": "#FDFBF7",
+                        "textColor": "#292524",
+                        "linkColor": "#78716C",
+                        "linkHoverColor": "#292524"
                     },
                     "children": []
                 },
                 {
-                    "id": "hero-1",
-                    "type": "Hero",
-                    "props": {
-                        "title": "Discover Premium Products",
-                        "subtitle": "Shop the Latest Collection",
-                        "description": "Curated selection of high-quality products delivered to your doorstep. Free shipping on orders over $50.",
-                        "primaryButtonText": "Shop Now",
-                        "backgroundColor": "#f0f9ff",
-                        "textColor": "#1e293b"
-                    },
-                    "children": []
-                },
-                {
-                    "id": "container-features",
+                    "id": "hero-section",
                     "type": "Container",
                     "props": {
-                        "padding": "xl",
-                        "maxWidth": "xl",
-                        "backgroundColor": "#ffffff"
+                        "padding": "none",
+                        "display": "flex",
+                        "minHeight": "80vh",
+                        "backgroundColor": "#FDFBF7",
+                        "alignItems": "center"
                     },
                     "children": [
                         {
-                            "id": "features-title",
-                            "type": "Text",
+                            "id": "hero-split-grid",
+                            "type": "Grid",
                             "props": {
-                                "content": "Why Shop With Us",
-                                "tag": "h2",
-                                "size": "3xl",
-                                "color": "#1f2937"
-                            },
-                            "children": []
-                        },
-                        {
-                            "id": "features-grid",
-                            "type": "Container",
-                            "props": {
-                                "display": "flex",
-                                "flexDirection": "row",
-                                "flexWrap": "wrap",
-                                "gap": "lg",
-                                "justifyContent": "center",
-                                "padding": "md"
+                                "columns": 2,
+                                "gap": "none"
                             },
                             "children": [
                                 {
-                                    "id": "feature-1",
-                                    "type": "Feature",
+                                    "id": "hero-content",
+                                    "type": "Container",
                                     "props": {
-                                        "icon": "🚚",
-                                        "title": "Free Shipping",
-                                        "description": "Free delivery on all orders over $50",
-                                        "backgroundColor": "#f9fafb",
-                                        "textColor": "#1f2937"
+                                        "padding": "2xl",
+                                        "display": "flex",
+                                        "flexDirection": "column",
+                                        "justifyContent": "center",
+                                        "height": "100%"
                                     },
-                                    "children": []
+                                    "children": [
+                                        {
+                                            "id": "hero-title",
+                                            "type": "Text",
+                                            "props": {
+                                                "content": "Elevate your everyday.",
+                                                "tag": "h1",
+                                                "size": "5xl",
+                                                "weight": "400",
+                                                "color": "#292524",
+                                                "letterSpacing": "-0.02em",
+                                                "marginBottom": "1.5rem"
+                                            },
+                                            "children": []
+                                        },
+                                        {
+                                            "id": "hero-desc",
+                                            "type": "Text",
+                                            "props": {
+                                                "content": "Discover our new spring collection. Crafted with sustainable materials and timeless design principles for the modern home.",
+                                                "tag": "p",
+                                                "size": "lg",
+                                                "color": "#78716C",
+                                                "marginBottom": "2.5rem",
+                                                "maxWidth": "400px"
+                                            },
+                                            "children": []
+                                        },
+                                        {
+                                            "id": "hero-btn",
+                                            "type": "Button",
+                                            "props": {
+                                                "text": "Shop Collection",
+                                                "variant": "outline",
+                                                "size": "lg"
+                                            },
+                                            "children": []
+                                        }
+                                    ]
                                 },
                                 {
-                                    "id": "feature-2",
-                                    "type": "Feature",
+                                    "id": "hero-image",
+                                    "type": "Image",
                                     "props": {
-                                        "icon": "🔒",
-                                        "title": "Secure Payment",
-                                        "description": "100% secure payment processing",
-                                        "backgroundColor": "#f9fafb",
-                                        "textColor": "#1f2937"
-                                    },
-                                    "children": []
-                                },
-                                {
-                                    "id": "feature-3",
-                                    "type": "Feature",
-                                    "props": {
-                                        "icon": "↩️",
-                                        "title": "Easy Returns",
-                                        "description": "30-day hassle-free return policy",
-                                        "backgroundColor": "#f9fafb",
-                                        "textColor": "#1f2937"
-                                    },
-                                    "children": []
-                                },
-                                {
-                                    "id": "feature-4",
-                                    "type": "Feature",
-                                    "props": {
-                                        "icon": "⭐",
-                                        "title": "Quality Guarantee",
-                                        "description": "Premium quality products guaranteed",
-                                        "backgroundColor": "#f9fafb",
-                                        "textColor": "#1f2937"
+                                        "src": "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200",
+                                        "alt": "Store interior",
+                                        "height": "100%",
+                                        "objectFit": "cover"
                                     },
                                     "children": []
                                 }
@@ -136,394 +114,208 @@
                     ]
                 },
                 {
-                    "id": "stats-section",
+                    "id": "trusted-bar",
                     "type": "Container",
                     "props": {
-                        "padding": "xl",
-                        "maxWidth": "xl",
-                        "backgroundColor": "#3b82f6"
+                        "padding": "sm",
+                        "backgroundColor": "#292524",
+                        "textColor": "#FFFFFF",
+                        "textAlign": "center"
                     },
                     "children": [
                         {
-                            "id": "stats-1",
-                            "type": "Stats",
+                            "id": "trusted-text",
+                            "type": "Text",
                             "props": {
-                                "stats": [
-                                    {
-                                        "value": "50K+",
-                                        "label": "Happy Customers"
-                                    },
-                                    {
-                                        "value": "1000+",
-                                        "label": "Products"
-                                    },
-                                    {
-                                        "value": "100+",
-                                        "label": "Categories"
-                                    },
-                                    {
-                                        "value": "24/7",
-                                        "label": "Support"
-                                    }
-                                ],
-                                "backgroundColor": "transparent",
-                                "textColor": "#ffffff",
-                                "accentColor": "#ffffff"
+                                "content": "Free international shipping on orders over $150 \u2014 Carbon neutral delivery",
+                                "tag": "p",
+                                "size": "sm",
+                                "letterSpacing": "0.05em"
                             },
                             "children": []
                         }
                     ]
                 },
                 {
-                    "id": "cta-1",
-                    "type": "CTA",
+                    "id": "products-section",
+                    "type": "Container",
                     "props": {
-                        "title": "Ready to Start Shopping?",
-                        "description": "Browse our collection of amazing products",
-                        "buttonText": "View Products",
-                        "buttonLink": "page:shop",
-                        "backgroundColor": "#1f2937",
-                        "textColor": "#ffffff"
+                        "padding": "2xl",
+                        "backgroundColor": "#FDFBF7",
+                        "maxWidth": "xl",
+                        "marginLeft": "auto",
+                        "marginRight": "auto"
                     },
-                    "children": []
+                    "children": [
+                        {
+                            "id": "products-header",
+                            "type": "Text",
+                            "props": {
+                                "content": "Curated Essentials",
+                                "tag": "h2",
+                                "size": "3xl",
+                                "weight": "400",
+                                "color": "#292524",
+                                "marginBottom": "3rem",
+                                "textAlign": "center"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "products-grid",
+                            "type": "Grid",
+                            "props": {
+                                "columns": 3,
+                                "gap": "2rem"
+                            },
+                            "children": [
+                                {
+                                    "id": "product-1",
+                                    "type": "Card",
+                                    "props": {
+                                        "title": "Ceramic Vase",
+                                        "description": "$45.00 \u2014 Handcrafted in Portugal",
+                                        "buttonText": "Add to Cart",
+                                        "backgroundColor": "#FFFFFF",
+                                        "textColor": "#292524",
+                                        "borderWidth": "1px",
+                                        "borderColor": "#E7E5E4",
+                                        "borderRadius": "0px"
+                                    },
+                                    "children": [
+                                        {
+                                            "id": "p1-img",
+                                            "type": "Image",
+                                            "props": { "src": "https://images.unsplash.com/photo-1612196808214-b8e1d615c010?w=600", "height": "300px", "objectFit": "cover" },
+                                            "children": []
+                                        }
+                                    ]
+                                },
+                                {
+                                    "id": "product-2",
+                                    "type": "Card",
+                                    "props": {
+                                        "title": "Linen Throw",
+                                        "description": "$85.00 \u2014 100% Organic Cotton",
+                                        "buttonText": "Add to Cart",
+                                        "backgroundColor": "#FFFFFF",
+                                        "textColor": "#292524",
+                                        "borderWidth": "1px",
+                                        "borderColor": "#E7E5E4",
+                                        "borderRadius": "0px"
+                                    },
+                                    "children": [
+                                        {
+                                            "id": "p2-img",
+                                            "type": "Image",
+                                            "props": { "src": "https://images.unsplash.com/photo-1544207945-8cedb53df426?w=600", "height": "300px", "objectFit": "cover" },
+                                            "children": []
+                                        }
+                                    ]
+                                },
+                                {
+                                    "id": "product-3",
+                                    "type": "Card",
+                                    "props": {
+                                        "title": "Oak Chair",
+                                        "description": "$220.00 \u2014 Minimalist Design",
+                                        "buttonText": "Add to Cart",
+                                        "backgroundColor": "#FFFFFF",
+                                        "textColor": "#292524",
+                                        "borderWidth": "1px",
+                                        "borderColor": "#E7E5E4",
+                                        "borderRadius": "0px"
+                                    },
+                                    "children": [
+                                        {
+                                            "id": "p3-img",
+                                            "type": "Image",
+                                            "props": { "src": "https://images.unsplash.com/photo-1506898667547-42e22a46e125?w=600", "height": "300px", "objectFit": "cover" },
+                                            "children": []
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "newsletter-section",
+                    "type": "Container",
+                    "props": {
+                        "padding": "2xl",
+                        "backgroundColor": "#D4A373",
+                        "textColor": "#FFFFFF",
+                        "textAlign": "center"
+                    },
+                    "children": [
+                        {
+                            "id": "nl-title",
+                            "type": "Text",
+                            "props": {
+                                "content": "Join our community",
+                                "tag": "h2",
+                                "size": "3xl",
+                                "weight": "400",
+                                "color": "#FFFFFF",
+                                "marginBottom": "1rem"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "nl-desc",
+                            "type": "Text",
+                            "props": {
+                                "content": "Sign up for exclusive offers, original stories, and events.",
+                                "tag": "p",
+                                "size": "md",
+                                "color": "#FFFFFF",
+                                "opacity": 0.9,
+                                "marginBottom": "2rem"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "nl-form",
+                            "type": "Form",
+                            "props": {
+                                "title": "",
+                                "submitText": "Subscribe",
+                                "backgroundColor": "transparent"
+                            },
+                            "children": []
+                        }
+                    ]
                 },
                 {
                     "id": "footer-1",
                     "type": "Footer",
                     "props": {
-                        "logoText": "ShopHub",
-                        "copyright": "© 2024 ShopHub. All rights reserved.",
-                        "backgroundColor": "#111827",
-                        "textColor": "#9ca3af"
-                    },
-                    "children": []
-                }
-            ]
-        },
-        {
-            "id": "shop",
-            "name": "Shop",
-            "slug": "shop",
-            "components": [
-                {
-                    "id": "nav-shop",
-                    "type": "Navbar",
-                    "props": {
-                        "logoText": "ShopHub",
-                        "links": [
+                        "logoText": "AURA \u00B7 STUDIO",
+                        "description": "Crafting beautiful objects for mindful living.",
+                        "copyright": "\u00A9 2024 Aura Studio. All rights reserved.",
+                        "backgroundColor": "#292524",
+                        "textColor": "#A8A29E",
+                        "sections": [
                             {
-                                "text": "Home",
-                                "href": "page:home"
+                                "title": "Shop",
+                                "links": [
+                                    { "text": "All Products", "href": "#" },
+                                    { "text": "New Arrivals", "href": "#" },
+                                    { "text": "Living", "href": "#" },
+                                    { "text": "Dining", "href": "#" }
+                                ]
                             },
                             {
-                                "text": "About",
-                                "href": "page:about"
-                            },
-                            {
-                                "text": "Contact",
-                                "href": "page:contact"
+                                "title": "Support",
+                                "links": [
+                                    { "text": "FAQ", "href": "#" },
+                                    { "text": "Shipping & Returns", "href": "#" },
+                                    { "text": "Care Guide", "href": "#" },
+                                    { "text": "Contact Us", "href": "#" }
+                                ]
                             }
-                        ],
-                        "ctaText": "Cart (0)",
-                        "ctaLink": "#cart",
-                        "backgroundColor": "#ffffff",
-                        "textColor": "#1f2937"
-                    },
-                    "children": []
-                },
-                {
-                    "id": "shop-hero",
-                    "type": "Container",
-                    "props": {
-                        "padding": "xl",
-                        "maxWidth": "xl",
-                        "backgroundColor": "#f9fafb"
-                    },
-                    "children": [
-                        {
-                            "id": "shop-title",
-                            "type": "Text",
-                            "props": {
-                                "content": "Our Products",
-                                "tag": "h1",
-                                "size": "3xl",
-                                "color": "#1f2937"
-                            },
-                            "children": []
-                        },
-                        {
-                            "id": "shop-subtitle",
-                            "type": "Text",
-                            "props": {
-                                "content": "Browse our curated collection of premium products",
-                                "tag": "p",
-                                "size": "lg",
-                                "color": "#6b7280"
-                            },
-                            "children": []
-                        }
-                    ]
-                },
-                {
-                    "id": "products-grid",
-                    "type": "Container",
-                    "props": {
-                        "padding": "xl",
-                        "maxWidth": "xl",
-                        "display": "flex",
-                        "flexDirection": "row",
-                        "flexWrap": "wrap",
-                        "gap": "lg",
-                        "justifyContent": "center",
-                        "backgroundColor": "#ffffff"
-                    },
-                    "children": [
-                        {
-                            "id": "product-1",
-                            "type": "Card",
-                            "props": {
-                                "title": "Premium Product",
-                                "description": "High-quality product with amazing features",
-                                "buttonText": "Add to Cart",
-                                "backgroundColor": "#ffffff",
-                                "textColor": "#1f2937"
-                            },
-                            "children": []
-                        },
-                        {
-                            "id": "product-2",
-                            "type": "Card",
-                            "props": {
-                                "title": "Best Seller",
-                                "description": "Our most popular product this season",
-                                "buttonText": "Add to Cart",
-                                "backgroundColor": "#ffffff",
-                                "textColor": "#1f2937"
-                            },
-                            "children": []
-                        },
-                        {
-                            "id": "product-3",
-                            "type": "Card",
-                            "props": {
-                                "title": "New Arrival",
-                                "description": "Just added to our collection",
-                                "buttonText": "Add to Cart",
-                                "backgroundColor": "#ffffff",
-                                "textColor": "#1f2937"
-                            },
-                            "children": []
-                        }
-                    ]
-                },
-                {
-                    "id": "footer-shop",
-                    "type": "Footer",
-                    "props": {
-                        "logoText": "ShopHub",
-                        "copyright": "© 2024 ShopHub. All rights reserved.",
-                        "backgroundColor": "#111827",
-                        "textColor": "#9ca3af"
-                    },
-                    "children": []
-                }
-            ]
-        },
-        {
-            "id": "about",
-            "name": "About Us",
-            "slug": "about",
-            "components": [
-                {
-                    "id": "nav-about",
-                    "type": "Navbar",
-                    "props": {
-                        "logoText": "ShopHub",
-                        "links": [
-                            {
-                                "text": "Home",
-                                "href": "page:home"
-                            },
-                            {
-                                "text": "Shop",
-                                "href": "page:shop"
-                            },
-                            {
-                                "text": "Contact",
-                                "href": "page:contact"
-                            }
-                        ],
-                        "ctaText": "Cart (0)",
-                        "ctaLink": "#cart",
-                        "backgroundColor": "#ffffff",
-                        "textColor": "#1f2937"
-                    },
-                    "children": []
-                },
-                {
-                    "id": "about-hero",
-                    "type": "Hero",
-                    "props": {
-                        "title": "About ShopHub",
-                        "subtitle": "Our Story",
-                        "description": "We're passionate about bringing you the best products at the best prices",
-                        "primaryButtonText": "Start Shopping",
-                        "backgroundColor": "#f0f9ff",
-                        "textColor": "#1e293b"
-                    },
-                    "children": []
-                },
-                {
-                    "id": "testimonials",
-                    "type": "Container",
-                    "props": {
-                        "padding": "xl",
-                        "maxWidth": "xl",
-                        "backgroundColor": "#ffffff"
-                    },
-                    "children": [
-                        {
-                            "id": "testimonials-title",
-                            "type": "Text",
-                            "props": {
-                                "content": "What Our Customers Say",
-                                "tag": "h2",
-                                "size": "3xl",
-                                "color": "#1f2937"
-                            },
-                            "children": []
-                        },
-                        {
-                            "id": "testimonials-grid",
-                            "type": "Container",
-                            "props": {
-                                "display": "flex",
-                                "flexDirection": "row",
-                                "flexWrap": "wrap",
-                                "gap": "lg",
-                                "justifyContent": "center",
-                                "padding": "md"
-                            },
-                            "children": [
-                                {
-                                    "id": "testimonial-1",
-                                    "type": "Testimonial",
-                                    "props": {
-                                        "quote": "Amazing quality and fast shipping! Will definitely order again.",
-                                        "author": "Sarah Johnson",
-                                        "role": "Verified Customer",
-                                        "rating": 5,
-                                        "backgroundColor": "#f9fafb",
-                                        "textColor": "#1f2937"
-                                    },
-                                    "children": []
-                                },
-                                {
-                                    "id": "testimonial-2",
-                                    "type": "Testimonial",
-                                    "props": {
-                                        "quote": "Best online shopping experience I've had. Highly recommend!",
-                                        "author": "Michael Chen",
-                                        "role": "Verified Customer",
-                                        "rating": 5,
-                                        "backgroundColor": "#f9fafb",
-                                        "textColor": "#1f2937"
-                                    },
-                                    "children": []
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    "id": "footer-about",
-                    "type": "Footer",
-                    "props": {
-                        "logoText": "ShopHub",
-                        "copyright": "© 2024 ShopHub. All rights reserved.",
-                        "backgroundColor": "#111827",
-                        "textColor": "#9ca3af"
-                    },
-                    "children": []
-                }
-            ]
-        },
-        {
-            "id": "contact",
-            "name": "Contact",
-            "slug": "contact",
-            "components": [
-                {
-                    "id": "nav-contact",
-                    "type": "Navbar",
-                    "props": {
-                        "logoText": "ShopHub",
-                        "links": [
-                            {
-                                "text": "Home",
-                                "href": "page:home"
-                            },
-                            {
-                                "text": "Shop",
-                                "href": "page:shop"
-                            },
-                            {
-                                "text": "About",
-                                "href": "page:about"
-                            }
-                        ],
-                        "ctaText": "Cart (0)",
-                        "ctaLink": "#cart",
-                        "backgroundColor": "#ffffff",
-                        "textColor": "#1f2937"
-                    },
-                    "children": []
-                },
-                {
-                    "id": "contact-hero",
-                    "type": "Hero",
-                    "props": {
-                        "title": "Get In Touch",
-                        "subtitle": "Contact Us",
-                        "description": "Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.",
-                        "primaryButtonText": "Send Message",
-                        "backgroundColor": "#f8fafc",
-                        "textColor": "#1f2937"
-                    },
-                    "children": []
-                },
-                {
-                    "id": "contact-info",
-                    "type": "Container",
-                    "props": {
-                        "padding": "xl",
-                        "maxWidth": "xl",
-                        "backgroundColor": "#ffffff"
-                    },
-                    "children": [
-                        {
-                            "id": "contact-alert",
-                            "type": "Alert",
-                            "props": {
-                                "title": "Customer Support",
-                                "message": "Our team is available 24/7 to help you with any questions",
-                                "variant": "info",
-                                "dismissible": false,
-                                "backgroundColor": "#ffffff",
-                                "textColor": "#1f2937"
-                            },
-                            "children": []
-                        }
-                    ]
-                },
-                {
-                    "id": "footer-contact",
-                    "type": "Footer",
-                    "props": {
-                        "logoText": "ShopHub",
-                        "copyright": "© 2024 ShopHub. All rights reserved.",
-                        "backgroundColor": "#111827",
-                        "textColor": "#9ca3af"
+                        ]
                     },
                     "children": []
                 }

@@ -23,6 +23,7 @@ import { Divider } from './Divider';
 import { Spacer } from './Spacer';
 import { Badge } from './Badge';
 import { Alert } from './Alert';
+import { CustomCode } from './CustomCode';
 
 // Layout Components
 export { Header } from './Header';
@@ -61,6 +62,7 @@ export { Divider } from './Divider';
 export { Spacer } from './Spacer';
 export { Badge } from './Badge';
 export { Alert } from './Alert';
+export { CustomCode } from './CustomCode';
 
 // Component Registry for dynamic rendering
 export const COMPONENT_REGISTRY = {
@@ -88,6 +90,7 @@ export const COMPONENT_REGISTRY = {
     Spacer,
     Badge,
     Alert,
+    CustomCode,
 } as const;
 
 export type ComponentType = keyof typeof COMPONENT_REGISTRY;

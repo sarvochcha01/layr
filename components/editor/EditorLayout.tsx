@@ -1,13 +1,15 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { ComponentDefinition, Page, GlobalComponents } from "@/types/editor";
+import { Page, GlobalComponents, ComponentDefinition, CustomComponents, ChatMessage } from "@/types/editor";
 import { HierarchyPanel } from "./HierarchyPanel";
 import { ComponentPalette } from "./ComponentPalette";
 import { Canvas } from "./Canvas";
 import { PropertiesPanel } from "./PropertiesPanel";
 import { PagesPanel } from "./PagesPanel";
-import { Download, Eye, Edit, X, Undo, Redo, Monitor, Tablet, Smartphone, Layers, LayoutTemplate, FileBox, Save } from "lucide-react";
+import { AIChatPanel } from "./AIChatPanel";
+import { CodeEditorDialog } from "./CodeEditorDialog";
+import { Download, Eye, Edit, X, Undo, Redo, Monitor, Tablet, Smartphone, Layers, LayoutTemplate, FileBox, Save, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -41,6 +43,14 @@ interface EditorLayoutProps {
   onApplyGlobalTemplate?: (componentId: string, globalName: string) => void;
   onMoveComponentUp?: (componentId: string) => void;
   onMoveComponentDown?: (componentId: string) => void;
+  onApplyAIComponents?: (components: ComponentDefinition[], mode: "add" | "replace") => void;
+  onApplyAIPages?: (pages: { name: string; path: string; components: ComponentDefinition[] }[]) => void;
+  customComponents?: CustomComponents;
+  onSaveCustomComponent?: (componentId: string, customName: string) => void;
+  onDeleteCustomComponent?: (customName: string) => void;
+  onSaveCodeComponent?: (name: string, html: string, css: string) => void;
+  chatHistory?: ChatMessage[];
+  onChatHistoryChange?: (messages: ChatMessage[]) => void;
 }
 
 export function EditorLayout({
@@ -71,10 +81,19 @@ export function EditorLayout({
   onApplyGlobalTemplate,
   onMoveComponentUp,
   onMoveComponentDown,
+  onApplyAIComponents,
+  onApplyAIPages,
+  customComponents = {},
+  onSaveCustomComponent,
+  onDeleteCustomComponent,
+  onSaveCodeComponent,
+  chatHistory,
+  onChatHistoryChange,
 }: EditorLayoutProps) {
   const router = useRouter();
   const [viewport, setViewport] = useState<Viewport>("desktop");
   const [isPreviewMode, setIsPreviewMode] = useState(false);
+  const [showCodeEditor, setShowCodeEditor] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedName, setEditedName] = useState(projectName || "");
   const [showExportMenu, setShowExportMenu] = useState(false);
@@ -211,6 +230,7 @@ export function EditorLayout({
   };
 
   return (
+    <>
     <div className="dark h-screen flex bg-background text-foreground overflow-hidden">
       {/* Left Panel - Tabs for Pages, Layers, Assets */}
       {!isPreviewMode && (
@@ -221,10 +241,11 @@ export function EditorLayout({
           >
             <Tabs defaultValue="layers" className="flex flex-col h-full w-full">
               <div className="flex-shrink-0 p-2 border-b border-border">
-                <TabsList className="w-full grid grid-cols-3 bg-muted">
+                <TabsList className="w-full grid grid-cols-4 bg-muted">
                   <TabsTrigger value="pages" className="text-xs py-1.5"><LayoutTemplate className="w-3 h-3 mr-1.5" /> Pages</TabsTrigger>
                   <TabsTrigger value="layers" className="text-xs py-1.5"><Layers className="w-3 h-3 mr-1.5" /> Layers</TabsTrigger>
                   <TabsTrigger value="assets" className="text-xs py-1.5"><FileBox className="w-3 h-3 mr-1.5" /> Assets</TabsTrigger>
+                  <TabsTrigger value="ai" className="text-xs py-1.5"><Sparkles className="w-3 h-3 mr-1.5" /> AI</TabsTrigger>
                 </TabsList>
               </div>
 
@@ -256,7 +277,27 @@ export function EditorLayout({
 
               {/* Assets Tab (Components) */}
               <TabsContent value="assets" className="flex-1 min-h-0 m-0 p-0 border-none data-[state=inactive]:hidden overflow-y-auto">
-                <ComponentPalette globalComponents={globalComponents} />
+                <ComponentPalette
+                  globalComponents={globalComponents}
+                  customComponents={customComponents}
+                  onDeleteCustomComponent={onDeleteCustomComponent}
+                  selectedComponent={selectedComponent}
+                  onSaveCustomComponent={onSaveCustomComponent}
+                  onWriteCode={() => setShowCodeEditor(true)}
+                />
+              </TabsContent>
+
+              {/* AI Tab */}
+              <TabsContent value="ai" forceMount className="flex-1 min-h-0 m-0 p-0 border-none data-[state=inactive]:hidden overflow-hidden">
+                <AIChatPanel
+                  onApplyComponents={onApplyAIComponents || (() => {})}
+                  onApplyPages={onApplyAIPages || (() => {})}
+                  existingComponents={components}
+                  customComponents={customComponents}
+                  globalComponents={globalComponents}
+                  messages={chatHistory}
+                  onMessagesChange={onChatHistoryChange}
+                />
               </TabsContent>
             </Tabs>
           </div>
@@ -532,6 +573,17 @@ export function EditorLayout({
         </>
       )}
     </div>
+
+      {/* Code Editor Dialog */}
+      <CodeEditorDialog
+        open={showCodeEditor}
+        onClose={() => setShowCodeEditor(false)}
+        onSave={(name, html, css) => {
+          onSaveCodeComponent?.(name, html, css);
+          setShowCodeEditor(false);
+        }}
+      />
+    </>
   );
 }
 

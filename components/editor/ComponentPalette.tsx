@@ -3,11 +3,11 @@
 import { useDraggable } from "@dnd-kit/core";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { Search, Star } from "lucide-react";
+import { Search, Star, Puzzle, Trash2, Code2 } from "lucide-react";
 import { useState } from "react";
 import { useComponentFavorites } from "@/hooks/useComponentFavorites";
 import { ComponentCategory, ComponentItem, componentCategories } from "./config/components";
-import { GlobalComponents } from "@/types/editor";
+import { GlobalComponents, CustomComponents, ComponentDefinition } from "@/types/editor";
 import { Globe } from "lucide-react";
 
 function DraggableGlobalComponent({
@@ -43,6 +43,65 @@ function DraggableGlobalComponent({
         <div>
           <div className="text-xs font-medium text-foreground line-clamp-1">
             {globalName}
+          </div>
+          <div className="text-[10px] text-muted-foreground mt-1 leading-tight">
+            ({componentType})
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DraggableCustomComponent({
+  customName,
+  componentType,
+  onDelete,
+}: {
+  customName: string;
+  componentType: string;
+  onDelete?: () => void;
+}) {
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+    id: `palette-custom-${customName}`,
+    data: {
+      type: "palette-custom",
+      customName,
+      componentType,
+    },
+  });
+
+  return (
+    <div
+      ref={setNodeRef}
+      className={cn(
+        "p-3 border border-border rounded-lg hover:border-purple-400 hover:shadow-sm transition-all relative group bg-card",
+        "flex flex-col items-center text-center space-y-2",
+        isDragging && "opacity-50"
+      )}
+    >
+      {/* Delete Button */}
+      {onDelete && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete();
+          }}
+          className="absolute top-1 right-1 p-1 opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:text-destructive"
+          title="Delete custom component"
+        >
+          <Trash2 className="w-3 h-3" />
+        </button>
+      )}
+
+      {/* Draggable area */}
+      <div {...listeners} {...attributes} className="cursor-grab w-full flex flex-col items-center">
+        <div className="text-muted-foreground mb-2 p-2 bg-muted rounded-md group-hover:bg-purple-500/20 group-hover:text-purple-400 transition-colors">
+           <Puzzle className="w-5 h-5 text-purple-400" />
+        </div>
+        <div>
+          <div className="text-xs font-medium text-foreground line-clamp-1">
+            {customName}
           </div>
           <div className="text-[10px] text-muted-foreground mt-1 leading-tight">
             ({componentType})
@@ -119,10 +178,27 @@ function DraggableComponent({
   );
 }
 
-export function ComponentPalette({ globalComponents = {} }: { globalComponents?: GlobalComponents }) {
+export function ComponentPalette({
+  globalComponents = {},
+  customComponents = {},
+  onDeleteCustomComponent,
+  selectedComponent,
+  onSaveCustomComponent,
+  onWriteCode,
+}: {
+  globalComponents?: GlobalComponents;
+  customComponents?: CustomComponents;
+  onDeleteCustomComponent?: (name: string) => void;
+  selectedComponent?: ComponentDefinition | null;
+  onSaveCustomComponent?: (componentId: string, customName: string) => void;
+  onWriteCode?: () => void;
+}) {
   const [searchTerm, setSearchTerm] = useState("");
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [customNameInput, setCustomNameInput] = useState("");
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
     new Set([
+      "Custom",
       "Global",
       "Favorites",
       "Recent",
@@ -186,6 +262,105 @@ export function ComponentPalette({ globalComponents = {} }: { globalComponents?:
 
       {/* Component Categories */}
       <div className="flex-1 overflow-auto p-4 space-y-4">
+        {/* Custom Components Section */}
+        {!searchTerm && (
+          <div>
+            <button
+              onClick={() => toggleCategory("Custom")}
+              className="flex items-center justify-between w-full text-left mb-3"
+            >
+              <span className="text-xs font-semibold text-purple-500 uppercase tracking-wide flex items-center gap-1">
+                <Puzzle className="w-3 h-3 text-purple-400" />
+                Custom Components
+              </span>
+              <span className="text-[10px] text-muted-foreground">
+                {expandedCategories.has("Custom") ? "−" : "+"}
+              </span>
+            </button>
+
+            {expandedCategories.has("Custom") && (
+              <div className="space-y-2 mb-4">
+                {Object.keys(customComponents).length > 0 ? (
+                  <div className="grid grid-cols-2 gap-2">
+                    {Object.entries(customComponents).map(([name, comp]) => (
+                      <DraggableCustomComponent
+                        key={`custom-${name}`}
+                        customName={name}
+                        componentType={comp.type}
+                        onDelete={onDeleteCustomComponent ? () => onDeleteCustomComponent(name) : undefined}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-[11px] text-muted-foreground px-1">
+                    No custom components yet.
+                  </p>
+                )}
+
+                {/* Save selected as custom */}
+                {selectedComponent && onSaveCustomComponent && !showSaveDialog && (
+                  <button
+                    onClick={() => {
+                      setCustomNameInput(selectedComponent.type + " Custom");
+                      setShowSaveDialog(true);
+                    }}
+                    className="w-full flex items-center justify-center gap-1.5 px-3 py-2 text-[11px] font-medium text-purple-400 border border-purple-500/30 rounded-md hover:bg-purple-500/10 transition-colors"
+                  >
+                    <Puzzle className="w-3 h-3" />
+                    Save Selected as Custom
+                  </button>
+                )}
+
+                {/* Save dialog */}
+                {showSaveDialog && selectedComponent && onSaveCustomComponent && (
+                  <div className="flex gap-1.5">
+                    <input
+                      type="text"
+                      value={customNameInput}
+                      onChange={(e) => setCustomNameInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && customNameInput.trim()) {
+                          onSaveCustomComponent(selectedComponent.id, customNameInput.trim());
+                          setShowSaveDialog(false);
+                          setCustomNameInput("");
+                        } else if (e.key === "Escape") {
+                          setShowSaveDialog(false);
+                        }
+                      }}
+                      placeholder="Component name..."
+                      autoFocus
+                      className="flex-1 text-xs px-2 py-1.5 bg-background border border-border rounded focus:outline-none focus:ring-1 focus:ring-purple-500"
+                    />
+                    <button
+                      onClick={() => {
+                        if (customNameInput.trim()) {
+                          onSaveCustomComponent(selectedComponent.id, customNameInput.trim());
+                          setShowSaveDialog(false);
+                          setCustomNameInput("");
+                        }
+                      }}
+                      className="px-2.5 py-1.5 text-[11px] font-medium bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors"
+                    >
+                      Save
+                    </button>
+                  </div>
+                )}
+
+                {/* Write Code button */}
+                {onWriteCode && (
+                  <button
+                    onClick={onWriteCode}
+                    className="w-full flex items-center justify-center gap-1.5 px-3 py-2 text-[11px] font-medium text-purple-400 border border-purple-500/30 rounded-md hover:bg-purple-500/10 transition-colors"
+                  >
+                    <Code2 className="w-3 h-3" />
+                    Write Code
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Global Components Section */}
         {!searchTerm && Object.keys(globalComponents).length > 0 && (
           <div>

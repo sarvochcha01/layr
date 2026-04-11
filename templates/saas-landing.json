@@ -1,8 +1,8 @@
 {
-    "name": "SaaS Landing Page",
-    "description": "Professional SaaS landing page with features, pricing tiers, and testimonials - Multi-page",
+    "name": "SaaS Landing Page - Premium",
+    "description": "A high-converting, modern SaaS landing page featuring a dark-mode hero, crisp feature grids, and sleek pricing cards.",
     "category": "SaaS",
-    "thumbnail": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400",
+    "thumbnail": "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=400",
     "featured": true,
     "pages": [
         {
@@ -14,110 +14,274 @@
                     "id": "nav-1",
                     "type": "Navbar",
                     "props": {
-                        "logoText": "CloudFlow",
+                        "logoText": "Nexus",
                         "links": [
-                            {
-                                "text": "Features",
-                                "href": "#features"
-                            },
-                            {
-                                "text": "Pricing",
-                                "href": "page:pricing"
-                            },
-                            {
-                                "text": "Blog",
-                                "href": "page:blog"
-                            },
-                            {
-                                "text": "About",
-                                "href": "page:about"
-                            }
+                            { "text": "Platform", "href": "#" },
+                            { "text": "Solutions", "href": "#" },
+                            { "text": "Pricing", "href": "page:pricing" },
+                            { "text": "Company", "href": "#" }
                         ],
-                        "ctaText": "Start Free Trial",
-                        "ctaLink": "#signup",
-                        "backgroundColor": "#ffffff",
-                        "textColor": "#1f2937"
+                        "ctaText": "Get Early Access",
+                        "backgroundColor": "#0A0A0A",
+                        "textColor": "#FFFFFF",
+                        "linkColor": "#A3A3A3",
+                        "linkHoverColor": "#FFFFFF"
                     },
                     "children": []
                 },
                 {
-                    "id": "hero-1",
-                    "type": "Hero",
-                    "props": {
-                        "title": "Streamline Your Workflow",
-                        "subtitle": "The All-in-One Platform",
-                        "description": "Powerful collaboration tools that help your team work smarter, faster, and better together. Start your 14-day free trial today.",
-                        "primaryButtonText": "Get Started Free",
-                        "backgroundColor": "#6366f1",
-                        "textColor": "#ffffff"
-                    },
-                    "children": []
-                },
-                {
-                    "id": "features-section",
+                    "id": "hero-section",
                     "type": "Container",
                     "props": {
-                        "padding": "xl",
-                        "maxWidth": "xl",
-                        "backgroundColor": "#ffffff"
+                        "padding": "2xl",
+                        "backgroundColor": "#0A0A0A",
+                        "textColor": "#FFFFFF",
+                        "display": "flex",
+                        "flexDirection": "column",
+                        "alignItems": "center",
+                        "justifyContent": "center",
+                        "minHeight": "85vh",
+                        "textAlign": "center"
                     },
                     "children": [
                         {
-                            "id": "features-title",
-                            "type": "Text",
+                            "id": "hero-badge",
+                            "type": "Badge",
                             "props": {
-                                "content": "Everything You Need to Succeed",
-                                "tag": "h2",
-                                "size": "3xl",
-                                "color": "#1f2937"
+                                "text": "v2.0 is now live \u2192",
+                                "variant": "info",
+                                "marginBottom": "2rem"
                             },
                             "children": []
                         },
                         {
-                            "id": "features-grid",
+                            "id": "hero-title",
+                            "type": "Text",
+                            "props": {
+                                "content": "Develop Faster. Scale Infinite.",
+                                "tag": "h1",
+                                "size": "5xl",
+                                "weight": "800",
+                                "color": "#FFFFFF",
+                                "marginBottom": "1.5rem",
+                                "maxWidth": "800px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "hero-desc",
+                            "type": "Text",
+                            "props": {
+                                "content": "The ultimate platform for elite engineering teams to deploy, manage, and monitor infrastructure without the DevOps overhead.",
+                                "tag": "p",
+                                "size": "xl",
+                                "color": "#A3A3A3",
+                                "marginBottom": "3rem",
+                                "maxWidth": "600px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "hero-actions",
                             "type": "Container",
                             "props": {
                                 "display": "flex",
-                                "flexDirection": "row",
-                                "flexWrap": "wrap",
-                                "gap": "lg",
-                                "justifyContent": "center",
-                                "padding": "lg"
+                                "gap": "1rem",
+                                "justifyContent": "center"
                             },
                             "children": [
                                 {
-                                    "id": "feature-1",
-                                    "type": "Feature",
+                                    "id": "hero-btn-1",
+                                    "type": "Button",
                                     "props": {
-                                        "icon": "⚡",
-                                        "title": "Lightning Fast",
-                                        "description": "Optimized performance with sub-second response times",
-                                        "backgroundColor": "#f9fafb",
-                                        "textColor": "#1f2937"
+                                        "text": "Start Building Free",
+                                        "variant": "default",
+                                        "size": "lg"
                                     },
                                     "children": []
                                 },
                                 {
-                                    "id": "feature-2",
+                                    "id": "hero-btn-2",
+                                    "type": "Button",
+                                    "props": {
+                                        "text": "Read the Docs",
+                                        "variant": "outline",
+                                        "size": "lg"
+                                    },
+                                    "children": []
+                                }
+                            ]
+                        },
+                        {
+                            "id": "hero-image",
+                            "type": "Image",
+                            "props": {
+                                "src": "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1200",
+                                "alt": "Dashboard preview",
+                                "marginTop": "4rem",
+                                "borderRadius": "12px",
+                                "boxShadow": "0 25px 50px -12px rgba(255, 255, 255, 0.1)"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "logos-section",
+                    "type": "Container",
+                    "props": {
+                        "padding": "xl",
+                        "backgroundColor": "#FFFFFF",
+                        "textAlign": "center"
+                    },
+                    "children": [
+                        {
+                            "id": "logos-title",
+                            "type": "Text",
+                            "props": {
+                                "content": "TRUSTED BY INNOVATIVE TEAMS WORLDWIDE",
+                                "tag": "p",
+                                "size": "sm",
+                                "weight": "600",
+                                "color": "#6B7280",
+                                "letterSpacing": "0.1em",
+                                "marginBottom": "2rem"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "logos-grid",
+                            "type": "Grid",
+                            "props": {
+                                "columns": 5,
+                                "gap": "2rem",
+                                "alignItems": "center",
+                                "opacity": 0.5
+                            },
+                            "children": [
+                                {
+                                    "id": "logo-1",
+                                    "type": "Text",
+                                    "props": { "content": "Acme Corp", "tag": "p", "size": "xl", "weight": "bold", "color": "#000000" },
+                                    "children": []
+                                },
+                                {
+                                    "id": "logo-2",
+                                    "type": "Text",
+                                    "props": { "content": "GlobalTech", "tag": "p", "size": "xl", "weight": "bold", "color": "#000000" },
+                                    "children": []
+                                },
+                                {
+                                    "id": "logo-3",
+                                    "type": "Text",
+                                    "props": { "content": "Quantum", "tag": "p", "size": "xl", "weight": "bold", "color": "#000000" },
+                                    "children": []
+                                },
+                                {
+                                    "id": "logo-4",
+                                    "type": "Text",
+                                    "props": { "content": "Starlight", "tag": "p", "size": "xl", "weight": "bold", "color": "#000000" },
+                                    "children": []
+                                },
+                                {
+                                    "id": "logo-5",
+                                    "type": "Text",
+                                    "props": { "content": "Horizon", "tag": "p", "size": "xl", "weight": "bold", "color": "#000000" },
+                                    "children": []
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "features-showcase",
+                    "type": "Container",
+                    "props": {
+                        "padding": "2xl",
+                        "backgroundColor": "#F8FAFC"
+                    },
+                    "children": [
+                        {
+                            "id": "features-header",
+                            "type": "Container",
+                            "props": {
+                                "textAlign": "center",
+                                "marginBottom": "4rem",
+                                "maxWidth": "800px",
+                                "marginLeft": "auto",
+                                "marginRight": "auto"
+                            },
+                            "children": [
+                                {
+                                    "id": "features-pretitle",
+                                    "type": "Text",
+                                    "props": { "content": "FEATURES", "tag": "p", "size": "sm", "weight": "bold", "color": "#3B82F6", "letterSpacing": "0.1em", "marginBottom": "0.5rem" },
+                                    "children": []
+                                },
+                                {
+                                    "id": "features-title",
+                                    "type": "Text",
+                                    "props": { "content": "Everything you need to ship faster.", "tag": "h2", "size": "4xl", "weight": "bold", "color": "#0F172A", "marginBottom": "1rem" },
+                                    "children": []
+                                },
+                                {
+                                    "id": "features-desc",
+                                    "type": "Text",
+                                    "props": { "content": "We've built a comprehensive suite of tools designed specifically for high-performing engineering teams.", "tag": "p", "size": "lg", "color": "#475569" },
+                                    "children": []
+                                }
+                            ]
+                        },
+                        {
+                            "id": "features-grid",
+                            "type": "Grid",
+                            "props": {
+                                "columns": 3,
+                                "gap": "2rem"
+                            },
+                            "children": [
+                                {
+                                    "id": "feat-1",
                                     "type": "Feature",
                                     "props": {
-                                        "icon": "🔒",
-                                        "title": "Enterprise Security",
-                                        "description": "Bank-level encryption and SOC 2 compliance",
-                                        "backgroundColor": "#f9fafb",
-                                        "textColor": "#1f2937"
+                                        "icon": "\u26A1",
+                                        "title": "Instant Deployments",
+                                        "description": "Push your code and see it live globally in under 3 seconds using our edge network.",
+                                        "backgroundColor": "#FFFFFF",
+                                        "textColor": "#0F172A",
+                                        "padding": "1.5rem",
+                                        "borderRadius": "12px",
+                                        "boxShadow": "0 4px 6px -1px rgba(0, 0, 0, 0.05)"
                                     },
                                     "children": []
                                 },
                                 {
-                                    "id": "feature-3",
+                                    "id": "feat-2",
                                     "type": "Feature",
                                     "props": {
-                                        "icon": "🎨",
-                                        "title": "Fully Customizable",
-                                        "description": "Tailor every aspect to match your workflow",
-                                        "backgroundColor": "#f9fafb",
-                                        "textColor": "#1f2937"
+                                        "icon": "\uD83D\uDD12",
+                                        "title": "Zero-Trust Security",
+                                        "description": "Built-in DDoS protection, automatic SSL, and role-based access control by default.",
+                                        "backgroundColor": "#FFFFFF",
+                                        "textColor": "#0F172A",
+                                        "padding": "1.5rem",
+                                        "borderRadius": "12px",
+                                        "boxShadow": "0 4px 6px -1px rgba(0, 0, 0, 0.05)"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "feat-3",
+                                    "type": "Feature",
+                                    "props": {
+                                        "icon": "\uD83D\uDCCA",
+                                        "title": "Real-time Analytics",
+                                        "description": "Deep insights into your application performance, traffic, and user behavior out of the box.",
+                                        "backgroundColor": "#FFFFFF",
+                                        "textColor": "#0F172A",
+                                        "padding": "1.5rem",
+                                        "borderRadius": "12px",
+                                        "boxShadow": "0 4px 6px -1px rgba(0, 0, 0, 0.05)"
                                     },
                                     "children": []
                                 }
@@ -126,107 +290,67 @@
                     ]
                 },
                 {
-                    "id": "cta-1",
-                    "type": "CTA",
+                    "id": "cta-section",
+                    "type": "Container",
                     "props": {
-                        "title": "Ready to Transform Your Workflow?",
-                        "description": "Join 10,000+ teams already using CloudFlow",
-                        "buttonText": "View Pricing",
-                        "buttonLink": "page:pricing",
-                        "backgroundColor": "#6366f1",
-                        "textColor": "#ffffff"
+                        "padding": "2xl",
+                        "backgroundColor": "#3B82F6",
+                        "textColor": "#FFFFFF",
+                        "textAlign": "center"
                     },
-                    "children": []
+                    "children": [
+                        {
+                            "id": "cta-title",
+                            "type": "Text",
+                            "props": {
+                                "content": "Ready to scale your infrastructure?",
+                                "tag": "h2",
+                                "size": "4xl",
+                                "weight": "bold",
+                                "color": "#FFFFFF",
+                                "marginBottom": "1.5rem"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "cta-btn",
+                            "type": "Button",
+                            "props": {
+                                "text": "Start Free Trial",
+                                "variant": "secondary",
+                                "size": "lg"
+                            },
+                            "children": []
+                        }
+                    ]
                 },
                 {
                     "id": "footer-1",
                     "type": "Footer",
                     "props": {
-                        "logoText": "CloudFlow",
-                        "description": "Streamline your workflow with powerful cloud-based tools.",
-                        "copyright": "© 2024 CloudFlow. All rights reserved.",
-                        "backgroundColor": "#111827",
-                        "textColor": "#9ca3af",
+                        "logoText": "Nexus",
+                        "description": "The elite platform for shipping software faster and safer.",
+                        "copyright": "\u00A9 2024 Nexus Inc. All rights reserved.",
+                        "backgroundColor": "#0A0A0A",
+                        "textColor": "#A3A3A3",
                         "sections": [
                             {
-                                "title": "Product",
+                                "title": "Platform",
                                 "links": [
-                                    {
-                                        "text": "Features",
-                                        "href": "#features"
-                                    },
-                                    {
-                                        "text": "Pricing",
-                                        "href": "#pricing"
-                                    },
-                                    {
-                                        "text": "Security",
-                                        "href": "#security"
-                                    },
-                                    {
-                                        "text": "Roadmap",
-                                        "href": "#roadmap"
-                                    }
-                                ]
-                            },
-                            {
-                                "title": "Company",
-                                "links": [
-                                    {
-                                        "text": "About",
-                                        "href": "#about"
-                                    },
-                                    {
-                                        "text": "Blog",
-                                        "href": "#blog"
-                                    },
-                                    {
-                                        "text": "Careers",
-                                        "href": "#careers"
-                                    },
-                                    {
-                                        "text": "Contact",
-                                        "href": "#contact"
-                                    }
+                                    { "text": "Features", "href": "#" },
+                                    { "text": "Integrations", "href": "#" },
+                                    { "text": "Pricing", "href": "page:pricing" },
+                                    { "text": "Changelog", "href": "#" }
                                 ]
                             },
                             {
                                 "title": "Resources",
                                 "links": [
-                                    {
-                                        "text": "Documentation",
-                                        "href": "#docs"
-                                    },
-                                    {
-                                        "text": "Help Center",
-                                        "href": "#help"
-                                    },
-                                    {
-                                        "text": "API Reference",
-                                        "href": "#api"
-                                    },
-                                    {
-                                        "text": "Community",
-                                        "href": "#community"
-                                    }
+                                    { "text": "Documentation", "href": "#" },
+                                    { "text": "API Reference", "href": "#" },
+                                    { "text": "Blog", "href": "#" },
+                                    { "text": "Community", "href": "#" }
                                 ]
-                            }
-                        ],
-                        "socialLinks": [
-                            {
-                                "platform": "Twitter",
-                                "href": "https://twitter.com",
-                                "icon": "🐦"
-                            },
-                            {
-                                "platform": "LinkedIn",
-                                "href": "https://linkedin.com",
-                                "icon": "💼"
-                            },
-                            {
-                                "platform": "GitHub",
-                                "href": "https://github.com",
-                                "icon": "🐙"
                             }
                         ]
                     },
@@ -240,342 +364,112 @@
             "slug": "pricing",
             "components": [
                 {
-                    "id": "nav-pricing",
+                    "id": "nav-2",
                     "type": "Navbar",
                     "props": {
-                        "logoText": "CloudFlow",
+                        "logoText": "Nexus",
                         "links": [
-                            {
-                                "text": "Home",
-                                "href": "page:home"
-                            },
-                            {
-                                "text": "Features",
-                                "href": "page:home"
-                            },
-                            {
-                                "text": "Blog",
-                                "href": "page:blog"
-                            },
-                            {
-                                "text": "About",
-                                "href": "page:about"
-                            }
+                            { "text": "Platform", "href": "page:home" },
+                            { "text": "Solutions", "href": "#" },
+                            { "text": "Pricing", "href": "#" },
+                            { "text": "Company", "href": "#" }
                         ],
-                        "ctaText": "Start Free Trial",
-                        "ctaLink": "#signup",
-                        "backgroundColor": "#ffffff",
-                        "textColor": "#1f2937"
+                        "ctaText": "Get Early Access",
+                        "backgroundColor": "#0A0A0A",
+                        "textColor": "#FFFFFF"
                     },
                     "children": []
                 },
                 {
-                    "id": "pricing-hero",
+                    "id": "pricing-header",
                     "type": "Container",
                     "props": {
-                        "padding": "xl",
-                        "maxWidth": "xl",
-                        "backgroundColor": "#f9fafb"
+                        "padding": "2xl",
+                        "backgroundColor": "#0A0A0A",
+                        "textColor": "#FFFFFF",
+                        "textAlign": "center"
                     },
                     "children": [
                         {
-                            "id": "pricing-title",
+                            "id": "pt-title",
                             "type": "Text",
-                            "props": {
-                                "content": "Simple, Transparent Pricing",
-                                "tag": "h1",
-                                "size": "3xl",
-                                "color": "#1f2937"
-                            },
+                            "props": { "content": "Simple, transparent pricing.", "tag": "h1", "size": "5xl", "weight": "bold", "color": "#FFFFFF", "marginBottom": "1rem" },
                             "children": []
                         },
                         {
-                            "id": "pricing-subtitle",
+                            "id": "pt-desc",
                             "type": "Text",
-                            "props": {
-                                "content": "Choose the perfect plan for your team",
-                                "tag": "p",
-                                "size": "lg",
-                                "color": "#6b7280"
-                            },
-                            "children": []
-                        }
-                    ]
-                },
-                {
-                    "id": "pricing-grid",
-                    "type": "Container",
-                    "props": {
-                        "padding": "xl",
-                        "maxWidth": "xl",
-                        "display": "flex",
-                        "flexDirection": "row",
-                        "flexWrap": "wrap",
-                        "gap": "lg",
-                        "justifyContent": "center",
-                        "backgroundColor": "#ffffff"
-                    },
-                    "children": [
-                        {
-                            "id": "pricing-1",
-                            "type": "PricingCard",
-                            "props": {
-                                "title": "Starter",
-                                "price": "$19",
-                                "period": "/month",
-                                "description": "Perfect for small teams",
-                                "features": [
-                                    "Up to 5 team members",
-                                    "10GB storage",
-                                    "Basic analytics",
-                                    "Email support"
-                                ],
-                                "buttonText": "Start Free Trial",
-                                "featured": false,
-                                "backgroundColor": "#ffffff",
-                                "textColor": "#1f2937"
-                            },
+                            "props": { "content": "No hidden fees. Cancel anytime.", "tag": "p", "size": "xl", "color": "#A3A3A3", "marginBottom": "3rem" },
                             "children": []
                         },
                         {
-                            "id": "pricing-2",
-                            "type": "PricingCard",
+                            "id": "pricing-grid",
+                            "type": "Grid",
                             "props": {
-                                "title": "Professional",
-                                "price": "$49",
-                                "period": "/month",
-                                "description": "Best for growing teams",
-                                "features": [
-                                    "Up to 20 team members",
-                                    "100GB storage",
-                                    "Advanced analytics",
-                                    "Priority support",
-                                    "API access"
-                                ],
-                                "buttonText": "Start Free Trial",
-                                "featured": true,
-                                "backgroundColor": "#ffffff",
-                                "textColor": "#1f2937"
+                                "columns": 2,
+                                "gap": "2rem",
+                                "maxWidth": "900px",
+                                "marginLeft": "auto",
+                                "marginRight": "auto",
+                                "alignItems": "stretch"
                             },
-                            "children": []
-                        },
-                        {
-                            "id": "pricing-3",
-                            "type": "PricingCard",
-                            "props": {
-                                "title": "Enterprise",
-                                "price": "$149",
-                                "period": "/month",
-                                "description": "For large organizations",
-                                "features": [
-                                    "Unlimited team members",
-                                    "Unlimited storage",
-                                    "Custom analytics",
-                                    "24/7 phone support",
-                                    "SLA guarantee"
-                                ],
-                                "buttonText": "Contact Sales",
-                                "featured": false,
-                                "backgroundColor": "#ffffff",
-                                "textColor": "#1f2937"
-                            },
-                            "children": []
+                            "children": [
+                                {
+                                    "id": "plan-1",
+                                    "type": "PricingCard",
+                                    "props": {
+                                        "title": "Hobby",
+                                        "price": "$0",
+                                        "period": "forever",
+                                        "description": "Perfect for side projects and learning.",
+                                        "features": [
+                                            { "text": "1 User", "included": true },
+                                            { "text": "1GB Storage", "included": true },
+                                            { "text": "Community Support", "included": true },
+                                            { "text": "Custom Domains", "included": false },
+                                            { "text": "Analytics", "included": false }
+                                        ],
+                                        "buttonText": "Start for Free",
+                                        "featured": false,
+                                        "backgroundColor": "#171717",
+                                        "textColor": "#FFFFFF"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "plan-2",
+                                    "type": "PricingCard",
+                                    "props": {
+                                        "title": "Pro",
+                                        "price": "$29",
+                                        "period": "/month",
+                                        "description": "For professionals and small teams.",
+                                        "features": [
+                                            { "text": "Unlimited Users", "included": true },
+                                            { "text": "100GB Storage", "included": true },
+                                            { "text": "Priority Support", "included": true },
+                                            { "text": "Custom Domains", "included": true },
+                                            { "text": "Advanced Analytics", "included": true }
+                                        ],
+                                        "buttonText": "Upgrade to Pro",
+                                        "featured": true,
+                                        "backgroundColor": "#FFFFFF",
+                                        "textColor": "#0F172A"
+                                    },
+                                    "children": []
+                                }
+                            ]
                         }
                     ]
                 },
                 {
-                    "id": "footer-pricing",
+                    "id": "footer-2",
                     "type": "Footer",
                     "props": {
-                        "logoText": "CloudFlow",
-                        "copyright": "© 2024 CloudFlow. All rights reserved.",
-                        "backgroundColor": "#111827",
-                        "textColor": "#9ca3af"
-                    },
-                    "children": []
-                }
-            ]
-        },
-        {
-            "id": "blog",
-            "name": "Blog",
-            "slug": "blog",
-            "components": [
-                {
-                    "id": "nav-blog",
-                    "type": "Navbar",
-                    "props": {
-                        "logoText": "CloudFlow",
-                        "links": [
-                            {
-                                "text": "Home",
-                                "href": "page:home"
-                            },
-                            {
-                                "text": "Features",
-                                "href": "page:home"
-                            },
-                            {
-                                "text": "Pricing",
-                                "href": "page:pricing"
-                            },
-                            {
-                                "text": "About",
-                                "href": "page:about"
-                            }
-                        ],
-                        "ctaText": "Start Free Trial",
-                        "ctaLink": "#signup",
-                        "backgroundColor": "#ffffff",
-                        "textColor": "#1f2937"
-                    },
-                    "children": []
-                },
-                {
-                    "id": "blog-hero",
-                    "type": "Hero",
-                    "props": {
-                        "title": "CloudFlow Blog",
-                        "subtitle": "Latest Updates & Insights",
-                        "description": "Stay updated with the latest features, tips, and best practices",
-                        "primaryButtonText": "Subscribe",
-                        "backgroundColor": "#f8fafc",
-                        "textColor": "#1f2937"
-                    },
-                    "children": []
-                },
-                {
-                    "id": "blog-content",
-                    "type": "Container",
-                    "props": {
-                        "padding": "xl",
-                        "maxWidth": "xl",
-                        "backgroundColor": "#ffffff"
-                    },
-                    "children": [
-                        {
-                            "id": "blog-alert",
-                            "type": "Alert",
-                            "props": {
-                                "title": "New Feature Released!",
-                                "message": "Check out our latest collaboration tools that make teamwork even easier",
-                                "variant": "info",
-                                "dismissible": true,
-                                "backgroundColor": "#ffffff",
-                                "textColor": "#1f2937"
-                            },
-                            "children": []
-                        }
-                    ]
-                },
-                {
-                    "id": "footer-blog",
-                    "type": "Footer",
-                    "props": {
-                        "logoText": "CloudFlow",
-                        "copyright": "© 2024 CloudFlow. All rights reserved.",
-                        "backgroundColor": "#111827",
-                        "textColor": "#9ca3af"
-                    },
-                    "children": []
-                }
-            ]
-        },
-        {
-            "id": "about",
-            "name": "About Us",
-            "slug": "about",
-            "components": [
-                {
-                    "id": "nav-about",
-                    "type": "Navbar",
-                    "props": {
-                        "logoText": "CloudFlow",
-                        "links": [
-                            {
-                                "text": "Home",
-                                "href": "page:home"
-                            },
-                            {
-                                "text": "Features",
-                                "href": "page:home"
-                            },
-                            {
-                                "text": "Pricing",
-                                "href": "page:pricing"
-                            },
-                            {
-                                "text": "Blog",
-                                "href": "page:blog"
-                            }
-                        ],
-                        "ctaText": "Start Free Trial",
-                        "ctaLink": "#signup",
-                        "backgroundColor": "#ffffff",
-                        "textColor": "#1f2937"
-                    },
-                    "children": []
-                },
-                {
-                    "id": "about-hero",
-                    "type": "Hero",
-                    "props": {
-                        "title": "About CloudFlow",
-                        "subtitle": "Our Mission",
-                        "description": "We're on a mission to help teams collaborate better and achieve more together",
-                        "primaryButtonText": "Join Us",
-                        "backgroundColor": "#6366f1",
-                        "textColor": "#ffffff"
-                    },
-                    "children": []
-                },
-                {
-                    "id": "about-stats",
-                    "type": "Container",
-                    "props": {
-                        "padding": "xl",
-                        "maxWidth": "xl",
-                        "backgroundColor": "#f9fafb"
-                    },
-                    "children": [
-                        {
-                            "id": "stats-about",
-                            "type": "Stats",
-                            "props": {
-                                "stats": [
-                                    {
-                                        "value": "10K+",
-                                        "label": "Active Teams"
-                                    },
-                                    {
-                                        "value": "50+",
-                                        "label": "Countries"
-                                    },
-                                    {
-                                        "value": "99.9%",
-                                        "label": "Uptime"
-                                    },
-                                    {
-                                        "value": "24/7",
-                                        "label": "Support"
-                                    }
-                                ],
-                                "backgroundColor": "transparent",
-                                "textColor": "#1f2937",
-                                "accentColor": "#6366f1"
-                            },
-                            "children": []
-                        }
-                    ]
-                },
-                {
-                    "id": "footer-about",
-                    "type": "Footer",
-                    "props": {
-                        "logoText": "CloudFlow",
-                        "copyright": "© 2024 CloudFlow. All rights reserved.",
-                        "backgroundColor": "#111827",
-                        "textColor": "#9ca3af"
+                        "logoText": "Nexus",
+                        "copyright": "\u00A9 2024 Nexus Inc. All rights reserved.",
+                        "backgroundColor": "#0A0A0A",
+                        "textColor": "#A3A3A3"
                     },
                     "children": []
                 }
