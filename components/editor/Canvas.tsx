@@ -5,11 +5,13 @@ import { ComponentDefinition } from "@/types/editor";
 import { COMPONENT_REGISTRY } from "@/components/builder";
 import { cn } from "@/lib/utils";
 import { buildComponentStyle } from "@/lib/buildStyle";
+import { ResizableWrapper } from "./ResizableWrapper";
 
 interface CanvasProps {
   components: ComponentDefinition[];
   selectedComponentIds: string[];
   onSelectComponent: (id: string | null) => void;
+  onUpdateComponent?: (id: string, updates: Record<string, any>) => void;
   viewport?: "desktop" | "tablet" | "mobile";
   isPreviewMode?: boolean;
   onNavigate?: (slug: string) => void;
@@ -69,6 +71,7 @@ function ComponentWrapper({
   onSelect,
   selectedComponentIds,
   onSelectComponent,
+  onUpdateComponent,
   viewport,
   isPreviewMode,
   onNavigate,
@@ -80,6 +83,7 @@ function ComponentWrapper({
   onSelect: () => void;
   selectedComponentIds: string[];
   onSelectComponent: (id: string) => void;
+  onUpdateComponent?: (id: string, updates: Record<string, any>) => void;
   viewport?: "desktop" | "tablet" | "mobile";
   isPreviewMode?: boolean;
   onNavigate?: (slug: string) => void;
@@ -129,6 +133,12 @@ function ComponentWrapper({
   ];
   const shouldTakeFullHeight = fullHeightComponents.includes(component.type);
 
+  const handleResize = (id: string, updates: { width?: string; height?: string }) => {
+    if (onUpdateComponent) {
+      onUpdateComponent(id, updates);
+    }
+  };
+
   return (
     <div
       ref={setNodeRef}
@@ -141,7 +151,13 @@ function ComponentWrapper({
       )}
     >
       {/* Component wrapper — receives inline styles from properties panel */}
-      <div
+      <ResizableWrapper
+        componentId={component.id}
+        isSelected={isSelected}
+        isPreviewMode={!!isPreviewMode}
+        currentWidth={component.props.width}
+        currentHeight={component.props.height}
+        onResize={handleResize}
         className={cn(
           "relative transition-all duration-200",
           shouldTakeFullHeight && "flex flex-1",
@@ -152,15 +168,17 @@ function ComponentWrapper({
           !isPreviewMode && showOutlines && !isSelected &&
             "outline outline-1 outline-dashed outline-gray-300",
         )}
-        onClick={
-          isPreviewMode
-            ? undefined
-            : (e) => {
-                e.stopPropagation();
-                onSelect();
-              }
-        }
       >
+        <div
+          onClick={
+            isPreviewMode
+              ? undefined
+              : (e) => {
+                  e.stopPropagation();
+                  onSelect();
+                }
+          }
+        >
         {/* Selection overlay and DRAG HANDLE */}
         {!isPreviewMode && isSelected && (
           <div 
@@ -196,6 +214,7 @@ function ComponentWrapper({
                         component={child}
                         selectedComponentIds={selectedComponentIds}
                         onSelectComponent={onSelectComponent}
+                        onUpdateComponent={onUpdateComponent}
                         viewport={viewport}
                         isPreviewMode={isPreviewMode}
                         onNavigate={onNavigate}
@@ -222,6 +241,7 @@ function ComponentWrapper({
                         component={child}
                         selectedComponentIds={selectedComponentIds}
                         onSelectComponent={onSelectComponent}
+                        onUpdateComponent={onUpdateComponent}
                         viewport={viewport}
                         isPreviewMode={isPreviewMode}
                         onNavigate={onNavigate}
@@ -259,7 +279,8 @@ function ComponentWrapper({
             pages={pages}
           />
         )}
-      </div>
+        </div>
+      </ResizableWrapper>
     </div>
   );
 }
@@ -268,6 +289,7 @@ function ComponentRenderer({
   component,
   selectedComponentIds,
   onSelectComponent,
+  onUpdateComponent,
   viewport,
   isPreviewMode,
   onNavigate,
@@ -277,6 +299,7 @@ function ComponentRenderer({
   component: ComponentDefinition;
   selectedComponentIds: string[];
   onSelectComponent: (id: string) => void;
+  onUpdateComponent?: (id: string, updates: Record<string, any>) => void;
   viewport?: "desktop" | "tablet" | "mobile";
   isPreviewMode?: boolean;
   onNavigate?: (slug: string) => void;
@@ -290,6 +313,7 @@ function ComponentRenderer({
       onSelect={() => onSelectComponent(component.id)}
       selectedComponentIds={selectedComponentIds}
       onSelectComponent={onSelectComponent}
+      onUpdateComponent={onUpdateComponent}
       viewport={viewport}
       isPreviewMode={isPreviewMode}
       onNavigate={onNavigate}
@@ -303,6 +327,7 @@ export function Canvas({
   components,
   selectedComponentIds,
   onSelectComponent,
+  onUpdateComponent,
   viewport = "desktop",
   isPreviewMode = false,
   onNavigate,
@@ -342,6 +367,7 @@ export function Canvas({
                   component={component}
                   selectedComponentIds={selectedComponentIds}
                   onSelectComponent={onSelectComponent}
+                  onUpdateComponent={onUpdateComponent}
                   viewport={viewport}
                   isPreviewMode={isPreviewMode}
                   onNavigate={onNavigate}

@@ -647,6 +647,7 @@ export function EditorLayout({
               components={components}
               selectedComponentIds={isPreviewMode ? [] : selectedComponentIds}
               onSelectComponent={isPreviewMode ? () => {} : onSelectComponent}
+              onUpdateComponent={onUpdateComponent}
               viewport={viewport}
               isPreviewMode={isPreviewMode}
               onNavigate={(slug) => {

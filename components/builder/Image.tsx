@@ -42,23 +42,40 @@ export function Image({
     "scale-down": "object-scale-down",
   };
 
+  // Build the container style with explicit dimensions
   const baseStyle = buildComponentStyle(rest);
-  if (width) baseStyle.width = `${width}px`;
-  if (height) baseStyle.height = `${height}px`;
+  
+  // Set explicit width and height on the container
+  if (width) {
+    baseStyle.width = typeof width === 'number' ? `${width}px` : width;
+  } else if (!rest.width) {
+    baseStyle.width = '100%'; // Default to full width if not specified
+  }
+  
+  if (height) {
+    baseStyle.height = typeof height === 'number' ? `${height}px` : height;
+  } else if (!rest.height) {
+    baseStyle.height = '300px'; // Default height to prevent overflow
+  }
 
   const imageElement = (
-    <div style={baseStyle} className={className}>
+    <div 
+      style={baseStyle} 
+      className={cn(
+        "overflow-hidden relative block",
+        roundedClasses[rounded],
+        className
+      )}
+    >
       <img
         src={src}
         alt={alt}
-        width={width}
-        height={height}
         loading={loading}
         className={cn(
-          "w-full h-full",
-          roundedClasses[rounded],
+          "w-full h-full block",
           objectFitClasses[objectFit]
         )}
+        style={{ maxWidth: '100%', maxHeight: '100%' }}
       />
     </div>
   );
