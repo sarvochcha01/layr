@@ -1571,6 +1571,36 @@ export function PropertiesPanel({
                 </div>
 
                 <div className="space-y-1.5">
+                  <Label htmlFor="objectFit" className="text-xs font-medium text-muted-foreground">Image Fit</Label>
+                  <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
+                    <select id="objectFit" value={props.objectFit || "cover"} onChange={(e) => updateProp("objectFit", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
+                      <option className="bg-background text-foreground" value="cover">Cover (Fill & Crop)</option>
+                      <option className="bg-background text-foreground" value="contain">Contain (Fit Inside)</option>
+                      <option className="bg-background text-foreground" value="fill">Fill (Stretch)</option>
+                      <option className="bg-background text-foreground" value="scale-down">Scale Down</option>
+                      <option className="bg-background text-foreground" value="none">None (Original Size)</option>
+                    </select>
+                  </div>
+                  <p className="text-[10px] text-muted-foreground mt-1">
+                    {props.objectFit === "cover" && "Fills container, may crop image"}
+                    {props.objectFit === "contain" && "Fits entire image, may show empty space"}
+                    {props.objectFit === "fill" && "Stretches to fill, may distort"}
+                    {props.objectFit === "scale-down" && "Uses smallest of contain or none"}
+                    {props.objectFit === "none" && "Shows image at original size"}
+                    {!props.objectFit && "Fills container, may crop image"}
+                  </p>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="rounded" className="text-xs font-medium text-muted-foreground">Border Radius</Label>
+                  <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
+                    <select id="rounded" value={props.rounded || "md"} onChange={(e) => updateProp("rounded", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
+                      <option className="bg-background text-foreground" value="none">None</option>
+                      <option className="bg-background text-foreground" value="sm">Small</option>
+                      <option className="bg-background text-foreground" value="md">Medium</option>
+                      <option className="bg-background text-foreground" value="lg">Large</option>
+                      <option className="bg-background text-foreground" value="full">Full (Circle)</option>
+                      </select>
                   <Label
                     htmlFor="alt"
                     className="text-xs font-medium text-muted-foreground"
@@ -1584,6 +1614,7 @@ export function PropertiesPanel({
                     placeholder="Describe the image"
                     className="h-8 text-sm"
                   />
+                </div>
                 </div>
 
                 <div className="space-y-1.5">

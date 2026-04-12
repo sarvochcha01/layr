@@ -43,7 +43,12 @@ export function Video({
     "21:9": "aspect-[21/9]",
   };
 
-  const baseStyle = buildComponentStyle({ width, height, ...rest });
+  const baseStyle = buildComponentStyle({ 
+    width, 
+    height, 
+    paddingTop: rest.paddingTop || "15px",
+    ...rest 
+  });
 
   // YouTube / Vimeo URL Parsers
   const extractYoutubeId = (urlOrId?: string) => {

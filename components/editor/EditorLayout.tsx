@@ -583,6 +583,47 @@ export function EditorLayout({
             </div>
           </div>
 
+        {/* Canvas Area */}
+        <div
+          className={`flex-1 overflow-auto transition-all duration-300 ${
+            isPreviewMode ? "bg-white p-0" : "bg-muted p-8"
+          } light`}
+          style={{
+            maxHeight: "calc(100vh - 3rem)",
+            minWidth: 0,
+          }}
+        >
+          <div
+            className="transition-all duration-300 ease-in-out"
+            style={{
+              width: getCanvasWidth(),
+              maxWidth:
+                viewport === "desktop"
+                  ? isPreviewMode
+                    ? "none"
+                    : "1200px"
+                  : getCanvasWidth(),
+              minHeight: "100%",
+              margin: "0 auto",
+            }}
+          >
+            <Canvas
+              components={components}
+              selectedComponentIds={isPreviewMode ? [] : selectedComponentIds}
+              onSelectComponent={isPreviewMode ? () => {} : onSelectComponent}
+              onUpdateComponent={onUpdateComponent}
+              viewport={viewport}
+              isPreviewMode={isPreviewMode}
+              onNavigate={(slug) => {
+                const targetPage = pages.find((p) => p.slug === slug);
+                if (targetPage) {
+                  onPageSelect(targetPage.id);
+                }
+              }}
+              pages={pages}
+              showOutlines={!isPreviewMode && showOutlines}
+            />
+          </div>
           {/* Right Sidebar - Properties */}
           {!isPreviewMode && (
             <>
