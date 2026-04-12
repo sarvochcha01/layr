@@ -5,6 +5,7 @@ import { buildComponentStyle } from "@/lib/buildStyle";
 interface HeroProps {
   title?: string;
   subtitle?: string;
+  badge?: string;
   description?: string;
   primaryButtonText?: string;
   primaryButtonLink?: string;
@@ -15,6 +16,7 @@ interface HeroProps {
   textColor?: string;
   alignment?: "left" | "center" | "right";
   size?: "sm" | "md" | "lg" | "xl";
+  showScrollIndicator?: boolean;
   className?: string;
   width?: string;
   height?: string;
@@ -22,28 +24,30 @@ interface HeroProps {
 }
 
 export function Hero({
-  title = "Build something amazing today",
-  subtitle = "INTRODUCING LAYR",
-  description = "Create stunning websites in minutes with our intuitive drag-and-drop builder. No coding required — just pure creative freedom.",
-  primaryButtonText = "Get Started Free",
+  title = "ENGINEER THE FUTURE OF DIGITAL SPACE.",
+  subtitle,
+  badge = "ENGINE VERSION 4.2.0 ACTIVE",
+  description = "Obsidian Architect is the high-performance visual builder designed for technical precision. Construct immersive interfaces with the speed of code and the intuition of art.",
+  primaryButtonText = "START BUILDING",
   primaryButtonLink = "#",
-  secondaryButtonText = "See How It Works",
+  secondaryButtonText = "VIEW DOCUMENTATION",
   secondaryButtonLink = "#",
   backgroundImage,
-  backgroundColor,
-  textColor,
+  backgroundColor = "#0d0d0d",
+  textColor = "#ffffff",
   alignment = "center",
-  size = "lg",
+  size = "xl",
+  showScrollIndicator = true,
   className,
   width,
   height,
   ...rest
 }: HeroProps) {
   const sizeClasses = {
-    sm: "py-16 sm:py-20 px-4",
-    md: "py-20 sm:py-28 px-4 sm:px-6",
-    lg: "py-24 sm:py-36 px-4 sm:px-8",
-    xl: "py-32 sm:py-44 px-4 sm:px-12",
+    sm: "py-20 sm:py-24 px-4",
+    md: "py-28 sm:py-36 px-4 sm:px-6",
+    lg: "py-36 sm:py-44 px-4 sm:px-8",
+    xl: "py-44 sm:py-56 px-4 sm:px-12",
   };
 
   const alignmentClasses = {
@@ -53,8 +57,8 @@ export function Hero({
   };
 
   const baseStyle = buildComponentStyle({
-    backgroundColor: backgroundColor || "#0f172a",
-    textColor: textColor || "#f8fafc",
+    backgroundColor,
+    textColor,
     width,
     height,
     ...rest,
@@ -64,89 +68,191 @@ export function Hero({
     baseStyle.backgroundImage = `url(${backgroundImage})`;
     baseStyle.backgroundSize = "cover";
     baseStyle.backgroundPosition = "center";
-    baseStyle.backgroundColor = undefined;
   }
+
+  // Split title to highlight "FUTURE" word
+  const titleParts = title.split("FUTURE");
+  const hasHighlight = titleParts.length > 1;
 
   return (
     <section
       className={cn(
-        "relative flex items-center justify-center min-h-[560px] w-full overflow-hidden",
+        "relative flex flex-col items-center justify-center min-h-screen w-full overflow-hidden",
         sizeClasses[size],
         alignmentClasses[alignment],
-        className
+        className,
       )}
       style={baseStyle}
     >
-      {/* Decorative gradient orbs */}
+      {/* Animated grid background */}
+      {!backgroundImage && (
+        <div className="absolute inset-0 opacity-20">
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundImage: `
+                linear-gradient(rgba(99, 102, 241, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99, 102, 241, 0.1) 1px, transparent 1px)
+              `,
+              backgroundSize: "50px 50px",
+              animation: "grid-flow 20s linear infinite",
+            }}
+          />
+        </div>
+      )}
+
+      {/* Gradient orbs */}
       {!backgroundImage && (
         <>
-          <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full opacity-20" style={{ background: "radial-gradient(circle, #6366f1 0%, transparent 70%)" }} />
-          <div className="absolute bottom-[-20%] right-[-10%] w-[400px] h-[400px] rounded-full opacity-15" style={{ background: "radial-gradient(circle, #8b5cf6 0%, transparent 70%)" }} />
+          <div
+            className="absolute top-[-10%] left-[-5%] w-[600px] h-[600px] rounded-full opacity-30 blur-3xl"
+            style={{
+              background:
+                "radial-gradient(circle, #6366f1 0%, transparent 70%)",
+            }}
+          />
+          <div
+            className="absolute bottom-[-10%] right-[-5%] w-[500px] h-[500px] rounded-full opacity-20 blur-3xl"
+            style={{
+              background:
+                "radial-gradient(circle, #8b5cf6 0%, transparent 70%)",
+            }}
+          />
         </>
       )}
 
-      {backgroundImage && (
-        <div className="absolute inset-0 bg-black/50" />
-      )}
-
-      <div className="relative z-10 max-w-4xl mx-auto px-4">
-        {subtitle && (
-          <div className={cn("mb-6", alignment === "center" ? "flex justify-center" : alignment === "right" ? "flex justify-end" : "")}>
+      <div className="relative z-10 max-w-5xl mx-auto px-4">
+        {/* Badge */}
+        {badge && (
+          <div
+            className={cn(
+              "mb-8",
+              alignment === "center"
+                ? "flex justify-center"
+                : alignment === "right"
+                  ? "flex justify-end"
+                  : "",
+            )}
+          >
             <span
-              className="inline-block text-xs font-semibold uppercase tracking-[0.2em] px-4 py-1.5 rounded-full border"
-              style={{
-                color: "#a5b4fc",
-                borderColor: "rgba(165, 180, 252, 0.3)",
-                backgroundColor: "rgba(99, 102, 241, 0.1)",
-              }}
+              className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] px-4 py-2 rounded-full border border-[#2a2a2a] bg-[#1a1a1a]"
+              style={{ color: "#a5b4fc" }}
             >
-              {subtitle}
+              {badge}
             </span>
           </div>
         )}
 
+        {/* Title */}
         <h1
-          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-[1.1] tracking-tight"
+          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-8 leading-[1.1] tracking-tight"
           style={{ fontFamily: "'Inter', sans-serif" }}
         >
-          {title}
+          {hasHighlight ? (
+            <>
+              {titleParts[0]}
+              <span
+                className="inline-block"
+                style={{
+                  background:
+                    "linear-gradient(135deg, #a5b4fc 0%, #c4b5fd 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                }}
+              >
+                FUTURE
+              </span>
+              {titleParts[1]}
+            </>
+          ) : (
+            title
+          )}
         </h1>
 
+        {/* Description */}
         <p
-          className="text-lg sm:text-xl mb-10 leading-relaxed max-w-2xl opacity-80"
+          className="text-base sm:text-lg mb-12 leading-relaxed max-w-2xl text-gray-400"
           style={{
-            ...(alignment === "center" ? { marginLeft: "auto", marginRight: "auto" } : {}),
+            ...(alignment === "center"
+              ? { marginLeft: "auto", marginRight: "auto" }
+              : {}),
           }}
         >
           {description}
         </p>
 
-        <div className={cn(
-          "flex flex-col sm:flex-row gap-4",
-          alignment === "center" ? "justify-center items-center" : alignment === "right" ? "justify-end items-center" : "items-start"
-        )}>
+        {/* CTA Buttons */}
+        <div
+          className={cn(
+            "flex flex-col sm:flex-row gap-4",
+            alignment === "center"
+              ? "justify-center items-center"
+              : alignment === "right"
+                ? "justify-end items-center"
+                : "items-start",
+          )}
+        >
           <Button
             size="lg"
-            className="w-full sm:w-auto px-8 py-3 text-base font-medium rounded-full shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all duration-300"
-            style={{ backgroundColor: "#6366f1", color: "#ffffff" }}
+            className="w-full sm:w-auto px-8 py-3 text-sm font-bold tracking-wider rounded-xl bg-blue-600 hover:bg-blue-700 text-white border-0 transition-all duration-300"
             asChild
           >
-            <a href={primaryButtonLink}>{primaryButtonText}</a>
+            <a href={primaryButtonLink}>
+              {primaryButtonText}
+              <span className="ml-2">→</span>
+            </a>
           </Button>
 
           {secondaryButtonText && (
             <Button
               variant="outline"
               size="lg"
-              className="w-full sm:w-auto px-8 py-3 text-base font-medium rounded-full border-white/20 hover:bg-white/10 transition-all duration-300"
-              style={{ color: textColor || "#f8fafc" }}
+              className="w-full sm:w-auto px-8 py-3 text-sm font-bold tracking-wider rounded-xl border-[#2a2a2a] bg-[#1a1a1a] hover:bg-[#2a2a2a] text-white transition-all duration-300"
               asChild
             >
               <a href={secondaryButtonLink}>{secondaryButtonText}</a>
             </Button>
           )}
         </div>
+
+        {/* Tech Stack Badges */}
+        <div
+          className={cn(
+            "flex flex-wrap gap-6 mt-16 text-xs text-gray-500 font-semibold uppercase tracking-wider",
+            alignment === "center"
+              ? "justify-center"
+              : alignment === "right"
+                ? "justify-end"
+                : "",
+          )}
+        >
+          <div className="flex items-center gap-2">
+            <span className="w-1 h-1 rounded-full bg-blue-500"></span>
+            <span>VUE.JS</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="w-1 h-1 rounded-full bg-blue-500"></span>
+            <span>REACT</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="w-1 h-1 rounded-full bg-blue-500"></span>
+            <span>SUPABASE</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="w-1 h-1 rounded-full bg-blue-500"></span>
+            <span>VERCEL</span>
+          </div>
+        </div>
       </div>
+
+      {/* Scroll Indicator */}
+      {showScrollIndicator && (
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-xs text-gray-500 uppercase tracking-wider">
+          <span>SCROLL TO EXPLORE</span>
+          <div className="w-px h-12 bg-gradient-to-b from-gray-500 to-transparent animate-pulse" />
+        </div>
+      )}
     </section>
   );
 }

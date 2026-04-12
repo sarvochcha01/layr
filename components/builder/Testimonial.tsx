@@ -18,83 +18,80 @@ interface TestimonialProps {
 }
 
 export function Testimonial({
-  quote = "This product has completely transformed how we work. The attention to detail and ease of use is unmatched.",
-  author = "Sarah Johnson",
-  role = "Head of Design",
-  company = "Acme Inc",
+  quote = "The Obsidian Architect has transformed how our design team ships. It's the precision of an IDE with the speed of a site builder.",
+  author = "Marcus Chen",
+  role = "CTO",
+  company = "NEXUS DIGITAL",
   avatar,
   rating = 5,
   variant = "card",
-  backgroundColor,
-  textColor,
+  backgroundColor = "#1a1a1a",
+  textColor = "#ffffff",
   width,
   height,
   ...rest
 }: TestimonialProps) {
-  const baseStyle = buildComponentStyle({ backgroundColor, textColor, width, height, ...rest });
+  const baseStyle = buildComponentStyle({
+    backgroundColor,
+    textColor,
+    width,
+    height,
+    ...rest,
+  });
 
   return (
     <div
       className={cn(
         "p-8 rounded-2xl min-w-0 overflow-hidden transition-all duration-300",
-        variant === "card" && !backgroundColor && "bg-white border border-gray-100 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_6px_24px_rgba(0,0,0,0.06)]",
-        variant === "featured" && !backgroundColor && "bg-white border border-gray-100 shadow-[0_4px_12px_rgba(0,0,0,0.08),0_12px_40px_rgba(0,0,0,0.1)]",
-        variant === "minimal" && "bg-transparent",
-        "hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.08),0_12px_40px_rgba(0,0,0,0.1)]"
+        "border border-[#2a2a2a]",
+        "hover:border-[#3a3a3a]",
+        "hover:-translate-y-0.5",
       )}
       style={baseStyle}
     >
-      {/* Decorative quote mark */}
-      <div
-        className="text-5xl font-serif leading-none mb-4 select-none"
-        style={{ color: "#6366f1", opacity: 0.3 }}
-      >
-        "
-      </div>
-
-      {/* Quote */}
-      <blockquote
-        className="text-base leading-relaxed mb-6 break-words"
-        style={{ fontFamily: "'Inter', sans-serif" }}
-      >
-        {quote}
-      </blockquote>
-
-      {/* Rating */}
+      {/* Rating Stars */}
       {rating > 0 && (
-        <div className="flex gap-0.5 mb-5">
+        <div className="flex gap-1 mb-6">
           {Array.from({ length: 5 }).map((_, i) => (
             <Star
               key={i}
               className={cn(
-                "w-4 h-4",
-                i < rating ? "fill-amber-400 text-amber-400" : "text-gray-200"
+                "w-5 h-5",
+                i < rating ? "fill-blue-400 text-blue-400" : "text-gray-700",
               )}
             />
           ))}
         </div>
       )}
 
+      {/* Quote */}
+      <blockquote
+        className="text-lg leading-relaxed mb-8 break-words italic text-gray-300"
+        style={{ fontFamily: "'Inter', sans-serif" }}
+      >
+        "{quote}"
+      </blockquote>
+
       {/* Author */}
-      <div className="flex items-center gap-3 pt-4 border-t border-gray-100">
+      <div className="flex items-center gap-3 pt-6 border-t border-[#2a2a2a]">
         {avatar ? (
           <img
             src={avatar}
             alt={author}
-            className="w-10 h-10 rounded-full object-cover ring-2 ring-gray-100"
+            className="w-12 h-12 rounded-full object-cover ring-2 ring-[#2a2a2a]"
           />
         ) : (
-          <div
-            className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold"
-            style={{ backgroundColor: "rgba(99, 102, 241, 0.1)", color: "#6366f1" }}
-          >
+          <div className="w-12 h-12 rounded-full flex items-center justify-center text-sm font-semibold bg-[#2a2a2a]">
             {author?.charAt(0) || "?"}
           </div>
         )}
         <div className="min-w-0">
-          <div className="text-sm font-semibold truncate">{author}</div>
-          <div className="text-xs opacity-50 truncate">
-            {role}{company && `, ${company}`}
+          <div className="text-sm font-semibold truncate text-white">
+            {author}
+          </div>
+          <div className="text-xs text-gray-400 truncate uppercase tracking-wider">
+            {role}
+            {company && `, ${company}`}
           </div>
         </div>
       </div>

@@ -28,41 +28,46 @@ export function Alert({
   const variantConfig = {
     info: {
       icon: Info,
-      bgClass: "bg-blue-50 border-blue-200",
-      textClass: "text-blue-800",
-      iconClass: "text-blue-500",
+      bgClass: "bg-[#1a1a1a] border-blue-500/20",
+      textClass: "text-gray-300",
+      iconClass: "text-blue-400",
     },
     success: {
       icon: CheckCircle,
-      bgClass: "bg-green-50 border-green-200",
-      textClass: "text-green-800",
-      iconClass: "text-green-500",
+      bgClass: "bg-[#1a1a1a] border-green-500/20",
+      textClass: "text-gray-300",
+      iconClass: "text-green-400",
     },
     warning: {
       icon: AlertCircle,
-      bgClass: "bg-yellow-50 border-yellow-200",
-      textClass: "text-yellow-800",
-      iconClass: "text-yellow-500",
+      bgClass: "bg-[#1a1a1a] border-yellow-500/20",
+      textClass: "text-gray-300",
+      iconClass: "text-yellow-400",
     },
     error: {
       icon: XCircle,
-      bgClass: "bg-red-50 border-red-200",
-      textClass: "text-red-800",
-      iconClass: "text-red-500",
+      bgClass: "bg-[#1a1a1a] border-red-500/20",
+      textClass: "text-gray-300",
+      iconClass: "text-red-400",
     },
   };
 
   const config = variantConfig[variant];
   const Icon = config.icon;
 
-  const baseStyle = buildComponentStyle({ backgroundColor, textColor, width, ...rest });
+  const baseStyle = buildComponentStyle({
+    backgroundColor,
+    textColor,
+    width,
+    ...rest,
+  });
 
   return (
     <div
       className={cn(
         "p-4 rounded-lg border flex gap-3",
         !backgroundColor && config.bgClass,
-        !textColor && config.textClass
+        !textColor && config.textClass,
       )}
       style={baseStyle}
     >
