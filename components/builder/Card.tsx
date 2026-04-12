@@ -22,7 +22,7 @@ interface CardProps {
 export function Card({
   title = "Card Title",
   description = "A short description of this card's content goes here.",
-  image,
+  image = "https://images.unsplash.com/photo-1557683316-973673baf926?w=800&h=400&fit=crop",
   icon,
   buttonText,
   buttonLink = "#",

@@ -673,13 +673,120 @@ export function Image({ src = '/placeholder.jpg', alt = 'Image', className = '' 
 
 interface VideoProps {
   src?: string;
+  youtubeId?: string;
+  vimeoId?: string;
+  poster?: string;
+  width?: string;
+  height?: string;
+  autoplay?: boolean;
+  muted?: boolean;
+  loop?: boolean;
+  controls?: boolean;
   className?: string;
+  aspectRatio?: '16:9' | '4:3' | '1:1' | '21:9';
+  backgroundColor?: string;
+  textColor?: string;
   [key: string]: any;
 }
 
-export function Video({ src = '/placeholder.mp4', className = '' }: VideoProps) {
+export function Video({
+  src,
+  youtubeId,
+  vimeoId,
+  poster,
+  width,
+  height,
+  autoplay = false,
+  muted = false,
+  loop = false,
+  controls = true,
+  className = '',
+  aspectRatio = '16:9',
+  backgroundColor,
+  textColor,
+}: VideoProps) {
+  const aspectClasses: Record<string, string> = {
+    '16:9': 'aspect-video',
+    '4:3': 'aspect-[4/3]',
+    '1:1': 'aspect-square',
+    '21:9': 'aspect-[21/9]',
+  };
+
+  const wrapperStyle: React.CSSProperties = {};
+  if (width) wrapperStyle.width = width;
+  if (height) wrapperStyle.height = height;
+
+  // YouTube embed
+  if (youtubeId) {
+    const params = new URLSearchParams({
+      autoplay: autoplay ? '1' : '0',
+      mute: muted ? '1' : '0',
+      loop: loop ? '1' : '0',
+      controls: controls ? '1' : '0',
+    });
+    if (loop) params.set('playlist', youtubeId);
+
+    return (
+      <div className={\\\`w-full \\\${aspectClasses[aspectRatio] || 'aspect-video'} \\\${className}\\\`} style={wrapperStyle}>
+        <iframe
+          src={\\\`https://www.youtube-nocookie.com/embed/\\\${youtubeId}?\\\${params.toString()}\\\`}
+          title="YouTube video"
+          className="w-full h-full rounded-lg"
+          frameBorder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerPolicy="strict-origin-when-cross-origin"
+          allowFullScreen
+        />
+      </div>
+    );
+  }
+
+  // Vimeo embed
+  if (vimeoId) {
+    const params = new URLSearchParams({
+      autoplay: autoplay ? '1' : '0',
+      muted: muted ? '1' : '0',
+      loop: loop ? '1' : '0',
+    });
+
+    return (
+      <div className={\\\`w-full \\\${aspectClasses[aspectRatio] || 'aspect-video'} \\\${className}\\\`} style={wrapperStyle}>
+        <iframe
+          src={\\\`https://player.vimeo.com/video/\\\${vimeoId}?\\\${params.toString()}\\\`}
+          title="Vimeo video"
+          className="w-full h-full rounded-lg"
+          frameBorder="0"
+          allow="autoplay; fullscreen; picture-in-picture"
+          allowFullScreen
+        />
+      </div>
+    );
+  }
+
+  // Regular video file
+  if (src) {
+    return (
+      <video
+        src={src}
+        poster={poster}
+        autoPlay={autoplay}
+        muted={muted}
+        loop={loop}
+        controls={controls}
+        className={\\\`w-full h-auto rounded-lg \\\${!width && !height ? aspectClasses[aspectRatio] || '' : ''} \\\${className}\\\`}
+        style={wrapperStyle}
+      />
+    );
+  }
+
+  // Placeholder when no source provided
   return (
-    <video src={src} controls className={\`w-full rounded-lg \${className}\`} />
+    <div
+      className={\\\`w-full rounded-lg flex items-center justify-center \\\${!backgroundColor ? 'bg-gray-200' : ''} \\\${aspectClasses[aspectRatio] || 'aspect-video'} \\\${className}\\\`}
+      style={{ backgroundColor, color: textColor, ...wrapperStyle }}
+    >
+      <p className={\\\`\\\${!textColor ? 'opacity-50' : ''}\\\`}>No video source provided</p>
+    </div>
   );
 }`,
     Form: `'use client';

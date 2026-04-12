@@ -47,21 +47,23 @@ export function Video({
 
   // YouTube / Vimeo URL Parsers
   const extractYoutubeId = (urlOrId?: string) => {
-    if (!urlOrId) return null;
+    if (!urlOrId || urlOrId.trim() === "") return null;
+    const trimmed = urlOrId.trim();
     // If it's just an alphanumeric string (11 chars typical for YT), assume it's already an ID
-    if (/^[a-zA-Z0-9_-]{11}$/.test(urlOrId)) return urlOrId;
+    if (/^[a-zA-Z0-9_-]{11}$/.test(trimmed)) return trimmed;
     
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-    const match = urlOrId.match(regExp);
+    const match = trimmed.match(regExp);
     return (match && match[2].length === 11) ? match[2] : null;
   };
 
   const extractVimeoId = (urlOrId?: string) => {
-    if (!urlOrId) return null;
-    if (/^[0-9]+$/.test(urlOrId)) return urlOrId;
+    if (!urlOrId || urlOrId.trim() === "") return null;
+    const trimmed = urlOrId.trim();
+    if (/^[0-9]+$/.test(trimmed)) return trimmed;
     
     const regExp = /(?:www\.|player\.)?vimeo.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|album\/(?:\d+)\/video\/|video\/|)(\d+)(?:[a-zA-Z0-9_\-]+)?/i;
-    const match = urlOrId.match(regExp);
+    const match = trimmed.match(regExp);
     return match ? match[1] : null;
   };
 
@@ -117,26 +119,27 @@ export function Video({
     );
   }
 
-  // Regular video
-  if (src && !activeYoutubeId && !activeVimeoId) {
+  // Regular video (direct video file URL)
+  if (src && src.trim() !== "" && !activeYoutubeId && !activeVimeoId) {
     return (
-      <video
-        src={src}
-        poster={poster}
-        autoPlay={autoplay}
-        muted={muted}
-        loop={loop}
-        controls={controls}
-        className={cn(
-          "w-full h-auto rounded-lg",
-          !width && !height && aspectRatioClasses[aspectRatio],
-          className
-        )}
+      <div
+        className={cn("w-full", aspectRatioClasses[aspectRatio], className)}
         style={baseStyle}
-      />
+      >
+        <video
+          src={src}
+          poster={poster}
+          autoPlay={autoplay}
+          muted={muted}
+          loop={loop}
+          controls={controls}
+          className="w-full h-full rounded-lg object-cover"
+        />
+      </div>
     );
   }
 
+  // Placeholder when no video source is provided
   const placeholderStyle = buildComponentStyle({ backgroundColor, textColor, width, height, ...rest });
 
   return (

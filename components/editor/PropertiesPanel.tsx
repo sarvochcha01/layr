@@ -772,6 +772,16 @@ export function PropertiesPanel({
               </AccordionTrigger>
               <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
                 <div className="space-y-1.5">
+                  <Label htmlFor="image" className="text-xs font-medium text-muted-foreground">Image URL</Label>
+                  <Input id="image" value={props.image || ""} onChange={(e) => updateProp("image", e.target.value)} placeholder="https://example.com/image.jpg" className="h-8 text-sm" />
+                  {props.image && (
+                    <div className="mt-2 rounded-md overflow-hidden border border-border">
+                      <img src={props.image} alt="Preview" className="w-full h-24 object-cover" />
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-1.5">
                   <Label htmlFor="title" className="text-xs font-medium text-muted-foreground">Title</Label>
                   <Input id="title" value={props.title || ""} onChange={(e) => updateProp("title", e.target.value)} placeholder="Card title" className="h-8 text-sm" />
                 </div>
@@ -1563,14 +1573,14 @@ export function PropertiesPanel({
                   </Label>
                   <select
                     id="aspectRatio"
-                    value={props.aspectRatio || "16/9"}
+                    value={props.aspectRatio || "16:9"}
                     onChange={(e) => updateProp("aspectRatio", e.target.value)}
                     className="w-full p-2 border rounded-md"
                   >
-                    <option className="bg-background text-foreground" value="16/9">16:9 (Widescreen)</option>
-                    <option className="bg-background text-foreground" value="4/3">4:3 (Standard)</option>
-                    <option className="bg-background text-foreground" value="1/1">1:1 (Square)</option>
-                    <option className="bg-background text-foreground" value="21/9">21:9 (Ultrawide)</option>
+                    <option className="bg-background text-foreground" value="16:9">16:9 (Widescreen)</option>
+                    <option className="bg-background text-foreground" value="4:3">4:3 (Standard)</option>
+                    <option className="bg-background text-foreground" value="1:1">1:1 (Square)</option>
+                    <option className="bg-background text-foreground" value="21:9">21:9 (Ultrawide)</option>
                   </select>
                 </div>
 
