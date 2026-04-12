@@ -16,7 +16,9 @@ interface PricingCardProps {
   features?: (string | Feature)[];
   buttonText?: string;
   buttonLink?: string;
+  buttonVariant?: "primary" | "secondary";
   featured?: boolean;
+  badge?: string;
   backgroundColor?: string;
   textColor?: string;
   width?: string;
@@ -25,21 +27,23 @@ interface PricingCardProps {
 }
 
 export function PricingCard({
-  title = "Pro Plan",
+  title = "Professional",
   price = "$49",
-  period = "month",
-  description = "Everything you need to scale",
+  period = "mo",
+  description,
   features = [
-    { text: "Unlimited projects", included: true },
-    { text: "Priority support", included: true },
-    { text: "Advanced analytics", included: true },
-    { text: "Custom integrations", included: false },
+    { text: "Unlimited Components", included: true },
+    { text: "Advanced Interactivity", included: true },
+    { text: "Real-time Collaboration", included: true },
+    { text: "Custom Domain", included: true },
   ],
-  buttonText = "Get Started",
+  buttonText = "GET STARTED",
   buttonLink = "#",
+  buttonVariant = "primary",
   featured = false,
-  backgroundColor,
-  textColor,
+  badge = "POPULAR",
+  backgroundColor = "#1a1a1a",
+  textColor = "#ffffff",
   width,
   height,
   ...rest
@@ -52,8 +56,8 @@ export function PricingCard({
   });
 
   const baseStyle = buildComponentStyle({
-    backgroundColor: backgroundColor || "#ffffff",
-    textColor: textColor || "#1e293b",
+    backgroundColor,
+    textColor,
     width,
     height,
     ...rest,
@@ -63,56 +67,56 @@ export function PricingCard({
     <div
       className={cn(
         "p-8 rounded-2xl flex flex-col min-w-0 overflow-hidden transition-all duration-300",
-        "border",
-        featured
-          ? "border-indigo-200 shadow-[0_4px_12px_rgba(99,102,241,0.15),0_20px_50px_rgba(99,102,241,0.1)] hover:shadow-[0_8px_24px_rgba(99,102,241,0.2),0_24px_60px_rgba(99,102,241,0.15)] scale-[1.02]"
-          : "border-gray-100 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_6px_24px_rgba(0,0,0,0.06)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08),0_12px_40px_rgba(0,0,0,0.1)]",
-        "hover:-translate-y-1"
+        "border border-[#2a2a2a]",
+        "hover:border-[#3a3a3a]",
+        featured && "ring-1 ring-blue-500/20",
       )}
       style={baseStyle}
     >
-      {featured && (
-        <div className="text-center mb-5 -mt-2">
-          <span
-            className="inline-block text-xs font-semibold uppercase tracking-wider px-4 py-1 rounded-full"
-            style={{
-              background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
-              color: "#ffffff",
-            }}
+      {/* Header */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <h3
+            className="text-xl font-semibold tracking-tight"
+            style={{ fontFamily: "'Inter', sans-serif" }}
           >
-            Most Popular
-          </span>
+            {title}
+          </h3>
+          {featured && badge && (
+            <span className="text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-blue-500/20 text-blue-400">
+              {badge}
+            </span>
+          )}
         </div>
-      )}
 
-      <div className="text-center mb-8">
-        <h3
-          className="text-xl font-semibold mb-4 tracking-tight"
-          style={{ fontFamily: "'Inter', sans-serif" }}
-        >
-          {title}
-        </h3>
-        <div className="mb-2 flex items-baseline justify-center gap-1">
+        <div className="flex items-baseline gap-1 mb-2">
           <span className="text-5xl font-bold tracking-tight">{price}</span>
-          <span className="text-sm opacity-40 font-medium">/{period}</span>
+          <span className="text-sm text-gray-400">/{period}</span>
         </div>
-        <p className="text-sm opacity-50">{description}</p>
+
+        {description && <p className="text-sm text-gray-400">{description}</p>}
       </div>
 
-      <div className="border-t border-gray-100 pt-6 mb-8">
-        <ul className="space-y-3 flex-grow">
+      {/* Features */}
+      <div className="flex-grow mb-8">
+        <ul className="space-y-3">
           {normalizedFeatures.map((feature, index) => (
             <li key={index} className="flex items-center gap-3 text-sm">
               {feature.included ? (
-                <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: "rgba(34, 197, 94, 0.1)" }}>
-                  <Check className="w-3 h-3 text-green-500" />
+                <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 bg-blue-500/20">
+                  <Check className="w-3 h-3 text-blue-400" />
                 </div>
               ) : (
-                <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 bg-gray-100">
-                  <X className="w-3 h-3 text-gray-300" />
+                <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 bg-[#2a2a2a]">
+                  <X className="w-3 h-3 text-gray-600" />
                 </div>
               )}
-              <span className={cn("break-words min-w-0", !feature.included && "opacity-40")}>
+              <span
+                className={cn(
+                  "break-words min-w-0",
+                  feature.included ? "text-gray-300" : "text-gray-600",
+                )}
+              >
                 {feature.text}
               </span>
             </li>
@@ -120,16 +124,15 @@ export function PricingCard({
         </ul>
       </div>
 
+      {/* CTA Button */}
       <div className="mt-auto">
         <Button
           className={cn(
-            "w-full py-3 rounded-xl font-medium transition-all duration-300",
-            featured
-              ? "shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40"
-              : ""
+            "w-full py-3 rounded-xl font-semibold text-xs tracking-wider transition-all duration-300",
+            buttonVariant === "primary"
+              ? "bg-blue-600 hover:bg-blue-700 text-white border-0"
+              : "bg-[#2a2a2a] hover:bg-[#333333] text-white border border-[#3a3a3a]",
           )}
-          variant={featured ? "default" : "outline"}
-          style={featured ? { background: "linear-gradient(135deg, #6366f1, #8b5cf6)", color: "#fff", border: "none" } : undefined}
           asChild
         >
           <a href={buttonLink}>{buttonText}</a>

@@ -1,7 +1,13 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Page, GlobalComponents, ComponentDefinition, CustomComponents, ChatMessage } from "@/types/editor";
+import {
+  Page,
+  GlobalComponents,
+  ComponentDefinition,
+  CustomComponents,
+  ChatMessage,
+} from "@/types/editor";
 import { HierarchyPanel } from "./HierarchyPanel";
 import { ComponentPalette } from "./ComponentPalette";
 import { Canvas } from "./Canvas";
@@ -9,7 +15,26 @@ import { PropertiesPanel } from "./PropertiesPanel";
 import { PagesPanel } from "./PagesPanel";
 import { AIChatPanel } from "./AIChatPanel";
 import { CodeEditorDialog } from "./CodeEditorDialog";
-import { Download, Eye, Edit, X, Undo, Redo, Monitor, Tablet, Smartphone, Layers, LayoutTemplate, FileBox, Save, Sparkles, BoxSelect } from "lucide-react";
+import {
+  Download,
+  Eye,
+  Edit,
+  X,
+  Undo,
+  Redo,
+  Monitor,
+  Tablet,
+  Smartphone,
+  Layers,
+  LayoutTemplate,
+  FileBox,
+  Save,
+  Sparkles,
+  BoxSelect,
+  Play,
+  RotateCcw,
+  Settings,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import JSZip from "jszip";
@@ -57,8 +82,13 @@ interface EditorLayoutProps {
   onApplyGlobalTemplate?: (componentId: string, globalName: string) => void;
   onMoveComponentUp?: (componentId: string) => void;
   onMoveComponentDown?: (componentId: string) => void;
-  onApplyAIComponents?: (components: ComponentDefinition[], mode: "add" | "replace") => void;
-  onApplyAIPages?: (pages: { name: string; path: string; components: ComponentDefinition[] }[]) => void;
+  onApplyAIComponents?: (
+    components: ComponentDefinition[],
+    mode: "add" | "replace",
+  ) => void;
+  onApplyAIPages?: (
+    pages: { name: string; path: string; components: ComponentDefinition[] }[],
+  ) => void;
   customComponents?: CustomComponents;
   onSaveCustomComponent?: (componentId: string, customName: string) => void;
   onDeleteCustomComponent?: (customName: string) => void;
@@ -115,10 +145,8 @@ export function EditorLayout({
   const [showOutlines, setShowOutlines] = useState(false);
 
   // Panel widths and heights
-  const [leftPanelWidth, setLeftPanelWidth] = useState(320);
+  const [leftPanelWidth, setLeftPanelWidth] = useState(280);
   const [rightPanelWidth, setRightPanelWidth] = useState(320);
-  const [pagesPanelHeight, setPagesPanelHeight] = useState(256);
-  const [hierarchyPanelHeight, setHierarchyPanelHeight] = useState(300);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -133,16 +161,6 @@ export function EditorLayout({
         const delta = startPosRef.current.x - e.clientX;
         setRightPanelWidth(
           Math.max(200, Math.min(600, startSizeRef.current + delta)),
-        );
-      } else if (isResizingRef.current === "pages") {
-        const delta = e.clientY - startPosRef.current.y;
-        setPagesPanelHeight(
-          Math.max(150, Math.min(500, startSizeRef.current + delta)),
-        );
-      } else if (isResizingRef.current === "hierarchy") {
-        const delta = e.clientY - startPosRef.current.y;
-        setHierarchyPanelHeight(
-          Math.max(150, Math.min(600, startSizeRef.current + delta)),
         );
       }
     };
@@ -177,12 +195,6 @@ export function EditorLayout({
     } else if (type === "right") {
       startSizeRef.current = rightPanelWidth;
       document.body.style.cursor = "ew-resize";
-    } else if (type === "pages") {
-      startSizeRef.current = pagesPanelHeight;
-      document.body.style.cursor = "ns-resize";
-    } else if (type === "hierarchy") {
-      startSizeRef.current = hierarchyPanelHeight;
-      document.body.style.cursor = "ns-resize";
     }
 
     document.body.style.userSelect = "none";
@@ -214,40 +226,69 @@ export function EditorLayout({
       const name = projectName || "my-website";
 
       if (format === "react") {
-        // React/Next.js export with App Router structure — fully client-side
         const appFolder = zip.folder("app");
         const componentsFolder = zip.folder("components");
         const publicFolder = zip.folder("public");
 
-        // Generate app/layout.tsx
         appFolder?.file("layout.tsx", generateAppLayout(name));
+        appFolder?.file(
+          "globals.css",
+          `@tailwind base;\n@tailwind components;\n@tailwind utilities;\n\n:root {\n  --foreground-rgb: 0, 0, 0;\n  --background-start-rgb: 214, 219, 220;\n  --background-end-rgb: 255, 255, 255;\n}\n\nbody {\n  color: rgb(var(--foreground-rgb));\n  background: linear-gradient(\n      to bottom,\n      transparent,\n      rgb(var(--background-end-rgb))\n    )\n    rgb(var(--background-start-rgb));\n}\n`,
+        );
 
-        // Generate app/globals.css
-        appFolder?.file("globals.css", `@tailwind base;\n@tailwind components;\n@tailwind utilities;\n\n:root {\n  --foreground-rgb: 0, 0, 0;\n  --background-start-rgb: 214, 219, 220;\n  --background-end-rgb: 255, 255, 255;\n}\n\nbody {\n  color: rgb(var(--foreground-rgb));\n  background: linear-gradient(\n      to bottom,\n      transparent,\n      rgb(var(--background-end-rgb))\n    )\n    rgb(var(--background-start-rgb));\n}\n`);
-
-        // Generate page components using App Router structure
         for (let i = 0; i < pagesToExport.length; i++) {
           const page = pagesToExport[i];
           const pageName = page.name.replace(/\s+/g, "");
 
-          // App Router uses app/page.tsx for home and app/[slug]/page.tsx for other pages
-          if (page.slug === "index" || (i === 0 && !pagesToExport.some(p => p.slug === "index"))) {
-            const appPageContent = generateAppPage(page.components, pageName, `${pageName} - ${name}`);
+          if (
+            page.slug === "index" ||
+            (i === 0 && !pagesToExport.some((p) => p.slug === "index"))
+          ) {
+            const appPageContent = generateAppPage(
+              page.components,
+              pageName,
+              `${pageName} - ${name}`,
+            );
             appFolder?.file("page.tsx", appPageContent);
           } else {
-            const reactComponent = generateReactComponent(page.components, pageName);
-            const slugPath = page.slug || page.name.toLowerCase().replace(/\s+/g, "-") || page.id;
+            const reactComponent = generateReactComponent(
+              page.components,
+              pageName,
+            );
+            const slugPath =
+              page.slug ||
+              page.name.toLowerCase().replace(/\s+/g, "-") ||
+              page.id;
             const pageFolder = appFolder?.folder(slugPath);
             pageFolder?.file("page.tsx", reactComponent);
           }
         }
 
-        // Generate all component implementation files
         const componentNames = [
-          'Header', 'Footer', 'Hero', 'Section', 'Container', 'Grid',
-          'Card', 'Button', 'Text', 'Image', 'Video', 'Form',
-          'Navbar', 'Accordion', 'Tabs', 'Testimonial', 'PricingCard',
-          'Feature', 'Stats', 'CTA', 'Divider', 'Spacer', 'Badge', 'Alert'
+          "Header",
+          "Footer",
+          "Hero",
+          "Section",
+          "Container",
+          "Grid",
+          "Card",
+          "Button",
+          "Text",
+          "Image",
+          "Video",
+          "Form",
+          "Navbar",
+          "Accordion",
+          "Tabs",
+          "Testimonial",
+          "PricingCard",
+          "Feature",
+          "Stats",
+          "CTA",
+          "Divider",
+          "Spacer",
+          "Badge",
+          "Alert",
         ];
 
         for (const componentName of componentNames) {
@@ -255,54 +296,64 @@ export function EditorLayout({
           componentsFolder?.file(`${componentName}.tsx`, componentCode);
         }
 
-        // Add component index for convenient imports
         componentsFolder?.file("index.ts", generateReactComponentsIndex());
 
-        // Add config files
         zip.file("package.json", generatePackageJson(name));
         zip.file("next.config.js", generateNextConfig());
         zip.file("tailwind.config.js", generateTailwindConfig());
         zip.file("README.md", generateREADME(name));
+        zip.file(
+          "postcss.config.js",
+          `/** @type {import('postcss-load-config').Config} */\nconst config = {\n  plugins: {\n    tailwindcss: {},\n    autoprefixer: {},\n  },\n}\n\nmodule.exports = config\n`,
+        );
+        zip.file(
+          ".gitignore",
+          `# dependencies\n/node_modules\n/.pnp\n.pnp.js\n\n# testing\n/coverage\n\n# next.js\n/.next/\n/out/\n\n# production\n/build\n\n# misc\n.DS_Store\n*.pem\n\n# debug\nnpm-debug.log*\nyarn-debug.log*\nyarn-error.log*\n\n# local env files\n.env*.local\n\n# vercel\n.vercel\n\n# typescript\n*.tsbuildinfo\nnext-env.d.ts\n`,
+        );
+        zip.file(
+          ".eslintrc.json",
+          JSON.stringify({ extends: "next/core-web-vitals" }, null, 2),
+        );
+        zip.file(
+          "next-env.d.ts",
+          `/// <reference types="next" />\n/// <reference types="next/image-types/global" />\n\n// NOTE: This file should not be edited\n// see https://nextjs.org/docs/app/building-your-application/configuring/typescript for more information.\n`,
+        );
+        zip.file(
+          "tsconfig.json",
+          JSON.stringify(
+            {
+              compilerOptions: {
+                target: "ES2017",
+                lib: ["dom", "dom.iterable", "esnext"],
+                allowJs: true,
+                skipLibCheck: true,
+                strict: true,
+                noEmit: true,
+                esModuleInterop: true,
+                module: "esnext",
+                moduleResolution: "node",
+                resolveJsonModule: true,
+                isolatedModules: true,
+                jsx: "preserve",
+                incremental: true,
+                plugins: [{ name: "next" }],
+                paths: { "@/*": ["./*"] },
+              },
+              include: [
+                "next-env.d.ts",
+                "**/*.ts",
+                "**/*.tsx",
+                ".next/types/**/*.ts",
+              ],
+              exclude: ["node_modules"],
+            },
+            null,
+            2,
+          ),
+        );
 
-        // Add postcss config
-        zip.file("postcss.config.js", `/** @type {import('postcss-load-config').Config} */\nconst config = {\n  plugins: {\n    tailwindcss: {},\n    autoprefixer: {},\n  },\n}\n\nmodule.exports = config\n`);
-
-        // Add .gitignore
-        zip.file(".gitignore", `# dependencies\n/node_modules\n/.pnp\n.pnp.js\n\n# testing\n/coverage\n\n# next.js\n/.next/\n/out/\n\n# production\n/build\n\n# misc\n.DS_Store\n*.pem\n\n# debug\nnpm-debug.log*\nyarn-debug.log*\nyarn-error.log*\n\n# local env files\n.env*.local\n\n# vercel\n.vercel\n\n# typescript\n*.tsbuildinfo\nnext-env.d.ts\n`);
-
-        // Add .eslintrc.json
-        zip.file(".eslintrc.json", JSON.stringify({ extends: "next/core-web-vitals" }, null, 2));
-
-        // Add next-env.d.ts
-        zip.file("next-env.d.ts", `/// <reference types="next" />\n/// <reference types="next/image-types/global" />\n\n// NOTE: This file should not be edited\n// see https://nextjs.org/docs/app/building-your-application/configuring/typescript for more information.\n`);
-
-        // Add tsconfig.json with proper Next.js 15 configuration
-        zip.file("tsconfig.json", JSON.stringify({
-          compilerOptions: {
-            target: "ES2017",
-            lib: ["dom", "dom.iterable", "esnext"],
-            allowJs: true,
-            skipLibCheck: true,
-            strict: true,
-            noEmit: true,
-            esModuleInterop: true,
-            module: "esnext",
-            moduleResolution: "node",
-            resolveJsonModule: true,
-            isolatedModules: true,
-            jsx: "preserve",
-            incremental: true,
-            plugins: [{ name: "next" }],
-            paths: { "@/*": ["./*"] },
-          },
-          include: ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-          exclude: ["node_modules"],
-        }, null, 2));
-
-        // Add placeholder to public folder
         publicFolder?.file(".gitkeep", "");
       } else {
-        // HTML export — client-side
         const css = generateCSS();
         const js = generateJS();
 
@@ -316,308 +367,337 @@ export function EditorLayout({
         zip.file("script.js", js);
       }
 
-      // Generate and download the zip
       const blob = await zip.generateAsync({ type: "blob" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = format === "react" ? `${name}-nextjs.zip` : `${name}-export.zip`;
+      a.download =
+        format === "react" ? `${name}-nextjs.zip` : `${name}-export.zip`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     } catch (error) {
       console.error("Export failed:", error);
-      alert("Export failed: " + (error instanceof Error ? error.message : "Unknown error"));
+      alert(
+        "Export failed: " +
+          (error instanceof Error ? error.message : "Unknown error"),
+      );
     }
   };
 
   return (
     <>
-    <div className="dark h-screen flex bg-background text-foreground overflow-hidden">
-      {/* Left Panel - Tabs for Pages, Layers, Assets */}
-      {!isPreviewMode && (
-        <>
-          <div
-            className="flex-shrink-0 bg-card border-r border-border flex flex-col h-full"
-            style={{ width: `${leftPanelWidth}px` }}
-          >
-            <Tabs defaultValue="layers" className="flex flex-col h-full w-full">
-              <div className="flex-shrink-0 p-2 border-b border-border">
-                <TabsList className="w-full grid grid-cols-4 bg-muted">
-                  <TabsTrigger value="pages" className="text-xs py-1.5"><LayoutTemplate className="w-3 h-3 mr-1.5" /> Pages</TabsTrigger>
-                  <TabsTrigger value="layers" className="text-xs py-1.5"><Layers className="w-3 h-3 mr-1.5" /> Layers</TabsTrigger>
-                  <TabsTrigger value="assets" className="text-xs py-1.5"><FileBox className="w-3 h-3 mr-1.5" /> Assets</TabsTrigger>
-                  <TabsTrigger value="ai" className="text-xs py-1.5"><Sparkles className="w-3 h-3 mr-1.5" /> AI</TabsTrigger>
-                </TabsList>
-              </div>
+      <div className="h-screen flex bg-[#0d0d0d] text-white overflow-hidden">
+        {/* Top Header Bar */}
+        <div className="fixed top-0 left-0 right-0 h-14 bg-[#1a1a1a] border-b border-[#2a2a2a] flex items-center px-4 justify-between z-50">
+          <div className="flex items-center space-x-6">
+            {/* Logo/Brand */}
+            <div className="flex items-center space-x-3">
+              <button
+                onClick={() => router.back()}
+                className="p-2 hover:bg-[#2a2a2a] rounded-md transition-colors text-gray-400 hover:text-white"
+                title="Close Editor"
+              >
+                <X className="w-4 h-4" />
+              </button>
+              <div className="text-sm font-semibold tracking-wide">LAYR</div>
+            </div>
 
-              {/* Pages Tab */}
-              <TabsContent value="pages" className="flex-1 min-h-0 m-0 p-0 border-none data-[state=inactive]:hidden overflow-y-auto">
-                <PagesPanel
-                  pages={pages}
-                  currentPageId={currentPageId}
-                  onPageSelect={onPageSelect}
-                  onPageAdd={onPageAdd}
-                  onPageDelete={onPageDelete}
-                  onPageDuplicate={onPageDuplicate}
-                  onPageRename={onPageRename || (() => {})}
-                />
-              </TabsContent>
-
-              {/* Layers Tab (Hierarchy) */}
-              <TabsContent value="layers" className="flex-1 min-h-0 m-0 p-0 border-none data-[state=inactive]:hidden overflow-y-auto">
-                <HierarchyPanel
-                  components={components}
-                  selectedComponentIds={selectedComponentIds}
-                  onSelectComponent={onSelectComponent}
-                  onDeleteComponent={onDeleteComponent}
-                  onAddComponent={onAddComponent}
-                />
-              </TabsContent>
-
-              {/* Assets Tab (Components) */}
-              <TabsContent value="assets" className="flex-1 min-h-0 m-0 p-0 border-none data-[state=inactive]:hidden overflow-y-auto">
-                <ComponentPalette
-                  globalComponents={globalComponents}
-                  customComponents={customComponents}
-                  onDeleteCustomComponent={onDeleteCustomComponent}
-                  selectedComponent={selectedComponent}
-                  onSaveCustomComponent={onSaveCustomComponent}
-                  onWriteCode={() => setShowCodeEditor(true)}
-                />
-              </TabsContent>
-
-              {/* AI Tab */}
-              <TabsContent value="ai" forceMount className="flex-1 min-h-0 m-0 p-0 border-none data-[state=inactive]:hidden overflow-hidden">
-                <AIChatPanel
-                  onApplyComponents={onApplyAIComponents || (() => {})}
-                  onApplyPages={onApplyAIPages || (() => {})}
-                  existingComponents={components}
-                  customComponents={customComponents}
-                  globalComponents={globalComponents}
-                  messages={chatHistory}
-                  onMessagesChange={onChatHistoryChange}
-                />
-              </TabsContent>
-            </Tabs>
-          </div>
-
-          {/* Resize Handle for Left Panel */}
-          <div
-            className="w-1 bg-border hover:bg-primary cursor-ew-resize transition-colors flex-shrink-0 z-10 relative"
-            onMouseDown={(e) => startResize("left", e)}
-          />
-        </>
-      )}
-
-      {/* Canvas - Center */}
-      <div className="flex-1 flex flex-col min-w-0 bg-muted/30">
-        {/* Toolbar */}
-        <div className="h-12 bg-card border-b border-border flex items-center px-4 justify-between shrink-0">
-          <div className="flex items-center space-x-4">
-            {/* Close Button */}
-            <button
-              onClick={() => router.back()}
-              className="p-1.5 hover:bg-muted rounded-md transition-colors text-muted-foreground hover:text-foreground"
-              title="Close Editor"
-            >
-              <X className="w-4 h-4" />
-            </button>
-            {projectName && onProjectNameChange ? (
-              isEditingName ? (
-                <input
-                  type="text"
-                  value={editedName}
-                  onChange={(e) => setEditedName(e.target.value)}
-                  onBlur={() => {
-                    if (editedName.trim()) {
-                      onProjectNameChange(editedName.trim());
-                    } else {
-                      setEditedName(projectName);
-                    }
-                    setIsEditingName(false);
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      if (editedName.trim()) {
-                        onProjectNameChange(editedName.trim());
-                      } else {
-                        setEditedName(projectName);
-                      }
-                      setIsEditingName(false);
-                    } else if (e.key === "Escape") {
-                      setEditedName(projectName);
-                      setIsEditingName(false);
-                    }
-                  }}
-                  autoFocus
-                  className="text-sm font-medium px-2 py-1 border border-border bg-background rounded focus:outline-none focus:ring-1 focus:ring-primary"
-                />
-              ) : (
-                <button
-                  onClick={() => {
-                    setEditedName(projectName);
-                    setIsEditingName(true);
-                  }}
-                  className="text-sm font-medium text-foreground hover:text-primary transition-colors"
-                >
-                  {projectName}
-                </button>
-              )
-            ) : (
-              <span className="text-sm font-medium text-foreground">Canvas</span>
-            )}
-            <div className="flex items-center space-x-1 border border-border rounded p-0.5 bg-background">
+            {/* Viewport Tabs */}
+            <div className="flex items-center space-x-1 bg-[#0d0d0d] border border-[#2a2a2a] rounded-md p-1">
               <button
                 onClick={() => setViewport("desktop")}
-                className={`p-1.5 rounded transition-colors ${
+                className={`px-3 py-1.5 text-xs font-medium transition-colors rounded ${
                   viewport === "desktop"
-                    ? "bg-muted text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    ? "bg-[#2a2a2a] text-white"
+                    : "text-gray-400 hover:text-white"
                 }`}
-                title="Desktop (1200px+)"
               >
-                <Monitor className="w-3.5 h-3.5" />
+                Desktop
               </button>
               <button
                 onClick={() => setViewport("tablet")}
-                className={`p-1.5 rounded transition-colors ${
+                className={`px-3 py-1.5 text-xs font-medium transition-colors rounded ${
                   viewport === "tablet"
-                    ? "bg-muted text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    ? "bg-[#2a2a2a] text-white"
+                    : "text-gray-400 hover:text-white"
                 }`}
-                title="Tablet (768px)"
               >
-                <Tablet className="w-3.5 h-3.5" />
+                Tablet
               </button>
               <button
                 onClick={() => setViewport("mobile")}
-                className={`p-1.5 rounded transition-colors ${
+                className={`px-3 py-1.5 text-xs font-medium transition-colors rounded ${
                   viewport === "mobile"
-                    ? "bg-muted text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    ? "bg-[#2a2a2a] text-white"
+                    : "text-gray-400 hover:text-white"
                 }`}
-                title="Mobile (375px)"
               >
-                <Smartphone className="w-3.5 h-3.5" />
+                Mobile
               </button>
+            </div>
+
+            {/* Breadcrumb */}
+            <div className="flex items-center space-x-2 text-xs text-gray-500">
+              <span>PAGES</span>
+              <span>/</span>
+              <span className="text-gray-300">INDEX / HERO SECTION</span>
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="ml-auto flex items-center space-x-2">
-            {/* Save Button */}
-            {onSave && (
-              <button
-                onClick={onSave}
-                disabled={isSaving}
-                className={`flex items-center justify-center space-x-1.5 px-3 h-8 rounded text-xs font-medium transition-colors ${
-                  isSaving 
-                    ? "bg-muted text-muted-foreground cursor-not-allowed" 
-                    : "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm"
-                }`}
-                title="Save Project (Ctrl+S)"
-              >
-                <Save className="w-3.5 h-3.5" />
-                <span>{isSaving ? "Saving..." : "Save"}</span>
+          {/* Right Actions */}
+          <div className="flex items-center space-x-3">
+            {/* Mode Tabs */}
+            <div className="flex items-center space-x-1 bg-[#0d0d0d] border border-[#2a2a2a] rounded-md p-1">
+              <button className="px-4 py-1.5 text-xs font-medium bg-blue-600 text-white rounded transition-colors">
+                DESIGN
               </button>
-            )}
+              <button className="px-4 py-1.5 text-xs font-medium text-gray-400 hover:text-white transition-colors">
+                PROTOTYPE
+              </button>
+              <button className="px-4 py-1.5 text-xs font-medium text-gray-400 hover:text-white transition-colors">
+                INSPECT
+              </button>
+            </div>
 
-            <div className="w-px h-4 bg-border mx-1"></div>
-
-            {/* Undo Button */}
+            {/* Action Buttons */}
+            <button
+              onClick={() => setIsPreviewMode(!isPreviewMode)}
+              className="p-2 hover:bg-[#2a2a2a] rounded-md transition-colors text-gray-400 hover:text-white"
+              title="Preview"
+            >
+              <Play className="w-4 h-4" />
+            </button>
             <button
               onClick={onUndo}
               disabled={!canUndo}
-              className={`flex items-center justify-center w-8 h-8 rounded transition-colors ${
+              className={`p-2 rounded-md transition-colors ${
                 canUndo
-                  ? "text-muted-foreground hover:text-foreground hover:bg-muted"
-                  : "text-muted-foreground/30 cursor-not-allowed"
+                  ? "hover:bg-[#2a2a2a] text-gray-400 hover:text-white"
+                  : "text-gray-600 cursor-not-allowed"
               }`}
-              title="Undo (Ctrl+Z)"
+              title="Undo"
             >
-              <Undo className="w-4 h-4" />
+              <RotateCcw className="w-4 h-4" />
+            </button>
+            <button className="p-2 hover:bg-[#2a2a2a] rounded-md transition-colors text-gray-400 hover:text-white">
+              <Settings className="w-4 h-4" />
             </button>
 
-            {/* Redo Button */}
+            <div className="w-px h-6 bg-[#2a2a2a]"></div>
+
+            {/* Save & Publish */}
             <button
-              onClick={onRedo}
-              disabled={!canRedo}
-              className={`flex items-center justify-center w-8 h-8 rounded transition-colors ${
-                canRedo
-                  ? "text-muted-foreground hover:text-foreground hover:bg-muted"
-                  : "text-muted-foreground/30 cursor-not-allowed"
+              onClick={onSave}
+              disabled={isSaving}
+              className={`px-4 py-2 rounded-md text-xs font-medium transition-colors ${
+                isSaving
+                  ? "bg-[#2a2a2a] text-gray-500 cursor-not-allowed"
+                  : "bg-[#2a2a2a] text-white hover:bg-[#333333]"
               }`}
-              title="Redo (Ctrl+Y)"
             >
-              <Redo className="w-4 h-4" />
+              {isSaving ? "Saving..." : "Save"}
             </button>
-
-            <div className="w-px h-4 bg-border mx-1"></div>
-
-            {/* Outline Toggle */}
             <button
-              onClick={() => setShowOutlines(!showOutlines)}
-              className={`flex items-center justify-center w-8 h-8 rounded transition-colors ${
-                showOutlines
-                  ? "bg-primary/10 text-primary hover:bg-primary/20"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
-              }`}
-              title={showOutlines ? "Hide Outlines" : "Show Outlines"}
+              onClick={() => setShowExportMenu(!showExportMenu)}
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-xs font-medium transition-colors relative"
             >
-              <BoxSelect className="w-4 h-4" />
-            </button>
-
-            <div className="w-px h-4 bg-border mx-1"></div>
-
-            <button
-              onClick={() => setIsPreviewMode(!isPreviewMode)}
-              className={`flex items-center justify-center w-8 h-8 rounded transition-colors ${
-                isPreviewMode
-                  ? "bg-primary/10 text-primary hover:bg-primary/20"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
-              }`}
-              title={isPreviewMode ? "Edit Mode" : "Preview Mode"}
-            >
-              {isPreviewMode ? (
-                <Edit className="w-4 h-4" />
-              ) : (
-                <Eye className="w-4 h-4" />
-              )}
-            </button>
-
-            {/* Export Button with Dropdown */}
-            <div className="relative">
-              <button
-                onClick={() => setShowExportMenu(!showExportMenu)}
-                className="flex items-center justify-center w-8 h-8 text-muted-foreground hover:bg-muted hover:text-foreground rounded transition-colors"
-                title="Export Panel"
-              >
-                <Download className="w-4 h-4" />
-              </button>
-
+              Publish
               {showExportMenu && (
-                <div className="absolute right-0 mt-1 w-48 bg-card rounded-lg shadow-lg border border-border z-50">
+                <div className="absolute right-0 top-full mt-2 w-52 bg-[#1a1a1a] rounded-lg shadow-xl border border-[#2a2a2a] overflow-hidden">
                   <button
                     onClick={() => exportToZip("html")}
-                    className="w-full text-left px-4 py-2 text-sm hover:bg-muted rounded-t-lg"
+                    className="w-full text-left px-4 py-3 text-sm hover:bg-[#2a2a2a] transition-colors"
                   >
-                    <div className="font-medium">Export as HTML</div>
-                    <div className="text-xs text-muted-foreground">Static website</div>
+                    <div className="font-medium text-white">Export as HTML</div>
+                    <div className="text-xs text-gray-400 mt-0.5">
+                      Static website
+                    </div>
                   </button>
+                  <div className="h-px bg-[#2a2a2a]"></div>
                   <button
                     onClick={() => exportToZip("react")}
-                    className="w-full text-left px-4 py-2 text-sm hover:bg-muted rounded-b-lg border-t border-border"
+                    className="w-full text-left px-4 py-3 text-sm hover:bg-[#2a2a2a] transition-colors"
                   >
-                    <div className="font-medium">Export as React</div>
-                    <div className="text-xs text-muted-foreground">Next.js project</div>
+                    <div className="font-medium text-white">
+                      Export as React
+                    </div>
+                    <div className="text-xs text-gray-400 mt-0.5">
+                      Next.js project
+                    </div>
                   </button>
                 </div>
               )}
-            </div>
+            </button>
           </div>
         </div>
+
+        {/* Main Content Area */}
+        <div className="flex flex-1 pt-14">
+          {/* Left Sidebar */}
+          {!isPreviewMode && (
+            <>
+              <div
+                className="flex-shrink-0 bg-[#1a1a1a] border-r border-[#2a2a2a] flex flex-col"
+                style={{ width: `${leftPanelWidth}px` }}
+              >
+                <Tabs
+                  defaultValue="components"
+                  className="flex flex-col h-full w-full"
+                >
+                  <div className="flex-shrink-0 px-2 py-2 border-b border-[#2a2a2a]">
+                    <TabsList className="w-full grid grid-cols-3 bg-transparent gap-0.5 p-0">
+                      <TabsTrigger
+                        value="pages"
+                        className="text-[10px] py-2 px-1 data-[state=active]:bg-[#2a2a2a] data-[state=active]:text-white text-gray-400 rounded-md transition-all font-semibold tracking-wide flex items-center justify-center"
+                      >
+                        <LayoutTemplate className="w-3 h-3 mr-1" />
+                        PAGES
+                      </TabsTrigger>
+                      <TabsTrigger
+                        value="layers"
+                        className="text-[10px] py-2 px-1 data-[state=active]:bg-[#2a2a2a] data-[state=active]:text-white text-gray-400 rounded-md transition-all font-semibold tracking-wide flex items-center justify-center"
+                      >
+                        <Layers className="w-3 h-3 mr-1" />
+                        LAYERS
+                      </TabsTrigger>
+                      <TabsTrigger
+                        value="components"
+                        className="text-[10px] py-2 px-1 data-[state=active]:bg-[#2a2a2a] data-[state=active]:text-white text-gray-400 rounded-md transition-all font-semibold tracking-wide flex items-center justify-center"
+                      >
+                        <FileBox className="w-3 h-3 mr-1" />
+                        ASSETS
+                      </TabsTrigger>
+                    </TabsList>
+                  </div>
+
+                  <TabsContent
+                    value="pages"
+                    className="flex-1 min-h-0 m-0 p-0 border-none data-[state=inactive]:hidden overflow-y-auto"
+                  >
+                    <PagesPanel
+                      pages={pages}
+                      currentPageId={currentPageId}
+                      onPageSelect={onPageSelect}
+                      onPageAdd={onPageAdd}
+                      onPageDelete={onPageDelete}
+                      onPageDuplicate={onPageDuplicate}
+                      onPageRename={onPageRename || (() => {})}
+                    />
+                  </TabsContent>
+
+                  <TabsContent
+                    value="layers"
+                    className="flex-1 min-h-0 m-0 p-0 border-none data-[state=inactive]:hidden overflow-y-auto"
+                  >
+                    <HierarchyPanel
+                      components={components}
+                      selectedComponentIds={selectedComponentIds}
+                      onSelectComponent={onSelectComponent}
+                      onDeleteComponent={onDeleteComponent}
+                      onAddComponent={onAddComponent}
+                    />
+                  </TabsContent>
+
+                  <TabsContent
+                    value="components"
+                    className="flex-1 min-h-0 m-0 p-0 border-none data-[state=inactive]:hidden overflow-y-auto"
+                  >
+                    <ComponentPalette
+                      globalComponents={globalComponents}
+                      customComponents={customComponents}
+                      onDeleteCustomComponent={onDeleteCustomComponent}
+                      selectedComponent={selectedComponent}
+                      onSaveCustomComponent={onSaveCustomComponent}
+                      onWriteCode={() => setShowCodeEditor(true)}
+                    />
+                  </TabsContent>
+
+                  <TabsContent
+                    value="ai"
+                    forceMount
+                    className="flex-1 min-h-0 m-0 p-0 border-none data-[state=inactive]:hidden overflow-hidden"
+                  >
+                    <AIChatPanel
+                      onApplyComponents={onApplyAIComponents || (() => {})}
+                      onApplyPages={onApplyAIPages || (() => {})}
+                      existingComponents={components}
+                      customComponents={customComponents}
+                      globalComponents={globalComponents}
+                      messages={chatHistory}
+                      onMessagesChange={onChatHistoryChange}
+                    />
+                  </TabsContent>
+
+                  {/* Bottom AI Assistant Tab */}
+                  <div className="flex-shrink-0 p-2 border-t border-[#2a2a2a]">
+                    <TabsList className="w-full bg-transparent p-0">
+                      <TabsTrigger
+                        value="ai"
+                        className="w-full flex items-center justify-center space-x-2 px-4 py-2.5 data-[state=active]:bg-blue-600/20 data-[state=active]:text-blue-400 bg-blue-600/10 hover:bg-blue-600/15 text-blue-400/70 rounded-md transition-colors text-xs font-semibold"
+                      >
+                        <Sparkles className="w-4 h-4" />
+                        <span>AI ASSISTANT</span>
+                        <span className="text-[10px] bg-blue-600/20 px-1.5 py-0.5 rounded">
+                          ⌘K
+                        </span>
+                      </TabsTrigger>
+                    </TabsList>
+                  </div>
+                </Tabs>
+              </div>
+
+              {/* Resize Handle */}
+              <div
+                className="w-[1px] bg-[#2a2a2a] hover:bg-blue-500 cursor-ew-resize transition-colors flex-shrink-0 z-10"
+                onMouseDown={(e) => startResize("left", e)}
+              />
+            </>
+          )}
+
+          {/* Canvas Area */}
+          <div className="flex-1 flex flex-col min-w-0 bg-[#0d0d0d] overflow-auto">
+            <div
+              className={`flex-1 overflow-auto transition-all duration-300 ${
+                isPreviewMode ? "bg-white p-0" : "bg-[#0d0d0d] p-8"
+              } light`}
+            >
+              <div
+                className="transition-all duration-300 ease-in-out mx-auto"
+                style={{
+                  width: getCanvasWidth(),
+                  maxWidth:
+                    viewport === "desktop"
+                      ? isPreviewMode
+                        ? "none"
+                        : "1200px"
+                      : getCanvasWidth(),
+                  minHeight: "100%",
+                }}
+              >
+                <Canvas
+                  components={components}
+                  selectedComponentIds={
+                    isPreviewMode ? [] : selectedComponentIds
+                  }
+                  onSelectComponent={
+                    isPreviewMode ? () => {} : onSelectComponent
+                  }
+                  viewport={viewport}
+                  isPreviewMode={isPreviewMode}
+                  onNavigate={(slug) => {
+                    const targetPage = pages.find((p) => p.slug === slug);
+                    if (targetPage) {
+                      onPageSelect(targetPage.id);
+                    }
+                  }}
+                  pages={pages}
+                  showOutlines={!isPreviewMode && showOutlines}
+                />
+              </div>
+            </div>
+          </div>
 
         {/* Canvas Area */}
         <div
@@ -660,37 +740,34 @@ export function EditorLayout({
               showOutlines={!isPreviewMode && showOutlines}
             />
           </div>
+          {/* Right Sidebar - Properties */}
+          {!isPreviewMode && (
+            <>
+              <div
+                className="w-[1px] bg-[#2a2a2a] hover:bg-blue-500 cursor-ew-resize transition-colors flex-shrink-0 z-10"
+                onMouseDown={(e) => startResize("right", e)}
+              />
+
+              <div
+                className="flex-shrink-0 bg-[#1a1a1a] border-l border-[#2a2a2a] flex flex-col"
+                style={{ width: `${rightPanelWidth}px` }}
+              >
+                <PropertiesPanel
+                  selectedComponent={selectedComponent}
+                  onUpdateComponent={onUpdateComponent}
+                  onDeleteComponent={onDeleteComponent}
+                  onDuplicateComponent={onDuplicateComponent}
+                  pages={pages}
+                  globalComponents={globalComponents}
+                  onMarkAsGlobal={onMarkAsGlobal}
+                  onUnmarkGlobal={onUnmarkGlobal}
+                  onApplyGlobalTemplate={onApplyGlobalTemplate}
+                />
+              </div>
+            </>
+          )}
         </div>
       </div>
-
-      {/* Properties Panel - Right */}
-      {!isPreviewMode && (
-        <>
-          {/* Resize Handle for Right Panel */}
-          <div
-            className="w-1 bg-border hover:bg-primary cursor-ew-resize transition-colors flex-shrink-0 z-10 relative"
-            onMouseDown={(e) => startResize("right", e)}
-          />
-
-          <div
-            className="flex-shrink-0 bg-card border-l border-border h-full overflow-y-auto"
-            style={{ width: `${rightPanelWidth}px` }}
-          >
-            <PropertiesPanel
-              selectedComponent={selectedComponent}
-              onUpdateComponent={onUpdateComponent}
-              onDeleteComponent={onDeleteComponent}
-              onDuplicateComponent={onDuplicateComponent}
-              pages={pages}
-              globalComponents={globalComponents}
-              onMarkAsGlobal={onMarkAsGlobal}
-              onUnmarkGlobal={onUnmarkGlobal}
-              onApplyGlobalTemplate={onApplyGlobalTemplate}
-            />
-          </div>
-        </>
-      )}
-    </div>
 
       {/* Code Editor Dialog */}
       <CodeEditorDialog

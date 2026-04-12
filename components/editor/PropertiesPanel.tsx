@@ -14,7 +14,17 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Settings2, Type, Paintbrush, Scissors, Link as LinkIcon, Image as ImageIcon, Layout, Globe, X } from "lucide-react";
+import {
+  Settings2,
+  Type,
+  Paintbrush,
+  Scissors,
+  Link as LinkIcon,
+  Image as ImageIcon,
+  Layout,
+  Globe,
+  X,
+} from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -23,8 +33,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-
-
 
 interface PropertiesPanelProps {
   selectedComponent: ComponentDefinition | null;
@@ -124,16 +132,21 @@ export function PropertiesPanel({
     // SHARED STYLE SECTIONS — available to all components
     // ═══════════════════════════════════════════════════════════
 
-    const sectionTriggerClass = "hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50";
+    const sectionTriggerClass =
+      "hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50";
     const sectionContentClass = "px-4 pb-4 pt-2 space-y-4";
     const labelClass = "text-xs font-medium text-muted-foreground";
-    const selectClass = "w-full h-8 px-2 text-xs bg-transparent appearance-none focus:outline-none";
+    const selectClass =
+      "w-full h-8 px-2 text-xs bg-transparent appearance-none focus:outline-none";
 
     // ── Fill (Background + Text Color) ──
     const renderFillFields = () => {
       const bgType = props.backgroundType || "solid";
       return (
-        <AccordionItem value="fill" className="border-b-0 border-t border-border/50">
+        <AccordionItem
+          value="fill"
+          className="border-b-0 border-t border-border/50"
+        >
           <AccordionTrigger className={sectionTriggerClass}>
             <div className="flex items-center gap-2">
               <Paintbrush className="w-4 h-4 text-muted-foreground" />
@@ -162,8 +175,22 @@ export function PropertiesPanel({
               <div className="space-y-1.5">
                 <Label className={labelClass}>Background Color</Label>
                 <div className="flex gap-2 items-center">
-                  <Input type="color" value={props.backgroundColor || "#ffffff"} onChange={(e) => updateProp("backgroundColor", e.target.value)} className="w-8 h-8 p-0.5 min-h-0 cursor-pointer" />
-                  <Input type="text" value={props.backgroundColor || "#ffffff"} onChange={(e) => updateProp("backgroundColor", e.target.value)} className="flex-1 h-8 text-xs font-mono" />
+                  <Input
+                    type="color"
+                    value={props.backgroundColor || "#ffffff"}
+                    onChange={(e) =>
+                      updateProp("backgroundColor", e.target.value)
+                    }
+                    className="w-8 h-8 p-0.5 min-h-0 cursor-pointer"
+                  />
+                  <Input
+                    type="text"
+                    value={props.backgroundColor || "#ffffff"}
+                    onChange={(e) =>
+                      updateProp("backgroundColor", e.target.value)
+                    }
+                    className="flex-1 h-8 text-xs font-mono"
+                  />
                 </div>
               </div>
             )}
@@ -173,12 +200,24 @@ export function PropertiesPanel({
               <div className="space-y-1.5">
                 <Label className={labelClass}>CSS Gradient</Label>
                 <Input
-                  value={props.backgroundGradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"}
-                  onChange={(e) => updateProp("backgroundGradient", e.target.value)}
+                  value={
+                    props.backgroundGradient ||
+                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+                  }
+                  onChange={(e) =>
+                    updateProp("backgroundGradient", e.target.value)
+                  }
                   placeholder="linear-gradient(135deg, #667eea, #764ba2)"
                   className="h-8 text-xs font-mono"
                 />
-                <div className="h-8 rounded border" style={{ backgroundImage: props.backgroundGradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" }} />
+                <div
+                  className="h-8 rounded border"
+                  style={{
+                    backgroundImage:
+                      props.backgroundGradient ||
+                      "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                  }}
+                />
               </div>
             )}
 
@@ -187,29 +226,93 @@ export function PropertiesPanel({
               <>
                 <div className="space-y-1.5">
                   <Label className={labelClass}>Image URL</Label>
-                  <Input value={props.backgroundImageUrl || ""} onChange={(e) => updateProp("backgroundImageUrl", e.target.value)} placeholder="https://example.com/bg.jpg" className="h-8 text-xs" />
+                  <Input
+                    value={props.backgroundImageUrl || ""}
+                    onChange={(e) =>
+                      updateProp("backgroundImageUrl", e.target.value)
+                    }
+                    placeholder="https://example.com/bg.jpg"
+                    className="h-8 text-xs"
+                  />
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-1.5">
                     <Label className={labelClass}>Size</Label>
                     <div className="relative border rounded-md">
-                      <select value={props.backgroundSize || "cover"} onChange={(e) => updateProp("backgroundSize", e.target.value)} className={selectClass}>
-                        <option className="bg-background text-foreground" value="cover">Cover</option>
-                        <option className="bg-background text-foreground" value="contain">Contain</option>
-                        <option className="bg-background text-foreground" value="auto">Auto</option>
-                        <option className="bg-background text-foreground" value="100% 100%">Stretch</option>
+                      <select
+                        value={props.backgroundSize || "cover"}
+                        onChange={(e) =>
+                          updateProp("backgroundSize", e.target.value)
+                        }
+                        className={selectClass}
+                      >
+                        <option
+                          className="bg-background text-foreground"
+                          value="cover"
+                        >
+                          Cover
+                        </option>
+                        <option
+                          className="bg-background text-foreground"
+                          value="contain"
+                        >
+                          Contain
+                        </option>
+                        <option
+                          className="bg-background text-foreground"
+                          value="auto"
+                        >
+                          Auto
+                        </option>
+                        <option
+                          className="bg-background text-foreground"
+                          value="100% 100%"
+                        >
+                          Stretch
+                        </option>
                       </select>
                     </div>
                   </div>
                   <div className="space-y-1.5">
                     <Label className={labelClass}>Position</Label>
                     <div className="relative border rounded-md">
-                      <select value={props.backgroundPosition || "center"} onChange={(e) => updateProp("backgroundPosition", e.target.value)} className={selectClass}>
-                        <option className="bg-background text-foreground" value="center">Center</option>
-                        <option className="bg-background text-foreground" value="top">Top</option>
-                        <option className="bg-background text-foreground" value="bottom">Bottom</option>
-                        <option className="bg-background text-foreground" value="left">Left</option>
-                        <option className="bg-background text-foreground" value="right">Right</option>
+                      <select
+                        value={props.backgroundPosition || "center"}
+                        onChange={(e) =>
+                          updateProp("backgroundPosition", e.target.value)
+                        }
+                        className={selectClass}
+                      >
+                        <option
+                          className="bg-background text-foreground"
+                          value="center"
+                        >
+                          Center
+                        </option>
+                        <option
+                          className="bg-background text-foreground"
+                          value="top"
+                        >
+                          Top
+                        </option>
+                        <option
+                          className="bg-background text-foreground"
+                          value="bottom"
+                        >
+                          Bottom
+                        </option>
+                        <option
+                          className="bg-background text-foreground"
+                          value="left"
+                        >
+                          Left
+                        </option>
+                        <option
+                          className="bg-background text-foreground"
+                          value="right"
+                        >
+                          Right
+                        </option>
                       </select>
                     </div>
                   </div>
@@ -221,8 +324,18 @@ export function PropertiesPanel({
             <div className="space-y-1.5">
               <Label className={labelClass}>Text Color</Label>
               <div className="flex gap-2 items-center">
-                <Input type="color" value={props.textColor || "#000000"} onChange={(e) => updateProp("textColor", e.target.value)} className="w-8 h-8 p-0.5 min-h-0 cursor-pointer" />
-                <Input type="text" value={props.textColor || "#000000"} onChange={(e) => updateProp("textColor", e.target.value)} className="flex-1 h-8 text-xs font-mono" />
+                <Input
+                  type="color"
+                  value={props.textColor || "#000000"}
+                  onChange={(e) => updateProp("textColor", e.target.value)}
+                  className="w-8 h-8 p-0.5 min-h-0 cursor-pointer"
+                />
+                <Input
+                  type="text"
+                  value={props.textColor || "#000000"}
+                  onChange={(e) => updateProp("textColor", e.target.value)}
+                  className="flex-1 h-8 text-xs font-mono"
+                />
               </div>
             </div>
           </AccordionContent>
@@ -236,7 +349,10 @@ export function PropertiesPanel({
       const height = parseDimension(props.height || "");
 
       return (
-        <AccordionItem value="dimensions" className="border-b-0 border-t border-border/50">
+        <AccordionItem
+          value="dimensions"
+          className="border-b-0 border-t border-border/50"
+        >
           <AccordionTrigger className={sectionTriggerClass}>
             <div className="flex items-center gap-2">
               <Scissors className="w-4 h-4 text-muted-foreground" />
@@ -248,18 +364,126 @@ export function PropertiesPanel({
               <div className="space-y-1.5">
                 <Label className={labelClass}>Width</Label>
                 <div className="flex gap-0 border rounded-md overflow-hidden focus-within:ring-1 focus-within:ring-primary">
-                  <Input type="number" value={width.value} onChange={(e) => updateProp("width", combineDimensionAllowEmpty(e.target.value, width.unit))} onBlur={(e) => { if (!e.target.value && width.unit !== "auto") updateProp("width", "auto"); }} placeholder="auto" className="flex-1 h-8 text-xs border-0 rounded-none shadow-none focus-visible:ring-0 px-2" disabled={width.unit === "auto"} />
-                  <select value={width.unit} onChange={(e) => { const u = e.target.value; updateProp("width", u === "auto" ? "auto" : combineDimension(width.value || "100", u)); }} className="w-14 bg-muted border-l text-xs text-muted-foreground px-1 focus:outline-none">
-                    <option className="bg-background text-foreground" value="auto">auto</option><option className="bg-background text-foreground" value="px">px</option><option className="bg-background text-foreground" value="%">%</option><option className="bg-background text-foreground" value="rem">rem</option><option className="bg-background text-foreground" value="vw">vw</option>
+                  <Input
+                    type="number"
+                    value={width.value}
+                    onChange={(e) =>
+                      updateProp(
+                        "width",
+                        combineDimensionAllowEmpty(e.target.value, width.unit),
+                      )
+                    }
+                    onBlur={(e) => {
+                      if (!e.target.value && width.unit !== "auto")
+                        updateProp("width", "auto");
+                    }}
+                    placeholder="auto"
+                    className="flex-1 h-8 text-xs border-0 rounded-none shadow-none focus-visible:ring-0 px-2"
+                    disabled={width.unit === "auto"}
+                  />
+                  <select
+                    value={width.unit}
+                    onChange={(e) => {
+                      const u = e.target.value;
+                      updateProp(
+                        "width",
+                        u === "auto"
+                          ? "auto"
+                          : combineDimension(width.value || "100", u),
+                      );
+                    }}
+                    className="w-14 bg-muted border-l text-xs text-muted-foreground px-1 focus:outline-none"
+                  >
+                    <option
+                      className="bg-background text-foreground"
+                      value="auto"
+                    >
+                      auto
+                    </option>
+                    <option
+                      className="bg-background text-foreground"
+                      value="px"
+                    >
+                      px
+                    </option>
+                    <option className="bg-background text-foreground" value="%">
+                      %
+                    </option>
+                    <option
+                      className="bg-background text-foreground"
+                      value="rem"
+                    >
+                      rem
+                    </option>
+                    <option
+                      className="bg-background text-foreground"
+                      value="vw"
+                    >
+                      vw
+                    </option>
                   </select>
                 </div>
               </div>
               <div className="space-y-1.5">
                 <Label className={labelClass}>Height</Label>
                 <div className="flex gap-0 border rounded-md overflow-hidden focus-within:ring-1 focus-within:ring-primary">
-                  <Input type="number" value={height.value} onChange={(e) => updateProp("height", combineDimensionAllowEmpty(e.target.value, height.unit))} onBlur={(e) => { if (!e.target.value && height.unit !== "auto") updateProp("height", "auto"); }} placeholder="auto" className="flex-1 h-8 text-xs border-0 rounded-none shadow-none focus-visible:ring-0 px-2" disabled={height.unit === "auto"} />
-                  <select value={height.unit} onChange={(e) => { const u = e.target.value; updateProp("height", u === "auto" ? "auto" : combineDimension(height.value || "100", u)); }} className="w-14 bg-muted border-l text-xs text-muted-foreground px-1 focus:outline-none">
-                    <option className="bg-background text-foreground" value="auto">auto</option><option className="bg-background text-foreground" value="px">px</option><option className="bg-background text-foreground" value="%">%</option><option className="bg-background text-foreground" value="rem">rem</option><option className="bg-background text-foreground" value="vh">vh</option>
+                  <Input
+                    type="number"
+                    value={height.value}
+                    onChange={(e) =>
+                      updateProp(
+                        "height",
+                        combineDimensionAllowEmpty(e.target.value, height.unit),
+                      )
+                    }
+                    onBlur={(e) => {
+                      if (!e.target.value && height.unit !== "auto")
+                        updateProp("height", "auto");
+                    }}
+                    placeholder="auto"
+                    className="flex-1 h-8 text-xs border-0 rounded-none shadow-none focus-visible:ring-0 px-2"
+                    disabled={height.unit === "auto"}
+                  />
+                  <select
+                    value={height.unit}
+                    onChange={(e) => {
+                      const u = e.target.value;
+                      updateProp(
+                        "height",
+                        u === "auto"
+                          ? "auto"
+                          : combineDimension(height.value || "100", u),
+                      );
+                    }}
+                    className="w-14 bg-muted border-l text-xs text-muted-foreground px-1 focus:outline-none"
+                  >
+                    <option
+                      className="bg-background text-foreground"
+                      value="auto"
+                    >
+                      auto
+                    </option>
+                    <option
+                      className="bg-background text-foreground"
+                      value="px"
+                    >
+                      px
+                    </option>
+                    <option className="bg-background text-foreground" value="%">
+                      %
+                    </option>
+                    <option
+                      className="bg-background text-foreground"
+                      value="rem"
+                    >
+                      rem
+                    </option>
+                    <option
+                      className="bg-background text-foreground"
+                      value="vh"
+                    >
+                      vh
+                    </option>
                   </select>
                 </div>
               </div>
@@ -273,7 +497,10 @@ export function PropertiesPanel({
     const renderSpacingFields = () => {
       const spacingSides = ["Top", "Right", "Bottom", "Left"] as const;
       return (
-        <AccordionItem value="spacing" className="border-b-0 border-t border-border/50">
+        <AccordionItem
+          value="spacing"
+          className="border-b-0 border-t border-border/50"
+        >
           <AccordionTrigger className={sectionTriggerClass}>
             <div className="flex items-center gap-2">
               <Layout className="w-4 h-4 text-muted-foreground" />
@@ -288,8 +515,15 @@ export function PropertiesPanel({
                   const key = `padding${side}`;
                   return (
                     <div key={key} className="space-y-0.5">
-                      <span className="text-[10px] text-muted-foreground block text-center">{side[0]}</span>
-                      <Input value={props[key] || ""} onChange={(e) => updateProp(key, e.target.value)} placeholder="0" className="h-7 text-xs text-center px-1" />
+                      <span className="text-[10px] text-muted-foreground block text-center">
+                        {side[0]}
+                      </span>
+                      <Input
+                        value={props[key] || ""}
+                        onChange={(e) => updateProp(key, e.target.value)}
+                        placeholder="0"
+                        className="h-7 text-xs text-center px-1"
+                      />
                     </div>
                   );
                 })}
@@ -302,8 +536,15 @@ export function PropertiesPanel({
                   const key = `margin${side}`;
                   return (
                     <div key={key} className="space-y-0.5">
-                      <span className="text-[10px] text-muted-foreground block text-center">{side[0]}</span>
-                      <Input value={props[key] || ""} onChange={(e) => updateProp(key, e.target.value)} placeholder="0" className="h-7 text-xs text-center px-1" />
+                      <span className="text-[10px] text-muted-foreground block text-center">
+                        {side[0]}
+                      </span>
+                      <Input
+                        value={props[key] || ""}
+                        onChange={(e) => updateProp(key, e.target.value)}
+                        placeholder="0"
+                        className="h-7 text-xs text-center px-1"
+                      />
                     </div>
                   );
                 })}
@@ -317,7 +558,10 @@ export function PropertiesPanel({
     // ── Typography ──
     const renderTypographyFields = () => {
       return (
-        <AccordionItem value="typography" className="border-b-0 border-t border-border/50">
+        <AccordionItem
+          value="typography"
+          className="border-b-0 border-t border-border/50"
+        >
           <AccordionTrigger className={sectionTriggerClass}>
             <div className="flex items-center gap-2">
               <Type className="w-4 h-4 text-muted-foreground" />
@@ -328,38 +572,107 @@ export function PropertiesPanel({
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label className={labelClass}>Font Size</Label>
-                <Input value={props.fontSize_css || ""} onChange={(e) => updateProp("fontSize_css", e.target.value)} placeholder="16px" className="h-8 text-xs" />
+                <Input
+                  value={props.fontSize_css || ""}
+                  onChange={(e) => updateProp("fontSize_css", e.target.value)}
+                  placeholder="16px"
+                  className="h-8 text-xs"
+                />
               </div>
               <div className="space-y-1.5">
                 <Label className={labelClass}>Font Weight</Label>
                 <div className="relative border rounded-md">
-                  <select value={props.fontWeight_css || ""} onChange={(e) => updateProp("fontWeight_css", e.target.value)} className={selectClass}>
-                    <option className="bg-background text-foreground" value="">Default</option>
-                    <option className="bg-background text-foreground" value="100">Thin (100)</option>
-                    <option className="bg-background text-foreground" value="300">Light (300)</option>
-                    <option className="bg-background text-foreground" value="400">Normal (400)</option>
-                    <option className="bg-background text-foreground" value="500">Medium (500)</option>
-                    <option className="bg-background text-foreground" value="600">Semi Bold (600)</option>
-                    <option className="bg-background text-foreground" value="700">Bold (700)</option>
-                    <option className="bg-background text-foreground" value="800">Extra Bold (800)</option>
-                    <option className="bg-background text-foreground" value="900">Black (900)</option>
+                  <select
+                    value={props.fontWeight_css || ""}
+                    onChange={(e) =>
+                      updateProp("fontWeight_css", e.target.value)
+                    }
+                    className={selectClass}
+                  >
+                    <option className="bg-background text-foreground" value="">
+                      Default
+                    </option>
+                    <option
+                      className="bg-background text-foreground"
+                      value="100"
+                    >
+                      Thin (100)
+                    </option>
+                    <option
+                      className="bg-background text-foreground"
+                      value="300"
+                    >
+                      Light (300)
+                    </option>
+                    <option
+                      className="bg-background text-foreground"
+                      value="400"
+                    >
+                      Normal (400)
+                    </option>
+                    <option
+                      className="bg-background text-foreground"
+                      value="500"
+                    >
+                      Medium (500)
+                    </option>
+                    <option
+                      className="bg-background text-foreground"
+                      value="600"
+                    >
+                      Semi Bold (600)
+                    </option>
+                    <option
+                      className="bg-background text-foreground"
+                      value="700"
+                    >
+                      Bold (700)
+                    </option>
+                    <option
+                      className="bg-background text-foreground"
+                      value="800"
+                    >
+                      Extra Bold (800)
+                    </option>
+                    <option
+                      className="bg-background text-foreground"
+                      value="900"
+                    >
+                      Black (900)
+                    </option>
                   </select>
                 </div>
               </div>
               <div className="space-y-1.5">
                 <Label className={labelClass}>Line Height</Label>
-                <Input value={props.lineHeight_css || ""} onChange={(e) => updateProp("lineHeight_css", e.target.value)} placeholder="1.5" className="h-8 text-xs" />
+                <Input
+                  value={props.lineHeight_css || ""}
+                  onChange={(e) => updateProp("lineHeight_css", e.target.value)}
+                  placeholder="1.5"
+                  className="h-8 text-xs"
+                />
               </div>
               <div className="space-y-1.5">
                 <Label className={labelClass}>Letter Spacing</Label>
-                <Input value={props.letterSpacing_css || ""} onChange={(e) => updateProp("letterSpacing_css", e.target.value)} placeholder="0px" className="h-8 text-xs" />
+                <Input
+                  value={props.letterSpacing_css || ""}
+                  onChange={(e) =>
+                    updateProp("letterSpacing_css", e.target.value)
+                  }
+                  placeholder="0px"
+                  className="h-8 text-xs"
+                />
               </div>
             </div>
             <div className="space-y-1.5">
               <Label className={labelClass}>Text Align</Label>
               <div className="flex gap-1 border rounded-md p-0.5">
                 {(["left", "center", "right", "justify"] as const).map((a) => (
-                  <button key={a} onClick={() => updateProp("textAlign_css", a)} className={`flex-1 px-2 py-1 text-xs rounded capitalize transition-colors ${(props.textAlign_css || "") === a ? "bg-secondary text-foreground font-medium" : "text-muted-foreground hover:text-foreground"}`}>
+                  <button
+                    key={a}
+                    onClick={() => updateProp("textAlign_css", a)}
+                    className={`flex-1 px-2 py-1 text-xs rounded capitalize transition-colors ${(props.textAlign_css || "") === a ? "bg-secondary text-foreground font-medium" : "text-muted-foreground hover:text-foreground"}`}
+                  >
                     {a}
                   </button>
                 ))}
@@ -373,7 +686,10 @@ export function PropertiesPanel({
     // ── Borders ──
     const renderBorderFields = () => {
       return (
-        <AccordionItem value="borders" className="border-b-0 border-t border-border/50">
+        <AccordionItem
+          value="borders"
+          className="border-b-0 border-t border-border/50"
+        >
           <AccordionTrigger className={sectionTriggerClass}>
             <div className="flex items-center gap-2">
               <Scissors className="w-4 h-4 text-muted-foreground" />
@@ -384,30 +700,82 @@ export function PropertiesPanel({
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label className={labelClass}>Radius</Label>
-                <Input value={props.borderRadius_css || ""} onChange={(e) => updateProp("borderRadius_css", e.target.value)} placeholder="0px" className="h-8 text-xs" />
+                <Input
+                  value={props.borderRadius_css || ""}
+                  onChange={(e) =>
+                    updateProp("borderRadius_css", e.target.value)
+                  }
+                  placeholder="0px"
+                  className="h-8 text-xs"
+                />
               </div>
               <div className="space-y-1.5">
                 <Label className={labelClass}>Width</Label>
-                <Input value={props.borderWidth_css || ""} onChange={(e) => updateProp("borderWidth_css", e.target.value)} placeholder="0px" className="h-8 text-xs" />
+                <Input
+                  value={props.borderWidth_css || ""}
+                  onChange={(e) =>
+                    updateProp("borderWidth_css", e.target.value)
+                  }
+                  placeholder="0px"
+                  className="h-8 text-xs"
+                />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label className={labelClass}>Color</Label>
                 <div className="flex gap-2 items-center">
-                  <Input type="color" value={props.borderColor || "#000000"} onChange={(e) => updateProp("borderColor", e.target.value)} className="w-8 h-8 p-0.5 min-h-0 cursor-pointer" />
-                  <Input type="text" value={props.borderColor || ""} onChange={(e) => updateProp("borderColor", e.target.value)} className="flex-1 h-8 text-xs font-mono" />
+                  <Input
+                    type="color"
+                    value={props.borderColor || "#000000"}
+                    onChange={(e) => updateProp("borderColor", e.target.value)}
+                    className="w-8 h-8 p-0.5 min-h-0 cursor-pointer"
+                  />
+                  <Input
+                    type="text"
+                    value={props.borderColor || ""}
+                    onChange={(e) => updateProp("borderColor", e.target.value)}
+                    className="flex-1 h-8 text-xs font-mono"
+                  />
                 </div>
               </div>
               <div className="space-y-1.5">
                 <Label className={labelClass}>Style</Label>
                 <div className="relative border rounded-md">
-                  <select value={props.borderStyle_css || ""} onChange={(e) => updateProp("borderStyle_css", e.target.value)} className={selectClass}>
-                    <option className="bg-background text-foreground" value="">None</option>
-                    <option className="bg-background text-foreground" value="solid">Solid</option>
-                    <option className="bg-background text-foreground" value="dashed">Dashed</option>
-                    <option className="bg-background text-foreground" value="dotted">Dotted</option>
-                    <option className="bg-background text-foreground" value="double">Double</option>
+                  <select
+                    value={props.borderStyle_css || ""}
+                    onChange={(e) =>
+                      updateProp("borderStyle_css", e.target.value)
+                    }
+                    className={selectClass}
+                  >
+                    <option className="bg-background text-foreground" value="">
+                      None
+                    </option>
+                    <option
+                      className="bg-background text-foreground"
+                      value="solid"
+                    >
+                      Solid
+                    </option>
+                    <option
+                      className="bg-background text-foreground"
+                      value="dashed"
+                    >
+                      Dashed
+                    </option>
+                    <option
+                      className="bg-background text-foreground"
+                      value="dotted"
+                    >
+                      Dotted
+                    </option>
+                    <option
+                      className="bg-background text-foreground"
+                      value="double"
+                    >
+                      Double
+                    </option>
                   </select>
                 </div>
               </div>
@@ -420,7 +788,10 @@ export function PropertiesPanel({
     // ── Effects (Opacity + Shadow) ──
     const renderEffectsFields = () => {
       return (
-        <AccordionItem value="effects" className="border-b-0 border-t border-border/50">
+        <AccordionItem
+          value="effects"
+          className="border-b-0 border-t border-border/50"
+        >
           <AccordionTrigger className={sectionTriggerClass}>
             <div className="flex items-center gap-2">
               <Paintbrush className="w-4 h-4 text-muted-foreground" />
@@ -431,24 +802,77 @@ export function PropertiesPanel({
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
                 <Label className={labelClass}>Opacity</Label>
-                <span className="text-xs text-muted-foreground">{Math.round((props.opacity_css ?? 1) * 100)}%</span>
+                <span className="text-xs text-muted-foreground">
+                  {Math.round((props.opacity_css ?? 1) * 100)}%
+                </span>
               </div>
-              <input type="range" min="0" max="1" step="0.01" value={props.opacity_css ?? 1} onChange={(e) => updateProp("opacity_css", parseFloat(e.target.value))} className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary" />
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={props.opacity_css ?? 1}
+                onChange={(e) =>
+                  updateProp("opacity_css", parseFloat(e.target.value))
+                }
+                className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
+              />
             </div>
             <div className="space-y-1.5">
               <Label className={labelClass}>Box Shadow</Label>
               <div className="relative border rounded-md">
-                <select value={props.boxShadow || ""} onChange={(e) => updateProp("boxShadow", e.target.value)} className={selectClass}>
-                  <option className="bg-background text-foreground" value="">None</option>
-                  <option className="bg-background text-foreground" value="0 1px 2px 0 rgba(0,0,0,0.05)">XS</option>
-                  <option className="bg-background text-foreground" value="0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1)">SM</option>
-                  <option className="bg-background text-foreground" value="0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1)">MD</option>
-                  <option className="bg-background text-foreground" value="0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)">LG</option>
-                  <option className="bg-background text-foreground" value="0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)">XL</option>
-                  <option className="bg-background text-foreground" value="0 25px 50px -12px rgba(0,0,0,0.25)">2XL</option>
+                <select
+                  value={props.boxShadow || ""}
+                  onChange={(e) => updateProp("boxShadow", e.target.value)}
+                  className={selectClass}
+                >
+                  <option className="bg-background text-foreground" value="">
+                    None
+                  </option>
+                  <option
+                    className="bg-background text-foreground"
+                    value="0 1px 2px 0 rgba(0,0,0,0.05)"
+                  >
+                    XS
+                  </option>
+                  <option
+                    className="bg-background text-foreground"
+                    value="0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1)"
+                  >
+                    SM
+                  </option>
+                  <option
+                    className="bg-background text-foreground"
+                    value="0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1)"
+                  >
+                    MD
+                  </option>
+                  <option
+                    className="bg-background text-foreground"
+                    value="0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)"
+                  >
+                    LG
+                  </option>
+                  <option
+                    className="bg-background text-foreground"
+                    value="0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)"
+                  >
+                    XL
+                  </option>
+                  <option
+                    className="bg-background text-foreground"
+                    value="0 25px 50px -12px rgba(0,0,0,0.25)"
+                  >
+                    2XL
+                  </option>
                 </select>
               </div>
-              <Input value={props.boxShadow || ""} onChange={(e) => updateProp("boxShadow", e.target.value)} placeholder="Custom: 0 4px 6px rgba(0,0,0,0.1)" className="h-8 text-xs font-mono" />
+              <Input
+                value={props.boxShadow || ""}
+                onChange={(e) => updateProp("boxShadow", e.target.value)}
+                placeholder="Custom: 0 4px 6px rgba(0,0,0,0.1)"
+                className="h-8 text-xs font-mono"
+              />
             </div>
           </AccordionContent>
         </AccordionItem>
@@ -459,7 +883,10 @@ export function PropertiesPanel({
     const renderPositionFields = () => {
       const posType = props.position_css || "static";
       return (
-        <AccordionItem value="position" className="border-b-0 border-t border-border/50">
+        <AccordionItem
+          value="position"
+          className="border-b-0 border-t border-border/50"
+        >
           <AccordionTrigger className={sectionTriggerClass}>
             <div className="flex items-center gap-2">
               <Layout className="w-4 h-4 text-muted-foreground" />
@@ -470,49 +897,145 @@ export function PropertiesPanel({
             <div className="space-y-1.5">
               <Label className={labelClass}>Position</Label>
               <div className="relative border rounded-md">
-                <select value={posType} onChange={(e) => updateProp("position_css", e.target.value)} className={selectClass}>
-                  <option className="bg-background text-foreground" value="static">Static</option>
-                  <option className="bg-background text-foreground" value="relative">Relative</option>
-                  <option className="bg-background text-foreground" value="absolute">Absolute</option>
-                  <option className="bg-background text-foreground" value="fixed">Fixed</option>
-                  <option className="bg-background text-foreground" value="sticky">Sticky</option>
+                <select
+                  value={posType}
+                  onChange={(e) => updateProp("position_css", e.target.value)}
+                  className={selectClass}
+                >
+                  <option
+                    className="bg-background text-foreground"
+                    value="static"
+                  >
+                    Static
+                  </option>
+                  <option
+                    className="bg-background text-foreground"
+                    value="relative"
+                  >
+                    Relative
+                  </option>
+                  <option
+                    className="bg-background text-foreground"
+                    value="absolute"
+                  >
+                    Absolute
+                  </option>
+                  <option
+                    className="bg-background text-foreground"
+                    value="fixed"
+                  >
+                    Fixed
+                  </option>
+                  <option
+                    className="bg-background text-foreground"
+                    value="sticky"
+                  >
+                    Sticky
+                  </option>
                 </select>
               </div>
             </div>
             {posType !== "static" && (
               <div className="grid grid-cols-2 gap-2">
-                {(["posTop", "posRight", "posBottom", "posLeft"] as const).map((key) => (
-                  <div key={key} className="space-y-1">
-                    <Label className={labelClass}>{key.replace("pos", "")}</Label>
-                    <Input value={props[key] || ""} onChange={(e) => updateProp(key, e.target.value)} placeholder="auto" className="h-7 text-xs" />
-                  </div>
-                ))}
+                {(["posTop", "posRight", "posBottom", "posLeft"] as const).map(
+                  (key) => (
+                    <div key={key} className="space-y-1">
+                      <Label className={labelClass}>
+                        {key.replace("pos", "")}
+                      </Label>
+                      <Input
+                        value={props[key] || ""}
+                        onChange={(e) => updateProp(key, e.target.value)}
+                        placeholder="auto"
+                        className="h-7 text-xs"
+                      />
+                    </div>
+                  ),
+                )}
               </div>
             )}
             <div className="space-y-1.5">
               <Label className={labelClass}>Z-Index</Label>
-              <Input type="number" value={props.zIndex || ""} onChange={(e) => updateProp("zIndex", e.target.value)} placeholder="auto" className="h-8 text-xs" />
+              <Input
+                type="number"
+                value={props.zIndex || ""}
+                onChange={(e) => updateProp("zIndex", e.target.value)}
+                placeholder="auto"
+                className="h-8 text-xs"
+              />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label className={labelClass}>Overflow X</Label>
                 <div className="relative border rounded-md">
-                  <select value={props.overflowX_css || "visible"} onChange={(e) => updateProp("overflowX_css", e.target.value)} className={selectClass}>
-                    <option className="bg-background text-foreground" value="visible">Visible</option>
-                    <option className="bg-background text-foreground" value="hidden">Hidden</option>
-                    <option className="bg-background text-foreground" value="scroll">Scroll</option>
-                    <option className="bg-background text-foreground" value="auto">Auto</option>
+                  <select
+                    value={props.overflowX_css || "visible"}
+                    onChange={(e) =>
+                      updateProp("overflowX_css", e.target.value)
+                    }
+                    className={selectClass}
+                  >
+                    <option
+                      className="bg-background text-foreground"
+                      value="visible"
+                    >
+                      Visible
+                    </option>
+                    <option
+                      className="bg-background text-foreground"
+                      value="hidden"
+                    >
+                      Hidden
+                    </option>
+                    <option
+                      className="bg-background text-foreground"
+                      value="scroll"
+                    >
+                      Scroll
+                    </option>
+                    <option
+                      className="bg-background text-foreground"
+                      value="auto"
+                    >
+                      Auto
+                    </option>
                   </select>
                 </div>
               </div>
               <div className="space-y-1.5">
                 <Label className={labelClass}>Overflow Y</Label>
                 <div className="relative border rounded-md">
-                  <select value={props.overflowY_css || "visible"} onChange={(e) => updateProp("overflowY_css", e.target.value)} className={selectClass}>
-                    <option className="bg-background text-foreground" value="visible">Visible</option>
-                    <option className="bg-background text-foreground" value="hidden">Hidden</option>
-                    <option className="bg-background text-foreground" value="scroll">Scroll</option>
-                    <option className="bg-background text-foreground" value="auto">Auto</option>
+                  <select
+                    value={props.overflowY_css || "visible"}
+                    onChange={(e) =>
+                      updateProp("overflowY_css", e.target.value)
+                    }
+                    className={selectClass}
+                  >
+                    <option
+                      className="bg-background text-foreground"
+                      value="visible"
+                    >
+                      Visible
+                    </option>
+                    <option
+                      className="bg-background text-foreground"
+                      value="hidden"
+                    >
+                      Hidden
+                    </option>
+                    <option
+                      className="bg-background text-foreground"
+                      value="scroll"
+                    >
+                      Scroll
+                    </option>
+                    <option
+                      className="bg-background text-foreground"
+                      value="auto"
+                    >
+                      Auto
+                    </option>
                   </select>
                 </div>
               </div>
@@ -538,8 +1061,15 @@ export function PropertiesPanel({
     switch (type) {
       case "Hero":
         return (
-          <Accordion type="multiple" defaultValue={["content", "fill", "dimensions"]} className="w-full">
-            <AccordionItem value="content" className="border-b-0 border-t border-border/50 first:border-t-0">
+          <Accordion
+            type="multiple"
+            defaultValue={["content", "fill", "dimensions"]}
+            className="w-full"
+          >
+            <AccordionItem
+              value="content"
+              className="border-b-0 border-t border-border/50 first:border-t-0"
+            >
               <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
                 <div className="flex items-center gap-2">
                   <Type className="w-4 h-4 text-muted-foreground" />
@@ -548,20 +1078,67 @@ export function PropertiesPanel({
               </AccordionTrigger>
               <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
                 <div className="space-y-1.5">
-                  <Label htmlFor="title" className="text-xs font-medium text-muted-foreground">Title</Label>
-                  <Input id="title" value={props.title || ""} onChange={(e) => updateProp("title", e.target.value)} placeholder="Enter hero title" className="h-8 text-sm" />
+                  <Label
+                    htmlFor="title"
+                    className="text-xs font-medium text-muted-foreground"
+                  >
+                    Title
+                  </Label>
+                  <Input
+                    id="title"
+                    value={props.title || ""}
+                    onChange={(e) => updateProp("title", e.target.value)}
+                    placeholder="Enter hero title"
+                    className="h-8 text-sm"
+                  />
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="subtitle" className="text-xs font-medium text-muted-foreground">Subtitle</Label>
-                  <Input id="subtitle" value={props.subtitle || ""} onChange={(e) => updateProp("subtitle", e.target.value)} placeholder="Enter subtitle" className="h-8 text-sm" />
+                  <Label
+                    htmlFor="subtitle"
+                    className="text-xs font-medium text-muted-foreground"
+                  >
+                    Subtitle
+                  </Label>
+                  <Input
+                    id="subtitle"
+                    value={props.subtitle || ""}
+                    onChange={(e) => updateProp("subtitle", e.target.value)}
+                    placeholder="Enter subtitle"
+                    className="h-8 text-sm"
+                  />
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="description" className="text-xs font-medium text-muted-foreground">Description</Label>
-                  <Textarea id="description" value={props.description || ""} onChange={(e) => updateProp("description", e.target.value)} placeholder="Enter description" rows={3} className="text-sm resize-none" />
+                  <Label
+                    htmlFor="description"
+                    className="text-xs font-medium text-muted-foreground"
+                  >
+                    Description
+                  </Label>
+                  <Textarea
+                    id="description"
+                    value={props.description || ""}
+                    onChange={(e) => updateProp("description", e.target.value)}
+                    placeholder="Enter description"
+                    rows={3}
+                    className="text-sm resize-none"
+                  />
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="primaryButtonText" className="text-xs font-medium text-muted-foreground">Primary Button Text</Label>
-                  <Input id="primaryButtonText" value={props.primaryButtonText || ""} onChange={(e) => updateProp("primaryButtonText", e.target.value)} placeholder="Button text" className="h-8 text-sm" />
+                  <Label
+                    htmlFor="primaryButtonText"
+                    className="text-xs font-medium text-muted-foreground"
+                  >
+                    Primary Button Text
+                  </Label>
+                  <Input
+                    id="primaryButtonText"
+                    value={props.primaryButtonText || ""}
+                    onChange={(e) =>
+                      updateProp("primaryButtonText", e.target.value)
+                    }
+                    placeholder="Button text"
+                    className="h-8 text-sm"
+                  />
                 </div>
               </AccordionContent>
             </AccordionItem>
@@ -571,8 +1148,15 @@ export function PropertiesPanel({
 
       case "Text":
         return (
-          <Accordion type="multiple" defaultValue={["content", "fill", "dimensions"]} className="w-full">
-            <AccordionItem value="content" className="border-b-0 border-t border-border/50 first:border-t-0">
+          <Accordion
+            type="multiple"
+            defaultValue={["content", "fill", "dimensions"]}
+            className="w-full"
+          >
+            <AccordionItem
+              value="content"
+              className="border-b-0 border-t border-border/50 first:border-t-0"
+            >
               <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
                 <div className="flex items-center gap-2">
                   <Type className="w-4 h-4 text-muted-foreground" />
@@ -581,37 +1165,144 @@ export function PropertiesPanel({
               </AccordionTrigger>
               <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
                 <div className="space-y-1.5">
-                  <Label htmlFor="content" className="text-xs font-medium text-muted-foreground">Content</Label>
-                  <Textarea id="content" value={props.content || ""} onChange={(e) => updateProp("content", e.target.value)} placeholder="Enter text content" rows={4} className="text-sm resize-none" />
+                  <Label
+                    htmlFor="content"
+                    className="text-xs font-medium text-muted-foreground"
+                  >
+                    Content
+                  </Label>
+                  <Textarea
+                    id="content"
+                    value={props.content || ""}
+                    onChange={(e) => updateProp("content", e.target.value)}
+                    placeholder="Enter text content"
+                    rows={4}
+                    className="text-sm resize-none"
+                  />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <Label htmlFor="tag" className="text-xs font-medium text-muted-foreground">HTML Tag</Label>
+                    <Label
+                      htmlFor="tag"
+                      className="text-xs font-medium text-muted-foreground"
+                    >
+                      HTML Tag
+                    </Label>
                     <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
-                      <select id="tag" value={props.tag || "p"} onChange={(e) => updateProp("tag", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
-                        <option className="bg-background text-foreground" value="h1">H1</option>
-                        <option className="bg-background text-foreground" value="h2">H2</option>
-                        <option className="bg-background text-foreground" value="h3">H3</option>
-                        <option className="bg-background text-foreground" value="h4">H4</option>
-                        <option className="bg-background text-foreground" value="h5">H5</option>
-                        <option className="bg-background text-foreground" value="h6">H6</option>
-                        <option className="bg-background text-foreground" value="p">Paragraph</option>
-                        <option className="bg-background text-foreground" value="span">Span</option>
+                      <select
+                        id="tag"
+                        value={props.tag || "p"}
+                        onChange={(e) => updateProp("tag", e.target.value)}
+                        className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none"
+                      >
+                        <option
+                          className="bg-background text-foreground"
+                          value="h1"
+                        >
+                          H1
+                        </option>
+                        <option
+                          className="bg-background text-foreground"
+                          value="h2"
+                        >
+                          H2
+                        </option>
+                        <option
+                          className="bg-background text-foreground"
+                          value="h3"
+                        >
+                          H3
+                        </option>
+                        <option
+                          className="bg-background text-foreground"
+                          value="h4"
+                        >
+                          H4
+                        </option>
+                        <option
+                          className="bg-background text-foreground"
+                          value="h5"
+                        >
+                          H5
+                        </option>
+                        <option
+                          className="bg-background text-foreground"
+                          value="h6"
+                        >
+                          H6
+                        </option>
+                        <option
+                          className="bg-background text-foreground"
+                          value="p"
+                        >
+                          Paragraph
+                        </option>
+                        <option
+                          className="bg-background text-foreground"
+                          value="span"
+                        >
+                          Span
+                        </option>
                       </select>
                     </div>
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="size" className="text-xs font-medium text-muted-foreground">Size</Label>
+                    <Label
+                      htmlFor="size"
+                      className="text-xs font-medium text-muted-foreground"
+                    >
+                      Size
+                    </Label>
                     <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
-                      <select id="size" value={props.size || "base"} onChange={(e) => updateProp("size", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
-                        <option className="bg-background text-foreground" value="xs">Extra Small</option>
-                        <option className="bg-background text-foreground" value="sm">Small</option>
-                        <option className="bg-background text-foreground" value="base">Base</option>
-                        <option className="bg-background text-foreground" value="lg">Large</option>
-                        <option className="bg-background text-foreground" value="xl">Extra Large</option>
-                        <option className="bg-background text-foreground" value="2xl">2X Large</option>
-                        <option className="bg-background text-foreground" value="3xl">3X Large</option>
+                      <select
+                        id="size"
+                        value={props.size || "base"}
+                        onChange={(e) => updateProp("size", e.target.value)}
+                        className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none"
+                      >
+                        <option
+                          className="bg-background text-foreground"
+                          value="xs"
+                        >
+                          Extra Small
+                        </option>
+                        <option
+                          className="bg-background text-foreground"
+                          value="sm"
+                        >
+                          Small
+                        </option>
+                        <option
+                          className="bg-background text-foreground"
+                          value="base"
+                        >
+                          Base
+                        </option>
+                        <option
+                          className="bg-background text-foreground"
+                          value="lg"
+                        >
+                          Large
+                        </option>
+                        <option
+                          className="bg-background text-foreground"
+                          value="xl"
+                        >
+                          Extra Large
+                        </option>
+                        <option
+                          className="bg-background text-foreground"
+                          value="2xl"
+                        >
+                          2X Large
+                        </option>
+                        <option
+                          className="bg-background text-foreground"
+                          value="3xl"
+                        >
+                          3X Large
+                        </option>
                       </select>
                     </div>
                   </div>
@@ -624,8 +1315,15 @@ export function PropertiesPanel({
 
       case "Button":
         return (
-          <Accordion type="multiple" defaultValue={["content", "links", "colors", "dimensions"]} className="w-full">
-            <AccordionItem value="content" className="border-b-0 border-t border-border/50 first:border-t-0">
+          <Accordion
+            type="multiple"
+            defaultValue={["content", "links", "colors", "dimensions"]}
+            className="w-full"
+          >
+            <AccordionItem
+              value="content"
+              className="border-b-0 border-t border-border/50 first:border-t-0"
+            >
               <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
                 <div className="flex items-center gap-2">
                   <Type className="w-4 h-4 text-muted-foreground" />
@@ -634,32 +1332,98 @@ export function PropertiesPanel({
               </AccordionTrigger>
               <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
                 <div className="space-y-1.5">
-                  <Label htmlFor="text" className="text-xs font-medium text-muted-foreground">Button Text</Label>
-                  <Input id="text" value={props.text || ""} onChange={(e) => updateProp("text", e.target.value)} placeholder="Button text" className="h-8 text-sm" />
+                  <Label
+                    htmlFor="text"
+                    className="text-xs font-medium text-muted-foreground"
+                  >
+                    Button Text
+                  </Label>
+                  <Input
+                    id="text"
+                    value={props.text || ""}
+                    onChange={(e) => updateProp("text", e.target.value)}
+                    placeholder="Button text"
+                    className="h-8 text-sm"
+                  />
                 </div>
-                
+
                 <div className="space-y-1.5">
-                  <Label htmlFor="variant" className="text-xs font-medium text-muted-foreground">Variant</Label>
+                  <Label
+                    htmlFor="variant"
+                    className="text-xs font-medium text-muted-foreground"
+                  >
+                    Variant
+                  </Label>
                   <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
-                    <select id="variant" value={props.variant || "default"} onChange={(e) => updateProp("variant", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
-                      <option className="bg-background text-foreground" value="default">Default</option>
-                      <option className="bg-background text-foreground" value="destructive">Destructive</option>
-                      <option className="bg-background text-foreground" value="outline">Outline</option>
-                      <option className="bg-background text-foreground" value="secondary">Secondary</option>
-                      <option className="bg-background text-foreground" value="ghost">Ghost</option>
-                      <option className="bg-background text-foreground" value="link">Link</option>
+                    <select
+                      id="variant"
+                      value={props.variant || "default"}
+                      onChange={(e) => updateProp("variant", e.target.value)}
+                      className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none"
+                    >
+                      <option
+                        className="bg-background text-foreground"
+                        value="default"
+                      >
+                        Default
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="destructive"
+                      >
+                        Destructive
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="outline"
+                      >
+                        Outline
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="secondary"
+                      >
+                        Secondary
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="ghost"
+                      >
+                        Ghost
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="link"
+                      >
+                        Link
+                      </option>
                     </select>
                   </div>
                 </div>
 
                 <div className="flex items-center justify-between p-2 rounded-md bg-muted border border-border/50">
-                  <Label htmlFor="fullWidth" className="text-xs font-medium text-muted-foreground cursor-pointer">Full Width</Label>
-                  <Switch id="fullWidth" checked={props.fullWidth || false} onCheckedChange={(checked) => updateProp("fullWidth", checked)} className="scale-75 origin-right" />
+                  <Label
+                    htmlFor="fullWidth"
+                    className="text-xs font-medium text-muted-foreground cursor-pointer"
+                  >
+                    Full Width
+                  </Label>
+                  <Switch
+                    id="fullWidth"
+                    checked={props.fullWidth || false}
+                    onCheckedChange={(checked) =>
+                      updateProp("fullWidth", checked)
+                    }
+                    className="scale-75 origin-right"
+                  />
                 </div>
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="links" className="border-b-0 border-t border-border/50 first:border-t-0">
+            <AccordionItem
+              value="links"
+              className="border-b-0 border-t border-border/50 first:border-t-0"
+            >
               <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
                 <div className="flex items-center gap-2">
                   <LinkIcon className="w-4 h-4 text-muted-foreground" />
@@ -668,7 +1432,12 @@ export function PropertiesPanel({
               </AccordionTrigger>
               <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
                 <div className="space-y-1.5">
-                  <Label htmlFor="linkType" className="text-xs font-medium text-muted-foreground">Link Type</Label>
+                  <Label
+                    htmlFor="linkType"
+                    className="text-xs font-medium text-muted-foreground"
+                  >
+                    Link Type
+                  </Label>
                   <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
                     <select
                       id="linkType"
@@ -682,19 +1451,43 @@ export function PropertiesPanel({
                       }}
                       className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none"
                     >
-                      <option className="bg-background text-foreground" value="url">External URL</option>
-                      <option className="bg-background text-foreground" value="page">Internal Page</option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="url"
+                      >
+                        External URL
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="page"
+                      >
+                        Internal Page
+                      </option>
                     </select>
                   </div>
                 </div>
 
                 {props.href?.startsWith("page:") ? (
                   <div className="space-y-1.5">
-                    <Label htmlFor="href" className="text-xs font-medium text-muted-foreground">Select Page</Label>
+                    <Label
+                      htmlFor="href"
+                      className="text-xs font-medium text-muted-foreground"
+                    >
+                      Select Page
+                    </Label>
                     <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
-                      <select id="href" value={props.href} onChange={(e) => updateProp("href", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
+                      <select
+                        id="href"
+                        value={props.href}
+                        onChange={(e) => updateProp("href", e.target.value)}
+                        className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none"
+                      >
                         {pages.map((page) => (
-                          <option className="bg-background text-foreground" key={page.id} value={`page:${page.id}`}>
+                          <option
+                            className="bg-background text-foreground"
+                            key={page.id}
+                            value={`page:${page.id}`}
+                          >
                             {page.name}
                           </option>
                         ))}
@@ -703,15 +1496,38 @@ export function PropertiesPanel({
                   </div>
                 ) : (
                   <div className="space-y-1.5">
-                    <Label htmlFor="href" className="text-xs font-medium text-muted-foreground">Link URL</Label>
-                    <Input id="href" value={props.href || ""} onChange={(e) => updateProp("href", e.target.value)} placeholder="https://example.com" className="h-8 text-sm" />
+                    <Label
+                      htmlFor="href"
+                      className="text-xs font-medium text-muted-foreground"
+                    >
+                      Link URL
+                    </Label>
+                    <Input
+                      id="href"
+                      value={props.href || ""}
+                      onChange={(e) => updateProp("href", e.target.value)}
+                      placeholder="https://example.com"
+                      className="h-8 text-sm"
+                    />
                   </div>
                 )}
 
                 {props.href && !props.href.startsWith("page:") && (
                   <div className="flex items-center justify-between p-2 rounded-md bg-muted border border-border/50">
-                    <Label htmlFor="external" className="text-xs font-medium text-muted-foreground cursor-pointer">Open in new tab</Label>
-                    <Switch id="external" checked={props.external || false} onCheckedChange={(checked) => updateProp("external", checked)} className="scale-75 origin-right" />
+                    <Label
+                      htmlFor="external"
+                      className="text-xs font-medium text-muted-foreground cursor-pointer"
+                    >
+                      Open in new tab
+                    </Label>
+                    <Switch
+                      id="external"
+                      checked={props.external || false}
+                      onCheckedChange={(checked) =>
+                        updateProp("external", checked)
+                      }
+                      className="scale-75 origin-right"
+                    />
                   </div>
                 )}
               </AccordionContent>
@@ -722,8 +1538,15 @@ export function PropertiesPanel({
 
       case "Image":
         return (
-          <Accordion type="multiple" defaultValue={["content", "dimensions"]} className="w-full">
-            <AccordionItem value="content" className="border-b-0 border-t border-border/50 first:border-t-0">
+          <Accordion
+            type="multiple"
+            defaultValue={["content", "dimensions"]}
+            className="w-full"
+          >
+            <AccordionItem
+              value="content"
+              className="border-b-0 border-t border-border/50 first:border-t-0"
+            >
               <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
                 <div className="flex items-center gap-2">
                   <ImageIcon className="w-4 h-4 text-muted-foreground" />
@@ -732,13 +1555,19 @@ export function PropertiesPanel({
               </AccordionTrigger>
               <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
                 <div className="space-y-1.5">
-                  <Label htmlFor="src" className="text-xs font-medium text-muted-foreground">Image URL</Label>
-                  <Input id="src" value={props.src || ""} onChange={(e) => updateProp("src", e.target.value)} placeholder="https://example.com/image.jpg" className="h-8 text-sm" />
-                </div>
-                
-                <div className="space-y-1.5">
-                  <Label htmlFor="alt" className="text-xs font-medium text-muted-foreground">Alt Text</Label>
-                  <Input id="alt" value={props.alt || ""} onChange={(e) => updateProp("alt", e.target.value)} placeholder="Describe the image" className="h-8 text-sm" />
+                  <Label
+                    htmlFor="src"
+                    className="text-xs font-medium text-muted-foreground"
+                  >
+                    Image URL
+                  </Label>
+                  <Input
+                    id="src"
+                    value={props.src || ""}
+                    onChange={(e) => updateProp("src", e.target.value)}
+                    placeholder="https://example.com/image.jpg"
+                    className="h-8 text-sm"
+                  />
                 </div>
 
                 <div className="space-y-1.5">
@@ -771,6 +1600,73 @@ export function PropertiesPanel({
                       <option className="bg-background text-foreground" value="md">Medium</option>
                       <option className="bg-background text-foreground" value="lg">Large</option>
                       <option className="bg-background text-foreground" value="full">Full (Circle)</option>
+                      </select>
+                  <Label
+                    htmlFor="alt"
+                    className="text-xs font-medium text-muted-foreground"
+                  >
+                    Alt Text
+                  </Label>
+                  <Input
+                    id="alt"
+                    value={props.alt || ""}
+                    onChange={(e) => updateProp("alt", e.target.value)}
+                    placeholder="Describe the image"
+                    className="h-8 text-sm"
+                  />
+                </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label
+                    htmlFor="rounded"
+                    className="text-xs font-medium text-muted-foreground"
+                  >
+                    Border Radius Corners
+                  </Label>
+                  <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
+                    <select
+                      id="rounded"
+                      value={props.rounded || "md"}
+                      onChange={(e) => updateProp("rounded", e.target.value)}
+                      className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none"
+                    >
+                      <option
+                        className="bg-background text-foreground"
+                        value="none"
+                      >
+                        None
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="sm"
+                      >
+                        Small
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="md"
+                      >
+                        Medium
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="lg"
+                      >
+                        Large
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="xl"
+                      >
+                        Extra Large
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="full"
+                      >
+                        Full (Circle)
+                      </option>
                     </select>
                   </div>
                 </div>
@@ -782,8 +1678,15 @@ export function PropertiesPanel({
 
       case "Card":
         return (
-          <Accordion type="multiple" defaultValue={["content", "fill", "dimensions"]} className="w-full">
-            <AccordionItem value="content" className="border-b-0 border-t border-border/50 first:border-t-0">
+          <Accordion
+            type="multiple"
+            defaultValue={["content", "fill", "dimensions"]}
+            className="w-full"
+          >
+            <AccordionItem
+              value="content"
+              className="border-b-0 border-t border-border/50 first:border-t-0"
+            >
               <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
                 <div className="flex items-center gap-2">
                   <Type className="w-4 h-4 text-muted-foreground" />
@@ -805,25 +1708,78 @@ export function PropertiesPanel({
                   <Label htmlFor="title" className="text-xs font-medium text-muted-foreground">Title</Label>
                   <Input id="title" value={props.title || ""} onChange={(e) => updateProp("title", e.target.value)} placeholder="Card title" className="h-8 text-sm" />
                 </div>
-                
+
                 <div className="space-y-1.5">
-                  <Label htmlFor="description" className="text-xs font-medium text-muted-foreground">Description</Label>
-                  <Textarea id="description" value={props.description || ""} onChange={(e) => updateProp("description", e.target.value)} placeholder="Card description" rows={3} className="text-sm resize-none" />
+                  <Label
+                    htmlFor="description"
+                    className="text-xs font-medium text-muted-foreground"
+                  >
+                    Description
+                  </Label>
+                  <Textarea
+                    id="description"
+                    value={props.description || ""}
+                    onChange={(e) => updateProp("description", e.target.value)}
+                    placeholder="Card description"
+                    rows={3}
+                    className="text-sm resize-none"
+                  />
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="buttonText" className="text-xs font-medium text-muted-foreground">Button Text</Label>
-                  <Input id="buttonText" value={props.buttonText || ""} onChange={(e) => updateProp("buttonText", e.target.value)} placeholder="Learn More" className="h-8 text-sm" />
+                  <Label
+                    htmlFor="buttonText"
+                    className="text-xs font-medium text-muted-foreground"
+                  >
+                    Button Text
+                  </Label>
+                  <Input
+                    id="buttonText"
+                    value={props.buttonText || ""}
+                    onChange={(e) => updateProp("buttonText", e.target.value)}
+                    placeholder="Learn More"
+                    className="h-8 text-sm"
+                  />
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="variant" className="text-xs font-medium text-muted-foreground">Card Style</Label>
+                  <Label
+                    htmlFor="variant"
+                    className="text-xs font-medium text-muted-foreground"
+                  >
+                    Card Style
+                  </Label>
                   <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
-                    <select id="variant" value={props.variant || "default"} onChange={(e) => updateProp("variant", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
-                      <option className="bg-background text-foreground" value="default">Default</option>
-                      <option className="bg-background text-foreground" value="bordered">Bordered</option>
-                      <option className="bg-background text-foreground" value="shadow">Shadow</option>
-                      <option className="bg-background text-foreground" value="elevated">Elevated</option>
+                    <select
+                      id="variant"
+                      value={props.variant || "default"}
+                      onChange={(e) => updateProp("variant", e.target.value)}
+                      className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none"
+                    >
+                      <option
+                        className="bg-background text-foreground"
+                        value="default"
+                      >
+                        Default
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="bordered"
+                      >
+                        Bordered
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="shadow"
+                      >
+                        Shadow
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="elevated"
+                      >
+                        Elevated
+                      </option>
                     </select>
                   </div>
                 </div>
@@ -835,8 +1791,15 @@ export function PropertiesPanel({
 
       case "Header":
         return (
-          <Accordion type="multiple" defaultValue={["settings", "colors", "dimensions"]} className="w-full">
-            <AccordionItem value="settings" className="border-b-0 border-t border-border/50 first:border-t-0">
+          <Accordion
+            type="multiple"
+            defaultValue={["settings", "colors", "dimensions"]}
+            className="w-full"
+          >
+            <AccordionItem
+              value="settings"
+              className="border-b-0 border-t border-border/50 first:border-t-0"
+            >
               <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
                 <div className="flex items-center gap-2">
                   <Settings2 className="w-4 h-4 text-muted-foreground" />
@@ -845,23 +1808,73 @@ export function PropertiesPanel({
               </AccordionTrigger>
               <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
                 <div className="flex items-center justify-between p-2 rounded-md bg-muted border border-border/50">
-                  <Label htmlFor="sticky" className="text-xs font-medium text-muted-foreground cursor-pointer">Sticky Header</Label>
-                  <Switch id="sticky" checked={props.sticky || false} onCheckedChange={(checked) => updateProp("sticky", checked)} className="scale-75 origin-right" />
+                  <Label
+                    htmlFor="sticky"
+                    className="text-xs font-medium text-muted-foreground cursor-pointer"
+                  >
+                    Sticky Header
+                  </Label>
+                  <Switch
+                    id="sticky"
+                    checked={props.sticky || false}
+                    onCheckedChange={(checked) => updateProp("sticky", checked)}
+                    className="scale-75 origin-right"
+                  />
                 </div>
 
                 <div className="flex items-center justify-between p-2 rounded-md bg-muted border border-border/50">
-                  <Label htmlFor="shadow" className="text-xs font-medium text-muted-foreground cursor-pointer">Drop Shadow</Label>
-                  <Switch id="shadow" checked={props.shadow || false} onCheckedChange={(checked) => updateProp("shadow", checked)} className="scale-75 origin-right" />
+                  <Label
+                    htmlFor="shadow"
+                    className="text-xs font-medium text-muted-foreground cursor-pointer"
+                  >
+                    Drop Shadow
+                  </Label>
+                  <Switch
+                    id="shadow"
+                    checked={props.shadow || false}
+                    onCheckedChange={(checked) => updateProp("shadow", checked)}
+                    className="scale-75 origin-right"
+                  />
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="padding" className="text-xs font-medium text-muted-foreground">Padding</Label>
+                  <Label
+                    htmlFor="padding"
+                    className="text-xs font-medium text-muted-foreground"
+                  >
+                    Padding
+                  </Label>
                   <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
-                    <select id="padding" value={props.padding || "md"} onChange={(e) => updateProp("padding", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
-                      <option className="bg-background text-foreground" value="sm">Small</option>
-                      <option className="bg-background text-foreground" value="md">Medium</option>
-                      <option className="bg-background text-foreground" value="lg">Large</option>
-                      <option className="bg-background text-foreground" value="xl">Extra Large</option>
+                    <select
+                      id="padding"
+                      value={props.padding || "md"}
+                      onChange={(e) => updateProp("padding", e.target.value)}
+                      className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none"
+                    >
+                      <option
+                        className="bg-background text-foreground"
+                        value="sm"
+                      >
+                        Small
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="md"
+                      >
+                        Medium
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="lg"
+                      >
+                        Large
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="xl"
+                      >
+                        Extra Large
+                      </option>
                     </select>
                   </div>
                 </div>
@@ -873,8 +1886,15 @@ export function PropertiesPanel({
 
       case "Navbar":
         return (
-          <Accordion type="multiple" defaultValue={["brand", "links", "colors", "dimensions"]} className="w-full">
-            <AccordionItem value="brand" className="border-b-0 border-t border-border/50 first:border-t-0">
+          <Accordion
+            type="multiple"
+            defaultValue={["brand", "links", "colors", "dimensions"]}
+            className="w-full"
+          >
+            <AccordionItem
+              value="brand"
+              className="border-b-0 border-t border-border/50 first:border-t-0"
+            >
               <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
                 <div className="flex items-center gap-2">
                   <Settings2 className="w-4 h-4 text-muted-foreground" />
@@ -883,22 +1903,60 @@ export function PropertiesPanel({
               </AccordionTrigger>
               <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
                 <div className="space-y-1.5">
-                  <Label htmlFor="logoText" className="text-xs font-medium text-muted-foreground">Logo Text</Label>
-                  <Input id="logoText" value={props.logoText || ""} onChange={(e) => updateProp("logoText", e.target.value)} placeholder="Brand Name" className="h-8 text-sm" />
-                </div>
-                
-                <div className="space-y-1.5">
-                  <Label htmlFor="ctaText" className="text-xs font-medium text-muted-foreground">CTA Button Text</Label>
-                  <Input id="ctaText" value={props.ctaText || ""} onChange={(e) => updateProp("ctaText", e.target.value)} placeholder="Get Started" className="h-8 text-sm" />
+                  <Label
+                    htmlFor="logoText"
+                    className="text-xs font-medium text-muted-foreground"
+                  >
+                    Logo Text
+                  </Label>
+                  <Input
+                    id="logoText"
+                    value={props.logoText || ""}
+                    onChange={(e) => updateProp("logoText", e.target.value)}
+                    placeholder="Brand Name"
+                    className="h-8 text-sm"
+                  />
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="ctaLink" className="text-xs font-medium text-muted-foreground">CTA Button Link</Label>
-                  <Input id="ctaLink" value={props.ctaLink || ""} onChange={(e) => updateProp("ctaLink", e.target.value)} placeholder="https://example.com" className="h-8 text-sm" />
+                  <Label
+                    htmlFor="ctaText"
+                    className="text-xs font-medium text-muted-foreground"
+                  >
+                    CTA Button Text
+                  </Label>
+                  <Input
+                    id="ctaText"
+                    value={props.ctaText || ""}
+                    onChange={(e) => updateProp("ctaText", e.target.value)}
+                    placeholder="Get Started"
+                    className="h-8 text-sm"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label
+                    htmlFor="ctaLink"
+                    className="text-xs font-medium text-muted-foreground"
+                  >
+                    CTA Button Link
+                  </Label>
+                  <Input
+                    id="ctaLink"
+                    value={props.ctaLink || ""}
+                    onChange={(e) => updateProp("ctaLink", e.target.value)}
+                    placeholder="https://example.com"
+                    className="h-8 text-sm"
+                  />
                 </div>
 
                 <div className="flex items-center justify-between p-2 rounded-md bg-muted border border-border/50">
-                  <Label htmlFor="ctaExternal" className="text-xs font-medium text-muted-foreground cursor-pointer">CTA is External Link</Label>
+                  <Label
+                    htmlFor="ctaExternal"
+                    className="text-xs font-medium text-muted-foreground cursor-pointer"
+                  >
+                    CTA is External Link
+                  </Label>
                   <Switch
                     id="ctaExternal"
                     checked={props.ctaExternal || false}
@@ -911,7 +1969,10 @@ export function PropertiesPanel({
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="links" className="border-b-0 border-t border-border/50 first:border-t-0">
+            <AccordionItem
+              value="links"
+              className="border-b-0 border-t border-border/50 first:border-t-0"
+            >
               <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
                 <div className="flex items-center gap-2">
                   <LinkIcon className="w-4 h-4 text-muted-foreground" />
@@ -921,15 +1982,22 @@ export function PropertiesPanel({
               <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
                 <div className="space-y-3">
                   {(props.links || []).map((link: any, index: number) => (
-                    <div key={index} className="space-y-3 p-3 bg-muted border border-border rounded-md">
+                    <div
+                      key={index}
+                      className="space-y-3 p-3 bg-muted border border-border rounded-md"
+                    >
                       <div className="flex items-center justify-between pointer-events-none">
-                        <span className="text-xs font-semibold text-muted-foreground">Link #{index + 1}</span>
+                        <span className="text-xs font-semibold text-muted-foreground">
+                          Link #{index + 1}
+                        </span>
                         <Button
                           variant="ghost"
                           size="icon"
                           className="h-6 w-6 text-destructive hover:text-destructive hover:bg-destructive/10 pointer-events-auto"
                           onClick={() => {
-                            const newLinks = (props.links || []).filter((_: any, i: number) => i !== index);
+                            const newLinks = (props.links || []).filter(
+                              (_: any, i: number) => i !== index,
+                            );
                             updateProp("links", newLinks);
                           }}
                         >
@@ -937,9 +2005,11 @@ export function PropertiesPanel({
                           &times;
                         </Button>
                       </div>
-                      
+
                       <div className="space-y-1.5">
-                        <Label className="text-[10px] uppercase text-muted-foreground font-semibold">Label</Label>
+                        <Label className="text-[10px] uppercase text-muted-foreground font-semibold">
+                          Label
+                        </Label>
                         <Input
                           value={link.text || ""}
                           onChange={(e) => {
@@ -953,15 +2023,25 @@ export function PropertiesPanel({
                       </div>
 
                       <div className="space-y-1.5">
-                        <Label className="text-[10px] uppercase text-muted-foreground font-semibold">Destination</Label>
+                        <Label className="text-[10px] uppercase text-muted-foreground font-semibold">
+                          Destination
+                        </Label>
                         <div className="grid grid-cols-[1fr_2fr] gap-2 items-start">
                           <div className="relative border border-border rounded-md focus-within:ring-1 focus-within:ring-primary bg-background">
                             <select
-                              value={link.href?.startsWith("page:") ? "page" : "url"}
+                              value={
+                                link.href?.startsWith("page:") ? "page" : "url"
+                              }
                               onChange={(e) => {
                                 const newLinks = [...(props.links || [])];
-                                if (e.target.value === "page" && pages.length > 0) {
-                                  newLinks[index] = { ...link, href: `page:${pages[0].id}` };
+                                if (
+                                  e.target.value === "page" &&
+                                  pages.length > 0
+                                ) {
+                                  newLinks[index] = {
+                                    ...link,
+                                    href: `page:${pages[0].id}`,
+                                  };
                                 } else {
                                   newLinks[index] = { ...link, href: "" };
                                 }
@@ -969,24 +2049,41 @@ export function PropertiesPanel({
                               }}
                               className="w-full h-7 px-1 text-xs bg-background text-foreground appearance-none focus:outline-none"
                             >
-                              <option className="bg-background text-foreground" value="url">URL</option>
-                              <option className="bg-background text-foreground" value="page">Page</option>
+                              <option
+                                className="bg-background text-foreground"
+                                value="url"
+                              >
+                                URL
+                              </option>
+                              <option
+                                className="bg-background text-foreground"
+                                value="page"
+                              >
+                                Page
+                              </option>
                             </select>
                           </div>
-                          
+
                           {link.href?.startsWith("page:") ? (
                             <div className="relative border border-border rounded-md focus-within:ring-1 focus-within:ring-primary bg-background">
                               <select
                                 value={link.href}
                                 onChange={(e) => {
                                   const newLinks = [...(props.links || [])];
-                                  newLinks[index] = { ...link, href: e.target.value };
+                                  newLinks[index] = {
+                                    ...link,
+                                    href: e.target.value,
+                                  };
                                   updateProp("links", newLinks);
                                 }}
                                 className="w-full h-7 px-1 text-xs bg-background text-foreground appearance-none focus:outline-none"
                               >
                                 {pages.map((page) => (
-                                  <option className="bg-background text-foreground" key={page.id} value={`page:${page.id}`}>
+                                  <option
+                                    className="bg-background text-foreground"
+                                    key={page.id}
+                                    value={`page:${page.id}`}
+                                  >
                                     {page.name}
                                   </option>
                                 ))}
@@ -997,7 +2094,10 @@ export function PropertiesPanel({
                               value={link.href || ""}
                               onChange={(e) => {
                                 const newLinks = [...(props.links || [])];
-                                newLinks[index] = { ...link, href: e.target.value };
+                                newLinks[index] = {
+                                  ...link,
+                                  href: e.target.value,
+                                };
                                 updateProp("links", newLinks);
                               }}
                               placeholder="URL"
@@ -1008,7 +2108,12 @@ export function PropertiesPanel({
                       </div>
 
                       <div className="flex items-center justify-between pt-2">
-                        <Label htmlFor={`external-${index}`} className="text-[10px] uppercase text-muted-foreground font-semibold cursor-pointer">Open in new tab</Label>
+                        <Label
+                          htmlFor={`external-${index}`}
+                          className="text-[10px] uppercase text-muted-foreground font-semibold cursor-pointer"
+                        >
+                          Open in new tab
+                        </Label>
                         <Switch
                           id={`external-${index}`}
                           checked={link.external || false}
@@ -1027,7 +2132,10 @@ export function PropertiesPanel({
                     size="sm"
                     className="w-full text-xs h-8 border-dashed"
                     onClick={() => {
-                      const newLinks = [...(props.links || []), { text: "New Link", href: "#", external: false }];
+                      const newLinks = [
+                        ...(props.links || []),
+                        { text: "New Link", href: "#", external: false },
+                      ];
                       updateProp("links", newLinks);
                     }}
                   >
@@ -1037,7 +2145,10 @@ export function PropertiesPanel({
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="styling" className="border-b-0 border-t border-border/50 first:border-t-0">
+            <AccordionItem
+              value="styling"
+              className="border-b-0 border-t border-border/50 first:border-t-0"
+            >
               <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
                 <div className="flex items-center gap-2">
                   <Paintbrush className="w-4 h-4 text-muted-foreground" />
@@ -1046,17 +2157,53 @@ export function PropertiesPanel({
               </AccordionTrigger>
               <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
                 <div className="space-y-1.5">
-                  <Label htmlFor="linkColor" className="text-xs font-medium text-muted-foreground">Link Color</Label>
+                  <Label
+                    htmlFor="linkColor"
+                    className="text-xs font-medium text-muted-foreground"
+                  >
+                    Link Color
+                  </Label>
                   <div className="flex gap-2 items-center">
-                    <Input id="linkColor" type="color" value={props.linkColor || "#000000"} onChange={(e) => updateProp("linkColor", e.target.value)} className="w-8 h-8 p-0.5 min-h-0 cursor-pointer" />
-                    <Input type="text" value={props.linkColor || "#000000"} onChange={(e) => updateProp("linkColor", e.target.value)} className="flex-1 h-8 text-xs font-mono" />
+                    <Input
+                      id="linkColor"
+                      type="color"
+                      value={props.linkColor || "#000000"}
+                      onChange={(e) => updateProp("linkColor", e.target.value)}
+                      className="w-8 h-8 p-0.5 min-h-0 cursor-pointer"
+                    />
+                    <Input
+                      type="text"
+                      value={props.linkColor || "#000000"}
+                      onChange={(e) => updateProp("linkColor", e.target.value)}
+                      className="flex-1 h-8 text-xs font-mono"
+                    />
                   </div>
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="linkHoverColor" className="text-xs font-medium text-muted-foreground">Link Hover Color</Label>
+                  <Label
+                    htmlFor="linkHoverColor"
+                    className="text-xs font-medium text-muted-foreground"
+                  >
+                    Link Hover Color
+                  </Label>
                   <div className="flex gap-2 items-center">
-                    <Input id="linkHoverColor" type="color" value={props.linkHoverColor || "#3b82f6"} onChange={(e) => updateProp("linkHoverColor", e.target.value)} className="w-8 h-8 p-0.5 min-h-0 cursor-pointer" />
-                    <Input type="text" value={props.linkHoverColor || "#3b82f6"} onChange={(e) => updateProp("linkHoverColor", e.target.value)} className="flex-1 h-8 text-xs font-mono" />
+                    <Input
+                      id="linkHoverColor"
+                      type="color"
+                      value={props.linkHoverColor || "#3b82f6"}
+                      onChange={(e) =>
+                        updateProp("linkHoverColor", e.target.value)
+                      }
+                      className="w-8 h-8 p-0.5 min-h-0 cursor-pointer"
+                    />
+                    <Input
+                      type="text"
+                      value={props.linkHoverColor || "#3b82f6"}
+                      onChange={(e) =>
+                        updateProp("linkHoverColor", e.target.value)
+                      }
+                      className="flex-1 h-8 text-xs font-mono"
+                    />
                   </div>
                 </div>
               </AccordionContent>
@@ -1067,8 +2214,15 @@ export function PropertiesPanel({
 
       case "Footer":
         return (
-          <Accordion type="multiple" defaultValue={["brand", "colors", "dimensions"]} className="w-full">
-            <AccordionItem value="brand" className="border-b-0 border-t border-border/50 first:border-t-0">
+          <Accordion
+            type="multiple"
+            defaultValue={["brand", "colors", "dimensions"]}
+            className="w-full"
+          >
+            <AccordionItem
+              value="brand"
+              className="border-b-0 border-t border-border/50 first:border-t-0"
+            >
               <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
                 <div className="flex items-center gap-2">
                   <Settings2 className="w-4 h-4 text-muted-foreground" />
@@ -1077,18 +2231,44 @@ export function PropertiesPanel({
               </AccordionTrigger>
               <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
                 <div className="space-y-1.5">
-                  <Label htmlFor="logoText" className="text-xs font-medium text-muted-foreground">Logo Text</Label>
-                  <Input id="logoText" value={props.logoText || ""} onChange={(e) => updateProp("logoText", e.target.value)} placeholder="Brand Name" className="h-8 text-sm" />
+                  <Label
+                    htmlFor="logoText"
+                    className="text-xs font-medium text-muted-foreground"
+                  >
+                    Logo Text
+                  </Label>
+                  <Input
+                    id="logoText"
+                    value={props.logoText || ""}
+                    onChange={(e) => updateProp("logoText", e.target.value)}
+                    placeholder="Brand Name"
+                    className="h-8 text-sm"
+                  />
                 </div>
-                
+
                 <div className="space-y-1.5">
-                  <Label htmlFor="description" className="text-xs font-medium text-muted-foreground">Description</Label>
-                  <Textarea id="description" value={props.description || ""} onChange={(e) => updateProp("description", e.target.value)} placeholder="Brief description about your brand" rows={3} className="text-sm resize-none" />
+                  <Label
+                    htmlFor="description"
+                    className="text-xs font-medium text-muted-foreground"
+                  >
+                    Description
+                  </Label>
+                  <Textarea
+                    id="description"
+                    value={props.description || ""}
+                    onChange={(e) => updateProp("description", e.target.value)}
+                    placeholder="Brief description about your brand"
+                    rows={3}
+                    className="text-sm resize-none"
+                  />
                 </div>
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="links" className="border-b-0 border-t border-border/50 first:border-t-0">
+            <AccordionItem
+              value="links"
+              className="border-b-0 border-t border-border/50 first:border-t-0"
+            >
               <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
                 <div className="flex items-center gap-2">
                   <LinkIcon className="w-4 h-4 text-muted-foreground" />
@@ -1097,114 +2277,189 @@ export function PropertiesPanel({
               </AccordionTrigger>
               <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
                 <div className="space-y-1.5">
-                  <Label htmlFor="copyright" className="text-xs font-medium text-muted-foreground">Copyright Text</Label>
-                  <Input id="copyright" value={props.copyright || ""} onChange={(e) => updateProp("copyright", e.target.value)} placeholder="© 2024 All rights reserved" className="h-8 text-sm" />
+                  <Label
+                    htmlFor="copyright"
+                    className="text-xs font-medium text-muted-foreground"
+                  >
+                    Copyright Text
+                  </Label>
+                  <Input
+                    id="copyright"
+                    value={props.copyright || ""}
+                    onChange={(e) => updateProp("copyright", e.target.value)}
+                    placeholder="© 2024 All rights reserved"
+                    className="h-8 text-sm"
+                  />
                 </div>
-                
-                <div className="space-y-3 pt-2">
-                  <div className="text-xs font-medium text-muted-foreground">Footer Sections</div>
-                  <div className="space-y-3">
-                    {(props.sections || []).map((section: any, sectionIndex: number) => (
-                      <div key={sectionIndex} className="space-y-3 p-3 bg-muted border border-border rounded-md">
-                        <div className="flex items-center justify-between pointer-events-none">
-                          <span className="text-xs font-semibold text-muted-foreground">Section {sectionIndex + 1}</span>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-6 w-6 text-destructive hover:text-destructive hover:bg-destructive/10 pointer-events-auto"
-                            onClick={() => {
-                              const newSections = (props.sections || []).filter((_: any, i: number) => i !== sectionIndex);
-                              updateProp("sections", newSections);
-                            }}
-                          >
-                            <span className="sr-only">Delete</span>
-                            &times;
-                          </Button>
-                        </div>
-                        
-                        <div className="space-y-1.5">
-                          <Label className="text-[10px] uppercase text-muted-foreground font-semibold">Title</Label>
-                          <Input
-                            value={section.title || ""}
-                            onChange={(e) => {
-                              const newSections = [...(props.sections || [])];
-                              newSections[sectionIndex] = { ...section, title: e.target.value };
-                              updateProp("sections", newSections);
-                            }}
-                            placeholder="Section title (e.g., Products)"
-                            className="h-7 text-xs bg-background"
-                          />
-                        </div>
 
-                        <div className="space-y-2 pt-1 border-t border-border">
-                          <Label className="text-[10px] uppercase text-muted-foreground font-semibold">Links</Label>
-                          <div className="space-y-2">
-                            {(section.links || []).map((link: any, linkIndex: number) => (
-                              <div key={linkIndex} className="grid grid-cols-[1fr_1fr_auto] gap-2 items-start bg-background p-2 rounded border border-border/50">
-                                <Input
-                                  value={link.text || ""}
-                                  onChange={(e) => {
-                                    const newSections = [...(props.sections || [])];
-                                    const newLinks = [...(section.links || [])];
-                                    newLinks[linkIndex] = { ...link, text: e.target.value };
-                                    newSections[sectionIndex] = { ...section, links: newLinks };
-                                    updateProp("sections", newSections);
-                                  }}
-                                  placeholder="Link text"
-                                  className="h-7 text-xs"
-                                />
-                                <Input
-                                  value={link.href || ""}
-                                  onChange={(e) => {
-                                    const newSections = [...(props.sections || [])];
-                                    const newLinks = [...(section.links || [])];
-                                    newLinks[linkIndex] = { ...link, href: e.target.value };
-                                    newSections[sectionIndex] = { ...section, links: newLinks };
-                                    updateProp("sections", newSections);
-                                  }}
-                                  placeholder="URL"
-                                  className="h-7 text-xs"
-                                />
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-7 w-7 text-destructive hover:text-destructive hover:bg-destructive/10"
-                                  onClick={() => {
-                                    const newSections = [...(props.sections || [])];
-                                    const newLinks = (section.links || []).filter((_: any, i: number) => i !== linkIndex);
-                                    newSections[sectionIndex] = { ...section, links: newLinks };
-                                    updateProp("sections", newSections);
-                                  }}
-                                >
-                                  &times;
-                                </Button>
-                              </div>
-                            ))}
+                <div className="space-y-3 pt-2">
+                  <div className="text-xs font-medium text-muted-foreground">
+                    Footer Sections
+                  </div>
+                  <div className="space-y-3">
+                    {(props.sections || []).map(
+                      (section: any, sectionIndex: number) => (
+                        <div
+                          key={sectionIndex}
+                          className="space-y-3 p-3 bg-muted border border-border rounded-md"
+                        >
+                          <div className="flex items-center justify-between pointer-events-none">
+                            <span className="text-xs font-semibold text-muted-foreground">
+                              Section {sectionIndex + 1}
+                            </span>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6 text-destructive hover:text-destructive hover:bg-destructive/10 pointer-events-auto"
+                              onClick={() => {
+                                const newSections = (
+                                  props.sections || []
+                                ).filter(
+                                  (_: any, i: number) => i !== sectionIndex,
+                                );
+                                updateProp("sections", newSections);
+                              }}
+                            >
+                              <span className="sr-only">Delete</span>
+                              &times;
+                            </Button>
                           </div>
-                          
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="w-full text-[10px] h-6 border-dashed mt-2"
-                            onClick={() => {
-                              const newSections = [...(props.sections || [])];
-                              const newLinks = [...(section.links || []), { text: "Link", href: "#" }];
-                              newSections[sectionIndex] = { ...section, links: newLinks };
-                              updateProp("sections", newSections);
-                            }}
-                          >
-                            + Add section link
-                          </Button>
+
+                          <div className="space-y-1.5">
+                            <Label className="text-[10px] uppercase text-muted-foreground font-semibold">
+                              Title
+                            </Label>
+                            <Input
+                              value={section.title || ""}
+                              onChange={(e) => {
+                                const newSections = [...(props.sections || [])];
+                                newSections[sectionIndex] = {
+                                  ...section,
+                                  title: e.target.value,
+                                };
+                                updateProp("sections", newSections);
+                              }}
+                              placeholder="Section title (e.g., Products)"
+                              className="h-7 text-xs bg-background"
+                            />
+                          </div>
+
+                          <div className="space-y-2 pt-1 border-t border-border">
+                            <Label className="text-[10px] uppercase text-muted-foreground font-semibold">
+                              Links
+                            </Label>
+                            <div className="space-y-2">
+                              {(section.links || []).map(
+                                (link: any, linkIndex: number) => (
+                                  <div
+                                    key={linkIndex}
+                                    className="grid grid-cols-[1fr_1fr_auto] gap-2 items-start bg-background p-2 rounded border border-border/50"
+                                  >
+                                    <Input
+                                      value={link.text || ""}
+                                      onChange={(e) => {
+                                        const newSections = [
+                                          ...(props.sections || []),
+                                        ];
+                                        const newLinks = [
+                                          ...(section.links || []),
+                                        ];
+                                        newLinks[linkIndex] = {
+                                          ...link,
+                                          text: e.target.value,
+                                        };
+                                        newSections[sectionIndex] = {
+                                          ...section,
+                                          links: newLinks,
+                                        };
+                                        updateProp("sections", newSections);
+                                      }}
+                                      placeholder="Link text"
+                                      className="h-7 text-xs"
+                                    />
+                                    <Input
+                                      value={link.href || ""}
+                                      onChange={(e) => {
+                                        const newSections = [
+                                          ...(props.sections || []),
+                                        ];
+                                        const newLinks = [
+                                          ...(section.links || []),
+                                        ];
+                                        newLinks[linkIndex] = {
+                                          ...link,
+                                          href: e.target.value,
+                                        };
+                                        newSections[sectionIndex] = {
+                                          ...section,
+                                          links: newLinks,
+                                        };
+                                        updateProp("sections", newSections);
+                                      }}
+                                      placeholder="URL"
+                                      className="h-7 text-xs"
+                                    />
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-7 w-7 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                      onClick={() => {
+                                        const newSections = [
+                                          ...(props.sections || []),
+                                        ];
+                                        const newLinks = (
+                                          section.links || []
+                                        ).filter(
+                                          (_: any, i: number) =>
+                                            i !== linkIndex,
+                                        );
+                                        newSections[sectionIndex] = {
+                                          ...section,
+                                          links: newLinks,
+                                        };
+                                        updateProp("sections", newSections);
+                                      }}
+                                    >
+                                      &times;
+                                    </Button>
+                                  </div>
+                                ),
+                              )}
+                            </div>
+
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="w-full text-[10px] h-6 border-dashed mt-2"
+                              onClick={() => {
+                                const newSections = [...(props.sections || [])];
+                                const newLinks = [
+                                  ...(section.links || []),
+                                  { text: "Link", href: "#" },
+                                ];
+                                newSections[sectionIndex] = {
+                                  ...section,
+                                  links: newLinks,
+                                };
+                                updateProp("sections", newSections);
+                              }}
+                            >
+                              + Add section link
+                            </Button>
+                          </div>
                         </div>
-                      </div>
-                    ))}
-                    
+                      ),
+                    )}
+
                     <Button
                       variant="outline"
                       size="sm"
                       className="w-full text-xs h-8 border-dashed"
                       onClick={() => {
-                        const newSections = [...(props.sections || []), { title: "New Section", links: [] }];
+                        const newSections = [
+                          ...(props.sections || []),
+                          { title: "New Section", links: [] },
+                        ];
                         updateProp("sections", newSections);
                       }}
                     >
@@ -1214,8 +2469,11 @@ export function PropertiesPanel({
                 </div>
               </AccordionContent>
             </AccordionItem>
-            
-            <AccordionItem value="socials" className="border-b-0 border-t border-border/50 first:border-t-0">
+
+            <AccordionItem
+              value="socials"
+              className="border-b-0 border-t border-border/50 first:border-t-0"
+            >
               <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
                 <div className="flex items-center gap-2">
                   <LinkIcon className="w-4 h-4 text-muted-foreground" />
@@ -1224,74 +2482,105 @@ export function PropertiesPanel({
               </AccordionTrigger>
               <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
                 <div className="space-y-3">
-                  {(props.socialLinks || []).map((social: any, index: number) => (
-                    <div key={index} className="space-y-3 p-3 bg-muted border border-border rounded-md">
-                      <div className="flex items-center justify-between pointer-events-none">
-                        <span className="text-xs font-semibold text-muted-foreground">Link #{index + 1}</span>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6 text-destructive hover:text-destructive hover:bg-destructive/10 pointer-events-auto"
-                          onClick={() => {
-                            const newSocials = (props.socialLinks || []).filter((_: any, i: number) => i !== index);
-                            updateProp("socialLinks", newSocials);
-                          }}
-                        >
-                          <span className="sr-only">Delete</span>
-                          &times;
-                        </Button>
-                      </div>
-                      
-                      <div className="space-y-1.5">
-                        <Label className="text-[10px] uppercase text-muted-foreground font-semibold">Platform</Label>
-                        <Input
-                          value={social.platform || ""}
-                          onChange={(e) => {
-                            const newSocials = [...(props.socialLinks || [])];
-                            newSocials[index] = { ...social, platform: e.target.value };
-                            updateProp("socialLinks", newSocials);
-                          }}
-                          placeholder="Platform name (e.g., Twitter)"
-                          className="h-7 text-xs bg-background"
-                        />
-                      </div>
+                  {(props.socialLinks || []).map(
+                    (social: any, index: number) => (
+                      <div
+                        key={index}
+                        className="space-y-3 p-3 bg-muted border border-border rounded-md"
+                      >
+                        <div className="flex items-center justify-between pointer-events-none">
+                          <span className="text-xs font-semibold text-muted-foreground">
+                            Link #{index + 1}
+                          </span>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 text-destructive hover:text-destructive hover:bg-destructive/10 pointer-events-auto"
+                            onClick={() => {
+                              const newSocials = (
+                                props.socialLinks || []
+                              ).filter((_: any, i: number) => i !== index);
+                              updateProp("socialLinks", newSocials);
+                            }}
+                          >
+                            <span className="sr-only">Delete</span>
+                            &times;
+                          </Button>
+                        </div>
 
-                      <div className="grid grid-cols-2 gap-2">
                         <div className="space-y-1.5">
-                          <Label className="text-[10px] uppercase text-muted-foreground font-semibold">URL</Label>
+                          <Label className="text-[10px] uppercase text-muted-foreground font-semibold">
+                            Platform
+                          </Label>
                           <Input
-                            value={social.href || ""}
+                            value={social.platform || ""}
                             onChange={(e) => {
                               const newSocials = [...(props.socialLinks || [])];
-                              newSocials[index] = { ...social, href: e.target.value };
+                              newSocials[index] = {
+                                ...social,
+                                platform: e.target.value,
+                              };
                               updateProp("socialLinks", newSocials);
                             }}
-                            placeholder="URL"
+                            placeholder="Platform name (e.g., Twitter)"
                             className="h-7 text-xs bg-background"
                           />
                         </div>
-                        <div className="space-y-1.5">
-                          <Label className="text-[10px] uppercase text-muted-foreground font-semibold">Icon</Label>
-                          <Input
-                            value={social.icon || ""}
-                            onChange={(e) => {
-                              const newSocials = [...(props.socialLinks || [])];
-                              newSocials[index] = { ...social, icon: e.target.value };
-                              updateProp("socialLinks", newSocials);
-                            }}
-                            placeholder="Emoji or text"
-                            className="h-7 text-xs bg-background"
-                          />
+
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="space-y-1.5">
+                            <Label className="text-[10px] uppercase text-muted-foreground font-semibold">
+                              URL
+                            </Label>
+                            <Input
+                              value={social.href || ""}
+                              onChange={(e) => {
+                                const newSocials = [
+                                  ...(props.socialLinks || []),
+                                ];
+                                newSocials[index] = {
+                                  ...social,
+                                  href: e.target.value,
+                                };
+                                updateProp("socialLinks", newSocials);
+                              }}
+                              placeholder="URL"
+                              className="h-7 text-xs bg-background"
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <Label className="text-[10px] uppercase text-muted-foreground font-semibold">
+                              Icon
+                            </Label>
+                            <Input
+                              value={social.icon || ""}
+                              onChange={(e) => {
+                                const newSocials = [
+                                  ...(props.socialLinks || []),
+                                ];
+                                newSocials[index] = {
+                                  ...social,
+                                  icon: e.target.value,
+                                };
+                                updateProp("socialLinks", newSocials);
+                              }}
+                              placeholder="Emoji or text"
+                              className="h-7 text-xs bg-background"
+                            />
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ),
+                  )}
                   <Button
                     variant="outline"
                     size="sm"
                     className="w-full text-xs h-8 border-dashed"
                     onClick={() => {
-                      const newSocials = [...(props.socialLinks || []), { platform: "Social", href: "#", icon: "🔗" }];
+                      const newSocials = [
+                        ...(props.socialLinks || []),
+                        { platform: "Social", href: "#", icon: "🔗" },
+                      ];
                       updateProp("socialLinks", newSocials);
                     }}
                   >
@@ -1306,8 +2595,15 @@ export function PropertiesPanel({
 
       case "Container":
         return (
-          <Accordion type="multiple" defaultValue={["layout", "colors", "dimensions"]} className="w-full">
-            <AccordionItem value="layout" className="border-b-0 border-t border-border/50 first:border-t-0">
+          <Accordion
+            type="multiple"
+            defaultValue={["layout", "colors", "dimensions"]}
+            className="w-full"
+          >
+            <AccordionItem
+              value="layout"
+              className="border-b-0 border-t border-border/50 first:border-t-0"
+            >
               <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
                 <div className="flex items-center gap-2">
                   <Layout className="w-4 h-4 text-muted-foreground" />
@@ -1316,38 +2612,133 @@ export function PropertiesPanel({
               </AccordionTrigger>
               <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
                 <div className="space-y-1.5">
-                  <Label htmlFor="maxWidth" className="text-xs font-medium text-muted-foreground">Max Width</Label>
+                  <Label
+                    htmlFor="maxWidth"
+                    className="text-xs font-medium text-muted-foreground"
+                  >
+                    Max Width
+                  </Label>
                   <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
-                    <select id="maxWidth" value={props.maxWidth || "xl"} onChange={(e) => updateProp("maxWidth", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
-                      <option className="bg-background text-foreground" value="sm">Small (640px)</option>
-                      <option className="bg-background text-foreground" value="md">Medium (768px)</option>
-                      <option className="bg-background text-foreground" value="lg">Large (1024px)</option>
-                      <option className="bg-background text-foreground" value="xl">Extra Large (1280px)</option>
-                      <option className="bg-background text-foreground" value="2xl">2X Large (1536px)</option>
-                      <option className="bg-background text-foreground" value="full">Full Width</option>
+                    <select
+                      id="maxWidth"
+                      value={props.maxWidth || "xl"}
+                      onChange={(e) => updateProp("maxWidth", e.target.value)}
+                      className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none"
+                    >
+                      <option
+                        className="bg-background text-foreground"
+                        value="sm"
+                      >
+                        Small (640px)
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="md"
+                      >
+                        Medium (768px)
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="lg"
+                      >
+                        Large (1024px)
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="xl"
+                      >
+                        Extra Large (1280px)
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="2xl"
+                      >
+                        2X Large (1536px)
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="full"
+                      >
+                        Full Width
+                      </option>
                     </select>
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="padding" className="text-xs font-medium text-muted-foreground">Padding</Label>
+                  <Label
+                    htmlFor="padding"
+                    className="text-xs font-medium text-muted-foreground"
+                  >
+                    Padding
+                  </Label>
                   <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
-                    <select id="padding" value={props.padding || "md"} onChange={(e) => updateProp("padding", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
-                      <option className="bg-background text-foreground" value="none">None</option>
-                      <option className="bg-background text-foreground" value="sm">Small</option>
-                      <option className="bg-background text-foreground" value="md">Medium</option>
-                      <option className="bg-background text-foreground" value="lg">Large</option>
-                      <option className="bg-background text-foreground" value="xl">Extra Large</option>
+                    <select
+                      id="padding"
+                      value={props.padding || "md"}
+                      onChange={(e) => updateProp("padding", e.target.value)}
+                      className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none"
+                    >
+                      <option
+                        className="bg-background text-foreground"
+                        value="none"
+                      >
+                        None
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="sm"
+                      >
+                        Small
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="md"
+                      >
+                        Medium
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="lg"
+                      >
+                        Large
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="xl"
+                      >
+                        Extra Large
+                      </option>
                     </select>
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="display" className="text-xs font-medium text-muted-foreground">Display</Label>
+                  <Label
+                    htmlFor="display"
+                    className="text-xs font-medium text-muted-foreground"
+                  >
+                    Display
+                  </Label>
                   <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
-                    <select id="display" value={props.display || "block"} onChange={(e) => updateProp("display", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
-                      <option className="bg-background text-foreground" value="block">Block</option>
-                      <option className="bg-background text-foreground" value="flex">Flex</option>
+                    <select
+                      id="display"
+                      value={props.display || "block"}
+                      onChange={(e) => updateProp("display", e.target.value)}
+                      className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none"
+                    >
+                      <option
+                        className="bg-background text-foreground"
+                        value="block"
+                      >
+                        Block
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="flex"
+                      >
+                        Flex
+                      </option>
                     </select>
                   </div>
                 </div>
@@ -1356,24 +2747,83 @@ export function PropertiesPanel({
                   <>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-1.5">
-                        <Label htmlFor="flexDirection" className="text-xs font-medium text-muted-foreground">Direction</Label>
+                        <Label
+                          htmlFor="flexDirection"
+                          className="text-xs font-medium text-muted-foreground"
+                        >
+                          Direction
+                        </Label>
                         <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
-                          <select id="flexDirection" value={props.flexDirection || "row"} onChange={(e) => updateProp("flexDirection", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
-                            <option className="bg-background text-foreground" value="row">Row</option>
-                            <option className="bg-background text-foreground" value="column">Column</option>
-                            <option className="bg-background text-foreground" value="row-reverse">Row Reverse</option>
-                            <option className="bg-background text-foreground" value="column-reverse">Column Reverse</option>
+                          <select
+                            id="flexDirection"
+                            value={props.flexDirection || "row"}
+                            onChange={(e) =>
+                              updateProp("flexDirection", e.target.value)
+                            }
+                            className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none"
+                          >
+                            <option
+                              className="bg-background text-foreground"
+                              value="row"
+                            >
+                              Row
+                            </option>
+                            <option
+                              className="bg-background text-foreground"
+                              value="column"
+                            >
+                              Column
+                            </option>
+                            <option
+                              className="bg-background text-foreground"
+                              value="row-reverse"
+                            >
+                              Row Reverse
+                            </option>
+                            <option
+                              className="bg-background text-foreground"
+                              value="column-reverse"
+                            >
+                              Column Reverse
+                            </option>
                           </select>
                         </div>
                       </div>
 
                       <div className="space-y-1.5">
-                        <Label htmlFor="flexWrap" className="text-xs font-medium text-muted-foreground">Wrap</Label>
+                        <Label
+                          htmlFor="flexWrap"
+                          className="text-xs font-medium text-muted-foreground"
+                        >
+                          Wrap
+                        </Label>
                         <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
-                          <select id="flexWrap" value={props.flexWrap || "nowrap"} onChange={(e) => updateProp("flexWrap", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
-                            <option className="bg-background text-foreground" value="nowrap">No Wrap</option>
-                            <option className="bg-background text-foreground" value="wrap">Wrap</option>
-                            <option className="bg-background text-foreground" value="wrap-reverse">Wrap Reverse</option>
+                          <select
+                            id="flexWrap"
+                            value={props.flexWrap || "nowrap"}
+                            onChange={(e) =>
+                              updateProp("flexWrap", e.target.value)
+                            }
+                            className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none"
+                          >
+                            <option
+                              className="bg-background text-foreground"
+                              value="nowrap"
+                            >
+                              No Wrap
+                            </option>
+                            <option
+                              className="bg-background text-foreground"
+                              value="wrap"
+                            >
+                              Wrap
+                            </option>
+                            <option
+                              className="bg-background text-foreground"
+                              value="wrap-reverse"
+                            >
+                              Wrap Reverse
+                            </option>
                           </select>
                         </div>
                       </div>
@@ -1381,42 +2831,156 @@ export function PropertiesPanel({
 
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-1.5">
-                        <Label htmlFor="justifyContent" className="text-xs font-medium text-muted-foreground">Justify</Label>
+                        <Label
+                          htmlFor="justifyContent"
+                          className="text-xs font-medium text-muted-foreground"
+                        >
+                          Justify
+                        </Label>
                         <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
-                          <select id="justifyContent" value={props.justifyContent || "start"} onChange={(e) => updateProp("justifyContent", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
-                            <option className="bg-background text-foreground" value="start">Start</option>
-                            <option className="bg-background text-foreground" value="center">Center</option>
-                            <option className="bg-background text-foreground" value="end">End</option>
-                            <option className="bg-background text-foreground" value="between">Space Between</option>
-                            <option className="bg-background text-foreground" value="around">Space Around</option>
-                            <option className="bg-background text-foreground" value="evenly">Space Evenly</option>
+                          <select
+                            id="justifyContent"
+                            value={props.justifyContent || "start"}
+                            onChange={(e) =>
+                              updateProp("justifyContent", e.target.value)
+                            }
+                            className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none"
+                          >
+                            <option
+                              className="bg-background text-foreground"
+                              value="start"
+                            >
+                              Start
+                            </option>
+                            <option
+                              className="bg-background text-foreground"
+                              value="center"
+                            >
+                              Center
+                            </option>
+                            <option
+                              className="bg-background text-foreground"
+                              value="end"
+                            >
+                              End
+                            </option>
+                            <option
+                              className="bg-background text-foreground"
+                              value="between"
+                            >
+                              Space Between
+                            </option>
+                            <option
+                              className="bg-background text-foreground"
+                              value="around"
+                            >
+                              Space Around
+                            </option>
+                            <option
+                              className="bg-background text-foreground"
+                              value="evenly"
+                            >
+                              Space Evenly
+                            </option>
                           </select>
                         </div>
                       </div>
 
                       <div className="space-y-1.5">
-                        <Label htmlFor="alignItems" className="text-xs font-medium text-muted-foreground">Align</Label>
+                        <Label
+                          htmlFor="alignItems"
+                          className="text-xs font-medium text-muted-foreground"
+                        >
+                          Align
+                        </Label>
                         <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
-                          <select id="alignItems" value={props.alignItems || "start"} onChange={(e) => updateProp("alignItems", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
-                            <option className="bg-background text-foreground" value="start">Start</option>
-                            <option className="bg-background text-foreground" value="center">Center</option>
-                            <option className="bg-background text-foreground" value="end">End</option>
-                            <option className="bg-background text-foreground" value="stretch">Stretch</option>
-                            <option className="bg-background text-foreground" value="baseline">Baseline</option>
+                          <select
+                            id="alignItems"
+                            value={props.alignItems || "start"}
+                            onChange={(e) =>
+                              updateProp("alignItems", e.target.value)
+                            }
+                            className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none"
+                          >
+                            <option
+                              className="bg-background text-foreground"
+                              value="start"
+                            >
+                              Start
+                            </option>
+                            <option
+                              className="bg-background text-foreground"
+                              value="center"
+                            >
+                              Center
+                            </option>
+                            <option
+                              className="bg-background text-foreground"
+                              value="end"
+                            >
+                              End
+                            </option>
+                            <option
+                              className="bg-background text-foreground"
+                              value="stretch"
+                            >
+                              Stretch
+                            </option>
+                            <option
+                              className="bg-background text-foreground"
+                              value="baseline"
+                            >
+                              Baseline
+                            </option>
                           </select>
                         </div>
                       </div>
                     </div>
 
                     <div className="space-y-1.5">
-                      <Label htmlFor="gap" className="text-xs font-medium text-muted-foreground">Gap</Label>
+                      <Label
+                        htmlFor="gap"
+                        className="text-xs font-medium text-muted-foreground"
+                      >
+                        Gap
+                      </Label>
                       <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
-                        <select id="gap" value={props.gap || "none"} onChange={(e) => updateProp("gap", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
-                          <option className="bg-background text-foreground" value="none">None</option>
-                          <option className="bg-background text-foreground" value="sm">Small</option>
-                          <option className="bg-background text-foreground" value="md">Medium</option>
-                          <option className="bg-background text-foreground" value="lg">Large</option>
-                          <option className="bg-background text-foreground" value="xl">Extra Large</option>
+                        <select
+                          id="gap"
+                          value={props.gap || "none"}
+                          onChange={(e) => updateProp("gap", e.target.value)}
+                          className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none"
+                        >
+                          <option
+                            className="bg-background text-foreground"
+                            value="none"
+                          >
+                            None
+                          </option>
+                          <option
+                            className="bg-background text-foreground"
+                            value="sm"
+                          >
+                            Small
+                          </option>
+                          <option
+                            className="bg-background text-foreground"
+                            value="md"
+                          >
+                            Medium
+                          </option>
+                          <option
+                            className="bg-background text-foreground"
+                            value="lg"
+                          >
+                            Large
+                          </option>
+                          <option
+                            className="bg-background text-foreground"
+                            value="xl"
+                          >
+                            Extra Large
+                          </option>
                         </select>
                       </div>
                     </div>
@@ -1425,25 +2989,89 @@ export function PropertiesPanel({
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <Label htmlFor="overflowX" className="text-xs font-medium text-muted-foreground">Overflow X</Label>
+                    <Label
+                      htmlFor="overflowX"
+                      className="text-xs font-medium text-muted-foreground"
+                    >
+                      Overflow X
+                    </Label>
                     <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
-                      <select id="overflowX" value={props.overflowX || "visible"} onChange={(e) => updateProp("overflowX", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
-                        <option className="bg-background text-foreground" value="visible">Visible</option>
-                        <option className="bg-background text-foreground" value="hidden">Hidden</option>
-                        <option className="bg-background text-foreground" value="scroll">Scroll</option>
-                        <option className="bg-background text-foreground" value="auto">Auto</option>
+                      <select
+                        id="overflowX"
+                        value={props.overflowX || "visible"}
+                        onChange={(e) =>
+                          updateProp("overflowX", e.target.value)
+                        }
+                        className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none"
+                      >
+                        <option
+                          className="bg-background text-foreground"
+                          value="visible"
+                        >
+                          Visible
+                        </option>
+                        <option
+                          className="bg-background text-foreground"
+                          value="hidden"
+                        >
+                          Hidden
+                        </option>
+                        <option
+                          className="bg-background text-foreground"
+                          value="scroll"
+                        >
+                          Scroll
+                        </option>
+                        <option
+                          className="bg-background text-foreground"
+                          value="auto"
+                        >
+                          Auto
+                        </option>
                       </select>
                     </div>
                   </div>
 
                   <div className="space-y-1.5">
-                    <Label htmlFor="overflowY" className="text-xs font-medium text-muted-foreground">Overflow Y</Label>
+                    <Label
+                      htmlFor="overflowY"
+                      className="text-xs font-medium text-muted-foreground"
+                    >
+                      Overflow Y
+                    </Label>
                     <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
-                      <select id="overflowY" value={props.overflowY || "visible"} onChange={(e) => updateProp("overflowY", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
-                        <option className="bg-background text-foreground" value="visible">Visible</option>
-                        <option className="bg-background text-foreground" value="hidden">Hidden</option>
-                        <option className="bg-background text-foreground" value="scroll">Scroll</option>
-                        <option className="bg-background text-foreground" value="auto">Auto</option>
+                      <select
+                        id="overflowY"
+                        value={props.overflowY || "visible"}
+                        onChange={(e) =>
+                          updateProp("overflowY", e.target.value)
+                        }
+                        className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none"
+                      >
+                        <option
+                          className="bg-background text-foreground"
+                          value="visible"
+                        >
+                          Visible
+                        </option>
+                        <option
+                          className="bg-background text-foreground"
+                          value="hidden"
+                        >
+                          Hidden
+                        </option>
+                        <option
+                          className="bg-background text-foreground"
+                          value="scroll"
+                        >
+                          Scroll
+                        </option>
+                        <option
+                          className="bg-background text-foreground"
+                          value="auto"
+                        >
+                          Auto
+                        </option>
                       </select>
                     </div>
                   </div>
@@ -1456,8 +3084,15 @@ export function PropertiesPanel({
 
       case "Grid":
         return (
-          <Accordion type="multiple" defaultValue={["layout", "colors", "dimensions"]} className="w-full">
-            <AccordionItem value="layout" className="border-b-0 border-t border-border/50 first:border-t-0">
+          <Accordion
+            type="multiple"
+            defaultValue={["layout", "colors", "dimensions"]}
+            className="w-full"
+          >
+            <AccordionItem
+              value="layout"
+              className="border-b-0 border-t border-border/50 first:border-t-0"
+            >
               <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
                 <div className="flex items-center gap-2">
                   <Layout className="w-4 h-4 text-muted-foreground" />
@@ -1466,42 +3101,142 @@ export function PropertiesPanel({
               </AccordionTrigger>
               <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
                 <div className="space-y-1.5">
-                  <Label htmlFor="columns" className="text-xs font-medium text-muted-foreground">Columns</Label>
+                  <Label
+                    htmlFor="columns"
+                    className="text-xs font-medium text-muted-foreground"
+                  >
+                    Columns
+                  </Label>
                   <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
-                    <select id="columns" value={props.columns || 3} onChange={(e) => updateProp("columns", parseInt(e.target.value))} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
-                      <option className="bg-background text-foreground" value={1}>1 Column</option>
-                      <option className="bg-background text-foreground" value={2}>2 Columns</option>
-                      <option className="bg-background text-foreground" value={3}>3 Columns</option>
-                      <option className="bg-background text-foreground" value={4}>4 Columns</option>
-                      <option className="bg-background text-foreground" value={6}>6 Columns</option>
+                    <select
+                      id="columns"
+                      value={props.columns || 3}
+                      onChange={(e) =>
+                        updateProp("columns", parseInt(e.target.value))
+                      }
+                      className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none"
+                    >
+                      <option
+                        className="bg-background text-foreground"
+                        value={1}
+                      >
+                        1 Column
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value={2}
+                      >
+                        2 Columns
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value={3}
+                      >
+                        3 Columns
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value={4}
+                      >
+                        4 Columns
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value={6}
+                      >
+                        6 Columns
+                      </option>
                     </select>
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="gap" className="text-xs font-medium text-muted-foreground">Gap</Label>
+                  <Label
+                    htmlFor="gap"
+                    className="text-xs font-medium text-muted-foreground"
+                  >
+                    Gap
+                  </Label>
                   <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
-                    <select id="gap" value={props.gap || "md"} onChange={(e) => updateProp("gap", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
-                      <option className="bg-background text-foreground" value="none">None</option>
-                      <option className="bg-background text-foreground" value="sm">Small</option>
-                      <option className="bg-background text-foreground" value="md">Medium</option>
-                      <option className="bg-background text-foreground" value="lg">Large</option>
-                      <option className="bg-background text-foreground" value="xl">Extra Large</option>
-                      <option className="bg-background text-foreground" value="custom">Custom</option>
+                    <select
+                      id="gap"
+                      value={props.gap || "md"}
+                      onChange={(e) => updateProp("gap", e.target.value)}
+                      className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none"
+                    >
+                      <option
+                        className="bg-background text-foreground"
+                        value="none"
+                      >
+                        None
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="sm"
+                      >
+                        Small
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="md"
+                      >
+                        Medium
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="lg"
+                      >
+                        Large
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="xl"
+                      >
+                        Extra Large
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="custom"
+                      >
+                        Custom
+                      </option>
                     </select>
                   </div>
                 </div>
 
                 {props.gap === "custom" && (
                   <div className="space-y-1.5">
-                    <Label htmlFor="gapCustom" className="text-xs font-medium text-muted-foreground">Custom Gap</Label>
-                    <Input id="gapCustom" value={props.gapCustom || ""} onChange={(e) => updateProp("gapCustom", e.target.value)} placeholder="e.g. 20px, 1.5rem" className="h-8 text-xs" />
+                    <Label
+                      htmlFor="gapCustom"
+                      className="text-xs font-medium text-muted-foreground"
+                    >
+                      Custom Gap
+                    </Label>
+                    <Input
+                      id="gapCustom"
+                      value={props.gapCustom || ""}
+                      onChange={(e) => updateProp("gapCustom", e.target.value)}
+                      placeholder="e.g. 20px, 1.5rem"
+                      className="h-8 text-xs"
+                    />
                   </div>
                 )}
 
                 <div className="flex items-center justify-between p-2 rounded-md bg-muted border border-border/50">
-                  <Label htmlFor="responsive" className="text-xs font-medium text-muted-foreground cursor-pointer">Responsive (Stack on mobile)</Label>
-                  <Switch id="responsive" checked={props.responsive !== false} onCheckedChange={(checked) => updateProp("responsive", checked)} className="scale-75 origin-right" />
+                  <Label
+                    htmlFor="responsive"
+                    className="text-xs font-medium text-muted-foreground cursor-pointer"
+                  >
+                    Responsive (Stack on mobile)
+                  </Label>
+                  <Switch
+                    id="responsive"
+                    checked={props.responsive !== false}
+                    onCheckedChange={(checked) =>
+                      updateProp("responsive", checked)
+                    }
+                    className="scale-75 origin-right"
+                  />
                 </div>
               </AccordionContent>
             </AccordionItem>
@@ -1511,8 +3246,15 @@ export function PropertiesPanel({
 
       case "Section":
         return (
-          <Accordion type="multiple" defaultValue={["layout", "colors", "dimensions"]} className="w-full">
-            <AccordionItem value="layout" className="border-b-0 border-t border-border/50 first:border-t-0">
+          <Accordion
+            type="multiple"
+            defaultValue={["layout", "colors", "dimensions"]}
+            className="w-full"
+          >
+            <AccordionItem
+              value="layout"
+              className="border-b-0 border-t border-border/50 first:border-t-0"
+            >
               <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
                 <div className="flex items-center gap-2">
                   <Layout className="w-4 h-4 text-muted-foreground" />
@@ -1521,28 +3263,103 @@ export function PropertiesPanel({
               </AccordionTrigger>
               <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
                 <div className="space-y-1.5">
-                  <Label htmlFor="padding" className="text-xs font-medium text-muted-foreground">Padding</Label>
+                  <Label
+                    htmlFor="padding"
+                    className="text-xs font-medium text-muted-foreground"
+                  >
+                    Padding
+                  </Label>
                   <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
-                    <select id="padding" value={props.padding || "lg"} onChange={(e) => updateProp("padding", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
-                      <option className="bg-background text-foreground" value="none">None</option>
-                      <option className="bg-background text-foreground" value="sm">Small</option>
-                      <option className="bg-background text-foreground" value="md">Medium</option>
-                      <option className="bg-background text-foreground" value="lg">Large</option>
-                      <option className="bg-background text-foreground" value="xl">Extra Large</option>
+                    <select
+                      id="padding"
+                      value={props.padding || "lg"}
+                      onChange={(e) => updateProp("padding", e.target.value)}
+                      className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none"
+                    >
+                      <option
+                        className="bg-background text-foreground"
+                        value="none"
+                      >
+                        None
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="sm"
+                      >
+                        Small
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="md"
+                      >
+                        Medium
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="lg"
+                      >
+                        Large
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="xl"
+                      >
+                        Extra Large
+                      </option>
                     </select>
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="maxWidth" className="text-xs font-medium text-muted-foreground">Max Width</Label>
+                  <Label
+                    htmlFor="maxWidth"
+                    className="text-xs font-medium text-muted-foreground"
+                  >
+                    Max Width
+                  </Label>
                   <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
-                    <select id="maxWidth" value={props.maxWidth || "xl"} onChange={(e) => updateProp("maxWidth", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
-                      <option className="bg-background text-foreground" value="sm">Small (640px)</option>
-                      <option className="bg-background text-foreground" value="md">Medium (768px)</option>
-                      <option className="bg-background text-foreground" value="lg">Large (1024px)</option>
-                      <option className="bg-background text-foreground" value="xl">Extra Large (1280px)</option>
-                      <option className="bg-background text-foreground" value="2xl">2X Large (1536px)</option>
-                      <option className="bg-background text-foreground" value="full">Full Width</option>
+                    <select
+                      id="maxWidth"
+                      value={props.maxWidth || "xl"}
+                      onChange={(e) => updateProp("maxWidth", e.target.value)}
+                      className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none"
+                    >
+                      <option
+                        className="bg-background text-foreground"
+                        value="sm"
+                      >
+                        Small (640px)
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="md"
+                      >
+                        Medium (768px)
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="lg"
+                      >
+                        Large (1024px)
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="xl"
+                      >
+                        Extra Large (1280px)
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="2xl"
+                      >
+                        2X Large (1536px)
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="full"
+                      >
+                        Full Width
+                      </option>
                     </select>
                   </div>
                 </div>
@@ -1554,8 +3371,15 @@ export function PropertiesPanel({
 
       case "Video":
         return (
-          <Accordion type="multiple" defaultValue={["settings", "fill", "dimensions"]} className="w-full">
-            <AccordionItem value="settings" className="border-b-0 border-t border-border/50 first:border-t-0">
+          <Accordion
+            type="multiple"
+            defaultValue={["settings", "fill", "dimensions"]}
+            className="w-full"
+          >
+            <AccordionItem
+              value="settings"
+              className="border-b-0 border-t border-border/50 first:border-t-0"
+            >
               <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
                 <div className="flex items-center gap-2">
                   <Settings2 className="w-4 h-4 text-muted-foreground" />
@@ -1608,7 +3432,9 @@ export function PropertiesPanel({
                   <Switch
                     id="autoplay"
                     checked={props.autoplay || false}
-                    onCheckedChange={(checked) => updateProp("autoplay", checked)}
+                    onCheckedChange={(checked) =>
+                      updateProp("autoplay", checked)
+                    }
                   />
                   <Label htmlFor="autoplay">Autoplay</Label>
                 </div>
@@ -1617,7 +3443,9 @@ export function PropertiesPanel({
                   <Switch
                     id="controls"
                     checked={props.controls !== false}
-                    onCheckedChange={(checked) => updateProp("controls", checked)}
+                    onCheckedChange={(checked) =>
+                      updateProp("controls", checked)
+                    }
                   />
                   <Label htmlFor="controls">Show Controls</Label>
                 </div>
@@ -1629,8 +3457,15 @@ export function PropertiesPanel({
 
       case "Form":
         return (
-          <Accordion type="multiple" defaultValue={["settings", "fill", "dimensions"]} className="w-full">
-            <AccordionItem value="settings" className="border-b-0 border-t border-border/50 first:border-t-0">
+          <Accordion
+            type="multiple"
+            defaultValue={["settings", "fill", "dimensions"]}
+            className="w-full"
+          >
+            <AccordionItem
+              value="settings"
+              className="border-b-0 border-t border-border/50 first:border-t-0"
+            >
               <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
                 <div className="flex items-center gap-2">
                   <Settings2 className="w-4 h-4 text-muted-foreground" />
@@ -1697,8 +3532,18 @@ export function PropertiesPanel({
                     onChange={(e) => updateProp("method", e.target.value)}
                     className="w-full p-2 border rounded-md"
                   >
-                    <option className="bg-background text-foreground" value="POST">POST</option>
-                    <option className="bg-background text-foreground" value="GET">GET</option>
+                    <option
+                      className="bg-background text-foreground"
+                      value="POST"
+                    >
+                      POST
+                    </option>
+                    <option
+                      className="bg-background text-foreground"
+                      value="GET"
+                    >
+                      GET
+                    </option>
                   </select>
                 </div>
               </AccordionContent>
@@ -1709,8 +3554,15 @@ export function PropertiesPanel({
 
       case "Accordion":
         return (
-          <Accordion type="multiple" defaultValue={["items", "colors", "dimensions"]} className="w-full">
-            <AccordionItem value="items" className="border-b-0 border-t border-border/50 first:border-t-0">
+          <Accordion
+            type="multiple"
+            defaultValue={["items", "colors", "dimensions"]}
+            className="w-full"
+          >
+            <AccordionItem
+              value="items"
+              className="border-b-0 border-t border-border/50 first:border-t-0"
+            >
               <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
                 <div className="flex items-center gap-2">
                   <Settings2 className="w-4 h-4 text-muted-foreground" />
@@ -1720,8 +3572,13 @@ export function PropertiesPanel({
               <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
                 <div className="space-y-4">
                   {(props.items || []).map((item: any, index: number) => (
-                    <div key={index} className="space-y-2 p-3 border rounded-md bg-muted/30">
-                      <Label className="text-xs text-muted-foreground w-full">Title</Label>
+                    <div
+                      key={index}
+                      className="space-y-2 p-3 border rounded-md bg-muted/30"
+                    >
+                      <Label className="text-xs text-muted-foreground w-full">
+                        Title
+                      </Label>
                       <Input
                         value={item.title || ""}
                         onChange={(e) => {
@@ -1732,12 +3589,17 @@ export function PropertiesPanel({
                         placeholder="Item title"
                         className="text-xs h-8"
                       />
-                      <Label className="text-xs text-muted-foreground w-full mt-2">Content</Label>
+                      <Label className="text-xs text-muted-foreground w-full mt-2">
+                        Content
+                      </Label>
                       <Textarea
                         value={item.content || ""}
                         onChange={(e) => {
                           const newItems = [...(props.items || [])];
-                          newItems[index] = { ...item, content: e.target.value };
+                          newItems[index] = {
+                            ...item,
+                            content: e.target.value,
+                          };
                           updateProp("items", newItems);
                         }}
                         placeholder="Item content"
@@ -1751,7 +3613,7 @@ export function PropertiesPanel({
                           className="h-7 text-xs px-2"
                           onClick={() => {
                             const newItems = (props.items || []).filter(
-                              (_: any, i: number) => i !== index
+                              (_: any, i: number) => i !== index,
                             );
                             updateProp("items", newItems);
                           }}
@@ -1784,8 +3646,15 @@ export function PropertiesPanel({
 
       case "Tabs":
         return (
-          <Accordion type="multiple" defaultValue={["settings", "fill", "dimensions"]} className="w-full">
-            <AccordionItem value="settings" className="border-b-0 border-t border-border/50 first:border-t-0">
+          <Accordion
+            type="multiple"
+            defaultValue={["settings", "fill", "dimensions"]}
+            className="w-full"
+          >
+            <AccordionItem
+              value="settings"
+              className="border-b-0 border-t border-border/50 first:border-t-0"
+            >
               <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
                 <div className="flex items-center gap-2">
                   <Settings2 className="w-4 h-4 text-muted-foreground" />
@@ -1811,7 +3680,10 @@ export function PropertiesPanel({
                           value={tab.content || ""}
                           onChange={(e) => {
                             const newTabs = [...(props.tabs || [])];
-                            newTabs[index] = { ...tab, content: e.target.value };
+                            newTabs[index] = {
+                              ...tab,
+                              content: e.target.value,
+                            };
                             updateProp("tabs", newTabs);
                           }}
                           placeholder="Tab content"
@@ -1822,7 +3694,7 @@ export function PropertiesPanel({
                           size="sm"
                           onClick={() => {
                             const newTabs = (props.tabs || []).filter(
-                              (_: any, i: number) => i !== index
+                              (_: any, i: number) => i !== index,
                             );
                             updateProp("tabs", newTabs);
                           }}
@@ -1854,8 +3726,15 @@ export function PropertiesPanel({
 
       case "Testimonial":
         return (
-          <Accordion type="multiple" defaultValue={["settings", "colors", "dimensions"]} className="w-full">
-            <AccordionItem value="settings" className="border-b-0 border-t border-border/50 first:border-t-0">
+          <Accordion
+            type="multiple"
+            defaultValue={["settings", "colors", "dimensions"]}
+            className="w-full"
+          >
+            <AccordionItem
+              value="settings"
+              className="border-b-0 border-t border-border/50 first:border-t-0"
+            >
               <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
                 <div className="flex items-center gap-2">
                   <Settings2 className="w-4 h-4 text-muted-foreground" />
@@ -1918,7 +3797,9 @@ export function PropertiesPanel({
                     min="1"
                     max="5"
                     value={props.rating || 5}
-                    onChange={(e) => updateProp("rating", parseInt(e.target.value))}
+                    onChange={(e) =>
+                      updateProp("rating", parseInt(e.target.value))
+                    }
                   />
                 </div>
               </AccordionContent>
@@ -1929,8 +3810,15 @@ export function PropertiesPanel({
 
       case "PricingCard":
         return (
-          <Accordion type="multiple" defaultValue={["settings", "colors", "dimensions"]} className="w-full">
-            <AccordionItem value="settings" className="border-b-0 border-t border-border/50 first:border-t-0">
+          <Accordion
+            type="multiple"
+            defaultValue={["settings", "colors", "dimensions"]}
+            className="w-full"
+          >
+            <AccordionItem
+              value="settings"
+              className="border-b-0 border-t border-border/50 first:border-t-0"
+            >
               <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
                 <div className="flex items-center gap-2">
                   <Settings2 className="w-4 h-4 text-muted-foreground" />
@@ -1987,31 +3875,56 @@ export function PropertiesPanel({
                   <Label className="mb-2 block">Features</Label>
                   <div className="space-y-2">
                     {(props.features || []).map(
-                      (feature: string, index: number) => (
-                        <div key={index} className="flex gap-2">
-                          <Input
-                            value={feature}
-                            onChange={(e) => {
-                              const newFeatures = [...(props.features || [])];
-                              newFeatures[index] = e.target.value;
-                              updateProp("features", newFeatures);
-                            }}
-                            placeholder="Feature"
-                          />
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              const newFeatures = (props.features || []).filter(
-                                (_: any, i: number) => i !== index
-                              );
-                              updateProp("features", newFeatures);
-                            }}
-                          >
-                            Remove
-                          </Button>
-                        </div>
-                      )
+                      (feature: any, index: number) => {
+                        const featureText =
+                          typeof feature === "string"
+                            ? feature
+                            : feature.text || "";
+                        const featureIncluded =
+                          typeof feature === "string"
+                            ? true
+                            : feature.included !== false;
+                        return (
+                          <div key={index} className="flex gap-2 items-center">
+                            <Input
+                              value={featureText}
+                              onChange={(e) => {
+                                const newFeatures = [...(props.features || [])];
+                                newFeatures[index] = {
+                                  text: e.target.value,
+                                  included: featureIncluded,
+                                };
+                                updateProp("features", newFeatures);
+                              }}
+                              placeholder="Feature"
+                              className="flex-1"
+                            />
+                            <Switch
+                              checked={featureIncluded}
+                              onCheckedChange={(checked) => {
+                                const newFeatures = [...(props.features || [])];
+                                newFeatures[index] = {
+                                  text: featureText,
+                                  included: checked,
+                                };
+                                updateProp("features", newFeatures);
+                              }}
+                            />
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                const newFeatures = (
+                                  props.features || []
+                                ).filter((_: any, i: number) => i !== index);
+                                updateProp("features", newFeatures);
+                              }}
+                            >
+                              <X className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        );
+                      },
                     )}
                     <Button
                       variant="outline"
@@ -2019,7 +3932,7 @@ export function PropertiesPanel({
                       onClick={() => {
                         const newFeatures = [
                           ...(props.features || []),
-                          "New feature",
+                          { text: "New feature", included: true },
                         ];
                         updateProp("features", newFeatures);
                       }}
@@ -2043,7 +3956,9 @@ export function PropertiesPanel({
                   <Switch
                     id="featured"
                     checked={props.featured || false}
-                    onCheckedChange={(checked) => updateProp("featured", checked)}
+                    onCheckedChange={(checked) =>
+                      updateProp("featured", checked)
+                    }
                   />
                   <Label htmlFor="featured">Featured Plan</Label>
                 </div>
@@ -2055,8 +3970,15 @@ export function PropertiesPanel({
 
       case "Feature":
         return (
-          <Accordion type="multiple" defaultValue={["settings", "colors", "dimensions"]} className="w-full">
-            <AccordionItem value="settings" className="border-b-0 border-t border-border/50 first:border-t-0">
+          <Accordion
+            type="multiple"
+            defaultValue={["settings", "colors", "dimensions"]}
+            className="w-full"
+          >
+            <AccordionItem
+              value="settings"
+              className="border-b-0 border-t border-border/50 first:border-t-0"
+            >
               <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
                 <div className="flex items-center gap-2">
                   <Settings2 className="w-4 h-4 text-muted-foreground" />
@@ -2106,8 +4028,15 @@ export function PropertiesPanel({
 
       case "Stats":
         return (
-          <Accordion type="multiple" defaultValue={["settings", "colors", "dimensions"]} className="w-full">
-            <AccordionItem value="settings" className="border-b-0 border-t border-border/50 first:border-t-0">
+          <Accordion
+            type="multiple"
+            defaultValue={["settings", "colors", "dimensions"]}
+            className="w-full"
+          >
+            <AccordionItem
+              value="settings"
+              className="border-b-0 border-t border-border/50 first:border-t-0"
+            >
               <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
                 <div className="flex items-center gap-2">
                   <Settings2 className="w-4 h-4 text-muted-foreground" />
@@ -2135,7 +4064,10 @@ export function PropertiesPanel({
                           value={stat.value || ""}
                           onChange={(e) => {
                             const newStats = [...(props.stats || [])];
-                            newStats[index] = { ...stat, value: e.target.value };
+                            newStats[index] = {
+                              ...stat,
+                              value: e.target.value,
+                            };
                             updateProp("stats", newStats);
                           }}
                           placeholder="100+"
@@ -2144,7 +4076,10 @@ export function PropertiesPanel({
                           value={stat.label || ""}
                           onChange={(e) => {
                             const newStats = [...(props.stats || [])];
-                            newStats[index] = { ...stat, label: e.target.value };
+                            newStats[index] = {
+                              ...stat,
+                              label: e.target.value,
+                            };
                             updateProp("stats", newStats);
                           }}
                           placeholder="Customers"
@@ -2154,7 +4089,7 @@ export function PropertiesPanel({
                           size="sm"
                           onClick={() => {
                             const newStats = (props.stats || []).filter(
-                              (_: any, i: number) => i !== index
+                              (_: any, i: number) => i !== index,
                             );
                             updateProp("stats", newStats);
                           }}
@@ -2186,8 +4121,15 @@ export function PropertiesPanel({
 
       case "CTA":
         return (
-          <Accordion type="multiple" defaultValue={["settings", "colors", "dimensions"]} className="w-full">
-            <AccordionItem value="settings" className="border-b-0 border-t border-border/50 first:border-t-0">
+          <Accordion
+            type="multiple"
+            defaultValue={["settings", "colors", "dimensions"]}
+            className="w-full"
+          >
+            <AccordionItem
+              value="settings"
+              className="border-b-0 border-t border-border/50 first:border-t-0"
+            >
               <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
                 <div className="flex items-center gap-2">
                   <Settings2 className="w-4 h-4 text-muted-foreground" />
@@ -2248,8 +4190,15 @@ export function PropertiesPanel({
 
       case "Divider":
         return (
-          <Accordion type="multiple" defaultValue={["settings", "colors", "dimensions"]} className="w-full">
-            <AccordionItem value="settings" className="border-b-0 border-t border-border/50 first:border-t-0">
+          <Accordion
+            type="multiple"
+            defaultValue={["settings", "colors", "dimensions"]}
+            className="w-full"
+          >
+            <AccordionItem
+              value="settings"
+              className="border-b-0 border-t border-border/50 first:border-t-0"
+            >
               <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
                 <div className="flex items-center gap-2">
                   <Settings2 className="w-4 h-4 text-muted-foreground" />
@@ -2267,10 +4216,18 @@ export function PropertiesPanel({
                     onChange={(e) => updateProp("thickness", e.target.value)}
                     className="w-full p-2 border rounded-md text-xs"
                   >
-                    <option className="bg-background text-foreground" value="1">1px</option>
-                    <option className="bg-background text-foreground" value="2">2px</option>
-                    <option className="bg-background text-foreground" value="4">4px</option>
-                    <option className="bg-background text-foreground" value="8">8px</option>
+                    <option className="bg-background text-foreground" value="1">
+                      1px
+                    </option>
+                    <option className="bg-background text-foreground" value="2">
+                      2px
+                    </option>
+                    <option className="bg-background text-foreground" value="4">
+                      4px
+                    </option>
+                    <option className="bg-background text-foreground" value="8">
+                      8px
+                    </option>
                   </select>
                 </div>
                 <div>
@@ -2295,9 +4252,24 @@ export function PropertiesPanel({
                     onChange={(e) => updateProp("style", e.target.value)}
                     className="w-full p-2 border rounded-md text-xs"
                   >
-                    <option className="bg-background text-foreground" value="solid">Solid</option>
-                    <option className="bg-background text-foreground" value="dashed">Dashed</option>
-                    <option className="bg-background text-foreground" value="dotted">Dotted</option>
+                    <option
+                      className="bg-background text-foreground"
+                      value="solid"
+                    >
+                      Solid
+                    </option>
+                    <option
+                      className="bg-background text-foreground"
+                      value="dashed"
+                    >
+                      Dashed
+                    </option>
+                    <option
+                      className="bg-background text-foreground"
+                      value="dotted"
+                    >
+                      Dotted
+                    </option>
                   </select>
                 </div>
               </AccordionContent>
@@ -2308,8 +4280,15 @@ export function PropertiesPanel({
 
       case "Spacer":
         return (
-          <Accordion type="multiple" defaultValue={["settings", "colors", "dimensions"]} className="w-full">
-            <AccordionItem value="settings" className="border-b-0 border-t border-border/50 first:border-t-0">
+          <Accordion
+            type="multiple"
+            defaultValue={["settings", "colors", "dimensions"]}
+            className="w-full"
+          >
+            <AccordionItem
+              value="settings"
+              className="border-b-0 border-t border-border/50 first:border-t-0"
+            >
               <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
                 <div className="flex items-center gap-2">
                   <Settings2 className="w-4 h-4 text-muted-foreground" />
@@ -2327,11 +4306,36 @@ export function PropertiesPanel({
                     onChange={(e) => updateProp("size", e.target.value)}
                     className="w-full p-2 border rounded-md text-xs"
                   >
-                    <option className="bg-background text-foreground" value="xs">Extra Small (8px)</option>
-                    <option className="bg-background text-foreground" value="sm">Small (16px)</option>
-                    <option className="bg-background text-foreground" value="md">Medium (32px)</option>
-                    <option className="bg-background text-foreground" value="lg">Large (64px)</option>
-                    <option className="bg-background text-foreground" value="xl">Extra Large (128px)</option>
+                    <option
+                      className="bg-background text-foreground"
+                      value="xs"
+                    >
+                      Extra Small (8px)
+                    </option>
+                    <option
+                      className="bg-background text-foreground"
+                      value="sm"
+                    >
+                      Small (16px)
+                    </option>
+                    <option
+                      className="bg-background text-foreground"
+                      value="md"
+                    >
+                      Medium (32px)
+                    </option>
+                    <option
+                      className="bg-background text-foreground"
+                      value="lg"
+                    >
+                      Large (64px)
+                    </option>
+                    <option
+                      className="bg-background text-foreground"
+                      value="xl"
+                    >
+                      Extra Large (128px)
+                    </option>
                   </select>
                 </div>
               </AccordionContent>
@@ -2342,8 +4346,15 @@ export function PropertiesPanel({
 
       case "Badge":
         return (
-          <Accordion type="multiple" defaultValue={["content", "fill", "dimensions"]} className="w-full">
-            <AccordionItem value="content" className="border-b-0 border-t border-border/50 first:border-t-0">
+          <Accordion
+            type="multiple"
+            defaultValue={["content", "fill", "dimensions"]}
+            className="w-full"
+          >
+            <AccordionItem
+              value="content"
+              className="border-b-0 border-t border-border/50 first:border-t-0"
+            >
               <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
                 <div className="flex items-center gap-2">
                   <Type className="w-4 h-4 text-muted-foreground" />
@@ -2352,19 +4363,65 @@ export function PropertiesPanel({
               </AccordionTrigger>
               <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
                 <div className="space-y-1.5">
-                  <Label htmlFor="text" className="text-xs font-medium text-muted-foreground">Text</Label>
-                  <Input id="text" value={props.text || ""} onChange={(e) => updateProp("text", e.target.value)} placeholder="New" className="h-8 text-sm" />
+                  <Label
+                    htmlFor="text"
+                    className="text-xs font-medium text-muted-foreground"
+                  >
+                    Text
+                  </Label>
+                  <Input
+                    id="text"
+                    value={props.text || ""}
+                    onChange={(e) => updateProp("text", e.target.value)}
+                    placeholder="New"
+                    className="h-8 text-sm"
+                  />
                 </div>
-                
+
                 <div className="space-y-1.5">
-                  <Label htmlFor="variant" className="text-xs font-medium text-muted-foreground">Variant</Label>
+                  <Label
+                    htmlFor="variant"
+                    className="text-xs font-medium text-muted-foreground"
+                  >
+                    Variant
+                  </Label>
                   <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
-                    <select id="variant" value={props.variant || "default"} onChange={(e) => updateProp("variant", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
-                      <option className="bg-background text-foreground" value="default">Default</option>
-                      <option className="bg-background text-foreground" value="success">Success</option>
-                      <option className="bg-background text-foreground" value="warning">Warning</option>
-                      <option className="bg-background text-foreground" value="error">Error</option>
-                      <option className="bg-background text-foreground" value="info">Info</option>
+                    <select
+                      id="variant"
+                      value={props.variant || "default"}
+                      onChange={(e) => updateProp("variant", e.target.value)}
+                      className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none"
+                    >
+                      <option
+                        className="bg-background text-foreground"
+                        value="default"
+                      >
+                        Default
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="success"
+                      >
+                        Success
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="warning"
+                      >
+                        Warning
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="error"
+                      >
+                        Error
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="info"
+                      >
+                        Info
+                      </option>
                     </select>
                   </div>
                 </div>
@@ -2376,8 +4433,15 @@ export function PropertiesPanel({
 
       case "Alert":
         return (
-          <Accordion type="multiple" defaultValue={["content", "fill", "dimensions"]} className="w-full">
-            <AccordionItem value="content" className="border-b-0 border-t border-border/50 first:border-t-0">
+          <Accordion
+            type="multiple"
+            defaultValue={["content", "fill", "dimensions"]}
+            className="w-full"
+          >
+            <AccordionItem
+              value="content"
+              className="border-b-0 border-t border-border/50 first:border-t-0"
+            >
               <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
                 <div className="flex items-center gap-2">
                   <Type className="w-4 h-4 text-muted-foreground" />
@@ -2386,30 +4450,95 @@ export function PropertiesPanel({
               </AccordionTrigger>
               <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
                 <div className="space-y-1.5">
-                  <Label htmlFor="title" className="text-xs font-medium text-muted-foreground">Title</Label>
-                  <Input id="title" value={props.title || ""} onChange={(e) => updateProp("title", e.target.value)} placeholder="Alert title" className="h-8 text-sm" />
-                </div>
-                
-                <div className="space-y-1.5">
-                  <Label htmlFor="message" className="text-xs font-medium text-muted-foreground">Message</Label>
-                  <Textarea id="message" value={props.message || ""} onChange={(e) => updateProp("message", e.target.value)} placeholder="Alert message" rows={2} className="text-sm resize-none" />
+                  <Label
+                    htmlFor="title"
+                    className="text-xs font-medium text-muted-foreground"
+                  >
+                    Title
+                  </Label>
+                  <Input
+                    id="title"
+                    value={props.title || ""}
+                    onChange={(e) => updateProp("title", e.target.value)}
+                    placeholder="Alert title"
+                    className="h-8 text-sm"
+                  />
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="variant" className="text-xs font-medium text-muted-foreground">Variant</Label>
+                  <Label
+                    htmlFor="message"
+                    className="text-xs font-medium text-muted-foreground"
+                  >
+                    Message
+                  </Label>
+                  <Textarea
+                    id="message"
+                    value={props.message || ""}
+                    onChange={(e) => updateProp("message", e.target.value)}
+                    placeholder="Alert message"
+                    rows={2}
+                    className="text-sm resize-none"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label
+                    htmlFor="variant"
+                    className="text-xs font-medium text-muted-foreground"
+                  >
+                    Variant
+                  </Label>
                   <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
-                    <select id="variant" value={props.variant || "info"} onChange={(e) => updateProp("variant", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
-                      <option className="bg-background text-foreground" value="info">Info</option>
-                      <option className="bg-background text-foreground" value="success">Success</option>
-                      <option className="bg-background text-foreground" value="warning">Warning</option>
-                      <option className="bg-background text-foreground" value="error">Error</option>
+                    <select
+                      id="variant"
+                      value={props.variant || "info"}
+                      onChange={(e) => updateProp("variant", e.target.value)}
+                      className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none"
+                    >
+                      <option
+                        className="bg-background text-foreground"
+                        value="info"
+                      >
+                        Info
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="success"
+                      >
+                        Success
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="warning"
+                      >
+                        Warning
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="error"
+                      >
+                        Error
+                      </option>
                     </select>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center justify-between p-2 rounded-md bg-muted border border-border/50">
-                  <Label htmlFor="dismissible" className="text-xs font-medium text-muted-foreground cursor-pointer">Dismissible</Label>
-                  <Switch id="dismissible" checked={props.dismissible || false} onCheckedChange={(checked) => updateProp("dismissible", checked)} className="scale-75 origin-right" />
+                  <Label
+                    htmlFor="dismissible"
+                    className="text-xs font-medium text-muted-foreground cursor-pointer"
+                  >
+                    Dismissible
+                  </Label>
+                  <Switch
+                    id="dismissible"
+                    checked={props.dismissible || false}
+                    onCheckedChange={(checked) =>
+                      updateProp("dismissible", checked)
+                    }
+                    className="scale-75 origin-right"
+                  />
                 </div>
               </AccordionContent>
             </AccordionItem>
@@ -2419,8 +4548,15 @@ export function PropertiesPanel({
 
       case "Video":
         return (
-          <Accordion type="multiple" defaultValue={["settings", "fill", "dimensions"]} className="w-full">
-            <AccordionItem value="settings" className="border-b-0 border-t border-border/50 first:border-t-0">
+          <Accordion
+            type="multiple"
+            defaultValue={["settings", "fill", "dimensions"]}
+            className="w-full"
+          >
+            <AccordionItem
+              value="settings"
+              className="border-b-0 border-t border-border/50 first:border-t-0"
+            >
               <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
                 <div className="flex items-center gap-2">
                   <Settings2 className="w-4 h-4 text-muted-foreground" />
@@ -2429,55 +4565,175 @@ export function PropertiesPanel({
               </AccordionTrigger>
               <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
                 <div className="space-y-1.5">
-                  <Label htmlFor="youtubeId" className="text-xs font-medium text-muted-foreground">YouTube ID</Label>
-                  <Input id="youtubeId" value={props.youtubeId || ""} onChange={(e) => updateProp("youtubeId", e.target.value)} placeholder="e.g. dQw4w9WgXcQ" className="h-8 text-sm" />
-                </div>
-                
-                <div className="space-y-1.5">
-                  <Label htmlFor="vimeoId" className="text-xs font-medium text-muted-foreground">Vimeo ID</Label>
-                  <Input id="vimeoId" value={props.vimeoId || ""} onChange={(e) => updateProp("vimeoId", e.target.value)} placeholder="e.g. 76979871" className="h-8 text-sm" />
-                </div>
-
-                <div className="space-y-1.5">
-                  <Label htmlFor="src" className="text-xs font-medium text-muted-foreground">Direct Video URL (MP4, WebM)</Label>
-                  <Input id="src" value={props.src || ""} onChange={(e) => updateProp("src", e.target.value)} placeholder="https://example.com/video.mp4" className="h-8 text-sm" />
-                </div>
-                
-                <div className="space-y-1.5">
-                  <Label htmlFor="poster" className="text-xs font-medium text-muted-foreground">Poster Image URL</Label>
-                  <Input id="poster" value={props.poster || ""} onChange={(e) => updateProp("poster", e.target.value)} placeholder="https://example.com/poster.jpg" className="h-8 text-sm" />
+                  <Label
+                    htmlFor="youtubeId"
+                    className="text-xs font-medium text-muted-foreground"
+                  >
+                    YouTube ID
+                  </Label>
+                  <Input
+                    id="youtubeId"
+                    value={props.youtubeId || ""}
+                    onChange={(e) => updateProp("youtubeId", e.target.value)}
+                    placeholder="e.g. dQw4w9WgXcQ"
+                    className="h-8 text-sm"
+                  />
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="aspectRatio" className="text-xs font-medium text-muted-foreground">Aspect Ratio</Label>
+                  <Label
+                    htmlFor="vimeoId"
+                    className="text-xs font-medium text-muted-foreground"
+                  >
+                    Vimeo ID
+                  </Label>
+                  <Input
+                    id="vimeoId"
+                    value={props.vimeoId || ""}
+                    onChange={(e) => updateProp("vimeoId", e.target.value)}
+                    placeholder="e.g. 76979871"
+                    className="h-8 text-sm"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label
+                    htmlFor="src"
+                    className="text-xs font-medium text-muted-foreground"
+                  >
+                    Direct Video URL (MP4, WebM)
+                  </Label>
+                  <Input
+                    id="src"
+                    value={props.src || ""}
+                    onChange={(e) => updateProp("src", e.target.value)}
+                    placeholder="https://example.com/video.mp4"
+                    className="h-8 text-sm"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label
+                    htmlFor="poster"
+                    className="text-xs font-medium text-muted-foreground"
+                  >
+                    Poster Image URL
+                  </Label>
+                  <Input
+                    id="poster"
+                    value={props.poster || ""}
+                    onChange={(e) => updateProp("poster", e.target.value)}
+                    placeholder="https://example.com/poster.jpg"
+                    className="h-8 text-sm"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label
+                    htmlFor="aspectRatio"
+                    className="text-xs font-medium text-muted-foreground"
+                  >
+                    Aspect Ratio
+                  </Label>
                   <div className="relative border rounded-md focus-within:ring-1 focus-within:ring-primary">
-                    <select id="aspectRatio" value={props.aspectRatio || "16:9"} onChange={(e) => updateProp("aspectRatio", e.target.value)} className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none">
-                      <option className="bg-background text-foreground" value="16:9">16:9</option>
-                      <option className="bg-background text-foreground" value="4:3">4:3</option>
-                      <option className="bg-background text-foreground" value="1:1">1:1</option>
-                      <option className="bg-background text-foreground" value="21:9">21:9</option>
+                    <select
+                      id="aspectRatio"
+                      value={props.aspectRatio || "16:9"}
+                      onChange={(e) =>
+                        updateProp("aspectRatio", e.target.value)
+                      }
+                      className="w-full h-8 px-2 text-sm bg-transparent appearance-none focus:outline-none"
+                    >
+                      <option
+                        className="bg-background text-foreground"
+                        value="16:9"
+                      >
+                        16:9
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="4:3"
+                      >
+                        4:3
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="1:1"
+                      >
+                        1:1
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="21:9"
+                      >
+                        21:9
+                      </option>
                     </select>
                   </div>
                 </div>
 
                 <div className="flex items-center justify-between p-2 rounded-md bg-muted border border-border/50">
-                  <Label htmlFor="autoplay" className="text-xs font-medium text-muted-foreground cursor-pointer">Autoplay</Label>
-                  <Switch id="autoplay" checked={props.autoplay || false} onCheckedChange={(checked) => updateProp("autoplay", checked)} className="scale-75 origin-right" />
+                  <Label
+                    htmlFor="autoplay"
+                    className="text-xs font-medium text-muted-foreground cursor-pointer"
+                  >
+                    Autoplay
+                  </Label>
+                  <Switch
+                    id="autoplay"
+                    checked={props.autoplay || false}
+                    onCheckedChange={(checked) =>
+                      updateProp("autoplay", checked)
+                    }
+                    className="scale-75 origin-right"
+                  />
                 </div>
 
                 <div className="flex items-center justify-between p-2 rounded-md bg-muted border border-border/50">
-                  <Label htmlFor="loop" className="text-xs font-medium text-muted-foreground cursor-pointer">Loop</Label>
-                  <Switch id="loop" checked={props.loop || false} onCheckedChange={(checked) => updateProp("loop", checked)} className="scale-75 origin-right" />
+                  <Label
+                    htmlFor="loop"
+                    className="text-xs font-medium text-muted-foreground cursor-pointer"
+                  >
+                    Loop
+                  </Label>
+                  <Switch
+                    id="loop"
+                    checked={props.loop || false}
+                    onCheckedChange={(checked) => updateProp("loop", checked)}
+                    className="scale-75 origin-right"
+                  />
                 </div>
 
                 <div className="flex items-center justify-between p-2 rounded-md bg-muted border border-border/50">
-                  <Label htmlFor="muted" className="text-xs font-medium text-muted-foreground cursor-pointer">Muted</Label>
-                  <Switch id="muted" checked={props.muted || false} onCheckedChange={(checked) => updateProp("muted", checked)} className="scale-75 origin-right" />
+                  <Label
+                    htmlFor="muted"
+                    className="text-xs font-medium text-muted-foreground cursor-pointer"
+                  >
+                    Muted
+                  </Label>
+                  <Switch
+                    id="muted"
+                    checked={props.muted || false}
+                    onCheckedChange={(checked) => updateProp("muted", checked)}
+                    className="scale-75 origin-right"
+                  />
                 </div>
 
                 <div className="flex items-center justify-between p-2 rounded-md bg-muted border border-border/50">
-                  <Label htmlFor="controls" className="text-xs font-medium text-muted-foreground cursor-pointer">Controls</Label>
-                  <Switch id="controls" checked={props.controls !== false} onCheckedChange={(checked) => updateProp("controls", checked)} className="scale-75 origin-right" />
+                  <Label
+                    htmlFor="controls"
+                    className="text-xs font-medium text-muted-foreground cursor-pointer"
+                  >
+                    Controls
+                  </Label>
+                  <Switch
+                    id="controls"
+                    checked={props.controls !== false}
+                    onCheckedChange={(checked) =>
+                      updateProp("controls", checked)
+                    }
+                    className="scale-75 origin-right"
+                  />
                 </div>
               </AccordionContent>
             </AccordionItem>
@@ -2494,9 +4750,15 @@ export function PropertiesPanel({
             <div className="text-center text-muted-foreground py-4">
               <div className="text-4xl mb-2">🔧</div>
               <div className="text-sm">Properties for {type} component</div>
-              <div className="text-[10px] text-muted-foreground/50 mt-1 uppercase tracking-wider">Advanced configuration coming soon</div>
+              <div className="text-[10px] text-muted-foreground/50 mt-1 uppercase tracking-wider">
+                Advanced configuration coming soon
+              </div>
             </div>
-            <Accordion type="multiple" defaultValue={["colors", "dimensions"]} className="w-full">
+            <Accordion
+              type="multiple"
+              defaultValue={["colors", "dimensions"]}
+              className="w-full"
+            >
               {renderAllStyleSections()}
             </Accordion>
           </div>
@@ -2505,13 +4767,15 @@ export function PropertiesPanel({
   };
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col overflow-hidden">
       {/* Header */}
-      <div className="p-4 border-b border-border">
+      <div className="flex-shrink-0 p-4 border-b border-[#2a2a2a]">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-sm font-semibold text-foreground">Properties</h3>
-            <p className="text-xs text-muted-foreground mt-1">
+            <h3 className="text-xs font-semibold text-gray-400 tracking-wide uppercase">
+              Properties
+            </h3>
+            <p className="text-[10px] text-gray-500 mt-1">
               {selectedComponent.type} Component
             </p>
           </div>
@@ -2529,7 +4793,7 @@ export function PropertiesPanel({
           ) : (
             <button
               onClick={() => setShowGlobalDialog(true)}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-border text-xs text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-[#2a2a2a] text-xs text-gray-400 hover:text-white hover:border-gray-600 transition-colors"
               title="Mark as Global Component"
             >
               <Globe className="w-3 h-3" />
@@ -2539,15 +4803,17 @@ export function PropertiesPanel({
         </div>
       </div>
 
-      {/* Properties Form */}
-      <div className="flex-1 overflow-auto p-4">{renderPropertyFields()}</div>
+      {/* Properties Form - Single scrollable area */}
+      <div className="flex-1 overflow-y-auto min-h-0">
+        <div className="p-4">{renderPropertyFields()}</div>
+      </div>
 
       {/* Actions */}
-      <div className="p-4 border-t border-border space-y-2">
+      <div className="flex-shrink-0 p-4 border-t border-[#2a2a2a] space-y-2">
         <Button
           variant="outline"
           size="sm"
-          className="w-full"
+          className="w-full h-8 text-xs"
           onClick={() =>
             selectedComponent && onDuplicateComponent(selectedComponent.id)
           }
@@ -2557,7 +4823,7 @@ export function PropertiesPanel({
         <Button
           variant="destructive"
           size="sm"
-          className="w-full"
+          className="w-full h-8 text-xs"
           onClick={() =>
             selectedComponent && onDeleteComponent(selectedComponent.id)
           }
@@ -2572,7 +4838,9 @@ export function PropertiesPanel({
           <DialogHeader>
             <DialogTitle>Mark as Global Component</DialogTitle>
             <DialogDescription>
-              Global components sync their styles across all pages. Give this component a global name, or select an existing global group to join.
+              Global components sync their styles across all pages. Give this
+              component a global name, or select an existing global group to
+              join.
             </DialogDescription>
           </DialogHeader>
 
@@ -2603,7 +4871,9 @@ export function PropertiesPanel({
                     <span className="w-full border-t border-border" />
                   </div>
                   <div className="relative flex justify-center text-xs">
-                    <span className="bg-background px-2 text-muted-foreground">or create new</span>
+                    <span className="bg-background px-2 text-muted-foreground">
+                      or create new
+                    </span>
                   </div>
                 </div>
               </div>

@@ -15,7 +15,7 @@ interface ImageProps {
 }
 
 export function Image({
-  src = "https://placehold.co/400x200/e5e7eb/6b7280?text=Image",
+  src = "https://placehold.co/400x200/1a1a1a/6b7280?text=Image",
   alt = "",
   width,
   height,
@@ -73,7 +73,10 @@ export function Image({
         loading={loading}
         className={cn(
           "w-full h-full block",
-          objectFitClasses[objectFit]
+          objectFitClasses[objectFit],
+          "w-full h-full",
+          roundedClasses[rounded],
+          objectFitClasses[objectFit],
         )}
         style={{ maxWidth: '100%', maxHeight: '100%' }}
       />
