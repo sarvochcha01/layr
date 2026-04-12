@@ -48,17 +48,18 @@ export function Card({
   return (
     <div
       className={cn(
-        "rounded-2xl p-6 min-w-0 overflow-hidden transition-all duration-300",
+        "rounded-2xl p-6 min-w-0 transition-all duration-300 w-full h-full flex flex-col",
         "border border-[#2a2a2a]",
         "hover:border-[#3a3a3a]",
         "hover:-translate-y-0.5",
+        "overflow-hidden",
         className,
       )}
       style={baseStyle}
     >
       {/* Image */}
       {image && (
-        <div className="-mx-6 -mt-6 mb-5">
+        <div className="-mx-6 -mt-6 mb-5 flex-shrink-0 overflow-hidden">
           <img
             src={image}
             alt={title || "Card image"}
@@ -69,7 +70,7 @@ export function Card({
 
       {/* Icon */}
       {icon && !image && (
-        <div className="mb-5">
+        <div className="mb-5 flex-shrink-0">
           <div
             className="w-12 h-12 rounded-xl flex items-center justify-center text-xl font-bold backdrop-blur-sm"
             style={{ backgroundColor: iconBg, color: iconColor }}
@@ -80,10 +81,10 @@ export function Card({
       )}
 
       {/* Content */}
-      <div className="space-y-3 min-w-0">
+      <div className="space-y-3 min-w-0 flex-1 overflow-hidden">
         {title && (
           <h3
-            className="text-xl font-semibold break-words leading-tight tracking-tight"
+            className="text-xl font-semibold break-words leading-tight tracking-tight line-clamp-2"
             style={{ fontFamily: "'Inter', sans-serif" }}
           >
             {title}
@@ -91,7 +92,7 @@ export function Card({
         )}
 
         {description && (
-          <p className="text-sm leading-relaxed break-words text-gray-400">
+          <p className="text-sm leading-relaxed break-words text-gray-400 line-clamp-3">
             {description}
           </p>
         )}

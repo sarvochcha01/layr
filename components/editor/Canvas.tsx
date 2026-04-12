@@ -17,6 +17,14 @@ interface CanvasProps {
   onNavigate?: (slug: string) => void;
   pages?: any[];
   showOutlines?: boolean;
+  pageBackground?: {
+    backgroundColor?: string;
+    backgroundType?: "solid" | "gradient" | "image";
+    backgroundGradient?: string;
+    backgroundImageUrl?: string;
+    backgroundSize?: string;
+    backgroundPosition?: string;
+  };
 }
 
 function DropZone({
@@ -333,14 +341,34 @@ export function Canvas({
   onNavigate,
   pages,
   showOutlines = false,
+  pageBackground,
 }: CanvasProps) {
+  // Build page background style
+  const pageStyle: React.CSSProperties = {};
+  
+  if (pageBackground) {
+    const bgType = pageBackground.backgroundType || "solid";
+    
+    if (bgType === "solid") {
+      pageStyle.backgroundColor = pageBackground.backgroundColor || "#0d0d0d";
+    } else if (bgType === "gradient" && pageBackground.backgroundGradient) {
+      pageStyle.backgroundImage = pageBackground.backgroundGradient;
+    } else if (bgType === "image" && pageBackground.backgroundImageUrl) {
+      pageStyle.backgroundImage = `url(${pageBackground.backgroundImageUrl})`;
+      pageStyle.backgroundSize = pageBackground.backgroundSize || "cover";
+      pageStyle.backgroundPosition = pageBackground.backgroundPosition || "center";
+      pageStyle.backgroundRepeat = "no-repeat";
+    }
+  }
+
   return (
     <div
-      className={`bg-white w-full editor-canvas ${
+      className={`w-full editor-canvas ${
         isPreviewMode
           ? "min-h-screen"
           : "rounded-lg shadow-sm min-h-[800px] p-4"
       }`}
+      style={pageStyle}
       onClick={isPreviewMode ? undefined : () => onSelectComponent(null)}
       tabIndex={isPreviewMode ? undefined : 0}
     >

@@ -42,27 +42,14 @@ export function Image({
     "scale-down": "object-scale-down",
   };
 
-  // Build the container style with explicit dimensions
+  // Build the container style (width/height handled by ResizableWrapper)
   const baseStyle = buildComponentStyle(rest);
-  
-  // Set explicit width and height on the container
-  if (width) {
-    baseStyle.width = typeof width === 'number' ? `${width}px` : width;
-  } else if (!rest.width) {
-    baseStyle.width = '100%'; // Default to full width if not specified
-  }
-  
-  if (height) {
-    baseStyle.height = typeof height === 'number' ? `${height}px` : height;
-  } else if (!rest.height) {
-    baseStyle.height = '300px'; // Default height to prevent overflow
-  }
 
   const imageElement = (
     <div 
       style={baseStyle} 
       className={cn(
-        "overflow-hidden relative block",
+        "relative block w-full h-full overflow-hidden",
         roundedClasses[rounded],
         className
       )}
@@ -73,19 +60,15 @@ export function Image({
         loading={loading}
         className={cn(
           "w-full h-full block",
-          objectFitClasses[objectFit],
-          "w-full h-full",
-          roundedClasses[rounded],
-          objectFitClasses[objectFit],
+          objectFitClasses[objectFit]
         )}
-        style={{ maxWidth: '100%', maxHeight: '100%' }}
       />
     </div>
   );
 
   if (link) {
     return (
-      <a href={link} className="inline-block">
+      <a href={link} className="inline-block w-full h-full">
         {imageElement}
       </a>
     );

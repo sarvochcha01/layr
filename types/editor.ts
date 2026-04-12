@@ -21,6 +21,13 @@ export interface Page {
     slug?: string; // URL slug like "about-us", "contact" (legacy)
     path?: string; // URL path like "/", "/about", "/contact" (preferred)
     components: ComponentDefinition[];
+    backgroundColor?: string;
+    backgroundType?: "solid" | "gradient" | "image";
+    backgroundGradient?: string;
+    backgroundImageUrl?: string;
+    backgroundSize?: string;
+    backgroundPosition?: string;
+    backgroundRepeat?: string;
 }
 
 // Flexible: keyed by global name → template component

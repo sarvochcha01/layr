@@ -16,13 +16,15 @@ function ensureUnit(value: any): string | undefined {
 /**
  * Maps common style props from component definitions to a React CSSProperties object.
  * All builder components should spread this into their root element's style.
+ * Note: width and height are handled by ResizableWrapper in the editor, so they're excluded here.
  */
 export function buildComponentStyle(props: Record<string, any>): React.CSSProperties {
     const style: React.CSSProperties = {};
 
     // --- Dimensions ---
-    if (props.width) style.width = props.width;
-    if (props.height) style.height = props.height;
+    // Width and height are handled by ResizableWrapper, so we skip them
+    // if (props.width) style.width = props.width;
+    // if (props.height) style.height = props.height;
     if (props.minWidth) style.minWidth = props.minWidth;
     if (props.minHeight) style.minHeight = props.minHeight;
     if (props.maxWidth_css) style.maxWidth = props.maxWidth_css;

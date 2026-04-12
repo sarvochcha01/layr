@@ -70,6 +70,7 @@ interface EditorLayoutProps {
   onPageDelete: (pageId: string) => void;
   onPageDuplicate?: (pageId: string) => void;
   onPageRename?: (pageId: string, name: string, slug: string) => void;
+  onPageUpdate?: (pageId: string, updates: Partial<Page>) => void;
   onUndo?: () => void;
   onRedo?: () => void;
   canUndo?: boolean;
@@ -114,6 +115,7 @@ export function EditorLayout({
   onPageDelete,
   onPageDuplicate,
   onPageRename,
+  onPageUpdate,
   onUndo,
   onRedo,
   canUndo = false,
@@ -146,22 +148,29 @@ export function EditorLayout({
 
   // Panel widths and heights
   const [leftPanelWidth, setLeftPanelWidth] = useState(280);
-  const [rightPanelWidth, setRightPanelWidth] = useState(320);
+  const [rightPanelWidth, setRightPanelWidth] = useState(480);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (!isResizingRef.current) return;
 
       if (isResizingRef.current === "left") {
+        // Left panel: drag right to widen, drag left to narrow
         const delta = e.clientX - startPosRef.current.x;
         setLeftPanelWidth(
           Math.max(200, Math.min(600, startSizeRef.current + delta)),
         );
       } else if (isResizingRef.current === "right") {
-        const delta = startPosRef.current.x - e.clientX;
-        setRightPanelWidth(
-          Math.max(200, Math.min(600, startSizeRef.current + delta)),
-        );
+        // Right panel is on the right edge
+        // When we drag LEFT (towards center), clientX decreases, so delta is negative
+        // We want the panel to get WIDER, so we need to ADD the absolute value
+        // When we drag RIGHT (towards edge), clientX increases, so delta is positive  
+        // We want the panel to get NARROWER, so we need to SUBTRACT
+        const currentX = e.clientX;
+        const startX = startPosRef.current.x;
+        const delta = startX - currentX; // Positive when dragging left, negative when dragging right
+        const newWidth = startSizeRef.current + delta;
+        setRightPanelWidth(Math.max(300, Math.min(700, newWidth)));
       }
     };
 
@@ -657,9 +666,9 @@ export function EditorLayout({
           )}
 
           {/* Canvas Area */}
-          <div className="flex-1 flex flex-col min-w-0 bg-[#0d0d0d] overflow-auto">
+          <div className="flex-1 min-w-0 bg-[#0d0d0d] overflow-auto">
             <div
-              className={`flex-1 overflow-auto transition-all duration-300 ${
+              className={`h-full overflow-auto transition-all duration-300 ${
                 isPreviewMode ? "bg-white p-0" : "bg-[#0d0d0d] p-8"
               } light`}
             >
@@ -684,6 +693,7 @@ export function EditorLayout({
                   onSelectComponent={
                     isPreviewMode ? () => {} : onSelectComponent
                   }
+                  onUpdateComponent={onUpdateComponent}
                   viewport={viewport}
                   isPreviewMode={isPreviewMode}
                   onNavigate={(slug) => {
@@ -694,52 +704,12 @@ export function EditorLayout({
                   }}
                   pages={pages}
                   showOutlines={!isPreviewMode && showOutlines}
+                  pageBackground={pages.find(p => p.id === currentPageId)}
                 />
               </div>
             </div>
           </div>
 
-        {/* Canvas Area */}
-        <div
-          className={`flex-1 overflow-auto transition-all duration-300 ${
-            isPreviewMode ? "bg-white p-0" : "bg-muted p-8"
-          } light`}
-          style={{
-            maxHeight: "calc(100vh - 3rem)",
-            minWidth: 0,
-          }}
-        >
-          <div
-            className="transition-all duration-300 ease-in-out"
-            style={{
-              width: getCanvasWidth(),
-              maxWidth:
-                viewport === "desktop"
-                  ? isPreviewMode
-                    ? "none"
-                    : "1200px"
-                  : getCanvasWidth(),
-              minHeight: "100%",
-              margin: "0 auto",
-            }}
-          >
-            <Canvas
-              components={components}
-              selectedComponentIds={isPreviewMode ? [] : selectedComponentIds}
-              onSelectComponent={isPreviewMode ? () => {} : onSelectComponent}
-              onUpdateComponent={onUpdateComponent}
-              viewport={viewport}
-              isPreviewMode={isPreviewMode}
-              onNavigate={(slug) => {
-                const targetPage = pages.find((p) => p.slug === slug);
-                if (targetPage) {
-                  onPageSelect(targetPage.id);
-                }
-              }}
-              pages={pages}
-              showOutlines={!isPreviewMode && showOutlines}
-            />
-          </div>
           {/* Right Sidebar - Properties */}
           {!isPreviewMode && (
             <>
@@ -749,8 +719,12 @@ export function EditorLayout({
               />
 
               <div
-                className="flex-shrink-0 bg-[#1a1a1a] border-l border-[#2a2a2a] flex flex-col"
-                style={{ width: `${rightPanelWidth}px` }}
+                className="flex-shrink-0 bg-[#1a1a1a] border-l border-[#2a2a2a] flex flex-col overflow-hidden"
+                style={{ 
+                  width: `${rightPanelWidth}px`,
+                  minWidth: `${rightPanelWidth}px`,
+                  maxWidth: `${rightPanelWidth}px`
+                }}
               >
                 <PropertiesPanel
                   selectedComponent={selectedComponent}
@@ -758,6 +732,8 @@ export function EditorLayout({
                   onDeleteComponent={onDeleteComponent}
                   onDuplicateComponent={onDuplicateComponent}
                   pages={pages}
+                  currentPage={pages.find(p => p.id === currentPageId)}
+                  onUpdatePage={(updates) => onPageUpdate?.(currentPageId, updates)}
                   globalComponents={globalComponents}
                   onMarkAsGlobal={onMarkAsGlobal}
                   onUnmarkGlobal={onUnmarkGlobal}
