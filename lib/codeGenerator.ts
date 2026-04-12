@@ -333,9 +333,26 @@ export function generateHTML(components: ComponentDefinition[], allPages?: any[]
 
             case "Video":
                 if (props.youtubeId) {
+                    const ytParams = [];
+                    if (props.autoplay) ytParams.push('autoplay=1');
+                    if (props.muted) ytParams.push('mute=1');
+                    if (props.loop) ytParams.push(`loop=1&playlist=${props.youtubeId}`);
+                    if (props.controls === false) ytParams.push('controls=0');
+                    const ytQuery = ytParams.length > 0 ? `?${ytParams.join('&')}` : '';
                     return `
 <div class="relative w-full pb-[56.25%] rounded-2xl overflow-hidden shadow-lg"${getInlineStyles(props)}>
-    <iframe src="https://www.youtube.com/embed/${props.youtubeId}" title="${props.title || 'Video'}" class="absolute top-0 left-0 w-full h-full" allowfullscreen></iframe>
+    <iframe src="https://www.youtube-nocookie.com/embed/${props.youtubeId}${ytQuery}" title="${props.title || 'Video'}" class="absolute top-0 left-0 w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</div>`;
+                }
+                if (props.vimeoId) {
+                    const vimeoParams = [];
+                    if (props.autoplay) vimeoParams.push('autoplay=1');
+                    if (props.muted) vimeoParams.push('muted=1');
+                    if (props.loop) vimeoParams.push('loop=1');
+                    const vimeoQuery = vimeoParams.length > 0 ? `?${vimeoParams.join('&')}` : '';
+                    return `
+<div class="relative w-full pb-[56.25%] rounded-2xl overflow-hidden shadow-lg"${getInlineStyles(props)}>
+    <iframe src="https://player.vimeo.com/video/${props.vimeoId}${vimeoQuery}" title="${props.title || 'Video'}" class="absolute top-0 left-0 w-full h-full" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
 </div>`;
                 }
                 if (props.src) {

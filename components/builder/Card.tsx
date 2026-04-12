@@ -22,12 +22,10 @@ interface CardProps {
 }
 
 export function Card({
-  title = "Instant Deploy",
-  description = "Propagate your creative changes globally in under 300ms with our atomic edge network.",
-  image,
-  icon = "",
-  iconBg = "rgba(99, 102, 241, 0.1)",
-  iconColor = "#818cf8",
+  title = "Card Title",
+  description = "A short description of this card's content goes here.",
+  image = "https://images.unsplash.com/photo-1557683316-973673baf926?w=800&h=400&fit=crop",
+  icon,
   buttonText,
   buttonLink = "#",
   variant = "default",
