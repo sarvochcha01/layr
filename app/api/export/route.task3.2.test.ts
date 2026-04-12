@@ -54,7 +54,7 @@ describe('Task 3.2 - Generate app/layout.tsx', () => {
 
         // Verify layout structure
         expect(layoutContent).toContain("import type { Metadata } from 'next'");
-        expect(layoutContent).toContain("import '@/styles/globals.css'");
+        expect(layoutContent).toContain("import './globals.css'");
         expect(layoutContent).toContain('export const metadata: Metadata');
         expect(layoutContent).toContain('title:');
         expect(layoutContent).toContain('description:');

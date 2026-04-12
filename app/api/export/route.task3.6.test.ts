@@ -197,10 +197,10 @@ describe('Task 3.6: Configuration Files for App Router', () => {
         expect(zip.files['postcss.config.js']).toBeDefined();
         expect(zip.files['README.md']).toBeDefined();
 
-        // Verify package.json has Next.js 14+
+        // Verify package.json has Next.js 15+
         const packageJsonContent = await zip.files['package.json'].async('string');
         const packageJson = JSON.parse(packageJsonContent);
-        expect(packageJson.dependencies.next).toContain('^14');
+        expect(packageJson.dependencies.next).toContain('^15');
 
         // Verify App Router structure exists
         expect(zip.files['app/layout.tsx']).toBeDefined();
@@ -211,8 +211,8 @@ describe('Task 3.6: Configuration Files for App Router', () => {
         expect(zip.files['components/Hero.tsx']).toBeDefined();
         expect(zip.files['components/Footer.tsx']).toBeDefined();
 
-        // Verify styles folder exists
-        expect(zip.files['styles/globals.css']).toBeDefined();
+        // Verify app folder with globals.css exists
+        expect(zip.files['app/globals.css']).toBeDefined();
     });
 
     /**

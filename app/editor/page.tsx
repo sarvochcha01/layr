@@ -289,7 +289,9 @@ export default function EditorPage() {
     }
     setPages((prev) => prev.filter((p) => p.id !== pageId));
     if (currentPageId === pageId) {
-      setCurrentPageId(pages[0].id);
+      // Select the first page that isn't the deleted one
+      const nextPage = pages.find((p) => p.id !== pageId);
+      if (nextPage) setCurrentPageId(nextPage.id);
     }
     toast.success("Page deleted");
   };
@@ -319,6 +321,15 @@ export default function EditorPage() {
     setPages((prev) => [...prev, newPage]);
     setCurrentPageId(newPage.id);
     toast.success(`Page "${pageToDuplicate.name}" duplicated`);
+  };
+
+  const handlePageRename = (pageId: string, name: string, slug: string) => {
+    setPages((prev) =>
+      prev.map((p) =>
+        p.id === pageId ? { ...p, name, slug } : p
+      )
+    );
+    toast.success(`Page renamed to "${name}"`);
   };
 
   const handlePageSelect = (pageId: string) => {
@@ -631,21 +642,57 @@ export default function EditorPage() {
   const handleApplyAIPages = (aiPages: { name: string; path: string; components: ComponentDefinition[] }[]) => {
     if (!aiPages || aiPages.length === 0) return;
 
-    const newPages: Page[] = aiPages.map((p) => {
-      const pageId = generateId();
-      return {
-        id: pageId,
-        name: p.name || "Untitled Page",
-        slug: p.path ? p.path.replace(/^\//, "") : pageId,
-        path: p.path || `/${pageId}`,
-        components: p.components || [],
-      };
+    let firstNewOrUpdatedPageId: string | null = null;
+
+    setPages((prev) => {
+      const updatedPages = [...prev];
+
+      for (const aiPage of aiPages) {
+        const pageName = aiPage.name || "Untitled Page";
+        // Derive slug: "/" or empty → "index", otherwise strip leading slash
+        let slug = aiPage.path
+          ? aiPage.path.replace(/^\//, "").replace(/\.html$/, "")
+          : pageName.toLowerCase().replace(/\s+/g, "-");
+        if (!slug || slug === "/") slug = "index";
+
+        // Check if a page with this slug already exists
+        const existingBySlug = updatedPages.find((p) => p.slug === slug);
+        // Also check by name match (case-insensitive) for common cases like "Home"
+        const existingByName = !existingBySlug
+          ? updatedPages.find((p) => p.name.toLowerCase() === pageName.toLowerCase())
+          : null;
+        const existing = existingBySlug || existingByName;
+
+        if (existing) {
+          // Replace the existing page's components instead of creating a duplicate
+          const idx = updatedPages.indexOf(existing);
+          updatedPages[idx] = {
+            ...existing,
+            components: aiPage.components || [],
+          };
+          if (!firstNewOrUpdatedPageId) firstNewOrUpdatedPageId = existing.id;
+        } else {
+          // Add as a new page
+          const newPage: Page = {
+            id: generateId(),
+            name: pageName,
+            slug,
+            path: aiPage.path || `/${slug}`,
+            components: aiPage.components || [],
+          };
+          updatedPages.push(newPage);
+          if (!firstNewOrUpdatedPageId) firstNewOrUpdatedPageId = newPage.id;
+        }
+      }
+
+      return updatedPages;
     });
 
-    setPages((prev) => [...prev, ...newPages]);
-    // Switch to the first newly generated page
-    setCurrentPageId(newPages[0].id);
-    toast.success(`Generated ${newPages.length} new page${newPages.length > 1 ? "s" : ""}`);
+    // Switch to the first new/updated page
+    if (firstNewOrUpdatedPageId) {
+      setCurrentPageId(firstNewOrUpdatedPageId);
+    }
+    toast.success(`Applied ${aiPages.length} AI-generated page${aiPages.length > 1 ? "s" : ""}`);
   };
 
   // Custom component handlers
@@ -844,6 +891,7 @@ export default function EditorPage() {
           onPageAdd={handlePageAdd}
           onPageDelete={handlePageDelete}
           onPageDuplicate={handlePageDuplicate}
+          onPageRename={handlePageRename}
           onUndo={undo}
           onRedo={redo}
           canUndo={canUndo}

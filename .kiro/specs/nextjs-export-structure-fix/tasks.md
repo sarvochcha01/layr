@@ -34,7 +34,7 @@
   - Mark task complete when tests are written, run, and passing on unfixed code
   - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5_
 
-- [ ] 3. Fix for Next.js Export Structure
+- [x] 3. Fix for Next.js Export Structure
   - [x] 3.1 Update export route to generate App Router structure
     - Replace pages/ directory with app/ directory in route.ts
     - Change `zip.folder("pages")` to `zip.folder("app")`
@@ -101,7 +101,7 @@
     - _Preservation: Configuration file generation must remain unchanged for non-React exports (Requirement 3.3)_
     - _Requirements: 2.1, 2.5_
 
-  - [-] 3.7 Verify bug condition exploration test now passes
+  - [x] 3.7 Verify bug condition exploration test now passes
     - **Property 1: Expected Behavior** - App Router Structure with Complete Components
     - **IMPORTANT**: Re-run the SAME test from task 1 - do NOT write a new test
     - The test from task 1 encodes the expected behavior
@@ -114,7 +114,7 @@
     - Verify exported project can run with npm install && npm run dev
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_
 
-  - [~] 3.8 Verify preservation tests still pass
+  - [x] 3.8 Verify preservation tests still pass
     - **Property 2: Preservation** - HTML Export and Configuration Files
     - **IMPORTANT**: Re-run the SAME tests from task 2 - do NOT write new tests
     - Run preservation property tests from step 2
@@ -126,7 +126,7 @@
     - Verify ZIP file generation and headers are unchanged
     - Confirm all tests still pass after fix (no regressions)
 
-- [~] 4. Checkpoint - Ensure all tests pass
+- [x] 4. Checkpoint - Ensure all tests pass
   - Run all property-based tests (bug condition and preservation)
   - Verify no regressions in HTML export functionality
   - Verify exported React/Next.js project runs successfully with npm install && npm run dev

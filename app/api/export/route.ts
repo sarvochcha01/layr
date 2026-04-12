@@ -50,9 +50,35 @@ export async function POST(request: NextRequest) {
             // React/Next.js export with App Router structure
             const appFolder = zip.folder("app");
             const componentsFolder = zip.folder("components");
+            const publicFolder = zip.folder("public");
 
             // Generate app/layout.tsx
             appFolder?.file("layout.tsx", generateAppLayout(projectName));
+
+            // Generate app/globals.css
+            appFolder?.file(
+                "globals.css",
+                `@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+}
+`
+            );
 
             // Generate page components using App Router structure
             for (let i = 0; i < pagesToExport.length; i++) {
@@ -98,37 +124,91 @@ export async function POST(request: NextRequest) {
             // Add postcss config
             zip.file(
                 "postcss.config.js",
-                `module.exports = {
+                `/** @type {import('postcss-load-config').Config} */
+const config = {
   plugins: {
     tailwindcss: {},
     autoprefixer: {},
   },
 }
+
+module.exports = config
 `
             );
 
-            // Add global styles
-            const stylesFolder = zip.folder("styles");
-            stylesFolder?.file(
-                "globals.css",
-                `@tailwind base;
-@tailwind components;
-@tailwind utilities;
+            // Add .gitignore
+            zip.file(
+                ".gitignore",
+                `# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# local env files
+.env*.local
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
 `
             );
 
-            // Add tsconfig
+            // Add .eslintrc.json
+            zip.file(
+                ".eslintrc.json",
+                JSON.stringify(
+                    {
+                        extends: "next/core-web-vitals",
+                    },
+                    null,
+                    2
+                )
+            );
+
+            // Add next-env.d.ts
+            zip.file(
+                "next-env.d.ts",
+                `/// <reference types="next" />
+/// <reference types="next/image-types/global" />
+
+// NOTE: This file should not be edited
+// see https://nextjs.org/docs/app/building-your-application/configuring/typescript for more information.
+`
+            );
+
+            // Add tsconfig.json with proper Next.js 15 configuration
             zip.file(
                 "tsconfig.json",
                 JSON.stringify(
                     {
                         compilerOptions: {
-                            target: "es5",
+                            target: "ES2017",
                             lib: ["dom", "dom.iterable", "esnext"],
                             allowJs: true,
                             skipLibCheck: true,
                             strict: true,
-                            forceConsistentCasingInFileNames: true,
                             noEmit: true,
                             esModuleInterop: true,
                             module: "esnext",
@@ -137,17 +217,25 @@ export async function POST(request: NextRequest) {
                             isolatedModules: true,
                             jsx: "preserve",
                             incremental: true,
+                            plugins: [
+                                {
+                                    name: "next",
+                                },
+                            ],
                             paths: {
                                 "@/*": ["./*"],
                             },
                         },
-                        include: ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+                        include: ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
                         exclude: ["node_modules"],
                     },
                     null,
                     2
                 )
             );
+
+            // Add placeholder image to public folder
+            publicFolder?.file(".gitkeep", "");
         } else {
             // HTML export (existing logic)
             for (const page of pagesToExport) {

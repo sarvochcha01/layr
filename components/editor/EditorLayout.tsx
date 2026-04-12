@@ -21,6 +21,9 @@ import {
   generateNextConfig,
   generateTailwindConfig,
   generateREADME,
+  generateAppLayout,
+  generateAppPage,
+  generateComponentImplementation,
 } from "@/lib/reactGenerator";
 
 type Viewport = "desktop" | "tablet" | "mobile";
@@ -41,6 +44,7 @@ interface EditorLayoutProps {
   onPageAdd: (name: string, slug: string) => void;
   onPageDelete: (pageId: string) => void;
   onPageDuplicate?: (pageId: string) => void;
+  onPageRename?: (pageId: string, name: string, slug: string) => void;
   onUndo?: () => void;
   onRedo?: () => void;
   canUndo?: boolean;
@@ -79,6 +83,7 @@ export function EditorLayout({
   onPageAdd,
   onPageDelete,
   onPageDuplicate,
+  onPageRename,
   onUndo,
   onRedo,
   canUndo = false,
@@ -208,38 +213,93 @@ export function EditorLayout({
       const name = projectName || "my-website";
 
       if (format === "react") {
-        // React/Next.js export — fully client-side
-        const pagesFolder = zip.folder("pages");
+        // React/Next.js export with App Router structure — fully client-side
+        const appFolder = zip.folder("app");
         const componentsFolder = zip.folder("components");
+        const publicFolder = zip.folder("public");
 
-        for (const page of pagesToExport) {
+        // Generate app/layout.tsx
+        appFolder?.file("layout.tsx", generateAppLayout(name));
+
+        // Generate app/globals.css
+        appFolder?.file("globals.css", `@tailwind base;\n@tailwind components;\n@tailwind utilities;\n\n:root {\n  --foreground-rgb: 0, 0, 0;\n  --background-start-rgb: 214, 219, 220;\n  --background-end-rgb: 255, 255, 255;\n}\n\nbody {\n  color: rgb(var(--foreground-rgb));\n  background: linear-gradient(\n      to bottom,\n      transparent,\n      rgb(var(--background-end-rgb))\n    )\n    rgb(var(--background-start-rgb));\n}\n`);
+
+        // Generate page components using App Router structure
+        for (let i = 0; i < pagesToExport.length; i++) {
+          const page = pagesToExport[i];
           const pageName = page.name.replace(/\s+/g, "");
-          const reactComponent = generateReactComponent(page.components, pageName);
-          const filename = page.slug === "index" ? "index.tsx" : `${page.slug}.tsx`;
-          pagesFolder?.file(filename, reactComponent);
+
+          // App Router uses app/page.tsx for home and app/[slug]/page.tsx for other pages
+          if (page.slug === "index" || (i === 0 && !pagesToExport.some(p => p.slug === "index"))) {
+            const appPageContent = generateAppPage(page.components, pageName, `${pageName} - ${name}`);
+            appFolder?.file("page.tsx", appPageContent);
+          } else {
+            const reactComponent = generateReactComponent(page.components, pageName);
+            const slugPath = page.slug || page.name.toLowerCase().replace(/\s+/g, "-") || page.id;
+            const pageFolder = appFolder?.folder(slugPath);
+            pageFolder?.file("page.tsx", reactComponent);
+          }
         }
 
+        // Generate all component implementation files
+        const componentNames = [
+          'Header', 'Footer', 'Hero', 'Section', 'Container', 'Grid',
+          'Card', 'Button', 'Text', 'Image', 'Video', 'Form',
+          'Navbar', 'Accordion', 'Tabs', 'Testimonial', 'PricingCard',
+          'Feature', 'Stats', 'CTA', 'Divider', 'Spacer', 'Badge', 'Alert'
+        ];
+
+        for (const componentName of componentNames) {
+          const componentCode = generateComponentImplementation(componentName);
+          componentsFolder?.file(`${componentName}.tsx`, componentCode);
+        }
+
+        // Add component index for convenient imports
         componentsFolder?.file("index.ts", generateReactComponentsIndex());
+
+        // Add config files
         zip.file("package.json", generatePackageJson(name));
         zip.file("next.config.js", generateNextConfig());
         zip.file("tailwind.config.js", generateTailwindConfig());
         zip.file("README.md", generateREADME(name));
-        zip.file("postcss.config.js", `module.exports = {\n  plugins: {\n    tailwindcss: {},\n    autoprefixer: {},\n  },\n}\n`);
 
-        const stylesFolder = zip.folder("styles");
-        stylesFolder?.file("globals.css", `@tailwind base;\n@tailwind components;\n@tailwind utilities;\n`);
+        // Add postcss config
+        zip.file("postcss.config.js", `/** @type {import('postcss-load-config').Config} */\nconst config = {\n  plugins: {\n    tailwindcss: {},\n    autoprefixer: {},\n  },\n}\n\nmodule.exports = config\n`);
 
+        // Add .gitignore
+        zip.file(".gitignore", `# dependencies\n/node_modules\n/.pnp\n.pnp.js\n\n# testing\n/coverage\n\n# next.js\n/.next/\n/out/\n\n# production\n/build\n\n# misc\n.DS_Store\n*.pem\n\n# debug\nnpm-debug.log*\nyarn-debug.log*\nyarn-error.log*\n\n# local env files\n.env*.local\n\n# vercel\n.vercel\n\n# typescript\n*.tsbuildinfo\nnext-env.d.ts\n`);
+
+        // Add .eslintrc.json
+        zip.file(".eslintrc.json", JSON.stringify({ extends: "next/core-web-vitals" }, null, 2));
+
+        // Add next-env.d.ts
+        zip.file("next-env.d.ts", `/// <reference types="next" />\n/// <reference types="next/image-types/global" />\n\n// NOTE: This file should not be edited\n// see https://nextjs.org/docs/app/building-your-application/configuring/typescript for more information.\n`);
+
+        // Add tsconfig.json with proper Next.js 15 configuration
         zip.file("tsconfig.json", JSON.stringify({
           compilerOptions: {
-            target: "es5", lib: ["dom", "dom.iterable", "esnext"], allowJs: true,
-            skipLibCheck: true, strict: true, forceConsistentCasingInFileNames: true,
-            noEmit: true, esModuleInterop: true, module: "esnext",
-            moduleResolution: "node", resolveJsonModule: true, isolatedModules: true,
-            jsx: "preserve", incremental: true, paths: { "@/*": ["./*"] },
+            target: "ES2017",
+            lib: ["dom", "dom.iterable", "esnext"],
+            allowJs: true,
+            skipLibCheck: true,
+            strict: true,
+            noEmit: true,
+            esModuleInterop: true,
+            module: "esnext",
+            moduleResolution: "node",
+            resolveJsonModule: true,
+            isolatedModules: true,
+            jsx: "preserve",
+            incremental: true,
+            plugins: [{ name: "next" }],
+            paths: { "@/*": ["./*"] },
           },
-          include: ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+          include: ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
           exclude: ["node_modules"],
         }, null, 2));
+
+        // Add placeholder to public folder
+        publicFolder?.file(".gitkeep", "");
       } else {
         // HTML export — client-side
         const css = generateCSS();
@@ -300,9 +360,7 @@ export function EditorLayout({
                   onPageAdd={onPageAdd}
                   onPageDelete={onPageDelete}
                   onPageDuplicate={onPageDuplicate}
-                  onPageRename={(id, name, slug) => {
-                    // TODO: Implement page rename
-                  }}
+                  onPageRename={onPageRename || (() => {})}
                 />
               </TabsContent>
 
