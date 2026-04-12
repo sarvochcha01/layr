@@ -221,158 +221,39 @@ export function EditorLayout({
     try {
       setShowExportMenu(false);
 
-      const zip = new JSZip();
-      const pagesToExport = pages;
-      const name = projectName || "my-website";
+      // Call the API route to generate the export server-side
+      const response = await fetch("/api/export", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          pages,
+          format,
+          projectName: projectName || "my-website",
+        }),
+      });
 
-      if (format === "react") {
-        const appFolder = zip.folder("app");
-        const componentsFolder = zip.folder("components");
-        const publicFolder = zip.folder("public");
-
-        appFolder?.file("layout.tsx", generateAppLayout(name));
-        appFolder?.file(
-          "globals.css",
-          `@tailwind base;\n@tailwind components;\n@tailwind utilities;\n\n:root {\n  --foreground-rgb: 0, 0, 0;\n  --background-start-rgb: 214, 219, 220;\n  --background-end-rgb: 255, 255, 255;\n}\n\nbody {\n  color: rgb(var(--foreground-rgb));\n  background: linear-gradient(\n      to bottom,\n      transparent,\n      rgb(var(--background-end-rgb))\n    )\n    rgb(var(--background-start-rgb));\n}\n`,
-        );
-
-        for (let i = 0; i < pagesToExport.length; i++) {
-          const page = pagesToExport[i];
-          const pageName = page.name.replace(/\s+/g, "");
-
-          if (
-            page.slug === "index" ||
-            (i === 0 && !pagesToExport.some((p) => p.slug === "index"))
-          ) {
-            const appPageContent = generateAppPage(
-              page.components,
-              pageName,
-              `${pageName} - ${name}`,
-            );
-            appFolder?.file("page.tsx", appPageContent);
-          } else {
-            const reactComponent = generateReactComponent(
-              page.components,
-              pageName,
-            );
-            const slugPath =
-              page.slug ||
-              page.name.toLowerCase().replace(/\s+/g, "-") ||
-              page.id;
-            const pageFolder = appFolder?.folder(slugPath);
-            pageFolder?.file("page.tsx", reactComponent);
-          }
-        }
-
-        const componentNames = [
-          "Header",
-          "Footer",
-          "Hero",
-          "Section",
-          "Container",
-          "Grid",
-          "Card",
-          "Button",
-          "Text",
-          "Image",
-          "Video",
-          "Form",
-          "Navbar",
-          "Accordion",
-          "Tabs",
-          "Testimonial",
-          "PricingCard",
-          "Feature",
-          "Stats",
-          "CTA",
-          "Divider",
-          "Spacer",
-          "Badge",
-          "Alert",
-        ];
-
-        for (const componentName of componentNames) {
-          const componentCode = generateComponentImplementation(componentName);
-          componentsFolder?.file(`${componentName}.tsx`, componentCode);
-        }
-
-        componentsFolder?.file("index.ts", generateReactComponentsIndex());
-
-        zip.file("package.json", generatePackageJson(name));
-        zip.file("next.config.js", generateNextConfig());
-        zip.file("tailwind.config.js", generateTailwindConfig());
-        zip.file("README.md", generateREADME(name));
-        zip.file(
-          "postcss.config.js",
-          `/** @type {import('postcss-load-config').Config} */\nconst config = {\n  plugins: {\n    tailwindcss: {},\n    autoprefixer: {},\n  },\n}\n\nmodule.exports = config\n`,
-        );
-        zip.file(
-          ".gitignore",
-          `# dependencies\n/node_modules\n/.pnp\n.pnp.js\n\n# testing\n/coverage\n\n# next.js\n/.next/\n/out/\n\n# production\n/build\n\n# misc\n.DS_Store\n*.pem\n\n# debug\nnpm-debug.log*\nyarn-debug.log*\nyarn-error.log*\n\n# local env files\n.env*.local\n\n# vercel\n.vercel\n\n# typescript\n*.tsbuildinfo\nnext-env.d.ts\n`,
-        );
-        zip.file(
-          ".eslintrc.json",
-          JSON.stringify({ extends: "next/core-web-vitals" }, null, 2),
-        );
-        zip.file(
-          "next-env.d.ts",
-          `/// <reference types="next" />\n/// <reference types="next/image-types/global" />\n\n// NOTE: This file should not be edited\n// see https://nextjs.org/docs/app/building-your-application/configuring/typescript for more information.\n`,
-        );
-        zip.file(
-          "tsconfig.json",
-          JSON.stringify(
-            {
-              compilerOptions: {
-                target: "ES2017",
-                lib: ["dom", "dom.iterable", "esnext"],
-                allowJs: true,
-                skipLibCheck: true,
-                strict: true,
-                noEmit: true,
-                esModuleInterop: true,
-                module: "esnext",
-                moduleResolution: "node",
-                resolveJsonModule: true,
-                isolatedModules: true,
-                jsx: "preserve",
-                incremental: true,
-                plugins: [{ name: "next" }],
-                paths: { "@/*": ["./*"] },
-              },
-              include: [
-                "next-env.d.ts",
-                "**/*.ts",
-                "**/*.tsx",
-                ".next/types/**/*.ts",
-              ],
-              exclude: ["node_modules"],
-            },
-            null,
-            2,
-          ),
-        );
-
-        publicFolder?.file(".gitkeep", "");
-      } else {
-        const css = generateCSS();
-        const js = generateJS();
-
-        for (const page of pagesToExport) {
-          const html = generateHTML(page.components, pagesToExport);
-          const filename = `${page.slug || page.id}.html`;
-          zip.file(filename, html);
-        }
-
-        zip.file("styles.css", css);
-        zip.file("script.js", js);
+      if (!response.ok) {
+        throw new Error("Export failed");
       }
 
-      const blob = await zip.generateAsync({ type: "blob" });
+      // Download the zip file
+      const blob = await response.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download =
-        format === "react" ? `${name}-nextjs.zip` : `${name}-export.zip`;
+
+      // Get filename from Content-Disposition header or use default
+      const contentDisposition = response.headers.get("Content-Disposition");
+      const filenameMatch = contentDisposition?.match(/filename="(.+)"/);
+      const filename = filenameMatch
+        ? filenameMatch[1]
+        : format === "react"
+          ? `${projectName || "my-website"}-nextjs.zip`
+          : `${projectName || "my-website"}-export.zip`;
+
+      a.download = filename;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -499,13 +380,16 @@ export function EditorLayout({
             >
               {isSaving ? "Saving..." : "Save"}
             </button>
-            <button
-              onClick={() => setShowExportMenu(!showExportMenu)}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-xs font-medium transition-colors relative"
-            >
-              Publish
+            <div className="relative">
+              <button
+                onClick={() => setShowExportMenu(!showExportMenu)}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-xs font-medium transition-colors flex items-center gap-2"
+              >
+                <Download className="w-4 h-4" />
+                Export
+              </button>
               {showExportMenu && (
-                <div className="absolute right-0 top-full mt-2 w-52 bg-[#1a1a1a] rounded-lg shadow-xl border border-[#2a2a2a] overflow-hidden">
+                <div className="absolute right-0 top-full mt-2 w-52 bg-[#1a1a1a] rounded-lg shadow-xl border border-[#2a2a2a] overflow-hidden z-50">
                   <button
                     onClick={() => exportToZip("html")}
                     className="w-full text-left px-4 py-3 text-sm hover:bg-[#2a2a2a] transition-colors"
@@ -529,7 +413,7 @@ export function EditorLayout({
                   </button>
                 </div>
               )}
-            </button>
+            </div>
           </div>
         </div>
 
