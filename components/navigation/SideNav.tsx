@@ -6,11 +6,10 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
-  Home,
   FileText,
   Settings,
   User,
-  BarChart3,
+  LayoutDashboard,
   Folder,
   ChevronLeft,
   ChevronRight,
@@ -25,14 +24,14 @@ interface NavItem {
 
 const navigationItems: NavItem[] = [
   {
-    icon: Home,
-    text: "Dashboard",
-    href: "/dashboard",
-  },
-  {
     icon: FileText,
     text: "Projects",
     href: "/projects",
+  },
+  {
+    icon: LayoutDashboard,
+    text: "Overview",
+    href: "/dashboard",
   },
   {
     icon: Folder,
@@ -101,7 +100,7 @@ export function SideNav({ className }: SideNavProps) {
       <nav className="flex-1 p-2">
         <ul className="space-y-1">
           {navigationItems.map((item) => {
-            const isActive = pathname === item.href;
+            const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
             const Icon = item.icon;
 
             return (
@@ -111,8 +110,8 @@ export function SideNav({ className }: SideNavProps) {
                   className={cn(
                     "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                     isActive
-                      ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
-                      : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+                      ? "bg-secondary text-foreground"
+                      : "text-muted-foreground hover:bg-secondary/50 hover:text-foreground",
                     isCollapsed && "justify-center px-2"
                   )}
                   title={isCollapsed ? item.text : undefined}

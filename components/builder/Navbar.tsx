@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
+import { buildComponentStyle } from "@/lib/buildStyle";
 
 interface NavLink {
   text: string;
@@ -27,6 +28,9 @@ interface NavbarProps {
   textColor?: string;
   linkColor?: string;
   linkHoverColor?: string;
+  onNavigate?: (slug: string) => void;
+  pages?: any[];
+  [key: string]: any;
 }
 
 export function Navbar({
@@ -45,7 +49,10 @@ export function Navbar({
   backgroundColor,
   textColor,
   linkColor,
-  linkHoverColor = "#3b82f6",
+  linkHoverColor = "#6366f1",
+  onNavigate,
+  pages,
+  ...rest
 }: NavbarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -57,83 +64,114 @@ export function Navbar({
     setIsMobileMenuOpen(false);
   };
 
+  const baseStyle = buildComponentStyle({ backgroundColor, textColor, width, height, ...rest });
+
+  // Apply glass effect when no explicit background
+  if (!backgroundColor) {
+    if (theme === "dark") {
+      baseStyle.backgroundColor = "rgba(15, 23, 42, 0.8)";
+    } else {
+      baseStyle.backgroundColor = "rgba(255, 255, 255, 0.8)";
+    }
+    baseStyle.backdropFilter = "blur(12px)";
+    (baseStyle as any).WebkitBackdropFilter = "blur(12px)";
+  }
+
   return (
     <div className="relative">
       <nav
         className={cn(
-          "flex items-center justify-between w-full",
+          "flex items-center w-full px-6 sm:px-8 py-4",
+          "border-b",
+          theme === "dark" ? "border-white/10" : "border-gray-200/60",
           !textColor && (theme === "dark" ? "text-white" : "text-gray-900"),
-          className
+          className,
         )}
-        style={{
-          width: width || undefined,
-          height: height || undefined,
-          backgroundColor: backgroundColor || undefined,
-          color: textColor || undefined,
-        }}
+        style={baseStyle}
       >
         {/* Logo */}
         <div className="flex items-center space-x-2">
           {logo ? (
-            <img src={logo} alt="Logo" className="h-6 sm:h-8 w-auto" />
+            <img src={logo} alt="Logo" className="h-7 sm:h-8 w-auto" />
           ) : (
-            <span className="text-lg sm:text-xl font-bold">{logoText}</span>
+            <span className="text-lg font-bold tracking-tight" style={{ fontFamily: "'Inter', sans-serif" }}>
+              {logoText}
+            </span>
           )}
         </div>
 
-        {/* Navigation Links - Hidden on mobile */}
+        {/* Navigation Links - Desktop */}
         {viewport === "desktop" && (
-          <div className="flex items-center space-x-4 xl:space-x-8">
+          <div className="flex items-center space-x-1 ml-auto mr-4">
             {links.map((link, index) => {
-              const linkProps = {
-                href: isPreviewMode ? link.href : "#",
-                className: cn(
-                  "transition-colors text-sm lg:text-base cursor-pointer",
-                  !linkColor &&
-                    (theme === "dark" ? "text-white" : "text-gray-700")
-                ),
-                style: {
-                  color: linkColor || undefined,
-                },
-                onMouseEnter: (e: React.MouseEvent<HTMLAnchorElement>) => {
-                  if (linkHoverColor) {
-                    e.currentTarget.style.color = linkHoverColor;
+              const handleClick = (e: React.MouseEvent) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                if (onNavigate && !link.external) {
+                  let slug = link.href;
+
+                  if (slug.startsWith("page:")) {
+                    slug = slug.replace("page:", "");
+                  } else {
+                    slug = slug.replace(/^\//, "").replace(/\.html$/, "");
                   }
-                },
-                onMouseLeave: (e: React.MouseEvent<HTMLAnchorElement>) => {
-                  if (linkColor) {
-                    e.currentTarget.style.color = linkColor;
+
+                  if (!slug || slug === "#") {
+                    slug = link.text.toLowerCase().replace(/\s+/g, "-");
+                    if (slug === "home") slug = "index";
                   }
-                },
-                onClick: isPreviewMode
-                  ? undefined
-                  : (e: React.MouseEvent) => e.preventDefault(),
-                ...(isPreviewMode &&
-                  link.external && {
-                    target: "_blank",
-                    rel: "noopener noreferrer",
-                  }),
+
+                  onNavigate(slug);
+                }
               };
 
-              return link.external && isPreviewMode ? (
-                <a key={index} {...linkProps}>
+              return (
+                <a
+                  key={index}
+                  href={link.external ? link.href : "#"}
+                  className={cn(
+                    "px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200",
+                    !linkColor && (theme === "dark" ? "text-white/70 hover:text-white hover:bg-white/5" : "text-gray-500 hover:text-gray-900 hover:bg-gray-100/60"),
+                  )}
+                  style={{
+                    color: linkColor || undefined,
+                  }}
+                  onMouseEnter={(e) => {
+                    if (linkHoverColor) {
+                      e.currentTarget.style.color = linkHoverColor;
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = linkColor || "";
+                  }}
+                  onClick={handleClick}
+                  {...(link.external && isPreviewMode && {
+                    target: "_blank",
+                    rel: "noopener noreferrer",
+                  })}
+                >
                   {link.text}
                 </a>
-              ) : (
-                <Link key={index} {...linkProps}>
-                  {link.text}
-                </Link>
               );
             })}
           </div>
         )}
 
         {/* Desktop CTA & Mobile Menu Button */}
-        <div className="flex items-center space-x-2">
-          {/* Desktop CTA */}
+        <div className={cn("flex items-center space-x-3", viewport === "desktop" ? "" : "ml-auto")}>
           {ctaText && ctaLink && viewport === "desktop" && (
             <div style={isPreviewMode ? undefined : { pointerEvents: "none" }}>
-              <Button asChild size="sm" className="text-sm">
+              <Button
+                asChild
+                size="sm"
+                className="text-sm font-medium rounded-full px-5 shadow-sm transition-all duration-300 hover:shadow-md"
+                style={{
+                  background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
+                  color: "#ffffff",
+                  border: "none",
+                }}
+              >
                 {ctaExternal && isPreviewMode ? (
                   <a href={ctaLink} target="_blank" rel="noopener noreferrer">
                     {ctaText}
@@ -152,7 +190,6 @@ export function Navbar({
             </div>
           )}
 
-          {/* Mobile Menu Button */}
           {links.length > 0 && viewport !== "desktop" && (
             <Button
               variant="ghost"
@@ -172,43 +209,72 @@ export function Navbar({
 
       {/* Mobile Menu Dropdown */}
       {isMobileMenuOpen && links.length > 0 && viewport !== "desktop" && (
-        <div className="absolute top-full left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
-          <div className="py-2">
+        <div
+          className="absolute top-full left-0 right-0 border-b shadow-xl z-50"
+          style={{
+            backgroundColor: theme === "dark" ? "rgba(15, 23, 42, 0.95)" : "rgba(255, 255, 255, 0.95)",
+            backdropFilter: "blur(12px)",
+            borderColor: theme === "dark" ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.06)",
+          }}
+        >
+          <div className="py-2 px-2">
             {links.map((link, index) => {
-              const linkProps = {
-                href: isPreviewMode ? link.href : "#",
-                className: cn(
-                  "block px-4 py-3 text-sm hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0",
-                  theme === "dark" ? "text-gray-900" : "text-gray-700"
-                ),
-                onClick: isPreviewMode
-                  ? closeMobileMenu
-                  : (e: React.MouseEvent) => e.preventDefault(),
-                ...(isPreviewMode &&
-                  link.external && {
-                    target: "_blank",
-                    rel: "noopener noreferrer",
-                  }),
+              const handleClick = (e: React.MouseEvent) => {
+                closeMobileMenu();
+                if (onNavigate && !link.external) {
+                  e.preventDefault();
+
+                  let slug = link.href;
+
+                  if (slug.startsWith("page:")) {
+                    slug = slug.replace("page:", "");
+                  } else {
+                    slug = slug.replace(/^\//, "").replace(/\.html$/, "");
+                  }
+
+                  if (!slug || slug === "#") {
+                    slug = link.text.toLowerCase().replace(/\s+/g, "-");
+                    if (slug === "home") slug = "index";
+                  }
+
+                  onNavigate(slug);
+                }
               };
 
-              return link.external && isPreviewMode ? (
-                <a key={index} {...linkProps}>
+              return (
+                <a
+                  key={index}
+                  href={link.external ? link.href : "#"}
+                  className={cn(
+                    "block px-4 py-3 text-sm font-medium rounded-lg transition-colors",
+                    theme === "dark" ? "text-white/80 hover:bg-white/5" : "text-gray-700 hover:bg-gray-50",
+                  )}
+                  onClick={handleClick}
+                  {...(link.external && isPreviewMode && {
+                    target: "_blank",
+                    rel: "noopener noreferrer",
+                  })}
+                >
                   {link.text}
                 </a>
-              ) : (
-                <Link key={index} {...linkProps}>
-                  {link.text}
-                </Link>
               );
             })}
 
-            {/* Mobile CTA */}
             {ctaText && ctaLink && (
               <div
                 className="px-4 py-3"
                 style={isPreviewMode ? undefined : { pointerEvents: "none" }}
               >
-                <Button asChild size="sm" className="w-full text-sm">
+                <Button
+                  asChild
+                  size="sm"
+                  className="w-full text-sm rounded-full"
+                  style={{
+                    background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
+                    color: "#ffffff",
+                    border: "none",
+                  }}
+                >
                   {ctaExternal && isPreviewMode ? (
                     <a
                       href={ctaLink}

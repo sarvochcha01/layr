@@ -1,5 +1,6 @@
 import { Button as ShadcnButton } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { buildComponentStyle } from "@/lib/buildStyle";
 
 interface ButtonProps {
   children?: React.ReactNode;
@@ -19,10 +20,13 @@ interface ButtonProps {
   className?: string;
   onClick?: () => void;
   isPreviewMode?: boolean;
+  onNavigate?: (slug: string) => void;
+  pages?: any[];
   width?: string;
   height?: string;
   backgroundColor?: string;
   textColor?: string;
+  [key: string]: any;
 }
 
 export function Button({
@@ -37,54 +41,88 @@ export function Button({
   className,
   onClick,
   isPreviewMode = false,
+  onNavigate,
+  pages,
   width,
   height,
   backgroundColor,
   textColor,
+  ...rest
 }: ButtonProps) {
   const buttonContent = children || text || "Button";
+  const baseStyle = buildComponentStyle({ backgroundColor, textColor, width, height, ...rest });
+
+  // Resolve page: links to actual page slugs
+  const resolveHref = (rawHref: string | undefined): { resolved: string; isPageLink: boolean; slug?: string } => {
+    if (!rawHref) return { resolved: "#", isPageLink: false };
+
+    if (rawHref.startsWith("page:")) {
+      const pageId = rawHref.substring(5);
+      const page = pages?.find((p: any) => p.id === pageId);
+      if (page) {
+        return { resolved: `/${page.slug}`, isPageLink: true, slug: page.slug };
+      }
+      return { resolved: "#", isPageLink: true };
+    }
+
+    return { resolved: rawHref, isPageLink: false };
+  };
+
+  const linkInfo = resolveHref(href);
+
+  const handleClick = (e: React.MouseEvent) => {
+    if (!isPreviewMode) {
+      e.preventDefault();
+      return;
+    }
+
+    // Handle internal page navigation in preview mode
+    if (linkInfo.isPageLink && onNavigate && linkInfo.slug) {
+      e.preventDefault();
+      onNavigate(linkInfo.slug);
+      return;
+    }
+
+    if (onClick) {
+      onClick();
+    }
+  };
 
   const buttonElement = (
     <ShadcnButton
       variant={variant}
       size={size}
       disabled={disabled}
-      onClick={isPreviewMode ? onClick : (e) => e.preventDefault()}
+      onClick={handleClick}
       className={cn(fullWidth && "w-full", className)}
-      style={{
-        width: width || undefined,
-        height: height || undefined,
-        backgroundColor: backgroundColor || undefined,
-        color: textColor || undefined,
-      }}
+      style={baseStyle}
     >
       {buttonContent}
     </ShadcnButton>
   );
 
-  // Wrap in a div that prevents all interactions in edit mode
-  const wrappedButton = (
-    <div
-      style={
-        isPreviewMode ? undefined : { pointerEvents: "none", cursor: "default" }
-      }
-      onClick={isPreviewMode ? undefined : (e) => e.stopPropagation()}
-    >
-      {buttonElement}
-    </div>
-  );
+  // In edit mode, wrap to block all interactions
+  if (!isPreviewMode) {
+    return (
+      <div style={{ pointerEvents: "none", cursor: "default" }}>
+        {buttonElement}
+      </div>
+    );
+  }
 
-  if (href && !disabled && isPreviewMode) {
+  // In preview mode with an external link
+  if (href && !disabled && !linkInfo.isPageLink) {
     return (
       <a
-        href={href}
+        href={linkInfo.resolved}
         target={external ? "_blank" : undefined}
         rel={external ? "noopener noreferrer" : undefined}
       >
-        {wrappedButton}
+        {buttonElement}
       </a>
     );
   }
 
-  return wrappedButton;
+  // In preview mode with internal page link or no link — button handles its own click
+  return buttonElement;
 }

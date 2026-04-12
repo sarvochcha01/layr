@@ -80,7 +80,7 @@ export async function PATCH(
         }
 
         const body = await request.json();
-        const { name, description, components, pages, thumbnail } = body;
+        const { name, description, components, pages, thumbnail, globalComponents, customComponents, chatHistory } = body;
 
         const updateData: any = {
             updatedAt: Timestamp.now(),
@@ -91,6 +91,9 @@ export async function PATCH(
         if (components !== undefined) updateData.components = components;
         if (pages !== undefined) updateData.pages = pages;
         if (thumbnail !== undefined) updateData.thumbnail = thumbnail;
+        if (globalComponents !== undefined) updateData.globalComponents = globalComponents;
+        if (customComponents !== undefined) updateData.customComponents = customComponents;
+        if (chatHistory !== undefined) updateData.chatHistory = chatHistory;
 
         await updateDoc(projectRef, updateData);
 

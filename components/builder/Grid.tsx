@@ -1,29 +1,35 @@
 import { cn } from "@/lib/utils";
+import { buildComponentStyle } from "@/lib/buildStyle";
 
 interface GridProps {
   children?: React.ReactNode;
   columns?: 1 | 2 | 3 | 4 | 5 | 6;
-  gap?: "sm" | "md" | "lg" | "xl";
+  gap?: "none" | "sm" | "md" | "lg" | "xl" | "custom";
+  gapCustom?: string;
   className?: string;
   responsive?: boolean;
   width?: string;
   height?: string;
   backgroundColor?: string;
   textColor?: string;
+  [key: string]: any;
 }
 
 export function Grid({
   children,
   columns = 3,
   gap = "md",
+  gapCustom,
   className,
   responsive = true,
   width,
   height,
   backgroundColor,
   textColor,
+  ...rest
 }: GridProps) {
-  const gapClasses = {
+  const gapClasses: Record<string, string> = {
+    none: "gap-0",
     sm: "gap-4",
     md: "gap-6",
     lg: "gap-8",
@@ -39,15 +45,17 @@ export function Grid({
     6: responsive ? "grid-cols-1 md:grid-cols-3 lg:grid-cols-6" : "grid-cols-6",
   };
 
+  const baseStyle = buildComponentStyle({ backgroundColor, textColor, width, height, ...rest });
+
+  // Apply custom gap as inline style
+  if (gap === "custom" && gapCustom) {
+    baseStyle.gap = gapCustom;
+  }
+
   return (
     <div
-      className={cn("grid", columnClasses[columns], gapClasses[gap], className)}
-      style={{
-        width: width || undefined,
-        height: height || undefined,
-        backgroundColor: backgroundColor || undefined,
-        color: textColor || undefined,
-      }}
+      className={cn("grid", columnClasses[columns], gap !== "custom" ? gapClasses[gap] || gapClasses.md : undefined, className)}
+      style={baseStyle}
     >
       {children}
     </div>

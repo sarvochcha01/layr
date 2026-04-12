@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { buildComponentStyle } from "@/lib/buildStyle";
 
 interface TextProps {
   children?: React.ReactNode;
@@ -21,6 +22,7 @@ interface TextProps {
   className?: string;
   width?: string;
   height?: string;
+  [key: string]: any;
 }
 
 export function Text({
@@ -34,6 +36,7 @@ export function Text({
   className,
   width,
   height,
+  ...rest
 }: TextProps) {
   const Component = tag;
 
@@ -66,6 +69,8 @@ export function Text({
     justify: "text-justify",
   };
 
+  const baseStyle = buildComponentStyle({ textColor: color, width, height, ...rest });
+
   return (
     <Component
       className={cn(
@@ -74,11 +79,7 @@ export function Text({
         alignClasses[align],
         className
       )}
-      style={{
-        color,
-        width: width || undefined,
-        height: height || undefined,
-      }}
+      style={baseStyle}
     >
       {children || content}
     </Component>
