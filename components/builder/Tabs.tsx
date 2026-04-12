@@ -28,7 +28,7 @@ export function Tabs({
   defaultTab = 0,
   variant = "underline",
   backgroundColor,
-  textColor = "black",
+  textColor = "#ffffff",
   activeColor = "#3b82f6",
   width,
   height,
@@ -36,30 +36,37 @@ export function Tabs({
 }: TabsProps) {
   const [activeTab, setActiveTab] = useState(defaultTab);
 
-  const baseStyle = buildComponentStyle({ backgroundColor, textColor, width, height, ...rest });
+  const baseStyle = buildComponentStyle({
+    backgroundColor,
+    textColor,
+    width,
+    height,
+    ...rest,
+  });
 
   return (
     <div style={baseStyle}>
       {/* Tab Headers */}
-      <div className={cn("flex gap-2", variant === "bordered" && "border-b")}>
+      <div
+        className={cn(
+          "flex gap-2",
+          variant === "bordered" && "border-b border-[#2a2a2a]",
+        )}
+      >
         {tabs.map((tab, index) => (
           <button
             key={index}
             onClick={() => setActiveTab(index)}
             className={cn(
-              "px-4 py-2 font-medium transition-colors",
+              "px-4 py-2 font-medium transition-colors text-sm",
               variant === "underline" && "border-b-2",
               variant === "pills" && "rounded-lg",
               variant === "bordered" && "border-b-2 -mb-px",
-              activeTab === index
-                ? variant === "pills"
-                  ? ""
-                  : ""
-                : "opacity-60 hover:opacity-100"
+              activeTab !== index && "text-gray-400 hover:text-gray-300",
             )}
             style={{
               borderColor: activeTab === index ? activeColor : "transparent",
-              color: activeTab === index ? activeColor : textColor || undefined,
+              color: activeTab === index ? activeColor : undefined,
               backgroundColor:
                 activeTab === index && variant === "pills"
                   ? `${activeColor}20`
@@ -72,7 +79,7 @@ export function Tabs({
       </div>
 
       {/* Tab Content */}
-      <div className="py-4">{tabs[activeTab]?.content}</div>
+      <div className="py-4 text-gray-300">{tabs[activeTab]?.content}</div>
     </div>
   );
 }

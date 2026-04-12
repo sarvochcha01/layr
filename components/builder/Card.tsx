@@ -7,6 +7,8 @@ interface CardProps {
   description?: string;
   image?: string;
   icon?: string;
+  iconBg?: string;
+  iconColor?: string;
   buttonText?: string;
   buttonLink?: string;
   variant?: "default" | "bordered" | "shadow" | "elevated";
@@ -30,14 +32,14 @@ export function Card({
   className,
   width,
   height,
-  backgroundColor,
-  textColor,
+  backgroundColor = "#1a1a1a",
+  textColor = "#ffffff",
   children,
   ...rest
 }: CardProps) {
   const baseStyle = buildComponentStyle({
-    backgroundColor: backgroundColor || "#ffffff",
-    textColor: textColor || "#1e293b",
+    backgroundColor,
+    textColor,
     width,
     height,
     ...rest,
@@ -47,11 +49,10 @@ export function Card({
     <div
       className={cn(
         "rounded-2xl p-6 min-w-0 overflow-hidden transition-all duration-300",
-        "border border-gray-100",
-        "shadow-[0_1px_3px_rgba(0,0,0,0.04),0_6px_24px_rgba(0,0,0,0.06)]",
-        "hover:shadow-[0_4px_12px_rgba(0,0,0,0.08),0_12px_40px_rgba(0,0,0,0.1)]",
-        "hover:-translate-y-1",
-        className
+        "border border-[#2a2a2a]",
+        "hover:border-[#3a3a3a]",
+        "hover:-translate-y-0.5",
+        className,
       )}
       style={baseStyle}
     >
@@ -70,10 +71,10 @@ export function Card({
       {icon && !image && (
         <div className="mb-5">
           <div
-            className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl"
-            style={{ backgroundColor: "rgba(99, 102, 241, 0.1)", color: "#6366f1" }}
+            className="w-12 h-12 rounded-xl flex items-center justify-center text-xl font-bold backdrop-blur-sm"
+            style={{ backgroundColor: iconBg, color: iconColor }}
           >
-            {icon}
+            {icon || "•"}
           </div>
         </div>
       )}
@@ -82,7 +83,7 @@ export function Card({
       <div className="space-y-3 min-w-0">
         {title && (
           <h3
-            className="text-lg font-semibold break-words leading-snug tracking-tight"
+            className="text-xl font-semibold break-words leading-tight tracking-tight"
             style={{ fontFamily: "'Inter', sans-serif" }}
           >
             {title}
@@ -90,7 +91,7 @@ export function Card({
         )}
 
         {description && (
-          <p className="text-sm leading-relaxed break-words opacity-60">
+          <p className="text-sm leading-relaxed break-words text-gray-400">
             {description}
           </p>
         )}
@@ -100,8 +101,7 @@ export function Card({
             <Button
               variant="ghost"
               size="sm"
-              className="px-0 font-medium hover:bg-transparent"
-              style={{ color: "#6366f1" }}
+              className="px-0 font-medium hover:bg-transparent text-blue-400 hover:text-blue-300"
               asChild
             >
               <a href={buttonLink} className="inline-flex items-center gap-1.5">

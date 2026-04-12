@@ -21,16 +21,16 @@ interface StatsProps {
 
 export function Stats({
   stats = [
-    { value: "10K+", label: "Active Users" },
-    { value: "99.9%", label: "Uptime SLA" },
-    { value: "50+", label: "Countries" },
-    { value: "4.9", label: "Star Rating" },
+    { value: "10M", label: "ACTIVE USERS", suffix: "+" },
+    { value: "99.9", label: "UPTIME SLA", suffix: "%" },
+    { value: "240", label: "GLOBAL EDGES", suffix: "+" },
+    { value: "15", label: "AVG LATENCY", suffix: "ms" },
   ],
   layout = "horizontal",
   columns = 4,
-  backgroundColor,
-  textColor,
-  accentColor = "#6366f1",
+  backgroundColor = "#0d0d0d",
+  textColor = "#ffffff",
+  accentColor = "#ffffff",
   width,
   height,
   ...rest
@@ -41,15 +41,21 @@ export function Stats({
     4: "grid-cols-2 sm:grid-cols-4",
   };
 
-  const baseStyle = buildComponentStyle({ backgroundColor, textColor, width, height, ...rest });
+  const baseStyle = buildComponentStyle({
+    backgroundColor,
+    textColor,
+    width,
+    height,
+    ...rest,
+  });
 
   return (
     <div
       className={cn(
         "py-12 px-8",
         layout === "grid"
-          ? `grid ${gridCols[columns]} gap-8`
-          : "flex justify-around items-center flex-wrap gap-8"
+          ? `grid ${gridCols[columns]} gap-12`
+          : "flex justify-around items-center flex-wrap gap-12",
       )}
       style={baseStyle}
     >
@@ -59,32 +65,17 @@ export function Stats({
             className="text-4xl sm:text-5xl font-bold mb-2 tracking-tight"
             style={{
               fontFamily: "'Inter', sans-serif",
-              background: `linear-gradient(135deg, ${accentColor}, ${adjustColor(accentColor, 40)})`,
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
+              color: accentColor,
             }}
           >
-            {stat.value}{stat.suffix}
+            {stat.value}
+            {stat.suffix}
           </div>
-          <div className="text-xs font-medium uppercase tracking-[0.15em] opacity-50">
+          <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-gray-500">
             {stat.label}
           </div>
         </div>
       ))}
     </div>
   );
-}
-
-// Lighten a hex color
-function adjustColor(hex: string, amount: number): string {
-  try {
-    const num = parseInt(hex.replace("#", ""), 16);
-    const r = Math.min(255, (num >> 16) + amount);
-    const g = Math.min(255, ((num >> 8) & 0x00FF) + amount);
-    const b = Math.min(255, (num & 0x0000FF) + amount);
-    return `#${(1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1)}`;
-  } catch {
-    return hex;
-  }
 }

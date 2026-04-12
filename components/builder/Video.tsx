@@ -146,13 +146,13 @@ export function Video({
     <div
       className={cn(
         "w-full rounded-lg flex items-center justify-center",
-        !backgroundColor && "bg-gray-200",
+        !backgroundColor && "bg-[#1a1a1a] border border-[#2a2a2a]",
         aspectRatioClasses[aspectRatio],
-        className
+        className,
       )}
       style={placeholderStyle}
     >
-      <p className={cn(!textColor && "opacity-50")}>
+      <p className={cn(!textColor && "text-gray-500")}>
         No video source provided
       </p>
     </div>
