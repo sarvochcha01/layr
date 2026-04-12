@@ -39,16 +39,33 @@ export function buildComponentStyle(props: Record<string, any>): React.CSSProper
     if (props.marginLeft) style.marginLeft = ensureUnit(props.marginLeft);
 
     // --- Background ---
-    if (props.backgroundColor) style.backgroundColor = props.backgroundColor;
-    if (props.backgroundType === "gradient" && props.backgroundGradient) {
-        style.backgroundImage = props.backgroundGradient;
-        style.backgroundColor = undefined;
+    if (props.backgroundType === "gradient") {
+        // Use new gradient properties if available
+        if (props.gradientStart && props.gradientEnd) {
+            const direction = props.gradientDirection === "custom"
+                ? `${props.gradientAngle || "135"}deg`
+                : props.gradientDirection || "to bottom right";
+            style.backgroundImage = `linear-gradient(${direction}, ${props.gradientStart}, ${props.gradientEnd})`;
+            console.log("[buildComponentStyle] GRADIENT:", style.backgroundImage);
+        } else if (props.backgroundGradient) {
+            // Fallback to old CSS gradient string
+            style.backgroundImage = props.backgroundGradient;
+            console.log("[buildComponentStyle] GRADIENT (legacy):", style.backgroundImage);
+        } else {
+            // No gradient properties set yet, use defaults
+            style.backgroundImage = `linear-gradient(to bottom right, #667eea, #764ba2)`;
+            console.log("[buildComponentStyle] GRADIENT (default):", style.backgroundImage);
+        }
+        // Don't set backgroundColor when using gradient
     } else if (props.backgroundType === "image" && props.backgroundImageUrl) {
         style.backgroundImage = `url(${props.backgroundImageUrl})`;
         style.backgroundSize = props.backgroundSize || "cover";
         style.backgroundPosition = props.backgroundPosition || "center";
         style.backgroundRepeat = props.backgroundRepeat || "no-repeat";
-        style.backgroundColor = undefined;
+        // Don't set backgroundColor when using image
+    } else {
+        // Only set backgroundColor for solid type or when no type is specified
+        if (props.backgroundColor) style.backgroundColor = props.backgroundColor;
     }
 
     // --- Typography ---
