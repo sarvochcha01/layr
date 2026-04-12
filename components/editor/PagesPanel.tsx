@@ -13,7 +13,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Plus, FileText, Trash2, Home, Copy, Pencil, Check, X } from "lucide-react";
+import {
+  Plus,
+  FileText,
+  Trash2,
+  Home,
+  Copy,
+  Pencil,
+  Check,
+  X,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface PagesPanelProps {
@@ -81,14 +90,18 @@ export function PagesPanel({
 
   const handleEditSlugChange = (slug: string) => {
     // Sanitize slug: lowercase, replace spaces with dashes, remove special chars
-    const sanitized = slug.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9\-]/g, "");
+    const sanitized = slug
+      .toLowerCase()
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9\-]/g, "");
     setEditSlug(sanitized);
     setIsDirty(true);
   };
 
   const handleSavePageProps = () => {
     if (!selectedPage || !editName.trim()) return;
-    const finalSlug = editSlug.trim() || editName.toLowerCase().replace(/\s+/g, "-");
+    const finalSlug =
+      editSlug.trim() || editName.toLowerCase().replace(/\s+/g, "-");
     onPageRename(selectedPage.id, editName.trim(), finalSlug);
     setIsDirty(false);
   };
@@ -115,8 +128,12 @@ export function PagesPanel({
     <div className="h-full flex flex-col">
       {/* Header */}
       <div className="p-3 border-b border-border flex items-center justify-between">
-        <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider">Pages</h3>
-        <span className="text-[10px] text-muted-foreground">{pages.length} page{pages.length !== 1 ? "s" : ""}</span>
+        <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider">
+          Pages
+        </h3>
+        <span className="text-[10px] text-muted-foreground">
+          {pages.length} page{pages.length !== 1 ? "s" : ""}
+        </span>
       </div>
 
       {/* Pages List */}
@@ -155,7 +172,9 @@ export function PagesPanel({
       {selectedPage && (
         <div className="border-t border-border p-3 space-y-3">
           <div className="flex items-center justify-between">
-            <h4 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Page Properties</h4>
+            <h4 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+              Page Properties
+            </h4>
             {isDirty && (
               <div className="flex items-center gap-1">
                 <button
@@ -178,7 +197,10 @@ export function PagesPanel({
 
           {/* Page Name */}
           <div className="space-y-1">
-            <Label htmlFor="edit-page-name" className="text-[11px] text-muted-foreground">
+            <Label
+              htmlFor="edit-page-name"
+              className="text-[11px] text-muted-foreground"
+            >
               Name
             </Label>
             <Input
@@ -196,7 +218,10 @@ export function PagesPanel({
 
           {/* Page Slug/Route */}
           <div className="space-y-1">
-            <Label htmlFor="edit-page-slug" className="text-[11px] text-muted-foreground">
+            <Label
+              htmlFor="edit-page-slug"
+              className="text-[11px] text-muted-foreground"
+            >
               Route / Slug
             </Label>
             <Input
@@ -213,12 +238,16 @@ export function PagesPanel({
             <div className="text-[10px] text-muted-foreground space-y-0.5 pt-0.5">
               <p>
                 <span className="opacity-60">HTML:</span>{" "}
-                <span className="font-mono">/{editSlug || "page-slug"}.html</span>
+                <span className="font-mono">
+                  /{editSlug || "page-slug"}.html
+                </span>
               </p>
               <p>
                 <span className="opacity-60">Next.js:</span>{" "}
                 <span className="font-mono">
-                  {editSlug === "index" ? "/app/page.tsx" : `/app/${editSlug || "page-slug"}/page.tsx`}
+                  {editSlug === "index"
+                    ? "/app/page.tsx"
+                    : `/app/${editSlug || "page-slug"}/page.tsx`}
                 </span>
               </p>
             </div>
@@ -240,10 +269,14 @@ export function PagesPanel({
             <Button
               variant="outline"
               size="sm"
-              className="flex-1 h-7 text-xs text-destructive hover:text-destructive hover:bg-destructive/10 hover:border-destructive/30"
+              className="flex-1 h-7 text-xs text-destructive hover:text-destructive hover:bg-destructive/10 hover:border-destructive/30 disabled:opacity-50 disabled:cursor-not-allowed"
               onClick={handleDeletePage}
               disabled={pages.length <= 1}
-              title={pages.length <= 1 ? "Cannot delete the last page" : "Delete this page"}
+              title={
+                pages.length <= 1
+                  ? "Cannot delete the last page"
+                  : "Delete this page"
+              }
             >
               <Trash2 className="w-3 h-3 mr-1.5" />
               Delete

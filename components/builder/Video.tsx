@@ -50,17 +50,19 @@ export function Video({
     if (!urlOrId) return null;
     // If it's just an alphanumeric string (11 chars typical for YT), assume it's already an ID
     if (/^[a-zA-Z0-9_-]{11}$/.test(urlOrId)) return urlOrId;
-    
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+
+    const regExp =
+      /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
     const match = urlOrId.match(regExp);
-    return (match && match[2].length === 11) ? match[2] : null;
+    return match && match[2].length === 11 ? match[2] : null;
   };
 
   const extractVimeoId = (urlOrId?: string) => {
     if (!urlOrId) return null;
     if (/^[0-9]+$/.test(urlOrId)) return urlOrId;
-    
-    const regExp = /(?:www\.|player\.)?vimeo.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|album\/(?:\d+)\/video\/|video\/|)(\d+)(?:[a-zA-Z0-9_\-]+)?/i;
+
+    const regExp =
+      /(?:www\.|player\.)?vimeo.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|album\/(?:\d+)\/video\/|video\/|)(\d+)(?:[a-zA-Z0-9_\-]+)?/i;
     const match = urlOrId.match(regExp);
     return match ? match[1] : null;
   };
@@ -130,26 +132,32 @@ export function Video({
         className={cn(
           "w-full h-auto rounded-lg",
           !width && !height && aspectRatioClasses[aspectRatio],
-          className
+          className,
         )}
         style={baseStyle}
       />
     );
   }
 
-  const placeholderStyle = buildComponentStyle({ backgroundColor, textColor, width, height, ...rest });
+  const placeholderStyle = buildComponentStyle({
+    backgroundColor,
+    textColor,
+    width,
+    height,
+    ...rest,
+  });
 
   return (
     <div
       className={cn(
         "w-full rounded-lg flex items-center justify-center",
-        !backgroundColor && "bg-gray-200",
+        !backgroundColor && "bg-[#1a1a1a] border border-[#2a2a2a]",
         aspectRatioClasses[aspectRatio],
-        className
+        className,
       )}
       style={placeholderStyle}
     >
-      <p className={cn(!textColor && "opacity-50")}>
+      <p className={cn(!textColor && "text-gray-500")}>
         No video source provided
       </p>
     </div>

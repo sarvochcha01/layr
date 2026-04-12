@@ -45,11 +45,17 @@ export function CTA({
     right: "text-right items-end",
   };
 
-  const baseStyle = buildComponentStyle({ textColor: textColor || "#ffffff", width, height, ...rest });
+  const baseStyle = buildComponentStyle({
+    textColor: textColor || "#ffffff",
+    width,
+    height,
+    ...rest,
+  });
 
-  // Apply gradient background if no custom backgroundColor
+  // Apply dark gradient background if no custom backgroundColor
   if (!backgroundColor) {
-    baseStyle.background = "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)";
+    baseStyle.background = "linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%)";
+    baseStyle.border = "1px solid #3a3a3a";
   } else {
     baseStyle.backgroundColor = backgroundColor;
   }
@@ -59,14 +65,18 @@ export function CTA({
       className={cn(
         "rounded-2xl flex flex-col gap-8 relative overflow-hidden",
         sizeClasses[size],
-        alignmentClasses[alignment]
+        alignmentClasses[alignment],
       )}
       style={baseStyle}
     >
       {/* Decorative pattern */}
-      <div className="absolute inset-0 opacity-10" style={{
-        backgroundImage: "radial-gradient(circle at 20% 50%, rgba(255,255,255,0.3) 0%, transparent 50%), radial-gradient(circle at 80% 50%, rgba(255,255,255,0.2) 0%, transparent 50%)",
-      }} />
+      <div
+        className="absolute inset-0 opacity-5"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle at 20% 50%, rgba(59,130,246,0.3) 0%, transparent 50%), radial-gradient(circle at 80% 50%, rgba(59,130,246,0.2) 0%, transparent 50%)",
+        }}
+      />
 
       <div className="relative z-10">
         <h2
@@ -75,7 +85,14 @@ export function CTA({
         >
           {title}
         </h2>
-        <p className="text-lg opacity-85 max-w-xl" style={alignment === "center" ? { marginLeft: "auto", marginRight: "auto" } : undefined}>
+        <p
+          className="text-lg text-gray-400 max-w-xl"
+          style={
+            alignment === "center"
+              ? { marginLeft: "auto", marginRight: "auto" }
+              : undefined
+          }
+        >
           {description}
         </p>
       </div>
@@ -83,8 +100,7 @@ export function CTA({
       <div className="relative z-10 flex gap-4 flex-wrap">
         <Button
           size="lg"
-          className="px-8 py-3 text-base font-medium rounded-full bg-white hover:bg-gray-100 transition-all duration-300 shadow-lg shadow-black/10"
-          style={{ color: "#4f46e5" }}
+          className="px-8 py-3 text-base font-medium rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition-all duration-300"
           asChild
         >
           <a href={primaryButtonLink}>{primaryButtonText}</a>
@@ -93,8 +109,7 @@ export function CTA({
           <Button
             size="lg"
             variant="outline"
-            className="px-8 py-3 text-base font-medium rounded-full border-white/30 hover:bg-white/10 transition-all duration-300"
-            style={{ color: "#ffffff" }}
+            className="px-8 py-3 text-base font-medium rounded-xl border-[#3a3a3a] hover:bg-[#2a2a2a] text-white transition-all duration-300"
             asChild
           >
             <a href={secondaryButtonLink}>{secondaryButtonText}</a>

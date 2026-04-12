@@ -15,7 +15,7 @@ export function Divider({
   text,
   variant = "solid",
   thickness = "thin",
-  color = "#e5e7eb",
+  color = "#2a2a2a",
   width,
   spacing = "md",
   ...rest
@@ -42,7 +42,10 @@ export function Divider({
 
   if (text) {
     return (
-      <div className={cn("flex items-center gap-4", spacingMap[spacing])} style={baseStyle}>
+      <div
+        className={cn("flex items-center gap-4", spacingMap[spacing])}
+        style={baseStyle}
+      >
         <div
           className="flex-1"
           style={{
@@ -51,7 +54,7 @@ export function Divider({
             borderStyle: borderStyle[variant],
           }}
         />
-        <span className="text-sm opacity-60 px-2">{text}</span>
+        <span className="text-sm text-gray-400 px-2">{text}</span>
         <div
           className="flex-1"
           style={{
