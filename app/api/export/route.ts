@@ -12,6 +12,8 @@ import {
     generateAppPage,
     generateComponentImplementation,
 } from "@/lib/reactGenerator";
+import fs from "fs";
+import path from "path";
 
 export async function POST(request: NextRequest) {
     try {
@@ -99,21 +101,45 @@ body {
                 }
             }
 
-            // Generate all component implementation files
+            // Copy all component files from builder directory
             const componentNames = [
                 'Header', 'Footer', 'Hero', 'Section', 'Container', 'Grid',
                 'Card', 'Button', 'Text', 'Image', 'Video', 'Form',
                 'Navbar', 'Accordion', 'Tabs', 'Testimonial', 'PricingCard',
-                'Feature', 'Stats', 'CTA', 'Divider', 'Spacer', 'Badge', 'Alert'
+                'Feature', 'Stats', 'CTA', 'Divider', 'Spacer', 'Badge', 'Alert', 'CustomCode'
             ];
 
             for (const componentName of componentNames) {
-                const componentCode = generateComponentImplementation(componentName);
+                const componentPath = path.join(process.cwd(), 'components', 'builder', `${componentName}.tsx`);
+                const componentCode = fs.readFileSync(componentPath, 'utf-8');
                 componentsFolder?.file(`${componentName}.tsx`, componentCode);
             }
 
             // Add component index for convenient imports
             componentsFolder?.file("index.ts", generateReactComponentsIndex());
+
+            // Copy UI components folder
+            const uiFolder = componentsFolder?.folder("ui");
+            const uiComponentsPath = path.join(process.cwd(), 'components', 'ui');
+            const uiFiles = fs.readdirSync(uiComponentsPath);
+
+            for (const file of uiFiles) {
+                if (file.endsWith('.tsx') || file.endsWith('.ts')) {
+                    const filePath = path.join(uiComponentsPath, file);
+                    const fileContent = fs.readFileSync(filePath, 'utf-8');
+                    uiFolder?.file(file, fileContent);
+                }
+            }
+
+            // Add lib folder with utility files
+            const libFolder = zip.folder("lib");
+            const utilsPath = path.join(process.cwd(), 'lib', 'utils.ts');
+            const utilsCode = fs.readFileSync(utilsPath, 'utf-8');
+            libFolder?.file("utils.ts", utilsCode);
+
+            const buildStylePath = path.join(process.cwd(), 'lib', 'buildStyle.ts');
+            const buildStyleCode = fs.readFileSync(buildStylePath, 'utf-8');
+            libFolder?.file("buildStyle.ts", buildStyleCode);
 
             // Add config files
             zip.file("package.json", generatePackageJson(projectName));
@@ -265,11 +291,20 @@ next-env.d.ts
         // Generate zip as blob
         const zipBlob = await zip.generateAsync({ type: "blob" });
 
+        // Add timestamp to filename to prevent browser caching
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+        const filename = format === "react"
+            ? `${projectName.toLowerCase().replace(/\s+/g, '-')}-nextjs-${timestamp}.zip`
+            : `${projectName.toLowerCase().replace(/\s+/g, '-')}-html-${timestamp}.zip`;
+
         // Return zip file
         return new NextResponse(zipBlob, {
             headers: {
                 "Content-Type": "application/zip",
-                "Content-Disposition": 'attachment; filename="website-export.zip"',
+                "Content-Disposition": `attachment; filename="${filename}"`,
+                "Cache-Control": "no-cache, no-store, must-revalidate",
+                "Pragma": "no-cache",
+                "Expires": "0",
             },
         });
     } catch (error) {

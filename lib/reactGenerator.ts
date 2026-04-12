@@ -1,5 +1,5 @@
 import { ComponentDefinition } from "@/types/editor";
-
+0
 export function generateReactComponent(components: ComponentDefinition[], pageName: string = "Page"): string {
   const renderComponent = (component: ComponentDefinition, indent: number = 2): string => {
     const { type, props, children } = component;
@@ -103,6 +103,7 @@ export { Divider } from './Divider';
 export { Spacer } from './Spacer';
 export { Badge } from './Badge';
 export { Alert } from './Alert';
+export { CustomCode } from './CustomCode';
 `;
 }
 
@@ -122,6 +123,18 @@ export function generatePackageJson(projectName: string): string {
         react: "^19.0.0",
         "react-dom": "^19.0.0",
         next: "^15.1.6",
+        clsx: "^2.1.1",
+        "tailwind-merge": "^2.5.5",
+        "lucide-react": "^0.468.0",
+        "@radix-ui/react-slot": "^1.1.1",
+        "@radix-ui/react-label": "^2.1.7",
+        "@radix-ui/react-dialog": "^1.1.15",
+        "@radix-ui/react-dropdown-menu": "^2.1.16",
+        "@radix-ui/react-switch": "^1.2.6",
+        "@radix-ui/react-accordion": "^1.2.3",
+        "@radix-ui/react-tabs": "^1.1.3",
+        "class-variance-authority": "^0.7.1",
+        "sonner": "^2.0.7",
       },
       devDependencies: {
         "@types/node": "^22.10.5",
