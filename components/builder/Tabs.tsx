@@ -28,7 +28,7 @@ export function Tabs({
   defaultTab = 0,
   variant = "underline",
   backgroundColor,
-  textColor,
+  textColor = "black",
   activeColor = "#3b82f6",
   width,
   height,

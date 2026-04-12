@@ -1,4 +1,5 @@
 "use client";
+import React from "react";
 import { useDroppable, useDraggable } from "@dnd-kit/core";
 import { ComponentDefinition } from "@/types/editor";
 import { COMPONENT_REGISTRY } from "@/components/builder";
@@ -13,6 +14,7 @@ interface CanvasProps {
   isPreviewMode?: boolean;
   onNavigate?: (slug: string) => void;
   pages?: any[];
+  showOutlines?: boolean;
 }
 
 function DropZone({
@@ -71,6 +73,7 @@ function ComponentWrapper({
   isPreviewMode,
   onNavigate,
   pages,
+  showOutlines,
 }: {
   component: ComponentDefinition;
   isSelected: boolean;
@@ -81,6 +84,7 @@ function ComponentWrapper({
   isPreviewMode?: boolean;
   onNavigate?: (slug: string) => void;
   pages?: any[];
+  showOutlines?: boolean;
 }) {
   const Component =
     COMPONENT_REGISTRY[component.type as keyof typeof COMPONENT_REGISTRY];
@@ -145,6 +149,8 @@ function ComponentWrapper({
           !isPreviewMode && isSelected && "ring-2 ring-blue-500 ring-offset-2",
           !isPreviewMode &&
             "hover:ring-1 hover:ring-blue-300 hover:ring-offset-1",
+          !isPreviewMode && showOutlines && !isSelected &&
+            "outline outline-1 outline-dashed outline-gray-300",
         )}
         onClick={
           isPreviewMode
@@ -182,19 +188,30 @@ function ComponentWrapper({
             {component.children.length > 0 &&
               (component.type === "Grid" || component.type === "Container" ? (
                 // Grid & Container: render children without wrapper divs to preserve layout
+                // but still include drop zones when in edit mode
                 <>
-                  {component.children.map((child) => (
-                    <ComponentRenderer
-                      key={child.id}
-                      component={child}
-                      selectedComponentIds={selectedComponentIds}
-                      onSelectComponent={onSelectComponent}
-                      viewport={viewport}
-                      isPreviewMode={isPreviewMode}
-                      onNavigate={onNavigate}
-                      pages={pages}
-                    />
+                  {component.children.map((child, index) => (
+                    <React.Fragment key={child.id}>
+                      <ComponentRenderer
+                        component={child}
+                        selectedComponentIds={selectedComponentIds}
+                        onSelectComponent={onSelectComponent}
+                        viewport={viewport}
+                        isPreviewMode={isPreviewMode}
+                        onNavigate={onNavigate}
+                        pages={pages}
+                        showOutlines={showOutlines}
+                      />
+                    </React.Fragment>
                   ))}
+                  {/* Trailing drop zone so users can always add more children */}
+                  {!isPreviewMode && (
+                    <DropZone
+                      targetId={component.id}
+                      position="inside"
+                      className="min-h-[60px] rounded-md"
+                    />
+                  )}
                 </>
               ) : (
                 // Other containers: render with wrapper divs and drop zones
@@ -209,6 +226,7 @@ function ComponentWrapper({
                         isPreviewMode={isPreviewMode}
                         onNavigate={onNavigate}
                         pages={pages}
+                        showOutlines={showOutlines}
                       />
                       {!isPreviewMode &&
                         index < component.children.length - 1 && (
@@ -254,6 +272,7 @@ function ComponentRenderer({
   isPreviewMode,
   onNavigate,
   pages,
+  showOutlines,
 }: {
   component: ComponentDefinition;
   selectedComponentIds: string[];
@@ -262,6 +281,7 @@ function ComponentRenderer({
   isPreviewMode?: boolean;
   onNavigate?: (slug: string) => void;
   pages?: any[];
+  showOutlines?: boolean;
 }) {
   return (
     <ComponentWrapper
@@ -274,6 +294,7 @@ function ComponentRenderer({
       isPreviewMode={isPreviewMode}
       onNavigate={onNavigate}
       pages={pages}
+      showOutlines={showOutlines}
     />
   );
 }
@@ -286,6 +307,7 @@ export function Canvas({
   isPreviewMode = false,
   onNavigate,
   pages,
+  showOutlines = false,
 }: CanvasProps) {
   return (
     <div
@@ -324,6 +346,7 @@ export function Canvas({
                   isPreviewMode={isPreviewMode}
                   onNavigate={onNavigate}
                   pages={pages}
+                  showOutlines={showOutlines}
                 />
 
                 {/* Drop zone after each component */}
