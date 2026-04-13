@@ -332,7 +332,19 @@ export function PropertiesPanel({
                 {(["solid", "gradient", "image"] as const).map((t) => (
                   <button
                     key={t}
-                    onClick={() => updateProp("backgroundType", t)}
+                    onClick={() => {
+                      updateProp("backgroundType", t);
+                      // Initialize gradient properties with defaults when switching to gradient
+                      if (
+                        t === "gradient" &&
+                        !props.gradientStart &&
+                        !props.gradientEnd
+                      ) {
+                        updateProp("gradientStart", "#667eea");
+                        updateProp("gradientEnd", "#764ba2");
+                        updateProp("gradientDirection", "to bottom right");
+                      }
+                    }}
                     className={`flex-1 px-2 py-1 text-xs rounded capitalize transition-colors ${bgType === t ? "bg-secondary text-foreground font-medium" : "text-muted-foreground hover:text-foreground"}`}
                   >
                     {t}
@@ -368,27 +380,140 @@ export function PropertiesPanel({
 
             {/* Gradient */}
             {bgType === "gradient" && (
-              <div className="space-y-1.5">
-                <Label className={labelClass}>CSS Gradient</Label>
-                <Input
-                  value={
-                    props.backgroundGradient ||
-                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
-                  }
-                  onChange={(e) =>
-                    updateProp("backgroundGradient", e.target.value)
-                  }
-                  placeholder="linear-gradient(135deg, #667eea, #764ba2)"
-                  className="h-8 text-xs font-mono"
-                />
-                <div
-                  className="h-8 rounded border"
-                  style={{
-                    backgroundImage:
-                      props.backgroundGradient ||
-                      "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                  }}
-                />
+              <div className="space-y-3">
+                <div className="space-y-1.5">
+                  <Label className={labelClass}>Start Color</Label>
+                  <div className="flex gap-2 items-center">
+                    <Input
+                      type="color"
+                      value={props.gradientStart || "#667eea"}
+                      onChange={(e) =>
+                        updateProp("gradientStart", e.target.value)
+                      }
+                      className="w-8 h-8 p-0.5 min-h-0 cursor-pointer"
+                    />
+                    <Input
+                      type="text"
+                      value={props.gradientStart || "#667eea"}
+                      onChange={(e) =>
+                        updateProp("gradientStart", e.target.value)
+                      }
+                      className="flex-1 h-8 text-xs font-mono"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-1.5">
+                  <Label className={labelClass}>End Color</Label>
+                  <div className="flex gap-2 items-center">
+                    <Input
+                      type="color"
+                      value={props.gradientEnd || "#764ba2"}
+                      onChange={(e) =>
+                        updateProp("gradientEnd", e.target.value)
+                      }
+                      className="w-8 h-8 p-0.5 min-h-0 cursor-pointer"
+                    />
+                    <Input
+                      type="text"
+                      value={props.gradientEnd || "#764ba2"}
+                      onChange={(e) =>
+                        updateProp("gradientEnd", e.target.value)
+                      }
+                      className="flex-1 h-8 text-xs font-mono"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-1.5">
+                  <Label className={labelClass}>Direction</Label>
+                  <div className="relative border rounded-md">
+                    <select
+                      value={props.gradientDirection || "to bottom right"}
+                      onChange={(e) =>
+                        updateProp("gradientDirection", e.target.value)
+                      }
+                      className={selectClass}
+                    >
+                      <option
+                        className="bg-background text-foreground"
+                        value="to right"
+                      >
+                        To Right
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="to left"
+                      >
+                        To Left
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="to bottom"
+                      >
+                        To Bottom
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="to top"
+                      >
+                        To Top
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="to bottom right"
+                      >
+                        To Bottom Right
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="to bottom left"
+                      >
+                        To Bottom Left
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="to top right"
+                      >
+                        To Top Right
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="to top left"
+                      >
+                        To Top Left
+                      </option>
+                      <option
+                        className="bg-background text-foreground"
+                        value="custom"
+                      >
+                        Custom Angle
+                      </option>
+                    </select>
+                  </div>
+                </div>
+                {props.gradientDirection === "custom" && (
+                  <div className="space-y-1.5">
+                    <Label className={labelClass}>Angle (degrees)</Label>
+                    <Input
+                      type="number"
+                      value={props.gradientAngle || "135"}
+                      onChange={(e) =>
+                        updateProp("gradientAngle", e.target.value)
+                      }
+                      min="0"
+                      max="360"
+                      className="h-8 text-xs"
+                    />
+                  </div>
+                )}
+                <div className="space-y-1.5">
+                  <Label className={labelClass}>Preview</Label>
+                  <div
+                    className="h-12 rounded border"
+                    style={{
+                      backgroundImage: `linear-gradient(${props.gradientDirection === "custom" ? `${props.gradientAngle || "135"}deg` : props.gradientDirection || "to bottom right"}, ${props.gradientStart || "#667eea"}, ${props.gradientEnd || "#764ba2"})`,
+                    }}
+                  />
+                </div>
               </div>
             )}
 
@@ -1866,18 +1991,44 @@ export function PropertiesPanel({
               </AccordionTrigger>
               <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
                 <div className="space-y-1.5">
-                  <Label htmlFor="image" className="text-xs font-medium text-muted-foreground">Image URL</Label>
-                  <Input id="image" value={props.image || ""} onChange={(e) => updateProp("image", e.target.value)} placeholder="https://example.com/image.jpg" className="h-8 text-sm" />
+                  <Label
+                    htmlFor="image"
+                    className="text-xs font-medium text-muted-foreground"
+                  >
+                    Image URL
+                  </Label>
+                  <Input
+                    id="image"
+                    value={props.image || ""}
+                    onChange={(e) => updateProp("image", e.target.value)}
+                    placeholder="https://example.com/image.jpg"
+                    className="h-8 text-sm"
+                  />
                   {props.image && (
                     <div className="mt-2 rounded-md overflow-hidden border border-border">
-                      <img src={props.image} alt="Preview" className="w-full h-24 object-cover" />
+                      <img
+                        src={props.image}
+                        alt="Preview"
+                        className="w-full h-24 object-cover"
+                      />
                     </div>
                   )}
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="title" className="text-xs font-medium text-muted-foreground">Title</Label>
-                  <Input id="title" value={props.title || ""} onChange={(e) => updateProp("title", e.target.value)} placeholder="Card title" className="h-8 text-sm" />
+                  <Label
+                    htmlFor="title"
+                    className="text-xs font-medium text-muted-foreground"
+                  >
+                    Title
+                  </Label>
+                  <Input
+                    id="title"
+                    value={props.title || ""}
+                    onChange={(e) => updateProp("title", e.target.value)}
+                    placeholder="Card title"
+                    className="h-8 text-sm"
+                  />
                 </div>
 
                 <div className="space-y-1.5">
@@ -3565,8 +3716,16 @@ export function PropertiesPanel({
                   <Input
                     id="src"
                     value={props.src || ""}
-                    onChange={(e) => updateProp("src", e.target.value)}
-                    placeholder="https://youtube.com/watch?v=..."
+                    onChange={(e) => {
+                      const newSrc = e.target.value;
+                      // Clear youtubeId and vimeoId when src changes to avoid conflicts
+                      onUpdateComponent(selectedComponent.id, {
+                        src: newSrc,
+                        youtubeId: undefined,
+                        vimeoId: undefined,
+                      });
+                    }}
+                    placeholder="https://youtube.com/watch?v=... or direct video URL"
                   />
                 </div>
 
@@ -3592,10 +3751,30 @@ export function PropertiesPanel({
                     onChange={(e) => updateProp("aspectRatio", e.target.value)}
                     className="w-full p-2 border rounded-md"
                   >
-                    <option className="bg-background text-foreground" value="16:9">16:9 (Widescreen)</option>
-                    <option className="bg-background text-foreground" value="4:3">4:3 (Standard)</option>
-                    <option className="bg-background text-foreground" value="1:1">1:1 (Square)</option>
-                    <option className="bg-background text-foreground" value="21:9">21:9 (Ultrawide)</option>
+                    <option
+                      className="bg-background text-foreground"
+                      value="16:9"
+                    >
+                      16:9 (Widescreen)
+                    </option>
+                    <option
+                      className="bg-background text-foreground"
+                      value="4:3"
+                    >
+                      4:3 (Standard)
+                    </option>
+                    <option
+                      className="bg-background text-foreground"
+                      value="1:1"
+                    >
+                      1:1 (Square)
+                    </option>
+                    <option
+                      className="bg-background text-foreground"
+                      value="21:9"
+                    >
+                      21:9 (Ultrawide)
+                    </option>
                   </select>
                 </div>
 
@@ -3819,7 +3998,7 @@ export function PropertiesPanel({
         return (
           <Accordion
             type="multiple"
-            defaultValue={["settings", "fill", "dimensions"]}
+            defaultValue={["settings", "colors", "dimensions"]}
             className="w-full"
           >
             <AccordionItem
@@ -3891,7 +4070,322 @@ export function PropertiesPanel({
                 </div>
               </AccordionContent>
             </AccordionItem>
-            {renderAllStyleSections()}
+            <AccordionItem
+              value="colors"
+              className="border-b-0 border-t border-border/50"
+            >
+              <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
+                <div className="flex items-center gap-2">
+                  <Paintbrush className="w-4 h-4 text-muted-foreground" />
+                  Tab Colors
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
+                <div>
+                  <Label className="mb-2 block">Tab Heading Color</Label>
+                  <div className="flex gap-2 items-center">
+                    <Input
+                      type="color"
+                      value={props.tabHeadingColor || "#9ca3af"}
+                      onChange={(e) =>
+                        updateProp("tabHeadingColor", e.target.value)
+                      }
+                      className="w-12 h-8 p-0.5 min-h-0 cursor-pointer"
+                    />
+                    <Input
+                      type="text"
+                      value={props.tabHeadingColor || "#9ca3af"}
+                      onChange={(e) =>
+                        updateProp("tabHeadingColor", e.target.value)
+                      }
+                      className="flex-1 h-8 text-xs font-mono"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <Label className="mb-2 block">Active Tab Color</Label>
+                  <div className="flex gap-2 items-center">
+                    <Input
+                      type="color"
+                      value={props.activeTabColor || "#3b82f6"}
+                      onChange={(e) =>
+                        updateProp("activeTabColor", e.target.value)
+                      }
+                      className="w-12 h-8 p-0.5 min-h-0 cursor-pointer"
+                    />
+                    <Input
+                      type="text"
+                      value={props.activeTabColor || "#3b82f6"}
+                      onChange={(e) =>
+                        updateProp("activeTabColor", e.target.value)
+                      }
+                      className="flex-1 h-8 text-xs font-mono"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <Label className="mb-2 block">Content Text Color</Label>
+                  <div className="flex gap-2 items-center">
+                    <Input
+                      type="color"
+                      value={props.contentTextColor || "#e5e7eb"}
+                      onChange={(e) =>
+                        updateProp("contentTextColor", e.target.value)
+                      }
+                      className="w-12 h-8 p-0.5 min-h-0 cursor-pointer"
+                    />
+                    <Input
+                      type="text"
+                      value={props.contentTextColor || "#e5e7eb"}
+                      onChange={(e) =>
+                        updateProp("contentTextColor", e.target.value)
+                      }
+                      className="flex-1 h-8 text-xs font-mono"
+                    />
+                  </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+            {renderDimensionFields()}
+            {renderSpacingFields()}
+            {renderBorderFields()}
+            {renderEffectsFields()}
+            {renderPositionFields()}
+            {/* Custom Fill section without Text Color */}
+            <AccordionItem
+              value="fill"
+              className="border-b-0 border-t border-border/50"
+            >
+              <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
+                <div className="flex items-center gap-2">
+                  <Paintbrush className="w-4 h-4 text-muted-foreground" />
+                  Fill
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-medium text-muted-foreground">
+                    Background Type
+                  </Label>
+                  <div className="flex gap-1 border rounded-md p-0.5">
+                    {(["solid", "gradient", "image"] as const).map((t) => (
+                      <button
+                        key={t}
+                        onClick={() => {
+                          updateProp("backgroundType", t);
+                          // Initialize gradient properties with defaults when switching to gradient
+                          if (
+                            t === "gradient" &&
+                            !props.gradientStart &&
+                            !props.gradientEnd
+                          ) {
+                            updateProp("gradientStart", "#667eea");
+                            updateProp("gradientEnd", "#764ba2");
+                            updateProp("gradientDirection", "to bottom right");
+                          }
+                        }}
+                        className={`flex-1 px-2 py-1 text-xs rounded capitalize transition-colors ${(props.backgroundType || "solid") === t ? "bg-secondary text-foreground font-medium" : "text-muted-foreground hover:text-foreground"}`}
+                      >
+                        {t}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                {(props.backgroundType || "solid") === "solid" && (
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-medium text-muted-foreground">
+                      Background Color
+                    </Label>
+                    <div className="flex gap-2 items-center">
+                      <Input
+                        type="color"
+                        value={props.backgroundColor || "#0d0d0d"}
+                        onChange={(e) =>
+                          updateProp("backgroundColor", e.target.value)
+                        }
+                        className="w-8 h-8 p-0.5 min-h-0 cursor-pointer"
+                      />
+                      <Input
+                        type="text"
+                        value={props.backgroundColor || "#0d0d0d"}
+                        onChange={(e) =>
+                          updateProp("backgroundColor", e.target.value)
+                        }
+                        className="flex-1 h-8 text-xs font-mono"
+                      />
+                    </div>
+                  </div>
+                )}
+                {(props.backgroundType || "solid") === "gradient" && (
+                  <div className="space-y-3">
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-medium text-muted-foreground">
+                        Start Color
+                      </Label>
+                      <div className="flex gap-2 items-center">
+                        <Input
+                          type="color"
+                          value={props.gradientStart || "#667eea"}
+                          onChange={(e) =>
+                            updateProp("gradientStart", e.target.value)
+                          }
+                          className="w-8 h-8 p-0.5 min-h-0 cursor-pointer"
+                        />
+                        <Input
+                          type="text"
+                          value={props.gradientStart || "#667eea"}
+                          onChange={(e) =>
+                            updateProp("gradientStart", e.target.value)
+                          }
+                          className="flex-1 h-8 text-xs font-mono"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-medium text-muted-foreground">
+                        End Color
+                      </Label>
+                      <div className="flex gap-2 items-center">
+                        <Input
+                          type="color"
+                          value={props.gradientEnd || "#764ba2"}
+                          onChange={(e) =>
+                            updateProp("gradientEnd", e.target.value)
+                          }
+                          className="w-8 h-8 p-0.5 min-h-0 cursor-pointer"
+                        />
+                        <Input
+                          type="text"
+                          value={props.gradientEnd || "#764ba2"}
+                          onChange={(e) =>
+                            updateProp("gradientEnd", e.target.value)
+                          }
+                          className="flex-1 h-8 text-xs font-mono"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-medium text-muted-foreground">
+                        Direction
+                      </Label>
+                      <select
+                        value={props.gradientDirection || "to bottom right"}
+                        onChange={(e) =>
+                          updateProp("gradientDirection", e.target.value)
+                        }
+                        className="w-full h-8 px-2 text-xs rounded-md border bg-background"
+                      >
+                        <option value="to right">To Right</option>
+                        <option value="to left">To Left</option>
+                        <option value="to bottom">To Bottom</option>
+                        <option value="to top">To Top</option>
+                        <option value="to bottom right">To Bottom Right</option>
+                        <option value="to bottom left">To Bottom Left</option>
+                        <option value="to top right">To Top Right</option>
+                        <option value="to top left">To Top Left</option>
+                        <option value="custom">Custom Angle</option>
+                      </select>
+                    </div>
+                    {props.gradientDirection === "custom" && (
+                      <div className="space-y-1.5">
+                        <Label className="text-xs font-medium text-muted-foreground">
+                          Angle (degrees)
+                        </Label>
+                        <Input
+                          type="number"
+                          value={props.gradientAngle || "135"}
+                          onChange={(e) =>
+                            updateProp("gradientAngle", e.target.value)
+                          }
+                          min="0"
+                          max="360"
+                          className="h-8 text-xs"
+                        />
+                      </div>
+                    )}
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-medium text-muted-foreground">
+                        Preview
+                      </Label>
+                      <div
+                        className="h-12 rounded border"
+                        style={{
+                          backgroundImage: `linear-gradient(${props.gradientDirection === "custom" ? `${props.gradientAngle || "135"}deg` : props.gradientDirection || "to bottom right"}, ${props.gradientStart || "#667eea"}, ${props.gradientEnd || "#764ba2"})`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
+                {props.backgroundType === "image" && (
+                  <div className="space-y-3">
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-medium text-muted-foreground">
+                        Image URL
+                      </Label>
+                      <Input
+                        value={props.backgroundImageUrl || ""}
+                        onChange={(e) =>
+                          updateProp("backgroundImageUrl", e.target.value)
+                        }
+                        placeholder="https://example.com/image.jpg"
+                        className="h-8 text-xs"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-medium text-muted-foreground">
+                        Size
+                      </Label>
+                      <select
+                        value={props.backgroundSize || "cover"}
+                        onChange={(e) =>
+                          updateProp("backgroundSize", e.target.value)
+                        }
+                        className="w-full h-8 px-2 text-xs rounded-md border bg-background"
+                      >
+                        <option value="cover">Cover</option>
+                        <option value="contain">Contain</option>
+                        <option value="auto">Auto</option>
+                      </select>
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-medium text-muted-foreground">
+                        Position
+                      </Label>
+                      <select
+                        value={props.backgroundPosition || "center"}
+                        onChange={(e) =>
+                          updateProp("backgroundPosition", e.target.value)
+                        }
+                        className="w-full h-8 px-2 text-xs rounded-md border bg-background"
+                      >
+                        <option value="center">Center</option>
+                        <option value="top">Top</option>
+                        <option value="bottom">Bottom</option>
+                        <option value="left">Left</option>
+                        <option value="right">Right</option>
+                      </select>
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-medium text-muted-foreground">
+                        Repeat
+                      </Label>
+                      <select
+                        value={props.backgroundRepeat || "no-repeat"}
+                        onChange={(e) =>
+                          updateProp("backgroundRepeat", e.target.value)
+                        }
+                        className="w-full h-8 px-2 text-xs rounded-md border bg-background"
+                      >
+                        <option value="no-repeat">No Repeat</option>
+                        <option value="repeat">Repeat</option>
+                        <option value="repeat-x">Repeat X</option>
+                        <option value="repeat-y">Repeat Y</option>
+                      </select>
+                    </div>
+                  </div>
+                )}
+              </AccordionContent>
+            </AccordionItem>
           </Accordion>
         );
 

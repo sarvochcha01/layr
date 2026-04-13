@@ -115,3 +115,17 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Editor Canvas: Make viewport units relative to canvas container */
+.editor-canvas-container {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Convert vw/vh to percentage within editor canvas */
+.editor-canvas-container [style*="vw"],
+.editor-canvas-container [style*="vh"],
+.editor-canvas-container [style*="vmin"],
+.editor-canvas-container [style*="vmax"] {
+  /* This is handled by JavaScript conversion in buildStyle.ts */
+}

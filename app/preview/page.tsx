@@ -217,7 +217,7 @@ export default function PreviewPage() {
                 Videos
               </Text>
               <Video
-                youtubeId="dQw4w9WgXcQ"
+                src="https://www.youtube.com/watch?v=jNQXAC9IVRw"
                 aspectRatio="16:9"
                 className="mb-4"
               />

@@ -274,7 +274,8 @@ export function EditorLayout({
         zip.file("script.js", js);
       }
 
-      const blob = await zip.generateAsync({ type: "blob" });
+      // Download the zip file
+      const blob = await response.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;

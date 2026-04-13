@@ -11,7 +11,13 @@ import {
   DragStartEvent,
 } from "@dnd-kit/core";
 import { EditorLayout } from "@/components/editor/EditorLayout";
-import { ComponentDefinition, Page, GlobalComponents, CustomComponents, ChatMessage } from "@/types/editor";
+import {
+  ComponentDefinition,
+  Page,
+  GlobalComponents,
+  CustomComponents,
+  ChatMessage,
+} from "@/types/editor";
 import { generateId } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProject, useUpdateProject } from "@/hooks/useProjects";
@@ -116,10 +122,14 @@ export default function EditorPage() {
   const [isSavingManual, setIsSavingManual] = useState(false);
 
   // Global components state
-  const [globalComponents, setGlobalComponents] = useState<GlobalComponents>({});
+  const [globalComponents, setGlobalComponents] = useState<GlobalComponents>(
+    {},
+  );
 
   // Custom reusable components
-  const [customComponents, setCustomComponents] = useState<CustomComponents>({});
+  const [customComponents, setCustomComponents] = useState<CustomComponents>(
+    {},
+  );
 
   // AI chat history
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
@@ -176,17 +186,17 @@ export default function EditorPage() {
     if (projectData && isInitialLoad) {
       // Load pages from project data, or create default home page
       if (projectData.pages && Array.isArray(projectData.pages)) {
-            const globalComps = projectData.globalComponents || {};
-            setGlobalComponents(globalComps);
+        const globalComps = projectData.globalComponents || {};
+        setGlobalComponents(globalComps);
 
-            const customComps = (projectData as any).customComponents || {};
-            setCustomComponents(customComps);
+        const customComps = (projectData as any).customComponents || {};
+        setCustomComponents(customComps);
 
-            const history = (projectData as any).chatHistory || [];
-            setChatHistory(history);
+        const history = (projectData as any).chatHistory || [];
+        setChatHistory(history);
 
-            // Just load pages as they are
-            setPages(projectData.pages, false);
+        // Just load pages as they are
+        setPages(projectData.pages, false);
         setCurrentPageId(projectData.pages[0]?.id || "home");
       } else {
         // Legacy support: convert old components array to pages
@@ -218,7 +228,13 @@ export default function EditorPage() {
         return page;
       });
 
-      const updates = sanitizeForFirestore({ pages: pagesWithGlobal, name: projectName, globalComponents, customComponents, chatHistory });
+      const updates = sanitizeForFirestore({
+        pages: pagesWithGlobal,
+        name: projectName,
+        globalComponents,
+        customComponents,
+        chatHistory,
+      });
 
       updateProjectMutation.mutate({
         projectId,
@@ -228,19 +244,34 @@ export default function EditorPage() {
     }, 2000);
 
     return () => clearTimeout(timeoutId);
-  }, [pages, globalComponents, customComponents, chatHistory, projectName, projectId, user, isInitialLoad]);
+  }, [
+    pages,
+    globalComponents,
+    customComponents,
+    chatHistory,
+    projectName,
+    projectId,
+    user,
+    isInitialLoad,
+  ]);
 
   // Manual save handler
   const handleManualSave = async () => {
     if (!projectId || !user || isInitialLoad) return;
     setIsSavingManual(true);
-    
+
     try {
       const pagesWithGlobal = pages.map((page, index) => {
         return page;
       });
 
-      const updates = sanitizeForFirestore({ pages: pagesWithGlobal, name: projectName, globalComponents, customComponents, chatHistory });
+      const updates = sanitizeForFirestore({
+        pages: pagesWithGlobal,
+        name: projectName,
+        globalComponents,
+        customComponents,
+        chatHistory,
+      });
 
       await updateProjectMutation.mutateAsync({
         projectId,
@@ -325,9 +356,7 @@ export default function EditorPage() {
 
   const handlePageRename = (pageId: string, name: string, slug: string) => {
     setPages((prev) =>
-      prev.map((p) =>
-        p.id === pageId ? { ...p, name, slug } : p
-      )
+      prev.map((p) => (p.id === pageId ? { ...p, name, slug } : p)),
     );
     toast.success(`Page renamed to "${name}"`);
   };
@@ -375,10 +404,12 @@ export default function EditorPage() {
     } else if (active.data.current?.type === "palette-global") {
       const { globalName, componentType } = active.data.current;
       const template = globalComponents[globalName];
-      
+
       if (template) {
         // Deep clone the global component with new IDs
-        const cloneComponent = (comp: ComponentDefinition): ComponentDefinition => ({
+        const cloneComponent = (
+          comp: ComponentDefinition,
+        ): ComponentDefinition => ({
           ...comp,
           id: generateId(),
           isGlobal: comp.id === template.id ? globalName : undefined,
@@ -402,7 +433,9 @@ export default function EditorPage() {
 
       if (template) {
         // Deep clone the custom component with new IDs
-        const cloneComponent = (comp: ComponentDefinition): ComponentDefinition => ({
+        const cloneComponent = (
+          comp: ComponentDefinition,
+        ): ComponentDefinition => ({
           ...comp,
           id: generateId(),
           children: comp.children.map(cloneComponent),
@@ -421,7 +454,7 @@ export default function EditorPage() {
       }
     } else if (active.data.current?.type === "canvas-item") {
       const componentId = active.data.current.componentId;
-      
+
       if (over.data.current?.type === "drop-zone") {
         const targetId = over.data.current.targetId;
         const position = over.data.current.position;
@@ -465,19 +498,27 @@ export default function EditorPage() {
           if (page.id === currentPageId) return page; // Already updated above
           return {
             ...page,
-            components: syncGlobalInComponents(page.components, globalName, updates),
+            components: syncGlobalInComponents(
+              page.components,
+              globalName,
+              updates,
+            ),
           };
-        })
+        }),
       );
     }
   };
 
   const moveComponentUp = (componentId: string) => {
-    updateCurrentPageComponents((prev) => moveComponentInTree(prev, componentId, "up"));
+    updateCurrentPageComponents((prev) =>
+      moveComponentInTree(prev, componentId, "up"),
+    );
   };
 
   const moveComponentDown = (componentId: string) => {
-    updateCurrentPageComponents((prev) => moveComponentInTree(prev, componentId, "down"));
+    updateCurrentPageComponents((prev) =>
+      moveComponentInTree(prev, componentId, "down"),
+    );
   };
 
   // Recursively find and update components with matching isGlobal name
@@ -492,7 +533,10 @@ export default function EditorPage() {
         updated = { ...comp, props: { ...comp.props, ...updates } };
       }
       if (comp.children.length > 0) {
-        updated = { ...updated, children: syncGlobalInComponents(comp.children, globalName, updates) };
+        updated = {
+          ...updated,
+          children: syncGlobalInComponents(comp.children, globalName, updates),
+        };
       }
       return updated;
     });
@@ -508,16 +552,16 @@ export default function EditorPage() {
       [globalName]: { ...component, isGlobal: globalName },
     }));
 
-    // 2. Mark the current instance as global 
-    updateCurrentPageComponents((prev) => 
-      setGlobalFlagInTree(prev, componentId, globalName)
+    // 2. Mark the current instance as global
+    updateCurrentPageComponents((prev) =>
+      setGlobalFlagInTree(prev, componentId, globalName),
     );
     toast.success(`Component marked as global: ${globalName}`);
   };
 
   const unmarkGlobal = (componentId: string) => {
-    updateCurrentPageComponents((prev) => 
-      clearGlobalFlagInTree(prev, componentId)
+    updateCurrentPageComponents((prev) =>
+      clearGlobalFlagInTree(prev, componentId),
     );
     toast.success("Removed global sync from component");
   };
@@ -530,10 +574,10 @@ export default function EditorPage() {
       // Find the component and update all its props with the template's props
       return updateComponentInTree(prev, componentId, template.props);
     });
-    
+
     // Also mark it as pointing to this global group
-    updateCurrentPageComponents((prev) => 
-      setGlobalFlagInTree(prev, componentId, globalName)
+    updateCurrentPageComponents((prev) =>
+      setGlobalFlagInTree(prev, componentId, globalName),
     );
 
     toast.success(`Applied global style "${globalName}"`);
@@ -542,13 +586,13 @@ export default function EditorPage() {
   const deleteComponent = (componentId: string) => {
     // Check if it's a global component template
     const isGlobalTemplate = Object.values(globalComponents).some(
-      (comp) => comp.id === componentId
+      (comp) => comp.id === componentId,
     );
 
     if (isGlobalTemplate) {
       // Find its global name and remove from global state
       const globalName = Object.entries(globalComponents).find(
-        ([_, comp]) => comp.id === componentId
+        ([_, comp]) => comp.id === componentId,
       )?.[0];
 
       if (globalName) {
@@ -576,7 +620,7 @@ export default function EditorPage() {
     selectedComponentIds.forEach((id) => {
       // Check if it's a global component template
       const globalName = Object.entries(globalComponents).find(
-        ([_, comp]) => comp.id === id
+        ([_, comp]) => comp.id === id,
       )?.[0];
 
       if (globalName) {
@@ -627,19 +671,32 @@ export default function EditorPage() {
   };
 
   // AI components handler
-  const handleApplyAIComponents = (aiComponents: ComponentDefinition[], mode: "add" | "replace") => {
+  const handleApplyAIComponents = (
+    aiComponents: ComponentDefinition[],
+    mode: "add" | "replace",
+  ) => {
     if (mode === "replace") {
       updateCurrentPageComponents(() => aiComponents);
-      toast.success(`Page replaced with ${aiComponents.length} AI-generated component${aiComponents.length !== 1 ? "s" : ""}`);
+      toast.success(
+        `Page replaced with ${aiComponents.length} AI-generated component${aiComponents.length !== 1 ? "s" : ""}`,
+      );
     } else {
       updateCurrentPageComponents((prev) => [...prev, ...aiComponents]);
-      toast.success(`${aiComponents.length} AI-generated component${aiComponents.length !== 1 ? "s" : ""} added to page`);
+      toast.success(
+        `${aiComponents.length} AI-generated component${aiComponents.length !== 1 ? "s" : ""} added to page`,
+      );
     }
     setSelectedComponentIds([]);
   };
 
   // AI pages handler
-  const handleApplyAIPages = (aiPages: { name: string; path: string; components: ComponentDefinition[] }[]) => {
+  const handleApplyAIPages = (
+    aiPages: {
+      name: string;
+      path: string;
+      components: ComponentDefinition[];
+    }[],
+  ) => {
     if (!aiPages || aiPages.length === 0) return;
 
     let firstNewOrUpdatedPageId: string | null = null;
@@ -659,7 +716,9 @@ export default function EditorPage() {
         const existingBySlug = updatedPages.find((p) => p.slug === slug);
         // Also check by name match (case-insensitive) for common cases like "Home"
         const existingByName = !existingBySlug
-          ? updatedPages.find((p) => p.name.toLowerCase() === pageName.toLowerCase())
+          ? updatedPages.find(
+              (p) => p.name.toLowerCase() === pageName.toLowerCase(),
+            )
           : null;
         const existing = existingBySlug || existingByName;
 
@@ -692,16 +751,23 @@ export default function EditorPage() {
     if (firstNewOrUpdatedPageId) {
       setCurrentPageId(firstNewOrUpdatedPageId);
     }
-    toast.success(`Applied ${aiPages.length} AI-generated page${aiPages.length > 1 ? "s" : ""}`);
+    toast.success(
+      `Applied ${aiPages.length} AI-generated page${aiPages.length > 1 ? "s" : ""}`,
+    );
   };
 
   // Custom component handlers
-  const handleSaveCustomComponent = (componentId: string, customName: string) => {
+  const handleSaveCustomComponent = (
+    componentId: string,
+    customName: string,
+  ) => {
     const component = findComponentInTree(components, componentId);
     if (!component) return;
 
     // Deep clone the component
-    const cloneComponent = (comp: ComponentDefinition): ComponentDefinition => ({
+    const cloneComponent = (
+      comp: ComponentDefinition,
+    ): ComponentDefinition => ({
       ...comp,
       id: comp.id,
       children: comp.children.map(cloneComponent),
@@ -922,7 +988,8 @@ export default function EditorPage() {
                   <Globe className="w-5 h-5" />
                 ) : (
                   (() => {
-                    const type = draggedComponent.componentType || draggedComponent.type;
+                    const type =
+                      draggedComponent.componentType || draggedComponent.type;
                     for (const cat of componentCategories) {
                       const found = cat.components.find((c) => c.type === type);
                       if (found) return found.icon;
@@ -932,9 +999,9 @@ export default function EditorPage() {
                 )}
               </span>
               <span className="text-xs font-medium text-foreground">
-                {draggedComponent.type === "palette-global" 
-                  ? draggedComponent.globalName 
-                  : (draggedComponent.componentType || draggedComponent.type)}
+                {draggedComponent.type === "palette-global"
+                  ? draggedComponent.globalName
+                  : draggedComponent.componentType || draggedComponent.type}
               </span>
             </div>
           ) : null}
@@ -959,7 +1026,8 @@ function getDefaultProps(componentType: string): Record<string, any> {
     Hero: {
       title: "Build Something Amazing",
       subtitle: "Welcome to our platform",
-      description: "Create stunning websites in minutes with our intuitive drag-and-drop builder. No coding required — just pick your components and go.",
+      description:
+        "Create stunning websites in minutes with our intuitive drag-and-drop builder. No coding required — just pick your components and go.",
       primaryButtonText: "Get Started Free",
       primaryButtonLink: "#",
       secondaryButtonText: "Watch Demo",
@@ -975,7 +1043,8 @@ function getDefaultProps(componentType: string): Record<string, any> {
     },
     Card: {
       title: "Getting Started",
-      description: "Everything you need to know to get up and running quickly. Our platform makes it easy to build beautiful websites.",
+      description:
+        "Everything you need to know to get up and running quickly. Our platform makes it easy to build beautiful websites.",
       image: "https://placehold.co/600x300/e0e7ff/4f46e5?text=Card+Image",
       buttonText: "Learn More",
       buttonLink: "#",
@@ -987,7 +1056,8 @@ function getDefaultProps(componentType: string): Record<string, any> {
       size: "default",
     },
     Text: {
-      content: "This is a text block. You can use it for paragraphs, headings, captions, or any other text content on your page. Double-click to edit this text and make it your own.",
+      content:
+        "This is a text block. You can use it for paragraphs, headings, captions, or any other text content on your page. Double-click to edit this text and make it your own.",
       tag: "p",
       size: "base",
       weight: "normal",
@@ -1000,7 +1070,6 @@ function getDefaultProps(componentType: string): Record<string, any> {
       objectFit: "cover",
     },
     Video: {
-      youtubeId: "dQw4w9WgXcQ",
       aspectRatio: "16:9",
       autoplay: false,
       controls: true,
@@ -1020,19 +1089,51 @@ function getDefaultProps(componentType: string): Record<string, any> {
     },
     Form: {
       title: "Contact Us",
-      description: "Have a question or want to work together? Fill out the form below and we'll get back to you within 24 hours.",
+      description:
+        "Have a question or want to work together? Fill out the form below and we'll get back to you within 24 hours.",
       submitText: "Send Message",
       fields: [
-        { id: "name", type: "text", label: "Full Name", placeholder: "John Doe", required: true },
-        { id: "email", type: "email", label: "Email Address", placeholder: "john@example.com", required: true },
-        { id: "phone", type: "tel", label: "Phone Number", placeholder: "+1 (555) 000-0000", required: false },
-        { id: "subject", type: "select", label: "Subject", required: true, options: ["General Inquiry", "Support", "Feedback", "Partnership"] },
-        { id: "message", type: "textarea", label: "Message", placeholder: "Tell us what you're looking for...", required: true },
+        {
+          id: "name",
+          type: "text",
+          label: "Full Name",
+          placeholder: "John Doe",
+          required: true,
+        },
+        {
+          id: "email",
+          type: "email",
+          label: "Email Address",
+          placeholder: "john@example.com",
+          required: true,
+        },
+        {
+          id: "phone",
+          type: "tel",
+          label: "Phone Number",
+          placeholder: "+1 (555) 000-0000",
+          required: false,
+        },
+        {
+          id: "subject",
+          type: "select",
+          label: "Subject",
+          required: true,
+          options: ["General Inquiry", "Support", "Feedback", "Partnership"],
+        },
+        {
+          id: "message",
+          type: "textarea",
+          label: "Message",
+          placeholder: "Tell us what you're looking for...",
+          required: true,
+        },
       ],
     },
     Footer: {
       logoText: "Acme Inc.",
-      description: "Building the future of web design, one component at a time.",
+      description:
+        "Building the future of web design, one component at a time.",
       copyright: `© ${new Date().getFullYear()} Acme Inc. All rights reserved.`,
       sections: [
         {
@@ -1081,22 +1182,51 @@ function getDefaultProps(componentType: string): Record<string, any> {
     },
     Accordion: {
       items: [
-        { title: "What is this platform?", content: "Our platform is a drag-and-drop website builder that lets you create stunning websites without writing any code. Simply pick components, customize them, and publish." },
-        { title: "How do I get started?", content: "Sign up for a free account, choose a template or start from scratch, and begin dragging components onto your canvas. It's that easy!" },
-        { title: "Can I use my own domain?", content: "Yes! You can connect your own custom domain to any project. We also provide free subdomains if you're just getting started." },
-        { title: "Is there a free plan?", content: "Absolutely. Our free plan includes all core features, up to 3 projects, and community support. Upgrade anytime for more." },
+        {
+          title: "What is this platform?",
+          content:
+            "Our platform is a drag-and-drop website builder that lets you create stunning websites without writing any code. Simply pick components, customize them, and publish.",
+        },
+        {
+          title: "How do I get started?",
+          content:
+            "Sign up for a free account, choose a template or start from scratch, and begin dragging components onto your canvas. It's that easy!",
+        },
+        {
+          title: "Can I use my own domain?",
+          content:
+            "Yes! You can connect your own custom domain to any project. We also provide free subdomains if you're just getting started.",
+        },
+        {
+          title: "Is there a free plan?",
+          content:
+            "Absolutely. Our free plan includes all core features, up to 3 projects, and community support. Upgrade anytime for more.",
+        },
       ],
     },
     Tabs: {
       tabs: [
-        { label: "Overview", content: "Get a bird's-eye view of your project. Track progress, manage components, and see real-time updates as your site comes to life." },
-        { label: "Features", content: "Drag-and-drop editor, responsive layouts, custom themes, SEO tools, analytics integration, and much more — all built in." },
-        { label: "Pricing", content: "Start for free with our basic plan. Pro plans start at $19/month and include custom domains, priority support, and advanced features." },
+        {
+          label: "Overview",
+          content:
+            "Get a bird's-eye view of your project. Track progress, manage components, and see real-time updates as your site comes to life.",
+        },
+        {
+          label: "Features",
+          content:
+            "Drag-and-drop editor, responsive layouts, custom themes, SEO tools, analytics integration, and much more — all built in.",
+        },
+        {
+          label: "Pricing",
+          content:
+            "Start for free with our basic plan. Pro plans start at $19/month and include custom domains, priority support, and advanced features.",
+        },
       ],
       variant: "underline",
     },
     Testimonial: {
-      quote: "This platform completely transformed how we build websites. What used to take weeks now takes hours. The drag-and-drop editor is incredibly intuitive.",
+      quote:
+        "This platform completely transformed how we build websites. What used to take weeks now takes hours. The drag-and-drop editor is incredibly intuitive.",
       author: "Sarah Johnson",
       role: "Head of Marketing",
       company: "TechCorp",
@@ -1107,7 +1237,8 @@ function getDefaultProps(componentType: string): Record<string, any> {
       title: "Professional",
       price: "$49",
       period: "month",
-      description: "Everything you need to build and scale your online presence.",
+      description:
+        "Everything you need to build and scale your online presence.",
       buttonText: "Start Free Trial",
       buttonLink: "#",
       featured: true,
@@ -1123,7 +1254,8 @@ function getDefaultProps(componentType: string): Record<string, any> {
     Feature: {
       icon: "🚀",
       title: "Lightning Fast",
-      description: "Our optimized infrastructure ensures your websites load in milliseconds, keeping your visitors engaged and your SEO rankings high.",
+      description:
+        "Our optimized infrastructure ensures your websites load in milliseconds, keeping your visitors engaged and your SEO rankings high.",
       layout: "vertical",
       iconSize: "md",
     },
@@ -1138,7 +1270,8 @@ function getDefaultProps(componentType: string): Record<string, any> {
     },
     CTA: {
       title: "Ready to Build Your Dream Website?",
-      description: "Join thousands of creators who are already building beautiful websites with our platform. Start for free — no credit card required.",
+      description:
+        "Join thousands of creators who are already building beautiful websites with our platform. Start for free — no credit card required.",
       primaryButtonText: "Get Started Free",
       primaryButtonLink: "#",
       secondaryButtonText: "Talk to Sales",
@@ -1161,7 +1294,8 @@ function getDefaultProps(componentType: string): Record<string, any> {
     },
     Alert: {
       title: "Heads Up!",
-      message: "This is an informational alert — use it to highlight important messages, tips, or updates for your visitors.",
+      message:
+        "This is an informational alert — use it to highlight important messages, tips, or updates for your visitors.",
       variant: "info",
       dismissible: true,
     },
@@ -1179,7 +1313,7 @@ function insertComponent(
   if (position === "root-start" || targetId === "root-start") {
     return [newComponent, ...components];
   }
-  
+
   if (!targetId || targetId === "root") {
     if (position === "before") {
       return [newComponent, ...components];
@@ -1251,10 +1385,18 @@ function repositionComponentInTree(
   if (isTargetInsideSelf(targetId)) return components;
 
   // Remove from old position
-  const componentsWithoutOriginal = removeComponentFromTree(components, componentId);
+  const componentsWithoutOriginal = removeComponentFromTree(
+    components,
+    componentId,
+  );
 
   // Insert into new position
-  return insertComponent(componentsWithoutOriginal, componentToMove, targetId, position);
+  return insertComponent(
+    componentsWithoutOriginal,
+    componentToMove,
+    targetId,
+    position,
+  );
 }
 
 function findComponentInTree(
@@ -1378,15 +1520,16 @@ function moveComponentInTree(
 
   for (let i = 0; i < components.length; i++) {
     const comp = components[i];
-    
+
     // Check if the target is one of the siblings at the current level
-    if (components.some(c => c.id === componentId)) {
-      const idx = components.findIndex(c => c.id === componentId);
-      
+    if (components.some((c) => c.id === componentId)) {
+      const idx = components.findIndex((c) => c.id === componentId);
+
       // If we're at the very top and trying to move up, ignore
       if (idx === 0 && direction === "up") return [...components];
       // If we're at the very bottom and trying to move down, ignore
-      if (idx === components.length - 1 && direction === "down") return [...components];
+      if (idx === components.length - 1 && direction === "down")
+        return [...components];
 
       // Perform the swap
       const newArray = [...components];
@@ -1394,7 +1537,7 @@ function moveComponentInTree(
       const temp = newArray[idx];
       newArray[idx] = newArray[swapIdx];
       newArray[swapIdx] = temp;
-      
+
       return newArray;
     }
 
