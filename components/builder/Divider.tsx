@@ -54,7 +54,7 @@ export function Divider({
             borderStyle: borderStyle[variant],
           }}
         />
-        <span className="text-sm text-gray-400 px-2">{text}</span>
+        <span className="text-sm text-muted-foreground px-2">{text}</span>
         <div
           className="flex-1"
           style={{

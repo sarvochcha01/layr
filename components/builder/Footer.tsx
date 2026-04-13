@@ -102,7 +102,7 @@ export function Footer({
   return (
     <footer
       className={cn(
-        "w-full py-16 px-6 sm:px-8 border-t border-[#2a2a2a]",
+        "w-full py-16 px-6 sm:px-8 border-t border-border",
         className,
       )}
       style={baseStyle}
@@ -125,7 +125,7 @@ export function Footer({
             </div>
 
             {description && (
-              <p className="text-sm leading-relaxed text-gray-400 max-w-sm">
+              <p className="text-sm leading-relaxed text-muted-foreground max-w-sm">
                 {description}
               </p>
             )}
@@ -137,7 +137,7 @@ export function Footer({
                   <a
                     key={index}
                     href={social.href}
-                    className="w-10 h-10 rounded-lg flex items-center justify-center text-sm transition-all duration-200 hover:bg-[#2a2a2a] text-gray-400 hover:text-white"
+                    className="w-10 h-10 rounded-lg flex items-center justify-center text-sm transition-all duration-200 hover:bg-muted text-muted-foreground hover:text-foreground"
                     target="_blank"
                     rel="noopener noreferrer"
                     title={social.platform}
@@ -152,7 +152,7 @@ export function Footer({
           {/* Footer Sections */}
           {sections.map((section, index) => (
             <div key={index} className="space-y-4">
-              <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500">
+              <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
                 {section.title}
               </h3>
               <ul className="space-y-3">
@@ -160,7 +160,7 @@ export function Footer({
                   <li key={linkIndex}>
                     <Link
                       href={link.href}
-                      className="text-sm text-gray-400 hover:text-white transition-colors duration-200"
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-200"
                     >
                       {link.text}
                     </Link>
@@ -172,26 +172,26 @@ export function Footer({
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-8 border-t border-[#2a2a2a] flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-gray-500">
+        <div className="pt-8 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-xs text-muted-foreground">
             {copyright || defaultCopyright}
           </p>
-          <div className="flex items-center gap-6 text-xs text-gray-500">
+          <div className="flex items-center gap-6 text-xs text-muted-foreground">
             <Link
               href={privacyLink}
-              className="hover:text-white transition-colors"
+              className="hover:text-foreground transition-colors"
             >
               Privacy Policy
             </Link>
             <Link
               href={termsLink}
-              className="hover:text-white transition-colors"
+              className="hover:text-foreground transition-colors"
             >
               Terms of Service
             </Link>
             <div className="flex items-center gap-2">
-              <span className="w-4 h-4 rounded-full bg-blue-500/20 flex items-center justify-center">
-                <span className="w-2 h-2 rounded-full bg-blue-400"></span>
+              <span className="w-4 h-4 rounded-full bg-primary/20 flex items-center justify-center">
+                <span className="w-2 h-2 rounded-full bg-primary"></span>
               </span>
               <span>United States (English)</span>
             </div>

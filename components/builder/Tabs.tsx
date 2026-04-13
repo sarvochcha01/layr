@@ -60,7 +60,7 @@ export function Tabs({
       <div
         className={cn(
           "flex gap-1",
-          variant === "bordered" && "border-b border-[#2a2a2a]",
+          variant === "bordered" && "border-b border-border",
         )}
       >
         {tabs.map((tab, index) => {

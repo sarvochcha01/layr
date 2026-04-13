@@ -38,7 +38,7 @@ function DraggableGlobalComponent({
       {/* Draggable area */}
       <div {...listeners} {...attributes} className="cursor-grab w-full flex flex-col items-center">
         <div className="text-muted-foreground mb-2 p-2 bg-muted rounded-md group-hover:bg-primary/20 group-hover:text-primary transition-colors">
-           <Globe className="w-5 h-5 text-blue-400" />
+           <Globe className="w-5 h-5 text-primary" />
         </div>
         <div>
           <div className="text-xs font-medium text-foreground line-clamp-1">
@@ -370,8 +370,8 @@ export function ComponentPalette({
               onClick={() => toggleCategory("Global")}
               className="flex items-center justify-between w-full text-left mb-3"
             >
-              <span className="text-xs font-semibold text-blue-500 uppercase tracking-wide flex items-center gap-1">
-                <Globe className="w-3 h-3 text-blue-400" />
+              <span className="text-xs font-semibold text-primary uppercase tracking-wide flex items-center gap-1">
+                <Globe className="w-3 h-3 text-primary" />
                 Global Components
               </span>
               <span className="text-[10px] text-muted-foreground">

@@ -1,7 +1,7 @@
 // @ts-nocheck
 "use client";
 import React from "react";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { ComponentDefinition, Page, GlobalComponents } from "@/types/editor";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -40,6 +40,8 @@ interface PropertiesPanelProps {
   onDeleteComponent: (id: string) => void;
   onDuplicateComponent: (id: string) => void;
   pages?: Page[];
+  currentPage?: Page;
+  onUpdatePage?: (updates: Partial<Page>) => void;
   globalComponents?: GlobalComponents;
   onMarkAsGlobal?: (componentId: string, globalName: string) => void;
   onUnmarkGlobal?: (componentId: string) => void;
@@ -52,6 +54,8 @@ export function PropertiesPanel({
   onDeleteComponent,
   onDuplicateComponent,
   pages = [],
+  currentPage,
+  onUpdatePage,
   globalComponents = {},
   onMarkAsGlobal,
   onUnmarkGlobal,
@@ -60,7 +64,178 @@ export function PropertiesPanel({
   const [showGlobalDialog, setShowGlobalDialog] = useState(false);
   const [globalName, setGlobalName] = useState("");
 
+  // Debounced update for continuous changes (color picker, sliders, etc.)
+  // Must be declared before any conditional returns (Rules of Hooks)
+  const debouncedUpdateRef = useRef<NodeJS.Timeout | null>(null);
+  const pendingUpdatesRef = useRef<Record<string, any>>({});
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (debouncedUpdateRef.current) {
+        clearTimeout(debouncedUpdateRef.current);
+      }
+    };
+  }, []);
+
+  const updateProp = (key: string, value: any, immediate: boolean = false) => {
+    if (!selectedComponent) return;
+    
+    if (immediate) {
+      // Flush any pending updates first
+      if (debouncedUpdateRef.current) {
+        clearTimeout(debouncedUpdateRef.current);
+        if (Object.keys(pendingUpdatesRef.current).length > 0) {
+          onUpdateComponent(selectedComponent.id, pendingUpdatesRef.current);
+          pendingUpdatesRef.current = {};
+        }
+      }
+      // Apply immediate update
+      onUpdateComponent(selectedComponent.id, { [key]: value });
+    } else {
+      // Accumulate updates
+      pendingUpdatesRef.current[key] = value;
+      
+      // Clear existing timeout
+      if (debouncedUpdateRef.current) {
+        clearTimeout(debouncedUpdateRef.current);
+      }
+      
+      // Set new timeout
+      debouncedUpdateRef.current = setTimeout(() => {
+        onUpdateComponent(selectedComponent.id, pendingUpdatesRef.current);
+        pendingUpdatesRef.current = {};
+        debouncedUpdateRef.current = null;
+      }, 300); // 300ms debounce
+    }
+  };
+
   if (!selectedComponent) {
+    // Show page properties when no component is selected
+    if (currentPage && onUpdatePage) {
+      const bgType = currentPage.backgroundType || "solid";
+      
+      return (
+        <div className="h-full flex flex-col">
+          <div className="p-4 border-b border-border">
+            <h3 className="text-sm font-semibold text-foreground">Page Settings</h3>
+          </div>
+          <div className="flex-1 overflow-auto">
+            <Accordion type="multiple" defaultValue={["background"]} className="w-full">
+              <AccordionItem value="background" className="border-b-0 border-t border-border/50">
+                <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
+                  <div className="flex items-center gap-2">
+                    <Paintbrush className="w-4 h-4 text-muted-foreground" />
+                    Page Background
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
+                  {/* Background Type Selector */}
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-medium text-muted-foreground">Background Type</Label>
+                    <div className="flex gap-1 border rounded-md p-0.5">
+                      {(["solid", "gradient", "image"] as const).map((t) => (
+                        <button
+                          key={t}
+                          onClick={() => onUpdatePage({ backgroundType: t })}
+                          className={`flex-1 px-2 py-1 text-xs rounded capitalize transition-colors ${bgType === t ? "bg-secondary text-foreground font-medium" : "text-muted-foreground hover:text-foreground"}`}
+                        >
+                          {t}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Solid Color */}
+                  {bgType === "solid" && (
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-medium text-muted-foreground">Background Color</Label>
+                      <div className="flex gap-2 items-center">
+                        <Input 
+                          type="color" 
+                          value={currentPage.backgroundColor || "#0d0d0d"} 
+                          onChange={(e) => onUpdatePage({ backgroundColor: e.target.value })} 
+                          className="w-8 h-8 p-0.5 min-h-0 cursor-pointer" 
+                        />
+                        <Input 
+                          type="text" 
+                          value={currentPage.backgroundColor || "#0d0d0d"} 
+                          onChange={(e) => onUpdatePage({ backgroundColor: e.target.value })} 
+                          className="flex-1 h-8 text-xs font-mono" 
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Gradient */}
+                  {bgType === "gradient" && (
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-medium text-muted-foreground">CSS Gradient</Label>
+                      <Input
+                        value={currentPage.backgroundGradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"}
+                        onChange={(e) => onUpdatePage({ backgroundGradient: e.target.value })}
+                        placeholder="linear-gradient(135deg, #667eea, #764ba2)"
+                        className="h-8 text-xs font-mono"
+                      />
+                      <div className="h-8 rounded border" style={{ backgroundImage: currentPage.backgroundGradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" }} />
+                    </div>
+                  )}
+
+                  {/* Background Image */}
+                  {bgType === "image" && (
+                    <>
+                      <div className="space-y-1.5">
+                        <Label className="text-xs font-medium text-muted-foreground">Image URL</Label>
+                        <Input 
+                          value={currentPage.backgroundImageUrl || ""} 
+                          onChange={(e) => onUpdatePage({ backgroundImageUrl: e.target.value })} 
+                          placeholder="https://example.com/bg.jpg" 
+                          className="h-8 text-xs" 
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="space-y-1.5">
+                          <Label className="text-xs font-medium text-muted-foreground">Size</Label>
+                          <div className="relative border rounded-md">
+                            <select 
+                              value={currentPage.backgroundSize || "cover"} 
+                              onChange={(e) => onUpdatePage({ backgroundSize: e.target.value })} 
+                              className="w-full h-8 px-2 text-xs bg-transparent appearance-none focus:outline-none"
+                            >
+                              <option className="bg-background text-foreground" value="cover">Cover</option>
+                              <option className="bg-background text-foreground" value="contain">Contain</option>
+                              <option className="bg-background text-foreground" value="auto">Auto</option>
+                              <option className="bg-background text-foreground" value="100% 100%">Stretch</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label className="text-xs font-medium text-muted-foreground">Position</Label>
+                          <div className="relative border rounded-md">
+                            <select 
+                              value={currentPage.backgroundPosition || "center"} 
+                              onChange={(e) => onUpdatePage({ backgroundPosition: e.target.value })} 
+                              className="w-full h-8 px-2 text-xs bg-transparent appearance-none focus:outline-none"
+                            >
+                              <option className="bg-background text-foreground" value="center">Center</option>
+                              <option className="bg-background text-foreground" value="top">Top</option>
+                              <option className="bg-background text-foreground" value="bottom">Bottom</option>
+                              <option className="bg-background text-foreground" value="left">Left</option>
+                              <option className="bg-background text-foreground" value="right">Right</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </div>
+        </div>
+      );
+    }
+    
     return (
       <div className="h-full flex flex-col">
         <div className="p-4 border-b border-border">
@@ -77,10 +252,6 @@ export function PropertiesPanel({
       </div>
     );
   }
-
-  const updateProp = (key: string, value: any) => {
-    onUpdateComponent(selectedComponent.id, { [key]: value });
-  };
 
   const isGlobal = !!selectedComponent.isGlobal;
   const existingGlobalNames = Object.keys(globalComponents);
@@ -5263,13 +5434,13 @@ export function PropertiesPanel({
   return (
     <div className="h-full flex flex-col overflow-hidden">
       {/* Header */}
-      <div className="flex-shrink-0 p-4 border-b border-[#2a2a2a]">
+      <div className="flex-shrink-0 p-4 border-b border-border">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-xs font-semibold text-gray-400 tracking-wide uppercase">
+            <h3 className="text-xs font-semibold text-muted-foreground tracking-wide uppercase">
               Properties
             </h3>
-            <p className="text-[10px] text-gray-500 mt-1">
+            <p className="text-[10px] text-muted-foreground/70 mt-1">
               {selectedComponent.type} Component
             </p>
           </div>
@@ -5277,7 +5448,7 @@ export function PropertiesPanel({
           {isGlobal ? (
             <button
               onClick={() => onUnmarkGlobal?.(selectedComponent.id)}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-500/15 text-blue-400 text-xs font-medium hover:bg-blue-500/25 transition-colors"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/15 text-primary text-xs font-medium hover:bg-primary/25 transition-colors"
               title={`Global: ${selectedComponent.isGlobal} — Click to unmark`}
             >
               <Globe className="w-3 h-3" />
@@ -5287,7 +5458,7 @@ export function PropertiesPanel({
           ) : (
             <button
               onClick={() => setShowGlobalDialog(true)}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-[#2a2a2a] text-xs text-gray-400 hover:text-white hover:border-gray-600 transition-colors"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-border text-xs text-muted-foreground hover:text-foreground hover:border-border/80 transition-colors"
               title="Mark as Global Component"
             >
               <Globe className="w-3 h-3" />
@@ -5303,7 +5474,7 @@ export function PropertiesPanel({
       </div>
 
       {/* Actions */}
-      <div className="flex-shrink-0 p-4 border-t border-[#2a2a2a] space-y-2">
+      <div className="flex-shrink-0 p-4 border-t border-border space-y-2">
         <Button
           variant="outline"
           size="sm"
@@ -5352,7 +5523,7 @@ export function PropertiesPanel({
                       onClick={() => handleApplyExistingGlobal(name)}
                       className="w-full flex items-center gap-2 p-2 rounded-md border border-border hover:bg-muted text-sm text-left transition-colors"
                     >
-                      <Globe className="w-3.5 h-3.5 text-blue-400" />
+                      <Globe className="w-3.5 h-3.5 text-primary" />
                       <span className="font-medium">{name}</span>
                       <span className="text-xs text-muted-foreground ml-auto">
                         ({globalComponents[name]?.type})

@@ -179,7 +179,7 @@ export function CodeEditorDialog({ open, onClose, onSave }: CodeEditorDialogProp
               <textarea
                 value={activeTab === "html" ? html : css}
                 onChange={(e) => activeTab === "html" ? setHtml(e.target.value) : setCss(e.target.value)}
-                className="flex-1 p-4 bg-[#0d1117] text-[#c9d1d9] font-mono text-xs leading-relaxed resize-none focus:outline-none"
+                className="flex-1 p-4 bg-muted text-foreground font-mono text-xs leading-relaxed resize-none focus:outline-none"
                 spellCheck={false}
                 placeholder={activeTab === "html" ? "Write your HTML here..." : "Write your CSS here..."}
               />

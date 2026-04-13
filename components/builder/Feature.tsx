@@ -46,7 +46,7 @@ export function Feature({
     <div
       className={cn(
         "p-6 rounded-2xl transition-all duration-300 min-w-0 overflow-hidden",
-        "hover:bg-[#1a1a1a]/50 border border-[#2a2a2a]",
+        "hover:bg-card/50 border border-border",
         layout === "vertical" ? "text-center" : "flex gap-5 items-start",
       )}
       style={baseStyle}
@@ -72,12 +72,12 @@ export function Feature({
         )}
       >
         <h3
-          className="text-lg font-semibold mb-2 tracking-tight break-words text-white"
+          className="text-lg font-semibold mb-2 tracking-tight break-words text-foreground"
           style={{ fontFamily: "'Inter', sans-serif" }}
         >
           {title}
         </h3>
-        <p className="text-sm leading-relaxed text-gray-400 break-words">
+        <p className="text-sm leading-relaxed text-muted-foreground break-words">
           {description}
         </p>
       </div>
