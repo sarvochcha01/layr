@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
       userMessage += `\n\n[CONTEXT] The CURRENT PAGE has these components:\n${JSON.stringify(existingComponents, null, 2)}`;
       contextAdded = true;
     }
-    
+
     if (customComponents && Object.keys(customComponents).length > 0) {
       userMessage += `\n\n[CONTEXT] The project has these saved CUSTOM COMPONENTS you can use or learn from:\n${JSON.stringify(customComponents, null, 2)}`;
       contextAdded = true;
@@ -135,7 +135,7 @@ export async function POST(request: NextRequest) {
     }
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: "gemini-flash-latest",
       contents: userMessage,
       config: {
         systemInstruction: SYSTEM_PROMPT,
@@ -203,7 +203,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       components: validatedComponents,
       pages: validatedPages
     });

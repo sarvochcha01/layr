@@ -14,8 +14,9 @@ interface TabsProps {
   defaultTab?: number;
   variant?: "underline" | "pills" | "bordered";
   backgroundColor?: string;
-  textColor?: string;
-  activeColor?: string;
+  tabHeadingColor?: string;
+  contentTextColor?: string;
+  activeTabColor?: string;
   width?: string;
   height?: string;
   [key: string]: any;
@@ -29,9 +30,10 @@ export function Tabs({
   ],
   defaultTab = 0,
   variant = "underline",
-  backgroundColor,
-  textColor = "#ffffff",
-  activeColor = "#3b82f6",
+  backgroundColor = "#0d0d0d",
+  tabHeadingColor = "#9ca3af",
+  contentTextColor = "#e5e7eb",
+  activeTabColor = "#3b82f6",
   width,
   height,
   ...rest
@@ -39,49 +41,66 @@ export function Tabs({
   const [activeTab, setActiveTab] = useState(defaultTab);
 
   const baseStyle = buildComponentStyle({
-    backgroundColor,
-    textColor,
+    backgroundColor:
+      rest.backgroundType === "gradient" ? undefined : backgroundColor,
+    backgroundType: rest.backgroundType,
+    gradientStart: rest.gradientStart,
+    gradientEnd: rest.gradientEnd,
+    gradientDirection: rest.gradientDirection,
+    gradientAngle: rest.gradientAngle,
+    backgroundGradient: rest.backgroundGradient, // Fallback for old format
     width,
     height,
     ...rest,
   });
 
   return (
-    <div style={baseStyle}>
+    <div style={baseStyle} className="rounded-lg">
       {/* Tab Headers */}
       <div
         className={cn(
-          "flex gap-2",
+          "flex gap-1",
           variant === "bordered" && "border-b border-[#2a2a2a]",
         )}
       >
-        {tabs.map((tab, index) => (
-          <button
-            key={index}
-            onClick={() => setActiveTab(index)}
-            className={cn(
-              "px-4 py-2 font-medium transition-colors text-sm",
-              variant === "underline" && "border-b-2",
-              variant === "pills" && "rounded-lg",
-              variant === "bordered" && "border-b-2 -mb-px",
-              activeTab !== index && "text-gray-400 hover:text-gray-300",
-            )}
-            style={{
-              borderColor: activeTab === index ? activeColor : "transparent",
-              color: activeTab === index ? activeColor : undefined,
-              backgroundColor:
-                activeTab === index && variant === "pills"
-                  ? `${activeColor}20`
-                  : undefined,
-            }}
-          >
-            {tab.label}
-          </button>
-        ))}
+        {tabs.map((tab, index) => {
+          const isActive = activeTab === index;
+
+          return (
+            <button
+              key={index}
+              onClick={() => setActiveTab(index)}
+              className={cn(
+                "px-4 py-2.5 font-medium transition-all duration-200 text-sm relative",
+                variant === "underline" && "border-b-2",
+                variant === "pills" && "rounded-lg",
+                variant === "bordered" && "border-b-2 -mb-px",
+              )}
+              style={{
+                borderColor:
+                  isActive && variant !== "pills"
+                    ? activeTabColor
+                    : "transparent",
+                color: isActive ? activeTabColor : tabHeadingColor,
+                backgroundColor:
+                  isActive && variant === "pills"
+                    ? `${activeTabColor}20`
+                    : "transparent",
+              }}
+            >
+              {tab.label}
+            </button>
+          );
+        })}
       </div>
 
       {/* Tab Content */}
-      <div className="py-4 text-gray-300">{tabs[activeTab]?.content}</div>
+      <div
+        className="py-6 px-1 leading-relaxed"
+        style={{ color: contentTextColor }}
+      >
+        {tabs[activeTab]?.content}
+      </div>
     </div>
   );
 }

@@ -147,7 +147,7 @@ function ComponentWrapper({
         "relative group min-w-0",
         shouldTakeFullHeight && "flex self-stretch",
         shouldTakeFullWidth && "w-full",
-        isDragging && "opacity-40"
+        isDragging && "opacity-40",
       )}
     >
       {/* Component wrapper — receives inline styles from properties panel */}
@@ -165,7 +165,9 @@ function ComponentWrapper({
           !isPreviewMode && isSelected && "ring-2 ring-blue-500 ring-offset-2",
           !isPreviewMode &&
             "hover:ring-1 hover:ring-blue-300 hover:ring-offset-1",
-          !isPreviewMode && showOutlines && !isSelected &&
+          !isPreviewMode &&
+            showOutlines &&
+            !isSelected &&
             "outline outline-1 outline-dashed outline-gray-300",
         )}
       >
@@ -181,9 +183,9 @@ function ComponentWrapper({
         >
         {/* Selection overlay and DRAG HANDLE */}
         {!isPreviewMode && isSelected && (
-          <div 
-            {...listeners} 
-            {...attributes} 
+          <div
+            {...listeners}
+            {...attributes}
             className="absolute -top-6 left-0 bg-blue-500 text-white text-xs px-2 py-1 rounded z-10 cursor-grab active:cursor-grabbing hover:bg-blue-600 transition-colors"
             title="Drag to move this component"
           >
@@ -336,10 +338,10 @@ export function Canvas({
 }: CanvasProps) {
   return (
     <div
-      className={`bg-white w-full editor-canvas ${
+      className={`bg-white w-full ${
         isPreviewMode
           ? "min-h-screen"
-          : "rounded-lg shadow-sm min-h-[800px] p-4"
+          : "editor-canvas-container rounded-lg shadow-sm min-h-[800px] p-4"
       }`}
       onClick={isPreviewMode ? undefined : () => onSelectComponent(null)}
       tabIndex={isPreviewMode ? undefined : 0}

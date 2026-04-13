@@ -14,19 +14,41 @@ function ensureUnit(value: any): string | undefined {
 }
 
 /**
+ * Converts viewport units (vw, vh) to percentages in editor mode.
+ * In preview/export mode, viewport units work normally.
+ */
+function convertViewportUnits(value: any, isPreviewMode: boolean = false): string | undefined {
+    if (value == null || value === "" || isPreviewMode) return value;
+    const str = String(value).trim();
+    if (!str) return undefined;
+
+    // Convert vw to % (100vw = 100% of canvas width)
+    if (str.includes("vw")) {
+        return str.replace(/(\d+(?:\.\d+)?)vw/g, "$1%");
+    }
+    // Convert vh to % (100vh = 100% of canvas height)
+    if (str.includes("vh")) {
+        return str.replace(/(\d+(?:\.\d+)?)vh/g, "$1%");
+    }
+
+    return str;
+}
+
+/**
  * Maps common style props from component definitions to a React CSSProperties object.
  * All builder components should spread this into their root element's style.
  */
 export function buildComponentStyle(props: Record<string, any>): React.CSSProperties {
     const style: React.CSSProperties = {};
+    const isPreviewMode = props.isPreviewMode || false;
 
     // --- Dimensions ---
-    if (props.width) style.width = props.width;
-    if (props.height) style.height = props.height;
-    if (props.minWidth) style.minWidth = props.minWidth;
-    if (props.minHeight) style.minHeight = props.minHeight;
-    if (props.maxWidth_css) style.maxWidth = props.maxWidth_css;
-    if (props.maxHeight) style.maxHeight = props.maxHeight;
+    if (props.width) style.width = convertViewportUnits(props.width, isPreviewMode) || props.width;
+    if (props.height) style.height = convertViewportUnits(props.height, isPreviewMode) || props.height;
+    if (props.minWidth) style.minWidth = convertViewportUnits(props.minWidth, isPreviewMode) || props.minWidth;
+    if (props.minHeight) style.minHeight = convertViewportUnits(props.minHeight, isPreviewMode) || props.minHeight;
+    if (props.maxWidth_css) style.maxWidth = convertViewportUnits(props.maxWidth_css, isPreviewMode) || props.maxWidth_css;
+    if (props.maxHeight) style.maxHeight = convertViewportUnits(props.maxHeight, isPreviewMode) || props.maxHeight;
 
     // --- Spacing (auto-append px for bare numbers) ---
     if (props.paddingTop) style.paddingTop = ensureUnit(props.paddingTop);
@@ -39,16 +61,33 @@ export function buildComponentStyle(props: Record<string, any>): React.CSSProper
     if (props.marginLeft) style.marginLeft = ensureUnit(props.marginLeft);
 
     // --- Background ---
-    if (props.backgroundColor) style.backgroundColor = props.backgroundColor;
-    if (props.backgroundType === "gradient" && props.backgroundGradient) {
-        style.backgroundImage = props.backgroundGradient;
-        style.backgroundColor = undefined;
+    if (props.backgroundType === "gradient") {
+        // Use new gradient properties if available
+        if (props.gradientStart && props.gradientEnd) {
+            const direction = props.gradientDirection === "custom"
+                ? `${props.gradientAngle || "135"}deg`
+                : props.gradientDirection || "to bottom right";
+            style.backgroundImage = `linear-gradient(${direction}, ${props.gradientStart}, ${props.gradientEnd})`;
+            console.log("[buildComponentStyle] GRADIENT:", style.backgroundImage);
+        } else if (props.backgroundGradient) {
+            // Fallback to old CSS gradient string
+            style.backgroundImage = props.backgroundGradient;
+            console.log("[buildComponentStyle] GRADIENT (legacy):", style.backgroundImage);
+        } else {
+            // No gradient properties set yet, use defaults
+            style.backgroundImage = `linear-gradient(to bottom right, #667eea, #764ba2)`;
+            console.log("[buildComponentStyle] GRADIENT (default):", style.backgroundImage);
+        }
+        // Don't set backgroundColor when using gradient
     } else if (props.backgroundType === "image" && props.backgroundImageUrl) {
         style.backgroundImage = `url(${props.backgroundImageUrl})`;
         style.backgroundSize = props.backgroundSize || "cover";
         style.backgroundPosition = props.backgroundPosition || "center";
         style.backgroundRepeat = props.backgroundRepeat || "no-repeat";
-        style.backgroundColor = undefined;
+        // Don't set backgroundColor when using image
+    } else {
+        // Only set backgroundColor for solid type or when no type is specified
+        if (props.backgroundColor) style.backgroundColor = props.backgroundColor;
     }
 
     // --- Typography ---
