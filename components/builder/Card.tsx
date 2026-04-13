@@ -35,6 +35,8 @@ export function Card({
   backgroundColor = "#1a1a1a",
   textColor = "#ffffff",
   children,
+  iconBg,
+  iconColor,
   ...rest
 }: CardProps) {
   const baseStyle = buildComponentStyle({
