@@ -135,7 +135,7 @@ export function Hero({
             )}
           >
             <span
-              className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] px-4 py-2 rounded-full border border-[#2a2a2a] bg-[#1a1a1a]"
+              className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] px-4 py-2 rounded-full border border-border bg-card"
               style={{ color: "#a5b4fc" }}
             >
               {badge}
@@ -172,7 +172,7 @@ export function Hero({
 
         {/* Description */}
         <p
-          className="text-base sm:text-lg mb-12 leading-relaxed max-w-2xl text-gray-400"
+          className="text-base sm:text-lg mb-12 leading-relaxed max-w-2xl text-muted-foreground"
           style={{
             ...(alignment === "center"
               ? { marginLeft: "auto", marginRight: "auto" }
@@ -195,7 +195,7 @@ export function Hero({
         >
           <Button
             size="lg"
-            className="w-full sm:w-auto px-8 py-3 text-sm font-bold tracking-wider rounded-xl bg-blue-600 hover:bg-blue-700 text-white border-0 transition-all duration-300"
+            className="w-full sm:w-auto px-8 py-3 text-sm font-bold tracking-wider rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground border-0 transition-all duration-300"
             asChild
           >
             <a href={primaryButtonLink}>
@@ -208,7 +208,7 @@ export function Hero({
             <Button
               variant="outline"
               size="lg"
-              className="w-full sm:w-auto px-8 py-3 text-sm font-bold tracking-wider rounded-xl border-[#2a2a2a] bg-[#1a1a1a] hover:bg-[#2a2a2a] text-white transition-all duration-300"
+              className="w-full sm:w-auto px-8 py-3 text-sm font-bold tracking-wider rounded-xl border-border bg-card hover:bg-muted text-foreground transition-all duration-300"
               asChild
             >
               <a href={secondaryButtonLink}>{secondaryButtonText}</a>
@@ -219,7 +219,7 @@ export function Hero({
         {/* Tech Stack Badges */}
         <div
           className={cn(
-            "flex flex-wrap gap-6 mt-16 text-xs text-gray-500 font-semibold uppercase tracking-wider",
+            "flex flex-wrap gap-6 mt-16 text-xs text-muted-foreground font-semibold uppercase tracking-wider",
             alignment === "center"
               ? "justify-center"
               : alignment === "right"
@@ -228,19 +228,19 @@ export function Hero({
           )}
         >
           <div className="flex items-center gap-2">
-            <span className="w-1 h-1 rounded-full bg-blue-500"></span>
+            <span className="w-1 h-1 rounded-full bg-primary"></span>
             <span>VUE.JS</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="w-1 h-1 rounded-full bg-blue-500"></span>
+            <span className="w-1 h-1 rounded-full bg-primary"></span>
             <span>REACT</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="w-1 h-1 rounded-full bg-blue-500"></span>
+            <span className="w-1 h-1 rounded-full bg-primary"></span>
             <span>SUPABASE</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="w-1 h-1 rounded-full bg-blue-500"></span>
+            <span className="w-1 h-1 rounded-full bg-primary"></span>
             <span>VERCEL</span>
           </div>
         </div>
@@ -248,9 +248,9 @@ export function Hero({
 
       {/* Scroll Indicator */}
       {showScrollIndicator && (
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-xs text-gray-500 uppercase tracking-wider">
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-xs text-muted-foreground uppercase tracking-wider">
           <span>SCROLL TO EXPLORE</span>
-          <div className="w-px h-12 bg-gradient-to-b from-gray-500 to-transparent animate-pulse" />
+          <div className="w-px h-12 bg-gradient-to-b from-muted-foreground to-transparent animate-pulse" />
         </div>
       )}
     </section>

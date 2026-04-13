@@ -28,9 +28,9 @@ export function Alert({
   const variantConfig = {
     info: {
       icon: Info,
-      bgClass: "bg-[#1a1a1a] border-blue-500/20",
-      textClass: "text-gray-300",
-      iconClass: "text-blue-400",
+      bgClass: "bg-card border-primary/20",
+      textClass: "text-foreground/80",
+      iconClass: "text-primary",
     },
     success: {
       icon: CheckCircle,

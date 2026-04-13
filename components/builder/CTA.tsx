@@ -100,7 +100,7 @@ export function CTA({
       <div className="relative z-10 flex gap-4 flex-wrap">
         <Button
           size="lg"
-          className="px-8 py-3 text-base font-medium rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition-all duration-300"
+          className="px-8 py-3 text-base font-medium rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300"
           asChild
         >
           <a href={primaryButtonLink}>{primaryButtonText}</a>

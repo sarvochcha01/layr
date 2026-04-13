@@ -275,7 +275,7 @@ export function EditorLayout({
       }
 
       // Download the zip file
-      const blob = await response.blob();
+      const blob = await zip.generateAsync({ type: "blob" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -292,14 +292,14 @@ export function EditorLayout({
 
   return (
     <>
-      <div className="h-screen flex flex-col bg-[#0d0d0d] text-white overflow-hidden">
+      <div className="h-screen flex flex-col bg-background text-foreground overflow-hidden">
         {/* Top Header Bar — part of normal flex flow, not fixed */}
-        <div className="flex-shrink-0 h-14 bg-[#1a1a1a] border-b border-[#2a2a2a] flex items-center px-4 justify-between z-50">
+        <div className="flex-shrink-0 h-14 bg-card border-b border-border flex items-center px-4 justify-between z-50">
           <div className="flex items-center space-x-6">
             <div className="flex items-center space-x-3">
               <button
                 onClick={() => router.back()}
-                className="p-2 hover:bg-[#2a2a2a] rounded-md transition-colors text-gray-400 hover:text-white"
+                className="p-2 hover:bg-muted rounded-md transition-colors text-muted-foreground hover:text-foreground"
                 title="Close Editor"
               >
                 <X className="w-4 h-4" />
@@ -308,13 +308,13 @@ export function EditorLayout({
             </div>
 
             {/* Viewport Tabs */}
-            <div className="flex items-center space-x-1 bg-[#0d0d0d] border border-[#2a2a2a] rounded-md p-1">
+            <div className="flex items-center space-x-1 bg-background border border-border rounded-md p-1">
               {(["desktop", "tablet", "mobile"] as Viewport[]).map((v) => (
                 <button
                   key={v}
                   onClick={() => setViewport(v)}
                   className={`px-3 py-1.5 text-xs font-medium transition-colors rounded capitalize ${
-                    viewport === v ? "bg-[#2a2a2a] text-white" : "text-gray-400 hover:text-white"
+                    viewport === v ? "bg-muted text-foreground" : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   {v.charAt(0).toUpperCase() + v.slice(1)}
@@ -322,23 +322,23 @@ export function EditorLayout({
               ))}
             </div>
 
-            <div className="flex items-center space-x-2 text-xs text-gray-500">
+            <div className="flex items-center space-x-2 text-xs text-muted-foreground">
               <span>PAGES</span>
               <span>/</span>
-              <span className="text-gray-300">INDEX / HERO SECTION</span>
+              <span className="text-foreground/70">INDEX / HERO SECTION</span>
             </div>
           </div>
 
           <div className="flex items-center space-x-3">
-            <div className="flex items-center space-x-1 bg-[#0d0d0d] border border-[#2a2a2a] rounded-md p-1">
-              <button className="px-4 py-1.5 text-xs font-medium bg-blue-600 text-white rounded transition-colors">DESIGN</button>
-              <button className="px-4 py-1.5 text-xs font-medium text-gray-400 hover:text-white transition-colors">PROTOTYPE</button>
-              <button className="px-4 py-1.5 text-xs font-medium text-gray-400 hover:text-white transition-colors">INSPECT</button>
+            <div className="flex items-center space-x-1 bg-background border border-border rounded-md p-1">
+              <button className="px-4 py-1.5 text-xs font-medium bg-primary text-primary-foreground rounded transition-colors">DESIGN</button>
+              <button className="px-4 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors">PROTOTYPE</button>
+              <button className="px-4 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors">INSPECT</button>
             </div>
 
             <button
               onClick={() => setIsPreviewMode(!isPreviewMode)}
-              className="p-2 hover:bg-[#2a2a2a] rounded-md transition-colors text-gray-400 hover:text-white"
+              className="p-2 hover:bg-muted rounded-md transition-colors text-muted-foreground hover:text-foreground"
               title="Preview"
             >
               <Play className="w-4 h-4" />
@@ -346,22 +346,22 @@ export function EditorLayout({
             <button
               onClick={onUndo}
               disabled={!canUndo}
-              className={`p-2 rounded-md transition-colors ${canUndo ? "hover:bg-[#2a2a2a] text-gray-400 hover:text-white" : "text-gray-600 cursor-not-allowed"}`}
+              className={`p-2 rounded-md transition-colors ${canUndo ? "hover:bg-muted text-muted-foreground hover:text-foreground" : "text-muted-foreground/50 cursor-not-allowed"}`}
               title="Undo"
             >
               <RotateCcw className="w-4 h-4" />
             </button>
-            <button className="p-2 hover:bg-[#2a2a2a] rounded-md transition-colors text-gray-400 hover:text-white">
+            <button className="p-2 hover:bg-muted rounded-md transition-colors text-muted-foreground hover:text-foreground">
               <Settings className="w-4 h-4" />
             </button>
 
-            <div className="w-px h-6 bg-[#2a2a2a]" />
+            <div className="w-px h-6 bg-border" />
 
             <button
               onClick={onSave}
               disabled={isSaving}
               className={`px-4 py-2 rounded-md text-xs font-medium transition-colors ${
-                isSaving ? "bg-[#2a2a2a] text-gray-500 cursor-not-allowed" : "bg-[#2a2a2a] text-white hover:bg-[#333333]"
+                isSaving ? "bg-muted text-muted-foreground cursor-not-allowed" : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
               }`}
             >
               {isSaving ? "Saving..." : "Save"}
@@ -370,7 +370,7 @@ export function EditorLayout({
             <div className="relative">
               <button
                 onClick={() => setShowExportMenu(!showExportMenu)}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-xs font-medium transition-colors"
+                className="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-md text-xs font-medium transition-colors"
               >
                 Publish
               </button>
@@ -378,21 +378,21 @@ export function EditorLayout({
                 <>
                   {/* Click-outside overlay */}
                   <div className="fixed inset-0 z-40" onClick={() => setShowExportMenu(false)} />
-                  <div className="absolute right-0 top-full mt-2 w-52 bg-[#1a1a1a] rounded-lg shadow-xl border border-[#2a2a2a] overflow-hidden z-50">
+                  <div className="absolute right-0 top-full mt-2 w-52 bg-card rounded-lg shadow-xl border border-border overflow-hidden z-50">
                     <button
                       onClick={() => exportToZip("html")}
-                      className="w-full text-left px-4 py-3 text-sm hover:bg-[#2a2a2a] transition-colors"
+                      className="w-full text-left px-4 py-3 text-sm hover:bg-muted transition-colors"
                     >
-                      <div className="font-medium text-white">Export as HTML</div>
-                      <div className="text-xs text-gray-400 mt-0.5">Static website</div>
+                      <div className="font-medium text-foreground">Export as HTML</div>
+                      <div className="text-xs text-muted-foreground mt-0.5">Static website</div>
                     </button>
-                    <div className="h-px bg-[#2a2a2a]" />
+                    <div className="h-px bg-border" />
                     <button
                       onClick={() => exportToZip("react")}
-                      className="w-full text-left px-4 py-3 text-sm hover:bg-[#2a2a2a] transition-colors"
+                      className="w-full text-left px-4 py-3 text-sm hover:bg-muted transition-colors"
                     >
-                      <div className="font-medium text-white">Export as React</div>
-                      <div className="text-xs text-gray-400 mt-0.5">Next.js project</div>
+                      <div className="font-medium text-foreground">Export as React</div>
+                      <div className="text-xs text-muted-foreground mt-0.5">Next.js project</div>
                     </button>
                   </div>
                 </>
@@ -407,30 +407,30 @@ export function EditorLayout({
           {!isPreviewMode && (
             <>
               <div
-                className="bg-[#1a1a1a] border-r border-[#2a2a2a] flex flex-col"
+                className="bg-card border-r border-border flex flex-col"
                 style={{ width: `${leftPanelWidth}px`, flexShrink: 0, flexGrow: 0 }}
               >
                 {/* Controlled Tabs — activeTab state drives everything */}
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col h-full w-full">
-                  <div className="flex-shrink-0 px-2 py-2 border-b border-[#2a2a2a] bg-[#1a1a1a]">
-                    <TabsList className="w-full grid grid-cols-3 bg-[#141414] gap-0.5 p-1 h-auto rounded-md border border-[#2a2a2a]">
+                  <div className="flex-shrink-0 px-2 py-2 border-b border-border bg-card">
+                    <TabsList className="w-full grid grid-cols-3 bg-muted gap-0.5 p-1 h-auto rounded-md border border-border">
                       <TabsTrigger
                         value="pages"
-                        className="text-[10px] py-2 px-1 data-[state=active]:bg-[#2a2a2a] data-[state=active]:text-white text-gray-500 hover:text-gray-300 rounded-md transition-all font-semibold tracking-wide flex items-center justify-center h-auto"
+                        className="text-[10px] py-2 px-1 data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground text-muted-foreground hover:text-foreground rounded-md transition-all font-semibold tracking-wide flex items-center justify-center h-auto"
                       >
                         <LayoutTemplate className="w-3 h-3 mr-1" />
                         PAGES
                       </TabsTrigger>
                       <TabsTrigger
                         value="layers"
-                        className="text-[10px] py-2 px-1 data-[state=active]:bg-[#2a2a2a] data-[state=active]:text-white text-gray-500 hover:text-gray-300 rounded-md transition-all font-semibold tracking-wide flex items-center justify-center h-auto"
+                        className="text-[10px] py-2 px-1 data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground text-muted-foreground hover:text-foreground rounded-md transition-all font-semibold tracking-wide flex items-center justify-center h-auto"
                       >
                         <Layers className="w-3 h-3 mr-1" />
                         LAYERS
                       </TabsTrigger>
                       <TabsTrigger
                         value="components"
-                        className="text-[10px] py-2 px-1 data-[state=active]:bg-[#2a2a2a] data-[state=active]:text-white text-gray-500 hover:text-gray-300 rounded-md transition-all font-semibold tracking-wide flex items-center justify-center h-auto"
+                        className="text-[10px] py-2 px-1 data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground text-muted-foreground hover:text-foreground rounded-md transition-all font-semibold tracking-wide flex items-center justify-center h-auto"
                       >
                         <FileBox className="w-3 h-3 mr-1" />
                         ASSETS
@@ -476,15 +476,15 @@ export function EditorLayout({
                     forceMount
                     className="flex-1 min-h-0 m-0 p-0 border-none data-[state=inactive]:hidden overflow-hidden flex flex-col"
                   >
-                    <div className="flex items-center justify-between px-4 py-3 border-b border-[#2a2a2a] bg-[#1a1a1a] flex-shrink-0">
+                    <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-card flex-shrink-0">
                       <div className="flex items-center space-x-2">
-                        <Sparkles className="w-4 h-4 text-blue-400" />
-                        <span className="text-sm font-semibold text-white">AI Assistant</span>
+                        <Sparkles className="w-4 h-4 text-primary" />
+                        <span className="text-sm font-semibold text-foreground">AI Assistant</span>
                       </div>
                       {/* Plain button — no TabsTrigger nesting needed */}
                       <button
                         onClick={() => setActiveTab("components")}
-                        className="p-1.5 hover:bg-[#2a2a2a] rounded-md transition-colors text-gray-400 hover:text-white"
+                        className="p-1.5 hover:bg-muted rounded-md transition-colors text-muted-foreground hover:text-foreground"
                         title="Close AI Assistant"
                       >
                         <X className="w-4 h-4" />
@@ -504,18 +504,18 @@ export function EditorLayout({
                   </TabsContent>
 
                   {/* Bottom AI trigger */}
-                  <div className="flex-shrink-0 p-2 border-t border-[#2a2a2a]">
+                  <div className="flex-shrink-0 p-2 border-t border-border">
                     <button
                       onClick={() => setActiveTab("ai")}
                       className={`w-full flex items-center justify-center space-x-2 px-4 py-2.5 rounded-md transition-colors text-xs font-semibold ${
                         activeTab === "ai"
-                          ? "bg-blue-600/20 text-blue-400"
-                          : "bg-blue-600/10 hover:bg-blue-600/15 text-blue-400/70"
+                          ? "bg-primary/20 text-primary"
+                          : "bg-primary/10 hover:bg-primary/15 text-primary/70"
                       }`}
                     >
                       <Sparkles className="w-4 h-4" />
                       <span>AI ASSISTANT</span>
-                      <span className="text-[10px] bg-blue-600/20 px-1.5 py-0.5 rounded">⌘K</span>
+                      <span className="text-[10px] bg-primary/20 px-1.5 py-0.5 rounded">⌘K</span>
                     </button>
                   </div>
                 </Tabs>
@@ -523,15 +523,15 @@ export function EditorLayout({
 
               {/* Left Resize Handle */}
               <div
-                className="w-[1px] bg-[#2a2a2a] hover:bg-blue-500 cursor-ew-resize transition-colors flex-shrink-0 z-10"
+                className="w-[1px] bg-border hover:bg-primary cursor-ew-resize transition-colors flex-shrink-0 z-10"
                 onMouseDown={(e) => startResize("left", e)}
               />
             </>
           )}
 
           {/* Canvas Area */}
-          <div className="flex-1 min-w-0 bg-[#0d0d0d] overflow-auto" style={{ flexShrink: 1, flexGrow: 1 }}>
-            <div className={`h-full overflow-auto transition-all duration-300 ${isPreviewMode ? "bg-white p-0" : "bg-[#0d0d0d] p-8"} light`}>
+          <div className="flex-1 min-w-0 bg-background overflow-auto" style={{ flexShrink: 1, flexGrow: 1 }}>
+            <div className={`h-full overflow-auto transition-all duration-300 ${isPreviewMode ? "bg-white p-0" : "bg-background p-8"} light`}>
               <div
                 className="transition-all duration-300 ease-in-out mx-auto"
                 style={{
@@ -563,11 +563,11 @@ export function EditorLayout({
           {!isPreviewMode && (
             <>
               <div
-                className="w-[1px] bg-[#2a2a2a] hover:bg-blue-500 cursor-ew-resize transition-colors flex-shrink-0 z-10"
+                className="w-[1px] bg-border hover:bg-primary cursor-ew-resize transition-colors flex-shrink-0 z-10"
                 onMouseDown={(e) => startResize("right", e)}
               />
               <div
-                className="bg-[#1a1a1a] border-l border-[#2a2a2a] flex flex-col overflow-hidden"
+                className="bg-card border-l border-border flex flex-col overflow-hidden"
                 style={{ width: `${rightPanelWidth}px`, flexShrink: 0, flexGrow: 0 }}
               >
                 <PropertiesPanel

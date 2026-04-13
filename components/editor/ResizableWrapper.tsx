@@ -162,37 +162,37 @@ export function ResizableWrapper({
         >
           {/* Corner Handles */}
           <div
-            className="absolute -top-2 -left-2 w-4 h-4 bg-blue-500 border-2 border-white rounded-full cursor-nw-resize z-50 hover:scale-125 transition-transform shadow-lg pointer-events-auto"
+            className="absolute -top-2 -left-2 w-4 h-4 bg-primary border-2 border-white rounded-full cursor-nw-resize z-50 hover:scale-125 transition-transform shadow-lg pointer-events-auto"
             onMouseDown={(e) => handleMouseDown(e, "top-left")}
           />
           <div
-            className="absolute -top-2 -right-2 w-4 h-4 bg-blue-500 border-2 border-white rounded-full cursor-ne-resize z-50 hover:scale-125 transition-transform shadow-lg pointer-events-auto"
+            className="absolute -top-2 -right-2 w-4 h-4 bg-primary border-2 border-white rounded-full cursor-ne-resize z-50 hover:scale-125 transition-transform shadow-lg pointer-events-auto"
             onMouseDown={(e) => handleMouseDown(e, "top-right")}
           />
           <div
-            className="absolute -bottom-2 -left-2 w-4 h-4 bg-blue-500 border-2 border-white rounded-full cursor-sw-resize z-50 hover:scale-125 transition-transform shadow-lg pointer-events-auto"
+            className="absolute -bottom-2 -left-2 w-4 h-4 bg-primary border-2 border-white rounded-full cursor-sw-resize z-50 hover:scale-125 transition-transform shadow-lg pointer-events-auto"
             onMouseDown={(e) => handleMouseDown(e, "bottom-left")}
           />
           <div
-            className="absolute -bottom-2 -right-2 w-4 h-4 bg-blue-500 border-2 border-white rounded-full cursor-se-resize z-50 hover:scale-125 transition-transform shadow-lg pointer-events-auto"
+            className="absolute -bottom-2 -right-2 w-4 h-4 bg-primary border-2 border-white rounded-full cursor-se-resize z-50 hover:scale-125 transition-transform shadow-lg pointer-events-auto"
             onMouseDown={(e) => handleMouseDown(e, "bottom-right")}
           />
 
           {/* Edge Handles */}
           <div
-            className="absolute -top-2 left-1/2 -translate-x-1/2 w-8 h-3 bg-blue-500 border-2 border-white rounded-full cursor-n-resize z-50 hover:scale-110 transition-transform shadow-lg pointer-events-auto"
+            className="absolute -top-2 left-1/2 -translate-x-1/2 w-8 h-3 bg-primary border-2 border-white rounded-full cursor-n-resize z-50 hover:scale-110 transition-transform shadow-lg pointer-events-auto"
             onMouseDown={(e) => handleMouseDown(e, "top")}
           />
           <div
-            className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-8 h-3 bg-blue-500 border-2 border-white rounded-full cursor-s-resize z-50 hover:scale-110 transition-transform shadow-lg pointer-events-auto"
+            className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-8 h-3 bg-primary border-2 border-white rounded-full cursor-s-resize z-50 hover:scale-110 transition-transform shadow-lg pointer-events-auto"
             onMouseDown={(e) => handleMouseDown(e, "bottom")}
           />
           <div
-            className="absolute top-1/2 -translate-y-1/2 -left-2 w-3 h-8 bg-blue-500 border-2 border-white rounded-full cursor-w-resize z-50 hover:scale-110 transition-transform shadow-lg pointer-events-auto"
+            className="absolute top-1/2 -translate-y-1/2 -left-2 w-3 h-8 bg-primary border-2 border-white rounded-full cursor-w-resize z-50 hover:scale-110 transition-transform shadow-lg pointer-events-auto"
             onMouseDown={(e) => handleMouseDown(e, "left")}
           />
           <div
-            className="absolute top-1/2 -translate-y-1/2 -right-2 w-3 h-8 bg-blue-500 border-2 border-white rounded-full cursor-e-resize z-50 hover:scale-110 transition-transform shadow-lg pointer-events-auto"
+            className="absolute top-1/2 -translate-y-1/2 -right-2 w-3 h-8 bg-primary border-2 border-white rounded-full cursor-e-resize z-50 hover:scale-110 transition-transform shadow-lg pointer-events-auto"
             onMouseDown={(e) => handleMouseDown(e, "right")}
           />
         </div>

@@ -53,18 +53,18 @@ function DropZone({
       className={cn(
         "transition-all duration-200",
         isOver
-          ? "bg-blue-100 border-2 border-dashed border-blue-400 min-h-[40px]"
+          ? "bg-primary/10 border-2 border-dashed border-primary min-h-[40px]"
           : "min-h-[8px] border-2 border-transparent",
         className,
       )}
     >
       {isOver ? (
-        <div className="flex items-center justify-center h-full text-blue-600 text-sm font-medium">
+        <div className="flex items-center justify-center h-full text-primary text-sm font-medium">
           Drop component here
         </div>
       ) : (
         emptyStateText && (
-          <div className="flex items-center justify-center h-full text-gray-500 text-sm">
+          <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
             {emptyStateText}
           </div>
         )
@@ -194,7 +194,7 @@ function ComponentWrapper({
           <div
             {...listeners}
             {...attributes}
-            className="absolute -top-6 left-0 bg-blue-500 text-white text-xs px-2 py-1 rounded z-10 cursor-grab active:cursor-grabbing hover:bg-blue-600 transition-colors"
+            className="absolute -top-6 left-0 bg-primary text-primary-foreground text-xs px-2 py-1 rounded z-10 cursor-grab active:cursor-grabbing hover:bg-primary/90 transition-colors"
             title="Drag to move this component"
           >
             <div className="flex items-center gap-1">

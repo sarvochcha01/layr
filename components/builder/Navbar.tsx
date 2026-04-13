@@ -83,7 +83,7 @@ export function Navbar({
       <nav
         className={cn(
           "flex items-center w-full px-6 sm:px-8 py-4",
-          "border-b border-[#2a2a2a]",
+          "border-b border-border",
           className,
         )}
         style={baseStyle}
@@ -132,7 +132,7 @@ export function Navbar({
                   href={link.external ? link.href : "#"}
                   className={cn(
                     "px-4 py-2 text-sm font-medium transition-colors duration-200 relative",
-                    isActive ? "text-white" : "text-gray-400 hover:text-white",
+                    isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground",
                   )}
                   onClick={handleClick}
                   {...(link.external &&
@@ -143,7 +143,7 @@ export function Navbar({
                 >
                   {link.text}
                   {isActive && (
-                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-500" />
+                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
                   )}
                 </a>
               );
@@ -182,7 +182,7 @@ export function Navbar({
                   />
                 </svg>
               </button>
-              <button className="p-2 text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-[#2a2a2a]">
+              <button className="p-2 text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-muted">
                 <svg
                   className="w-5 h-5"
                   fill="none"
@@ -211,7 +211,7 @@ export function Navbar({
             <Button
               variant="outline"
               size="sm"
-              className="px-4 h-9 text-xs font-medium border-[#2a2a2a] bg-transparent hover:bg-[#2a2a2a] text-white"
+              className="px-4 h-9 text-xs font-medium border-border bg-transparent hover:bg-muted text-foreground"
             >
               Save
             </Button>
@@ -223,7 +223,7 @@ export function Navbar({
               <Button
                 asChild
                 size="sm"
-                className="px-4 h-9 text-xs font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white border-0"
+                className="px-4 h-9 text-xs font-semibold rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground border-0"
               >
                 {ctaExternal && isPreviewMode ? (
                   <a href={ctaLink} target="_blank" rel="noopener noreferrer">
@@ -263,7 +263,7 @@ export function Navbar({
 
       {/* Mobile Menu Dropdown */}
       {isMobileMenuOpen && links.length > 0 && viewport !== "desktop" && (
-        <div className="absolute top-full left-0 right-0 border-b border-[#2a2a2a] shadow-xl z-50 bg-[#1a1a1a]">
+        <div className="absolute top-full left-0 right-0 border-b border-border shadow-xl z-50 bg-card">
           <div className="py-2 px-2">
             {links.map((link, index) => {
               const handleClick = (e: React.MouseEvent) => {
@@ -288,7 +288,7 @@ export function Navbar({
                 <a
                   key={index}
                   href={link.external ? link.href : "#"}
-                  className="block px-4 py-3 text-sm font-medium rounded-lg transition-colors text-gray-300 hover:bg-[#2a2a2a] hover:text-white"
+                  className="block px-4 py-3 text-sm font-medium rounded-lg transition-colors text-foreground/80 hover:bg-muted hover:text-foreground"
                   onClick={handleClick}
                   {...(link.external &&
                     isPreviewMode && {

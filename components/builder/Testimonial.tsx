@@ -43,8 +43,8 @@ export function Testimonial({
     <div
       className={cn(
         "p-8 rounded-2xl min-w-0 overflow-hidden transition-all duration-300",
-        "border border-[#2a2a2a]",
-        "hover:border-[#3a3a3a]",
+        "border border-border",
+        "hover:border-border/80",
         "hover:-translate-y-0.5",
       )}
       style={baseStyle}
@@ -57,7 +57,7 @@ export function Testimonial({
               key={i}
               className={cn(
                 "w-5 h-5",
-                i < rating ? "fill-blue-400 text-blue-400" : "text-gray-700",
+                i < rating ? "fill-primary text-primary" : "text-muted",
               )}
             />
           ))}
@@ -66,30 +66,30 @@ export function Testimonial({
 
       {/* Quote */}
       <blockquote
-        className="text-lg leading-relaxed mb-8 break-words italic text-gray-300"
+        className="text-lg leading-relaxed mb-8 break-words italic text-foreground/80"
         style={{ fontFamily: "'Inter', sans-serif" }}
       >
         "{quote}"
       </blockquote>
 
       {/* Author */}
-      <div className="flex items-center gap-3 pt-6 border-t border-[#2a2a2a]">
+      <div className="flex items-center gap-3 pt-6 border-t border-border">
         {avatar ? (
           <img
             src={avatar}
             alt={author}
-            className="w-12 h-12 rounded-full object-cover ring-2 ring-[#2a2a2a]"
+            className="w-12 h-12 rounded-full object-cover ring-2 ring-border"
           />
         ) : (
-          <div className="w-12 h-12 rounded-full flex items-center justify-center text-sm font-semibold bg-[#2a2a2a]">
+          <div className="w-12 h-12 rounded-full flex items-center justify-center text-sm font-semibold bg-muted">
             {author?.charAt(0) || "?"}
           </div>
         )}
         <div className="min-w-0">
-          <div className="text-sm font-semibold truncate text-white">
+          <div className="text-sm font-semibold truncate text-foreground">
             {author}
           </div>
-          <div className="text-xs text-gray-400 truncate uppercase tracking-wider">
+          <div className="text-xs text-muted-foreground truncate uppercase tracking-wider">
             {role}
             {company && `, ${company}`}
           </div>

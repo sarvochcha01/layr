@@ -5434,13 +5434,13 @@ export function PropertiesPanel({
   return (
     <div className="h-full flex flex-col overflow-hidden">
       {/* Header */}
-      <div className="flex-shrink-0 p-4 border-b border-[#2a2a2a]">
+      <div className="flex-shrink-0 p-4 border-b border-border">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-xs font-semibold text-gray-400 tracking-wide uppercase">
+            <h3 className="text-xs font-semibold text-muted-foreground tracking-wide uppercase">
               Properties
             </h3>
-            <p className="text-[10px] text-gray-500 mt-1">
+            <p className="text-[10px] text-muted-foreground/70 mt-1">
               {selectedComponent.type} Component
             </p>
           </div>
@@ -5448,7 +5448,7 @@ export function PropertiesPanel({
           {isGlobal ? (
             <button
               onClick={() => onUnmarkGlobal?.(selectedComponent.id)}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-500/15 text-blue-400 text-xs font-medium hover:bg-blue-500/25 transition-colors"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/15 text-primary text-xs font-medium hover:bg-primary/25 transition-colors"
               title={`Global: ${selectedComponent.isGlobal} — Click to unmark`}
             >
               <Globe className="w-3 h-3" />
@@ -5458,7 +5458,7 @@ export function PropertiesPanel({
           ) : (
             <button
               onClick={() => setShowGlobalDialog(true)}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-[#2a2a2a] text-xs text-gray-400 hover:text-white hover:border-gray-600 transition-colors"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-border text-xs text-muted-foreground hover:text-foreground hover:border-border/80 transition-colors"
               title="Mark as Global Component"
             >
               <Globe className="w-3 h-3" />
@@ -5474,7 +5474,7 @@ export function PropertiesPanel({
       </div>
 
       {/* Actions */}
-      <div className="flex-shrink-0 p-4 border-t border-[#2a2a2a] space-y-2">
+      <div className="flex-shrink-0 p-4 border-t border-border space-y-2">
         <Button
           variant="outline"
           size="sm"
@@ -5523,7 +5523,7 @@ export function PropertiesPanel({
                       onClick={() => handleApplyExistingGlobal(name)}
                       className="w-full flex items-center gap-2 p-2 rounded-md border border-border hover:bg-muted text-sm text-left transition-colors"
                     >
-                      <Globe className="w-3.5 h-3.5 text-blue-400" />
+                      <Globe className="w-3.5 h-3.5 text-primary" />
                       <span className="font-medium">{name}</span>
                       <span className="text-xs text-muted-foreground ml-auto">
                         ({globalComponents[name]?.type})

@@ -67,9 +67,9 @@ export function PricingCard({
     <div
       className={cn(
         "p-8 rounded-2xl flex flex-col min-w-0 overflow-hidden transition-all duration-300",
-        "border border-[#2a2a2a]",
-        "hover:border-[#3a3a3a]",
-        featured && "ring-1 ring-blue-500/20",
+        "border border-border",
+        "hover:border-border/80",
+        featured && "ring-1 ring-primary/20",
       )}
       style={baseStyle}
     >
@@ -83,7 +83,7 @@ export function PricingCard({
             {title}
           </h3>
           {featured && badge && (
-            <span className="text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-blue-500/20 text-blue-400">
+            <span className="text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-primary/20 text-primary">
               {badge}
             </span>
           )}
@@ -91,10 +91,10 @@ export function PricingCard({
 
         <div className="flex items-baseline gap-1 mb-2">
           <span className="text-5xl font-bold tracking-tight">{price}</span>
-          <span className="text-sm text-gray-400">/{period}</span>
+          <span className="text-sm text-muted-foreground">/{period}</span>
         </div>
 
-        {description && <p className="text-sm text-gray-400">{description}</p>}
+        {description && <p className="text-sm text-muted-foreground">{description}</p>}
       </div>
 
       {/* Features */}
@@ -103,18 +103,18 @@ export function PricingCard({
           {normalizedFeatures.map((feature, index) => (
             <li key={index} className="flex items-center gap-3 text-sm">
               {feature.included ? (
-                <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 bg-blue-500/20">
-                  <Check className="w-3 h-3 text-blue-400" />
+                <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 bg-primary/20">
+                  <Check className="w-3 h-3 text-primary" />
                 </div>
               ) : (
-                <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 bg-[#2a2a2a]">
-                  <X className="w-3 h-3 text-gray-600" />
+                <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 bg-muted">
+                  <X className="w-3 h-3 text-muted-foreground" />
                 </div>
               )}
               <span
                 className={cn(
                   "break-words min-w-0",
-                  feature.included ? "text-gray-300" : "text-gray-600",
+                  feature.included ? "text-foreground/80" : "text-muted-foreground",
                 )}
               >
                 {feature.text}
@@ -130,8 +130,8 @@ export function PricingCard({
           className={cn(
             "w-full py-3 rounded-xl font-semibold text-xs tracking-wider transition-all duration-300",
             buttonVariant === "primary"
-              ? "bg-blue-600 hover:bg-blue-700 text-white border-0"
-              : "bg-[#2a2a2a] hover:bg-[#333333] text-white border border-[#3a3a3a]",
+              ? "bg-primary hover:bg-primary/90 text-primary-foreground border-0"
+              : "bg-secondary hover:bg-secondary/80 text-secondary-foreground border border-border",
           )}
           asChild
         >

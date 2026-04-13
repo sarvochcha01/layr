@@ -51,8 +51,8 @@ export function Card({
     <div
       className={cn(
         "rounded-2xl p-6 min-w-0 transition-all duration-300 w-full h-full flex flex-col",
-        "border border-[#2a2a2a]",
-        "hover:border-[#3a3a3a]",
+        "border border-border",
+        "hover:border-border/80",
         "hover:-translate-y-0.5",
         "overflow-hidden",
         className,
@@ -104,7 +104,7 @@ export function Card({
             <Button
               variant="ghost"
               size="sm"
-              className="px-0 font-medium hover:bg-transparent text-blue-400 hover:text-blue-300"
+              className="px-0 font-medium hover:bg-transparent text-primary hover:text-primary/80"
               asChild
             >
               <a href={buttonLink} className="inline-flex items-center gap-1.5">

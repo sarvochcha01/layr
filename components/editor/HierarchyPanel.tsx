@@ -146,7 +146,7 @@ export function HierarchyPanel({
             </span>
             {component.isGlobal && (
               <span title={`Global: ${component.isGlobal}`}>
-                <Globe className="w-3 h-3 text-blue-400 ml-1.5 flex-shrink-0" />
+                <Globe className="w-3 h-3 text-primary ml-1.5 flex-shrink-0" />
               </span>
             )}
           </div>
