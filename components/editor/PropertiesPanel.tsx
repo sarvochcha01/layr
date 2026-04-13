@@ -1,7 +1,7 @@
 // @ts-nocheck
 "use client";
 import React from "react";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { ComponentDefinition, Page, GlobalComponents } from "@/types/editor";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -63,6 +63,52 @@ export function PropertiesPanel({
 }: PropertiesPanelProps) {
   const [showGlobalDialog, setShowGlobalDialog] = useState(false);
   const [globalName, setGlobalName] = useState("");
+
+  // Debounced update for continuous changes (color picker, sliders, etc.)
+  // Must be declared before any conditional returns (Rules of Hooks)
+  const debouncedUpdateRef = useRef<NodeJS.Timeout | null>(null);
+  const pendingUpdatesRef = useRef<Record<string, any>>({});
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (debouncedUpdateRef.current) {
+        clearTimeout(debouncedUpdateRef.current);
+      }
+    };
+  }, []);
+
+  const updateProp = (key: string, value: any, immediate: boolean = false) => {
+    if (!selectedComponent) return;
+    
+    if (immediate) {
+      // Flush any pending updates first
+      if (debouncedUpdateRef.current) {
+        clearTimeout(debouncedUpdateRef.current);
+        if (Object.keys(pendingUpdatesRef.current).length > 0) {
+          onUpdateComponent(selectedComponent.id, pendingUpdatesRef.current);
+          pendingUpdatesRef.current = {};
+        }
+      }
+      // Apply immediate update
+      onUpdateComponent(selectedComponent.id, { [key]: value });
+    } else {
+      // Accumulate updates
+      pendingUpdatesRef.current[key] = value;
+      
+      // Clear existing timeout
+      if (debouncedUpdateRef.current) {
+        clearTimeout(debouncedUpdateRef.current);
+      }
+      
+      // Set new timeout
+      debouncedUpdateRef.current = setTimeout(() => {
+        onUpdateComponent(selectedComponent.id, pendingUpdatesRef.current);
+        pendingUpdatesRef.current = {};
+        debouncedUpdateRef.current = null;
+      }, 300); // 300ms debounce
+    }
+  };
 
   if (!selectedComponent) {
     // Show page properties when no component is selected
@@ -206,10 +252,6 @@ export function PropertiesPanel({
       </div>
     );
   }
-
-  const updateProp = (key: string, value: any) => {
-    onUpdateComponent(selectedComponent.id, { [key]: value });
-  };
 
   const isGlobal = !!selectedComponent.isGlobal;
   const existingGlobalNames = Object.keys(globalComponents);

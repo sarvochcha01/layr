@@ -53,85 +53,76 @@ export function ResizableWrapper({
   const wrapperRef = useRef<HTMLDivElement>(null);
   const startPosRef = useRef({ x: 0, y: 0 });
   const startSizeRef = useRef({ width: 0, height: 0 });
+  const lastUpdateRef = useRef<{ width?: string; height?: string }>({});
+
+  // Keep onResize in a ref so it never causes the effect to re-register
+  const onResizeRef = useRef(onResize);
+  useEffect(() => { onResizeRef.current = onResize; }, [onResize]);
 
   const handleMouseDown = (e: React.MouseEvent, handle: ResizeHandle) => {
     if (isPreviewMode) return;
-    
     e.preventDefault();
     e.stopPropagation();
-    
+
     const wrapper = wrapperRef.current;
     if (!wrapper) return;
-    
+
     const rect = wrapper.getBoundingClientRect();
-    
     setIsResizing(true);
     setActiveHandle(handle);
-    
     startPosRef.current = { x: e.clientX, y: e.clientY };
-    startSizeRef.current = { 
-      width: rect.width,
-      height: rect.height
-    };
+    startSizeRef.current = { width: rect.width, height: rect.height };
   };
 
+  // Only depends on isResizing, activeHandle, componentId — never onResize
   useEffect(() => {
     if (!isResizing || !activeHandle) return;
 
     const handleMouseMove = (e: MouseEvent) => {
       e.preventDefault();
-      e.stopPropagation();
-      
+
       const deltaX = e.clientX - startPosRef.current.x;
       const deltaY = e.clientY - startPosRef.current.y;
-      
+
       let newWidth = startSizeRef.current.width;
       let newHeight = startSizeRef.current.height;
 
-      // Calculate new dimensions based on handle
-      if (activeHandle.includes("right")) {
-        newWidth = Math.max(100, startSizeRef.current.width + deltaX);
-      } else if (activeHandle.includes("left")) {
-        newWidth = Math.max(100, startSizeRef.current.width - deltaX);
-      }
+      if (activeHandle.includes("right")) newWidth = Math.max(100, newWidth + deltaX);
+      else if (activeHandle.includes("left")) newWidth = Math.max(100, newWidth - deltaX);
 
-      if (activeHandle.includes("bottom")) {
-        newHeight = Math.max(50, startSizeRef.current.height + deltaY);
-      } else if (activeHandle.includes("top")) {
-        newHeight = Math.max(50, startSizeRef.current.height - deltaY);
-      }
+      if (activeHandle.includes("bottom")) newHeight = Math.max(50, newHeight + deltaY);
+      else if (activeHandle.includes("top")) newHeight = Math.max(50, newHeight - deltaY);
 
-      // Update the component
       const updates: { width?: string; height?: string } = {};
-      
-      if (activeHandle.includes("left") || activeHandle.includes("right")) {
+      if (activeHandle.includes("left") || activeHandle.includes("right"))
         updates.width = `${Math.round(newWidth)}px`;
-      }
-      
-      if (activeHandle.includes("top") || activeHandle.includes("bottom")) {
+      if (activeHandle.includes("top") || activeHandle.includes("bottom"))
         updates.height = `${Math.round(newHeight)}px`;
-      }
 
-      onResize(componentId, updates);
+      // Store for commit on mouseup
+      lastUpdateRef.current = updates;
+
+      // Direct DOM mutation only — zero React re-renders during drag
+      if (wrapperRef.current) {
+        if (updates.width) wrapperRef.current.style.width = updates.width;
+        if (updates.height) wrapperRef.current.style.height = updates.height;
+      }
     };
 
-    const handleMouseUp = (e: MouseEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      
+    const handleMouseUp = () => {
+      // Single React state commit on release
+      if (Object.keys(lastUpdateRef.current).length > 0) {
+        onResizeRef.current(componentId, lastUpdateRef.current);
+        lastUpdateRef.current = {};
+      }
       setIsResizing(false);
       setActiveHandle(null);
-      
-      // Clean up immediately
       document.body.style.userSelect = "";
       document.body.style.cursor = "";
     };
 
-    // Add listeners to window to capture all mouse events
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("mouseup", handleMouseUp);
-
-    // Prevent text selection while resizing
     document.body.style.userSelect = "none";
     document.body.style.cursor = getCursorForHandle(activeHandle);
 
@@ -141,74 +132,68 @@ export function ResizableWrapper({
       document.body.style.userSelect = "";
       document.body.style.cursor = "";
     };
-  }, [isResizing, activeHandle, componentId, onResize]);
+  }, [isResizing, activeHandle, componentId]); // onResize intentionally omitted
 
   const showHandles = isSelected && !isPreviewMode;
 
   return (
     <div
       ref={wrapperRef}
-      className={cn("relative overflow-hidden", className)}
+      className={cn("relative", className)}
       style={{
         width: currentWidth || "auto",
         height: currentHeight || "auto",
         minWidth: "100px",
         minHeight: "50px",
+        maxWidth: "100%", // prevents growing past canvas edge
         pointerEvents: isResizing ? "none" : "auto",
       }}
     >
+      {/* Inner wrapper clips content without clipping handles */}
       <div className="w-full h-full overflow-hidden">
         {children}
       </div>
 
-      {/* Resize Handles - Only show when selected */}
+      {/* Handles render outside overflow so they're never clipped */}
       {showHandles && (
-        <div 
+        <div
           className="absolute inset-0 pointer-events-none"
-          style={{ pointerEvents: "none" }}
+          style={{ overflow: "visible" }}
         >
           {/* Corner Handles */}
           <div
             className="absolute -top-2 -left-2 w-4 h-4 bg-blue-500 border-2 border-white rounded-full cursor-nw-resize z-50 hover:scale-125 transition-transform shadow-lg pointer-events-auto"
             onMouseDown={(e) => handleMouseDown(e, "top-left")}
-            title="Resize from top-left"
           />
           <div
             className="absolute -top-2 -right-2 w-4 h-4 bg-blue-500 border-2 border-white rounded-full cursor-ne-resize z-50 hover:scale-125 transition-transform shadow-lg pointer-events-auto"
             onMouseDown={(e) => handleMouseDown(e, "top-right")}
-            title="Resize from top-right"
           />
           <div
             className="absolute -bottom-2 -left-2 w-4 h-4 bg-blue-500 border-2 border-white rounded-full cursor-sw-resize z-50 hover:scale-125 transition-transform shadow-lg pointer-events-auto"
             onMouseDown={(e) => handleMouseDown(e, "bottom-left")}
-            title="Resize from bottom-left"
           />
           <div
             className="absolute -bottom-2 -right-2 w-4 h-4 bg-blue-500 border-2 border-white rounded-full cursor-se-resize z-50 hover:scale-125 transition-transform shadow-lg pointer-events-auto"
             onMouseDown={(e) => handleMouseDown(e, "bottom-right")}
-            title="Resize from bottom-right"
           />
 
           {/* Edge Handles */}
           <div
             className="absolute -top-2 left-1/2 -translate-x-1/2 w-8 h-3 bg-blue-500 border-2 border-white rounded-full cursor-n-resize z-50 hover:scale-110 transition-transform shadow-lg pointer-events-auto"
             onMouseDown={(e) => handleMouseDown(e, "top")}
-            title="Resize from top"
           />
           <div
             className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-8 h-3 bg-blue-500 border-2 border-white rounded-full cursor-s-resize z-50 hover:scale-110 transition-transform shadow-lg pointer-events-auto"
             onMouseDown={(e) => handleMouseDown(e, "bottom")}
-            title="Resize from bottom"
           />
           <div
             className="absolute top-1/2 -translate-y-1/2 -left-2 w-3 h-8 bg-blue-500 border-2 border-white rounded-full cursor-w-resize z-50 hover:scale-110 transition-transform shadow-lg pointer-events-auto"
             onMouseDown={(e) => handleMouseDown(e, "left")}
-            title="Resize from left"
           />
           <div
             className="absolute top-1/2 -translate-y-1/2 -right-2 w-3 h-8 bg-blue-500 border-2 border-white rounded-full cursor-e-resize z-50 hover:scale-110 transition-transform shadow-lg pointer-events-auto"
             onMouseDown={(e) => handleMouseDown(e, "right")}
-            title="Resize from right"
           />
         </div>
       )}

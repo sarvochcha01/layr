@@ -350,7 +350,7 @@ export function Canvas({
     const bgType = pageBackground.backgroundType || "solid";
     
     if (bgType === "solid") {
-      pageStyle.backgroundColor = pageBackground.backgroundColor || "#0d0d0d";
+      pageStyle.backgroundColor = pageBackground.backgroundColor || "#ffffff";
     } else if (bgType === "gradient" && pageBackground.backgroundGradient) {
       pageStyle.backgroundImage = pageBackground.backgroundGradient;
     } else if (bgType === "image" && pageBackground.backgroundImageUrl) {
@@ -359,6 +359,9 @@ export function Canvas({
       pageStyle.backgroundPosition = pageBackground.backgroundPosition || "center";
       pageStyle.backgroundRepeat = "no-repeat";
     }
+  } else {
+    // Default to white background when no pageBackground is provided
+    pageStyle.backgroundColor = "#ffffff";
   }
 
   return (
