@@ -127,7 +127,12 @@ export function Navbar({
                 if (onNavigate && !link.external) {
                   let slug = link.href;
                   if (slug.startsWith("page:")) {
-                    slug = slug.replace("page:", "");
+                    const pageId = slug.replace("page:", "");
+                    const page = pages?.find((p: any) => p.id === pageId);
+                    if (page) {
+                      onNavigate(page.slug);
+                    }
+                    return;
                   } else {
                     slug = slug.replace(/^\//, "").replace(/\.html$/, "");
                   }

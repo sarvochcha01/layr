@@ -701,6 +701,28 @@ export default function EditorPage() {
 
     let firstNewOrUpdatedPageId: string | null = null;
 
+    // Automatically extract Navbar and Footer as Global Components
+    let aiNavbar: ComponentDefinition | null = null;
+    let aiFooter: ComponentDefinition | null = null;
+    
+    for (const page of aiPages) {
+      if (!aiNavbar && page.components) {
+        aiNavbar = page.components.find(c => c.type === "Navbar") || null;
+      }
+      if (!aiFooter && page.components) {
+        aiFooter = page.components.find(c => c.type === "Footer") || null;
+      }
+    }
+
+    if (aiNavbar || aiFooter) {
+      setGlobalComponents(prev => {
+        const next = { ...prev };
+        if (aiNavbar) next["GlobalNavbar"] = { ...aiNavbar, isGlobal: "GlobalNavbar", id: generateId() };
+        if (aiFooter) next["GlobalFooter"] = { ...aiFooter, isGlobal: "GlobalFooter", id: generateId() };
+        return next;
+      });
+    }
+
     setPages((prev) => {
       const updatedPages = [...prev];
 
@@ -744,7 +766,71 @@ export default function EditorPage() {
         }
       }
 
-      return updatedPages;
+      // Automatically link references to paths with their internal page IDs
+      const pathMap = new Map<string, string>();
+      for (const p of updatedPages) {
+        const pSlug = p.slug || "";
+        if (pSlug) {
+          pathMap.set(pSlug, p.id);
+          pathMap.set('/' + pSlug, p.id);
+          if (pSlug === 'index') pathMap.set('/', p.id);
+        }
+        if (p.path) pathMap.set(p.path, p.id);
+      }
+
+      const traverseAndLink = (comps: ComponentDefinition[]): ComponentDefinition[] => {
+        return comps.map(comp => {
+          const newProps = { ...comp.props };
+          
+          const linkFields = ["href", "linkUrl", "buttonLink", "primaryButtonLink", "secondaryButtonLink", "action", "privacyLink", "termsLink"];
+          for (const field of linkFields) {
+            if (typeof newProps[field] === "string" && pathMap.has(newProps[field])) {
+              newProps[field] = `page:${pathMap.get(newProps[field])}`;
+            }
+          }
+
+          if (Array.isArray(newProps.links)) {
+            newProps.links = newProps.links.map((link: any) => ({
+              ...link,
+              href: typeof link.href === "string" && pathMap.has(link.href) ? `page:${pathMap.get(link.href)}` : link.href
+            }));
+          }
+          
+          if (Array.isArray(newProps.sections)) {
+            newProps.sections = newProps.sections.map((section: any) => ({
+              ...section,
+              links: Array.isArray(section.links) ? section.links.map((link: any) => ({
+                ...link,
+                href: typeof link.href === "string" && pathMap.has(link.href) ? `page:${pathMap.get(link.href)}` : link.href
+              })) : section.links
+            }));
+          }
+
+          let newIsGlobal = comp.isGlobal;
+          if (comp.type === "Navbar" && aiNavbar) newIsGlobal = "GlobalNavbar";
+          if (comp.type === "Footer" && aiFooter) newIsGlobal = "GlobalFooter";
+
+          return {
+            ...comp,
+            isGlobal: newIsGlobal,
+            props: newProps,
+            children: traverseAndLink(comp.children)
+          };
+        });
+      };
+
+      const generatedSlugs = aiPages.map(p => {
+        let slug = p.path ? p.path.replace(/^\//, "").replace(/\.html$/, "") : (p.name || "Untitled").toLowerCase().replace(/\s+/g, "-");
+        return (!slug || slug === "/") ? "index" : slug;
+      });
+
+      return updatedPages.map(p => {
+        const pSlug = p.slug || "";
+        if (pSlug && generatedSlugs.includes(pSlug)) {
+          return { ...p, components: traverseAndLink(p.components) };
+        }
+        return p;
+      });
     });
 
     // Switch to the first new/updated page

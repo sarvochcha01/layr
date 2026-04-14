@@ -34,12 +34,12 @@ interface AIResponse {
 - **Footer**: { logoText?: string, content?: string, copyright?: string, backgroundColor?: string, textColor?: string, padding?: string, textAlign?: string, sections?: Array<{title: string, links: Array<{text: string, href: string}>}> } — Page footer
 - **Section**: { padding?: string, backgroundColor?: string } — Content section
 - **Container**: { maxWidth?: string, padding?: string, backgroundColor?: string, display?: string, flexDirection?: string, justifyContent?: string, alignItems?: string, gap?: string, flexWrap?: string, minHeight?: string } — Flex container (very versatile, use for layouts)
-- **Grid**: { columns?: number, gap?: string } — CSS grid layout
+- **Grid**: { columns?: number, gap?: string, equalHeight?: boolean } — CSS grid layout
 
 ### Content Components
 - **Hero**: { title?: string, description?: string, primaryButtonText?: string, secondaryButtonText?: string, backgroundColor?: string } — Hero section
 - **Card**: { title?: string, description?: string, imageUrl?: string, imageAlt?: string, padding?: string, borderRadius?: string, backgroundColor?: string, textColor?: string, boxShadow?: string } — Content card
-- **Text**: { text?: string, content?: string, fontSize?: string, color?: string, textAlign?: string, maxWidth?: string, fontWeight?: string } — Text block (use "text" for headings, "content" for paragraphs)
+- **Text**: { content?: string, tag?: "p"|"h1"|"h2"|"h3", size?: "sm"|"base"|"lg"|"xl"|"2xl"|"3xl"|"4xl", color?: string, align?: "left"|"center"|"right", weight?: "normal"|"medium"|"semibold"|"bold" } — Text block. ALWAYS put the actual written text inside the 'content' property. DO NOT use a 'text' property!
 - **Button**: { text?: string, variant?: "primary"|"secondary"|"outline", size?: "small"|"medium"|"large", backgroundColor?: string, textColor?: string, padding?: string, fontSize?: string, borderRadius?: string, borderWidth?: string, borderColor?: string, linkType?: "page"|"url", linkUrl?: string } — Button
 
 ### Media
@@ -54,7 +54,7 @@ interface AIResponse {
 - **Tabs**: { tabs?: Array<{label: string, content: string}> }
 
 ### Marketing
-- **Testimonial**: { quote?: string, author?: string, role?: string, avatar?: string, rating?: number }
+- **Testimonial**: { quote?: string, author?: string, role?: string, avatar?: string, rating?: number, variant?: "card"|"minimal"|"featured" } (rating can be a fractional value like 4.5)
 - **PricingCard**: { title?: string, price?: string, period?: string, features?: Array<{text: string, included: boolean}>, isPopular?: boolean, buttonText?: string, backgroundColor?: string, textColor?: string }
 - **Feature**: { icon?: string, title?: string, description?: string, iconSize?: string, iconColor?: string }
 - **Stats**: { stats?: Array<{value: string, label: string}>, layout?: "horizontal"|"vertical", backgroundColor?: string }
@@ -72,13 +72,13 @@ interface AIResponse {
 2. Generate unique IDs using the format "ai-<type>-<4chars>" where <4chars> is random alphanumeric.
 3. Use Container components for layout composition (flexbox). Nest components inside Containers for grids/rows.
 4. Use realistic, professional placeholder content — not "Lorem ipsum".
-5. Use attractive color schemes. For dark themes use colors like #0f172a, #1e293b, #334155. For accents use vibrant colors like #3b82f6, #8b5cf6, #10b981, #f59e0b.
-6. For images, ALWAYS use placehold.co URLs. Format: https://placehold.co/{width}x{height}/{bgColor}/{textColor}?text={label}. Example: https://placehold.co/400x250/1e293b/94a3b8?text=Product+Image. For avatars: https://placehold.co/150x150/3b82f6/ffffff?text=JD (use initials).
-6. For images, ALWAYS use placehold.co URLs. Format: https://placehold.co/{width}x{height}/{bgColor}/{textColor}?text={label}. Example: https://placehold.co/400x250/1e293b/94a3b8?text=Product+Image. For avatars: https://placehold.co/150x150/3b82f6/ffffff?text=JD (use initials).
-7. Return ONLY a valid JSON object matching the AIResponse interface. No markdown, no explanation, no wrapping — just the raw JSON object.
-8. Build complete, professional-looking pages with proper spacing, hierarchy, and visual appeal.
-9. For page layouts, structure as: Navbar → Hero/Header Content → Main Sections → CTA → Footer.
-10. Use emojis as icons for Feature components (e.g. ⚡, 🎨, 🚀, 💡, 🔒, 📱).
+5. High Contrast & Colors: Ensure extremely high contrast for text! NEVER put white text on a light background or dark text on a dark background. Default to '#1e293b' for light modes and '#f8fafc' on dark themes. Create beautiful, harmonious, professional color palettes.
+6. Multi-Page Consistency: If generating multiple pages, the Navbar and Footer components MUST be completely identical on every single page (matching links, colors, and layout precisely).
+7. For images, ALWAYS use placehold.co URLs. Format: https://placehold.co/{width}x{height}/{bgColor}/{textColor}?text={label}. Example: https://placehold.co/400x250/1e293b/94a3b8?text=Product+Image. For avatars: https://placehold.co/150x150/3b82f6/ffffff?text=JD (use initials).
+8. Return ONLY a valid JSON object matching the AIResponse interface. No markdown, no explanation, no wrapping — just the raw JSON object.
+9. Build complete, professional-looking pages with proper spacing, hierarchy, and visual appeal.
+10. For page layouts, structure as: Navbar → Hero/Header Content → Main Sections → CTA → Footer.
+11. Use Lucide icon names for Feature components (e.g. zap, shield, star, heart, settings, globe, lock, cpu, layers, code, rocket, target, eye, bell, chart, check, cloud, database, text, users, sparkles, lightbulb). Do NOT use emojis.
 
 ## Examples of Good Responses
 
@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { prompt, existingComponents, customComponents, globalComponents } = body;
+    const { prompt, existingComponents, customComponents, globalComponents, model } = body;
 
     if (!prompt || typeof prompt !== "string") {
       return NextResponse.json(
@@ -135,7 +135,7 @@ export async function POST(request: NextRequest) {
     }
 
     const response = await ai.models.generateContent({
-      model: "gemini-flash-latest",
+      model: model || "gemini-1.5-flash-latest",
       contents: userMessage,
       config: {
         systemInstruction: SYSTEM_PROMPT,

@@ -55,7 +55,7 @@ export function Tabs({
   });
 
   return (
-    <div style={baseStyle} className="rounded-lg">
+    <div style={baseStyle} className="w-full rounded-lg">
       {/* Tab Headers */}
       <div
         className={cn(
