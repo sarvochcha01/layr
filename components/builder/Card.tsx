@@ -17,6 +17,9 @@ interface CardProps {
   height?: string;
   backgroundColor?: string;
   textColor?: string;
+  isPreviewMode?: boolean;
+  onNavigate?: (slug: string) => void;
+  pages?: any[];
   children?: React.ReactNode;
   [key: string]: any;
 }
@@ -37,6 +40,9 @@ export function Card({
   children,
   iconBg,
   iconColor,
+  isPreviewMode = false,
+  onNavigate,
+  pages,
   ...rest
 }: CardProps) {
   const baseStyle = buildComponentStyle({
@@ -46,6 +52,20 @@ export function Card({
     height,
     ...rest,
   });
+
+  /** Handle link clicks — prevent navigation in edit mode */
+  const handleLinkClick = (e: React.MouseEvent, href: string) => {
+    if (!isPreviewMode) {
+      e.preventDefault();
+      return;
+    }
+    if (href.startsWith("page:") && onNavigate) {
+      e.preventDefault();
+      const pageId = href.substring(5);
+      const page = pages?.find((p: any) => p.id === pageId);
+      if (page) onNavigate(page.slug);
+    }
+  };
 
   return (
     <div
@@ -70,7 +90,7 @@ export function Card({
         </div>
       )}
 
-      {/* Icon */}
+      {/* Icon — show when there's no image */}
       {icon && !image && (
         <div className="mb-5 flex-shrink-0">
           <div
@@ -94,20 +114,24 @@ export function Card({
         )}
 
         {description && (
-          <p className="text-sm leading-relaxed break-words text-gray-400 line-clamp-3">
+          <p className="text-sm leading-relaxed break-words line-clamp-3" style={{ opacity: 0.7 }}>
             {description}
           </p>
         )}
 
         {buttonText && (
-          <div className="pt-2">
+          <div className="pt-2" style={isPreviewMode ? undefined : { pointerEvents: "none" }}>
             <Button
               variant="ghost"
               size="sm"
               className="px-0 font-medium hover:bg-transparent text-primary hover:text-primary/80"
               asChild
             >
-              <a href={buttonLink} className="inline-flex items-center gap-1.5">
+              <a
+                href={isPreviewMode ? buttonLink : "#"}
+                className="inline-flex items-center gap-1.5"
+                onClick={(e) => handleLinkClick(e, buttonLink)}
+              >
                 {buttonText}
                 <span className="text-xs">→</span>
               </a>

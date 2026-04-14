@@ -23,6 +23,9 @@ interface PricingCardProps {
   textColor?: string;
   width?: string;
   height?: string;
+  isPreviewMode?: boolean;
+  onNavigate?: (slug: string) => void;
+  pages?: any[];
   [key: string]: any;
 }
 
@@ -46,6 +49,9 @@ export function PricingCard({
   textColor = "#ffffff",
   width,
   height,
+  isPreviewMode = false,
+  onNavigate,
+  pages,
   ...rest
 }: PricingCardProps) {
   const normalizedFeatures = features.map((feature) => {
@@ -62,6 +68,20 @@ export function PricingCard({
     height,
     ...rest,
   });
+
+  /** Handle link clicks */
+  const handleLinkClick = (e: React.MouseEvent, href: string) => {
+    if (!isPreviewMode) {
+      e.preventDefault();
+      return;
+    }
+    if (href.startsWith("page:") && onNavigate) {
+      e.preventDefault();
+      const pageId = href.substring(5);
+      const page = pages?.find((p: any) => p.id === pageId);
+      if (page) onNavigate(page.slug);
+    }
+  };
 
   return (
     <div
@@ -125,7 +145,7 @@ export function PricingCard({
       </div>
 
       {/* CTA Button */}
-      <div className="mt-auto">
+      <div className="mt-auto" style={isPreviewMode ? undefined : { pointerEvents: "none" }}>
         <Button
           className={cn(
             "w-full py-3 rounded-xl font-semibold text-xs tracking-wider transition-all duration-300",
@@ -135,7 +155,12 @@ export function PricingCard({
           )}
           asChild
         >
-          <a href={buttonLink}>{buttonText}</a>
+          <a
+            href={isPreviewMode ? buttonLink : "#"}
+            onClick={(e) => handleLinkClick(e, buttonLink)}
+          >
+            {buttonText}
+          </a>
         </Button>
       </div>
     </div>

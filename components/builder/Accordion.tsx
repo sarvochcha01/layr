@@ -59,15 +59,21 @@ export function Accordion({
   };
 
   const outerStyle = buildComponentStyle({
+    backgroundColor,
+    textColor,
     width: width || "100%",
     height,
     ...rest,
   });
 
+  // Remove backgroundColor from outerStyle since we apply it inline
+  // to allow gradient/image background to work via buildComponentStyle
+  // For the items, we derive a slightly lighter version for open state
+
   return (
     <div
       className="w-full space-y-0"
-      style={{ ...outerStyle, display: "block", backgroundColor }}
+      style={outerStyle}
     >
       {items.map((item, index) => {
         const isOpen = openItems.includes(index);
@@ -76,15 +82,15 @@ export function Accordion({
             key={index}
             className={cn(
               "w-full border-b transition-all duration-300",
-              isOpen && "bg-[#1a1a1a]",
             )}
             style={{
               borderColor,
+              backgroundColor: isOpen ? "rgba(255,255,255,0.05)" : "transparent",
             }}
           >
             <button
               onClick={() => toggleItem(index)}
-              className="w-full px-6 py-5 flex items-center justify-between transition-colors hover:bg-[#1a1a1a]"
+              className="w-full px-6 py-5 flex items-center justify-between transition-colors"
               style={{ backgroundColor: "transparent", color: textColor }}
             >
               <span className="font-medium text-left text-base">
@@ -98,7 +104,10 @@ export function Accordion({
               />
             </button>
             {isOpen && (
-              <div className="px-6 pb-5 text-sm leading-relaxed text-gray-400 border-l-2 border-blue-500 ml-6">
+              <div
+                className="px-6 pb-5 text-sm leading-relaxed border-l-2 border-blue-500 ml-6"
+                style={{ color: textColor, opacity: 0.7 }}
+              >
                 {item.content}
               </div>
             )}

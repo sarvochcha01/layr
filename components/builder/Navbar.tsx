@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -78,6 +77,20 @@ export function Navbar({
     ...rest,
   });
 
+  /** Handle CTA link click: prevent navigation in edit mode */
+  const handleCtaClick = (e: React.MouseEvent) => {
+    if (!isPreviewMode) {
+      e.preventDefault();
+      return;
+    }
+    if (ctaLink.startsWith("page:") && onNavigate) {
+      e.preventDefault();
+      const pageId = ctaLink.substring(5);
+      const page = pages?.find((p: any) => p.id === pageId);
+      if (page) onNavigate(page.slug);
+    }
+  };
+
   return (
     <div className="relative">
       <nav
@@ -132,8 +145,22 @@ export function Navbar({
                   href={link.external ? link.href : "#"}
                   className={cn(
                     "px-4 py-2 text-sm font-medium transition-colors duration-200 relative",
-                    isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground",
+                    // Only apply Tailwind text classes if no custom linkColor is set
+                    !linkColor && (isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground"),
                   )}
+                  style={{
+                    color: linkColor || undefined,
+                  }}
+                  onMouseEnter={(e) => {
+                    if (linkHoverColor) {
+                      (e.currentTarget as HTMLElement).style.color = linkHoverColor;
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (linkColor || linkHoverColor) {
+                      (e.currentTarget as HTMLElement).style.color = linkColor || "";
+                    }
+                  }}
                   onClick={handleClick}
                   {...(link.external &&
                     isPreviewMode && {
@@ -230,14 +257,12 @@ export function Navbar({
                     {ctaText}
                   </a>
                 ) : (
-                  <Link
+                  <a
                     href={isPreviewMode ? ctaLink : "#"}
-                    onClick={
-                      isPreviewMode ? undefined : (e) => e.preventDefault()
-                    }
+                    onClick={handleCtaClick}
                   >
                     {ctaText}
-                  </Link>
+                  </a>
                 )}
               </Button>
             </div>
@@ -289,6 +314,9 @@ export function Navbar({
                   key={index}
                   href={link.external ? link.href : "#"}
                   className="block px-4 py-3 text-sm font-medium rounded-lg transition-colors text-foreground/80 hover:bg-muted hover:text-foreground"
+                  style={{
+                    color: linkColor || undefined,
+                  }}
                   onClick={handleClick}
                   {...(link.external &&
                     isPreviewMode && {

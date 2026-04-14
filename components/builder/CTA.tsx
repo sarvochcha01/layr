@@ -15,6 +15,9 @@ interface CTAProps {
   textColor?: string;
   width?: string;
   height?: string;
+  isPreviewMode?: boolean;
+  onNavigate?: (slug: string) => void;
+  pages?: any[];
   [key: string]: any;
 }
 
@@ -31,6 +34,9 @@ export function CTA({
   textColor,
   width,
   height,
+  isPreviewMode = false,
+  onNavigate,
+  pages,
   ...rest
 }: CTAProps) {
   const sizeClasses = {
@@ -59,6 +65,20 @@ export function CTA({
   } else {
     baseStyle.backgroundColor = backgroundColor;
   }
+
+  /** Handle link clicks — prevent navigation in edit mode, use onNavigate for page: links */
+  const handleLinkClick = (e: React.MouseEvent, href: string) => {
+    if (!isPreviewMode) {
+      e.preventDefault();
+      return;
+    }
+    if (href.startsWith("page:") && onNavigate) {
+      e.preventDefault();
+      const pageId = href.substring(5);
+      const page = pages?.find((p: any) => p.id === pageId);
+      if (page) onNavigate(page.slug);
+    }
+  };
 
   return (
     <div
@@ -97,13 +117,13 @@ export function CTA({
         </p>
       </div>
 
-      <div className="relative z-10 flex gap-4 flex-wrap">
+      <div className="relative z-10 flex gap-4 flex-wrap" style={isPreviewMode ? undefined : { pointerEvents: "none" }}>
         <Button
           size="lg"
           className="px-8 py-3 text-base font-medium rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300"
           asChild
         >
-          <a href={primaryButtonLink}>{primaryButtonText}</a>
+          <a href={isPreviewMode ? primaryButtonLink : "#"} onClick={(e) => handleLinkClick(e, primaryButtonLink)}>{primaryButtonText}</a>
         </Button>
         {secondaryButtonText && (
           <Button
@@ -112,7 +132,7 @@ export function CTA({
             className="px-8 py-3 text-base font-medium rounded-xl border-[#3a3a3a] hover:bg-[#2a2a2a] text-white transition-all duration-300"
             asChild
           >
-            <a href={secondaryButtonLink}>{secondaryButtonText}</a>
+            <a href={isPreviewMode ? secondaryButtonLink : "#"} onClick={(e) => handleLinkClick(e, secondaryButtonLink)}>{secondaryButtonText}</a>
           </Button>
         )}
       </div>

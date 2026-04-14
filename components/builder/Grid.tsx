@@ -8,6 +8,7 @@ interface GridProps {
   gapCustom?: string;
   className?: string;
   responsive?: boolean;
+  equalHeight?: boolean;
   width?: string;
   height?: string;
   backgroundColor?: string;
@@ -22,6 +23,7 @@ export function Grid({
   gapCustom,
   className,
   responsive = true,
+  equalHeight = false,
   width,
   height,
   backgroundColor,
@@ -52,9 +54,19 @@ export function Grid({
     baseStyle.gap = gapCustom;
   }
 
+  // Equal height: make all children stretch to match the tallest
+  if (equalHeight) {
+    baseStyle.alignItems = "stretch";
+  }
+
   return (
     <div
-      className={cn("grid", columnClasses[columns], gap !== "custom" ? gapClasses[gap] || gapClasses.md : undefined, className)}
+      className={cn(
+        "grid",
+        columnClasses[columns],
+        gap !== "custom" ? gapClasses[gap] || gapClasses.md : undefined,
+        className,
+      )}
       style={baseStyle}
     >
       {children}
