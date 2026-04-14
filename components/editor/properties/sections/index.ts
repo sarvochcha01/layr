@@ -1,0 +1,7 @@
+export { FillSection } from "./FillSection";
+export { DimensionsSection } from "./DimensionsSection";
+export { SpacingSection } from "./SpacingSection";
+export { TypographySection } from "./TypographySection";
+export { BordersSection } from "./BordersSection";
+export { EffectsSection } from "./EffectsSection";
+export { PositionSection } from "./PositionSection";
