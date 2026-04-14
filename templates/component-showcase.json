@@ -1,2274 +1,2561 @@
 {
-  "name": "Component Showcase",
-  "description": "Complete showcase of all components organized by category - Layout, Content, Media, Forms, Interactive, Marketing, and UI Elements",
-  "thumbnail": "https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=800&h=600&fit=crop",
-  "category": "showcase",
-  "pages": [
-    {
-      "id": "home",
-      "name": "Home",
-      "path": "/",
-      "components": [
+    "name": "Component Showcase",
+    "description": "Complete showcase of all components organized by category - Layout, Content, Media, Forms, Interactive, Marketing, and UI Elements",
+    "thumbnail": "https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=800&h=600&fit=crop",
+    "category": "showcase",
+    "pages": [
         {
-          "id": "nav-home",
-          "type": "Navbar",
-          "props": {
-            "logoText": "Component Showcase",
-            "links": [
-              { "text": "Home", "href": "/" },
-              { "text": "Layout", "href": "/layout" },
-              { "text": "Content", "href": "/content" },
-              { "text": "Media", "href": "/media" },
-              { "text": "Forms", "href": "/forms" },
-              { "text": "Interactive", "href": "/interactive" },
-              { "text": "Marketing", "href": "/marketing" },
-              { "text": "UI Elements", "href": "/ui-elements" }
-            ],
-            "ctaText": "Get Started",
-            "ctaLink": "/layout"
-          },
-          "children": []
-        },
-        {
-          "id": "home-hero",
-          "type": "Hero",
-          "props": {
-            "title": "COMPLETE COMPONENT LIBRARY",
-            "badge": "ALL COMPONENTS INCLUDED",
-            "description": "Explore every component in our design system, organized by category for easy navigation and implementation.",
-            "primaryButtonText": "EXPLORE COMPONENTS",
-            "primaryButtonLink": "/layout",
-            "secondaryButtonText": "VIEW DOCUMENTATION",
-            "secondaryButtonLink": "#",
-            "alignment": "center",
-            "size": "xl"
-          },
-          "children": []
-        },
-        {
-          "id": "home-categories",
-          "type": "Section",
-          "props": {
-            "padding": "80px 40px"
-          },
-          "children": [
-            {
-              "id": "categories-title",
-              "type": "Text",
-              "props": {
-                "text": "Component Categories",
-                "fontSize": "42px",
-                "textAlign": "center",
-                "marginBottom": "60px"
-              },
-              "children": []
-            },
-            {
-              "id": "categories-grid",
-              "type": "Grid",
-              "props": {
-                "columns": 4,
-                "gap": "30px"
-              },
-              "children": [
+            "id": "home",
+            "name": "Home",
+            "slug": "index",
+            "components": [
                 {
-                  "id": "cat-layout",
-                  "type": "Card",
-                  "props": {
-                    "title": "Layout",
-                    "description": "Headers, Navbars, Footers, Sections, Containers, and Grid systems",
-                    "linkText": "View Layout →",
-                    "linkHref": "/layout"
-                  },
-                  "children": []
+                    "id": "nav-home",
+                    "type": "Navbar",
+                    "props": {
+                        "logoText": "Component Showcase",
+                        "links": [
+                            {
+                                "text": "Home",
+                                "href": "/"
+                            },
+                            {
+                                "text": "Layout",
+                                "href": "/layout"
+                            },
+                            {
+                                "text": "Content",
+                                "href": "/content"
+                            },
+                            {
+                                "text": "Media",
+                                "href": "/media"
+                            },
+                            {
+                                "text": "Forms",
+                                "href": "/forms"
+                            },
+                            {
+                                "text": "Interactive",
+                                "href": "/interactive"
+                            },
+                            {
+                                "text": "Marketing",
+                                "href": "/marketing"
+                            },
+                            {
+                                "text": "UI Elements",
+                                "href": "/ui-elements"
+                            }
+                        ],
+                        "ctaText": "Get Started",
+                        "ctaLink": "/layout"
+                    },
+                    "children": [],
+                    "isGlobal": "GlobalNavbar"
                 },
                 {
-                  "id": "cat-content",
-                  "type": "Card",
-                  "props": {
-                    "title": "Content",
-                    "description": "Heroes, Cards, Text blocks, and Buttons for your content needs",
-                    "linkText": "View Content →",
-                    "linkHref": "/content"
-                  },
-                  "children": []
+                    "id": "home-hero",
+                    "type": "Hero",
+                    "props": {
+                        "title": "COMPLETE COMPONENT LIBRARY",
+                        "badge": "ALL COMPONENTS INCLUDED",
+                        "description": "Explore every component in our design system, organized by category for easy navigation and implementation.",
+                        "primaryButtonText": "EXPLORE COMPONENTS",
+                        "primaryButtonLink": "/layout",
+                        "secondaryButtonText": "VIEW DOCUMENTATION",
+                        "secondaryButtonLink": "#",
+                        "alignment": "center",
+                        "size": "xl"
+                    },
+                    "children": []
                 },
                 {
-                  "id": "cat-media",
-                  "type": "Card",
-                  "props": {
-                    "title": "Media",
-                    "description": "Images and Videos with responsive layouts and aspect ratios",
-                    "linkText": "View Media →",
-                    "linkHref": "/media"
-                  },
-                  "children": []
+                    "id": "home-categories",
+                    "type": "Section",
+                    "props": {
+                        "padding": "80px 40px"
+                    },
+                    "children": [
+                        {
+                            "id": "categories-title",
+                            "type": "Text",
+                            "props": {
+                                "text": "Component Categories",
+                                "fontSize": "42px",
+                                "textAlign": "center",
+                                "marginBottom": "60px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "categories-grid",
+                            "type": "Grid",
+                            "props": {
+                                "columns": 4,
+                                "gap": "30px"
+                            },
+                            "children": [
+                                {
+                                    "id": "cat-layout",
+                                    "type": "Card",
+                                    "props": {
+                                        "title": "Layout",
+                                        "description": "Headers, Navbars, Footers, Sections, Containers, and Grid systems",
+                                        "linkText": "View Layout →",
+                                        "linkHref": "/layout"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "cat-content",
+                                    "type": "Card",
+                                    "props": {
+                                        "title": "Content",
+                                        "description": "Heroes, Cards, Text blocks, and Buttons for your content needs",
+                                        "linkText": "View Content →",
+                                        "linkHref": "/content"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "cat-media",
+                                    "type": "Card",
+                                    "props": {
+                                        "title": "Media",
+                                        "description": "Images and Videos with responsive layouts and aspect ratios",
+                                        "linkText": "View Media →",
+                                        "linkHref": "/media"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "cat-forms",
+                                    "type": "Card",
+                                    "props": {
+                                        "title": "Forms",
+                                        "description": "Contact forms, signup forms, and input components",
+                                        "linkText": "View Forms →",
+                                        "linkHref": "/forms"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "cat-interactive",
+                                    "type": "Card",
+                                    "props": {
+                                        "title": "Interactive",
+                                        "description": "Accordions and Tabs for dynamic content organization",
+                                        "linkText": "View Interactive →",
+                                        "linkHref": "/interactive"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "cat-marketing",
+                                    "type": "Card",
+                                    "props": {
+                                        "title": "Marketing",
+                                        "description": "Testimonials, Pricing Cards, Features, Stats, and CTAs",
+                                        "linkText": "View Marketing →",
+                                        "linkHref": "/marketing"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "cat-ui",
+                                    "type": "Card",
+                                    "props": {
+                                        "title": "UI Elements",
+                                        "description": "Dividers, Spacers, Badges, and Alerts for UI polish",
+                                        "linkText": "View UI Elements →",
+                                        "linkHref": "/ui-elements"
+                                    },
+                                    "children": []
+                                }
+                            ]
+                        }
+                    ]
                 },
                 {
-                  "id": "cat-forms",
-                  "type": "Card",
-                  "props": {
-                    "title": "Forms",
-                    "description": "Contact forms, signup forms, and input components",
-                    "linkText": "View Forms →",
-                    "linkHref": "/forms"
-                  },
-                  "children": []
+                    "id": "home-cta",
+                    "type": "CTA",
+                    "props": {
+                        "title": "Ready to Build?",
+                        "description": "Start exploring our component library and build amazing interfaces",
+                        "buttonText": "Get Started",
+                        "buttonLink": "/layout"
+                    },
+                    "children": []
                 },
                 {
-                  "id": "cat-interactive",
-                  "type": "Card",
-                  "props": {
-                    "title": "Interactive",
-                    "description": "Accordions and Tabs for dynamic content organization",
-                    "linkText": "View Interactive →",
-                    "linkHref": "/interactive"
-                  },
-                  "children": []
-                },
-                {
-                  "id": "cat-marketing",
-                  "type": "Card",
-                  "props": {
-                    "title": "Marketing",
-                    "description": "Testimonials, Pricing Cards, Features, Stats, and CTAs",
-                    "linkText": "View Marketing →",
-                    "linkHref": "/marketing"
-                  },
-                  "children": []
-                },
-                {
-                  "id": "cat-ui",
-                  "type": "Card",
-                  "props": {
-                    "title": "UI Elements",
-                    "description": "Dividers, Spacers, Badges, and Alerts for UI polish",
-                    "linkText": "View UI Elements →",
-                    "linkHref": "/ui-elements"
-                  },
-                  "children": []
+                    "id": "home-footer",
+                    "type": "Footer",
+                    "props": {
+                        "logoText": "Component Showcase",
+                        "description": "A comprehensive design system with all components you need"
+                    },
+                    "children": [],
+                    "isGlobal": "GlobalFooter"
                 }
-              ]
-            }
-          ]
-        },
-        {
-          "id": "home-cta",
-          "type": "CTA",
-          "props": {
-            "title": "Ready to Build?",
-            "description": "Start exploring our component library and build amazing interfaces",
-            "buttonText": "Get Started",
-            "buttonLink": "/layout"
-          },
-          "children": []
-        },
-        {
-          "id": "home-footer",
-          "type": "Footer",
-          "props": {
-            "logoText": "Component Showcase",
-            "description": "A comprehensive design system with all components you need"
-          },
-          "children": []
-        }
-      ]
-    }
-,
-    {
-      "id": "layout",
-      "name": "Layout",
-      "path": "/layout",
-      "components": [
-        {
-          "id": "nav-layout",
-          "type": "Navbar",
-          "props": {
-            "logoText": "Component Showcase",
-            "links": [
-              { "text": "Home", "href": "/" },
-              { "text": "Layout", "href": "/layout" },
-              { "text": "Content", "href": "/content" },
-              { "text": "Media", "href": "/media" },
-              { "text": "Forms", "href": "/forms" },
-              { "text": "Interactive", "href": "/interactive" },
-              { "text": "Marketing", "href": "/marketing" },
-              { "text": "UI Elements", "href": "/ui-elements" }
             ]
-          },
-          "children": []
         },
         {
-          "id": "layout-hero",
-          "type": "Section",
-          "props": {
-            "padding": "60px 40px",
-            "backgroundColor": "#0f3460"
-          },
-          "children": [
-            {
-              "id": "layout-title",
-              "type": "Text",
-              "props": {
-                "text": "Layout Components",
-                "fontSize": "48px",
-                "textAlign": "center",
-                "color": "#ffffff"
-              },
-              "children": []
-            },
-            {
-              "id": "layout-desc",
-              "type": "Text",
-              "props": {
-                "text": "Structural components for organizing your page layout",
-                "fontSize": "18px",
-                "textAlign": "center",
-                "color": "#e8e8e8",
-                "marginTop": "20px"
-              },
-              "children": []
-            }
-          ]
+            "id": "layout",
+            "name": "Layout",
+            "slug": "layout",
+            "components": [
+                {
+                    "id": "nav-layout",
+                    "type": "Navbar",
+                    "props": {
+                        "logoText": "Component Showcase",
+                        "links": [
+                            {
+                                "text": "Home",
+                                "href": "/"
+                            },
+                            {
+                                "text": "Layout",
+                                "href": "/layout"
+                            },
+                            {
+                                "text": "Content",
+                                "href": "/content"
+                            },
+                            {
+                                "text": "Media",
+                                "href": "/media"
+                            },
+                            {
+                                "text": "Forms",
+                                "href": "/forms"
+                            },
+                            {
+                                "text": "Interactive",
+                                "href": "/interactive"
+                            },
+                            {
+                                "text": "Marketing",
+                                "href": "/marketing"
+                            },
+                            {
+                                "text": "UI Elements",
+                                "href": "/ui-elements"
+                            }
+                        ],
+                        "ctaText": "Get Started",
+                        "ctaLink": "/layout"
+                    },
+                    "children": [],
+                    "isGlobal": "GlobalNavbar"
+                },
+                {
+                    "id": "layout-hero",
+                    "type": "Section",
+                    "props": {
+                        "padding": "60px 40px",
+                        "backgroundColor": "#0f3460"
+                    },
+                    "children": [
+                        {
+                            "id": "layout-title",
+                            "type": "Text",
+                            "props": {
+                                "text": "Layout Components",
+                                "fontSize": "48px",
+                                "textAlign": "center",
+                                "color": "#ffffff"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "layout-desc",
+                            "type": "Text",
+                            "props": {
+                                "text": "Structural components for organizing your page layout",
+                                "fontSize": "18px",
+                                "textAlign": "center",
+                                "color": "#e8e8e8",
+                                "marginTop": "20px"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "header-demo",
+                    "type": "Section",
+                    "props": {
+                        "padding": "60px 40px"
+                    },
+                    "children": [
+                        {
+                            "id": "header-demo-title",
+                            "type": "Text",
+                            "props": {
+                                "text": "Header Component",
+                                "fontSize": "32px",
+                                "marginBottom": "30px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "header-1",
+                            "type": "Header",
+                            "props": {
+                                "title": "Welcome to Our Platform",
+                                "subtitle": "Build amazing things with our tools",
+                                "backgroundColor": "#1a1a2e",
+                                "textColor": "#ffffff",
+                                "padding": "40px"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "divider-1",
+                    "type": "Divider",
+                    "props": {},
+                    "children": []
+                },
+                {
+                    "id": "navbar-demo",
+                    "type": "Section",
+                    "props": {
+                        "padding": "60px 40px",
+                        "backgroundColor": "#f8f9fa"
+                    },
+                    "children": [
+                        {
+                            "id": "navbar-demo-title",
+                            "type": "Text",
+                            "props": {
+                                "text": "Navbar Component",
+                                "fontSize": "32px",
+                                "marginBottom": "30px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "navbar-1",
+                            "type": "Navbar",
+                            "props": {
+                                "logoText": "Component Showcase",
+                                "links": [
+                                    {
+                                        "text": "Home",
+                                        "href": "/"
+                                    },
+                                    {
+                                        "text": "Layout",
+                                        "href": "/layout"
+                                    },
+                                    {
+                                        "text": "Content",
+                                        "href": "/content"
+                                    },
+                                    {
+                                        "text": "Media",
+                                        "href": "/media"
+                                    },
+                                    {
+                                        "text": "Forms",
+                                        "href": "/forms"
+                                    },
+                                    {
+                                        "text": "Interactive",
+                                        "href": "/interactive"
+                                    },
+                                    {
+                                        "text": "Marketing",
+                                        "href": "/marketing"
+                                    },
+                                    {
+                                        "text": "UI Elements",
+                                        "href": "/ui-elements"
+                                    }
+                                ],
+                                "ctaText": "Get Started",
+                                "ctaLink": "/layout"
+                            },
+                            "children": [],
+                            "isGlobal": "GlobalNavbar"
+                        }
+                    ]
+                },
+                {
+                    "id": "divider-2",
+                    "type": "Divider",
+                    "props": {},
+                    "children": []
+                },
+                {
+                    "id": "section-demo",
+                    "type": "Section",
+                    "props": {
+                        "padding": "60px 40px"
+                    },
+                    "children": [
+                        {
+                            "id": "section-demo-title",
+                            "type": "Text",
+                            "props": {
+                                "text": "Section Component",
+                                "fontSize": "32px",
+                                "marginBottom": "30px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "section-1",
+                            "type": "Section",
+                            "props": {
+                                "padding": "40px",
+                                "backgroundColor": "#e8f4f8"
+                            },
+                            "children": [
+                                {
+                                    "id": "section-content",
+                                    "type": "Text",
+                                    "props": {
+                                        "text": "This is a Section component with custom background and padding. Sections are perfect for grouping related content.",
+                                        "fontSize": "16px"
+                                    },
+                                    "children": []
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "divider-3",
+                    "type": "Divider",
+                    "props": {},
+                    "children": []
+                },
+                {
+                    "id": "container-demo",
+                    "type": "Section",
+                    "props": {
+                        "padding": "60px 40px",
+                        "backgroundColor": "#f8f9fa"
+                    },
+                    "children": [
+                        {
+                            "id": "container-demo-title",
+                            "type": "Text",
+                            "props": {
+                                "text": "Container Component",
+                                "fontSize": "32px",
+                                "marginBottom": "30px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "container-1",
+                            "type": "Container",
+                            "props": {
+                                "maxWidth": "800px",
+                                "padding": "30px",
+                                "backgroundColor": "#ffffff",
+                                "borderRadius": "8px"
+                            },
+                            "children": [
+                                {
+                                    "id": "container-text",
+                                    "type": "Text",
+                                    "props": {
+                                        "text": "Container with max-width constraint",
+                                        "fontSize": "18px",
+                                        "marginBottom": "15px"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "container-desc",
+                                    "type": "Text",
+                                    "props": {
+                                        "text": "Containers help constrain content width and provide consistent spacing. This container has a max-width of 800px.",
+                                        "fontSize": "14px",
+                                        "color": "#666666"
+                                    },
+                                    "children": []
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "divider-4",
+                    "type": "Divider",
+                    "props": {},
+                    "children": []
+                },
+                {
+                    "id": "grid-demo",
+                    "type": "Section",
+                    "props": {
+                        "padding": "60px 40px"
+                    },
+                    "children": [
+                        {
+                            "id": "grid-demo-title",
+                            "type": "Text",
+                            "props": {
+                                "text": "Grid Component",
+                                "fontSize": "32px",
+                                "marginBottom": "30px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "grid-1",
+                            "type": "Grid",
+                            "props": {
+                                "columns": 3,
+                                "gap": "20px"
+                            },
+                            "children": [
+                                {
+                                    "id": "grid-item-1",
+                                    "type": "Container",
+                                    "props": {
+                                        "padding": "30px",
+                                        "backgroundColor": "#e3f2fd",
+                                        "borderRadius": "8px"
+                                    },
+                                    "children": [
+                                        {
+                                            "id": "grid-text-1",
+                                            "type": "Text",
+                                            "props": {
+                                                "text": "Grid Item 1",
+                                                "fontSize": "18px",
+                                                "textAlign": "center"
+                                            },
+                                            "children": []
+                                        }
+                                    ]
+                                },
+                                {
+                                    "id": "grid-item-2",
+                                    "type": "Container",
+                                    "props": {
+                                        "padding": "30px",
+                                        "backgroundColor": "#f3e5f5",
+                                        "borderRadius": "8px"
+                                    },
+                                    "children": [
+                                        {
+                                            "id": "grid-text-2",
+                                            "type": "Text",
+                                            "props": {
+                                                "text": "Grid Item 2",
+                                                "fontSize": "18px",
+                                                "textAlign": "center"
+                                            },
+                                            "children": []
+                                        }
+                                    ]
+                                },
+                                {
+                                    "id": "grid-item-3",
+                                    "type": "Container",
+                                    "props": {
+                                        "padding": "30px",
+                                        "backgroundColor": "#fff3e0",
+                                        "borderRadius": "8px"
+                                    },
+                                    "children": [
+                                        {
+                                            "id": "grid-text-3",
+                                            "type": "Text",
+                                            "props": {
+                                                "text": "Grid Item 3",
+                                                "fontSize": "18px",
+                                                "textAlign": "center"
+                                            },
+                                            "children": []
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "divider-5",
+                    "type": "Divider",
+                    "props": {},
+                    "children": []
+                },
+                {
+                    "id": "footer-demo",
+                    "type": "Section",
+                    "props": {
+                        "padding": "60px 40px",
+                        "backgroundColor": "#f8f9fa"
+                    },
+                    "children": [
+                        {
+                            "id": "footer-demo-title",
+                            "type": "Text",
+                            "props": {
+                                "text": "Footer Component",
+                                "fontSize": "32px",
+                                "marginBottom": "30px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "footer-1",
+                            "type": "Footer",
+                            "props": {
+                                "logoText": "Component Showcase",
+                                "description": "A comprehensive design system with all components you need"
+                            },
+                            "children": [],
+                            "isGlobal": "GlobalFooter"
+                        }
+                    ]
+                }
+            ]
         },
         {
-          "id": "header-demo",
-          "type": "Section",
-          "props": {
-            "padding": "60px 40px"
-          },
-          "children": [
-            {
-              "id": "header-demo-title",
-              "type": "Text",
-              "props": {
-                "text": "Header Component",
-                "fontSize": "32px",
-                "marginBottom": "30px"
-              },
-              "children": []
-            },
-            {
-              "id": "header-1",
-              "type": "Header",
-              "props": {
-                "title": "Welcome to Our Platform",
-                "subtitle": "Build amazing things with our tools",
-                "backgroundColor": "#1a1a2e",
-                "textColor": "#ffffff",
-                "padding": "40px"
-              },
-              "children": []
-            }
-          ]
+            "id": "content",
+            "name": "Content",
+            "slug": "content",
+            "components": [
+                {
+                    "id": "nav-content",
+                    "type": "Navbar",
+                    "props": {
+                        "logoText": "Component Showcase",
+                        "links": [
+                            {
+                                "text": "Home",
+                                "href": "/"
+                            },
+                            {
+                                "text": "Layout",
+                                "href": "/layout"
+                            },
+                            {
+                                "text": "Content",
+                                "href": "/content"
+                            },
+                            {
+                                "text": "Media",
+                                "href": "/media"
+                            },
+                            {
+                                "text": "Forms",
+                                "href": "/forms"
+                            },
+                            {
+                                "text": "Interactive",
+                                "href": "/interactive"
+                            },
+                            {
+                                "text": "Marketing",
+                                "href": "/marketing"
+                            },
+                            {
+                                "text": "UI Elements",
+                                "href": "/ui-elements"
+                            }
+                        ],
+                        "ctaText": "Get Started",
+                        "ctaLink": "/layout"
+                    },
+                    "children": [],
+                    "isGlobal": "GlobalNavbar"
+                },
+                {
+                    "id": "content-hero",
+                    "type": "Section",
+                    "props": {
+                        "padding": "60px 40px",
+                        "backgroundColor": "#0f3460"
+                    },
+                    "children": [
+                        {
+                            "id": "content-title",
+                            "type": "Text",
+                            "props": {
+                                "text": "Content Components",
+                                "fontSize": "48px",
+                                "textAlign": "center",
+                                "color": "#ffffff"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "content-desc",
+                            "type": "Text",
+                            "props": {
+                                "text": "Core content components for building engaging pages",
+                                "fontSize": "18px",
+                                "textAlign": "center",
+                                "color": "#e8e8e8",
+                                "marginTop": "20px"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "hero-demo",
+                    "type": "Section",
+                    "props": {
+                        "padding": "60px 40px"
+                    },
+                    "children": [
+                        {
+                            "id": "hero-demo-title",
+                            "type": "Text",
+                            "props": {
+                                "text": "Hero Component",
+                                "fontSize": "32px",
+                                "marginBottom": "30px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "hero-1",
+                            "type": "Hero",
+                            "props": {
+                                "title": "BUILD SOMETHING AMAZING",
+                                "badge": "NEW RELEASE",
+                                "description": "Create stunning websites with our powerful component library. Fast, flexible, and fully customizable.",
+                                "primaryButtonText": "GET STARTED",
+                                "primaryButtonLink": "#",
+                                "secondaryButtonText": "LEARN MORE",
+                                "secondaryButtonLink": "#",
+                                "alignment": "center",
+                                "size": "lg"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "divider-6",
+                    "type": "Divider",
+                    "props": {},
+                    "children": []
+                },
+                {
+                    "id": "card-demo",
+                    "type": "Section",
+                    "props": {
+                        "padding": "60px 40px",
+                        "backgroundColor": "#f8f9fa"
+                    },
+                    "children": [
+                        {
+                            "id": "card-demo-title",
+                            "type": "Text",
+                            "props": {
+                                "text": "Card Component",
+                                "fontSize": "32px",
+                                "marginBottom": "30px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "cards-grid",
+                            "type": "Grid",
+                            "props": {
+                                "columns": 3,
+                                "gap": "30px"
+                            },
+                            "children": [
+                                {
+                                    "id": "card-1",
+                                    "type": "Card",
+                                    "props": {
+                                        "title": "Design",
+                                        "description": "Beautiful, modern designs that capture attention and drive engagement.",
+                                        "image": "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400&h=300&fit=crop",
+                                        "linkText": "Learn More",
+                                        "linkHref": "#"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "card-2",
+                                    "type": "Card",
+                                    "props": {
+                                        "title": "Development",
+                                        "description": "Clean, maintainable code built with modern best practices.",
+                                        "image": "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&h=300&fit=crop",
+                                        "linkText": "Learn More",
+                                        "linkHref": "#"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "card-3",
+                                    "type": "Card",
+                                    "props": {
+                                        "title": "Performance",
+                                        "description": "Optimized for speed and efficiency across all devices.",
+                                        "image": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=300&fit=crop",
+                                        "linkText": "Learn More",
+                                        "linkHref": "#"
+                                    },
+                                    "children": []
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "divider-7",
+                    "type": "Divider",
+                    "props": {},
+                    "children": []
+                },
+                {
+                    "id": "text-demo",
+                    "type": "Section",
+                    "props": {
+                        "padding": "60px 40px"
+                    },
+                    "children": [
+                        {
+                            "id": "text-demo-title",
+                            "type": "Text",
+                            "props": {
+                                "text": "Text Component",
+                                "fontSize": "32px",
+                                "marginBottom": "30px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "text-1",
+                            "type": "Text",
+                            "props": {
+                                "text": "Large Heading",
+                                "fontSize": "42px",
+                                "fontWeight": "bold",
+                                "marginBottom": "20px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "text-2",
+                            "type": "Text",
+                            "props": {
+                                "text": "Medium Heading",
+                                "fontSize": "28px",
+                                "fontWeight": "600",
+                                "marginBottom": "20px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "text-3",
+                            "type": "Text",
+                            "props": {
+                                "text": "Body Text - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.",
+                                "fontSize": "16px",
+                                "lineHeight": "1.6",
+                                "marginBottom": "20px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "text-4",
+                            "type": "Text",
+                            "props": {
+                                "text": "Small Text - Additional details or captions",
+                                "fontSize": "14px",
+                                "color": "#666666"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "divider-8",
+                    "type": "Divider",
+                    "props": {},
+                    "children": []
+                },
+                {
+                    "id": "button-demo",
+                    "type": "Section",
+                    "props": {
+                        "padding": "60px 40px",
+                        "backgroundColor": "#f8f9fa"
+                    },
+                    "children": [
+                        {
+                            "id": "button-demo-title",
+                            "type": "Text",
+                            "props": {
+                                "text": "Button Component",
+                                "fontSize": "32px",
+                                "marginBottom": "30px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "button-container",
+                            "type": "Container",
+                            "props": {
+                                "display": "flex",
+                                "flexDirection": "row",
+                                "gap": "20px",
+                                "flexWrap": "wrap"
+                            },
+                            "children": [
+                                {
+                                    "id": "btn-primary",
+                                    "type": "Button",
+                                    "props": {
+                                        "text": "Primary Button",
+                                        "variant": "primary",
+                                        "size": "medium"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "btn-secondary",
+                                    "type": "Button",
+                                    "props": {
+                                        "text": "Secondary Button",
+                                        "variant": "secondary",
+                                        "size": "medium"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "btn-large",
+                                    "type": "Button",
+                                    "props": {
+                                        "text": "Large Button",
+                                        "variant": "primary",
+                                        "size": "large"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "btn-small",
+                                    "type": "Button",
+                                    "props": {
+                                        "text": "Small Button",
+                                        "variant": "primary",
+                                        "size": "small"
+                                    },
+                                    "children": []
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
         },
         {
-          "id": "divider-1",
-          "type": "Divider",
-          "props": {},
-          "children": []
+            "id": "media",
+            "name": "Media",
+            "slug": "media",
+            "components": [
+                {
+                    "id": "nav-media",
+                    "type": "Navbar",
+                    "props": {
+                        "logoText": "Component Showcase",
+                        "links": [
+                            {
+                                "text": "Home",
+                                "href": "/"
+                            },
+                            {
+                                "text": "Layout",
+                                "href": "/layout"
+                            },
+                            {
+                                "text": "Content",
+                                "href": "/content"
+                            },
+                            {
+                                "text": "Media",
+                                "href": "/media"
+                            },
+                            {
+                                "text": "Forms",
+                                "href": "/forms"
+                            },
+                            {
+                                "text": "Interactive",
+                                "href": "/interactive"
+                            },
+                            {
+                                "text": "Marketing",
+                                "href": "/marketing"
+                            },
+                            {
+                                "text": "UI Elements",
+                                "href": "/ui-elements"
+                            }
+                        ],
+                        "ctaText": "Get Started",
+                        "ctaLink": "/layout"
+                    },
+                    "children": [],
+                    "isGlobal": "GlobalNavbar"
+                },
+                {
+                    "id": "media-hero",
+                    "type": "Section",
+                    "props": {
+                        "padding": "60px 40px",
+                        "backgroundColor": "#0f3460"
+                    },
+                    "children": [
+                        {
+                            "id": "media-title",
+                            "type": "Text",
+                            "props": {
+                                "text": "Media Components",
+                                "fontSize": "48px",
+                                "textAlign": "center",
+                                "color": "#ffffff"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "media-desc",
+                            "type": "Text",
+                            "props": {
+                                "text": "Images and videos with responsive layouts",
+                                "fontSize": "18px",
+                                "textAlign": "center",
+                                "color": "#e8e8e8",
+                                "marginTop": "20px"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "image-demo",
+                    "type": "Section",
+                    "props": {
+                        "padding": "60px 40px"
+                    },
+                    "children": [
+                        {
+                            "id": "image-demo-title",
+                            "type": "Text",
+                            "props": {
+                                "text": "Image Component",
+                                "fontSize": "32px",
+                                "marginBottom": "30px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "image-grid",
+                            "type": "Grid",
+                            "props": {
+                                "columns": 2,
+                                "gap": "30px"
+                            },
+                            "children": [
+                                {
+                                    "id": "image-1",
+                                    "type": "Image",
+                                    "props": {
+                                        "src": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&h=600&fit=crop",
+                                        "alt": "Abstract Architecture",
+                                        "aspectRatio": "16/9",
+                                        "objectFit": "cover"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "image-2",
+                                    "type": "Image",
+                                    "props": {
+                                        "src": "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=800&h=600&fit=crop",
+                                        "alt": "Modern Office",
+                                        "aspectRatio": "16/9",
+                                        "objectFit": "cover"
+                                    },
+                                    "children": []
+                                }
+                            ]
+                        },
+                        {
+                            "id": "spacer-1",
+                            "type": "Spacer",
+                            "props": {
+                                "height": "40px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "image-3",
+                            "type": "Image",
+                            "props": {
+                                "src": "https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&h=400&fit=crop",
+                                "alt": "Team Collaboration",
+                                "aspectRatio": "21/9",
+                                "objectFit": "cover"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "divider-9",
+                    "type": "Divider",
+                    "props": {},
+                    "children": []
+                },
+                {
+                    "id": "video-demo",
+                    "type": "Section",
+                    "props": {
+                        "padding": "60px 40px",
+                        "backgroundColor": "#f8f9fa"
+                    },
+                    "children": [
+                        {
+                            "id": "video-demo-title",
+                            "type": "Text",
+                            "props": {
+                                "text": "Video Component",
+                                "fontSize": "32px",
+                                "marginBottom": "30px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "video-1",
+                            "type": "Video",
+                            "props": {
+                                "src": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+                                "aspectRatio": "16/9",
+                                "autoplay": false,
+                                "controls": true
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "spacer-2",
+                            "type": "Spacer",
+                            "props": {
+                                "height": "30px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "video-grid",
+                            "type": "Grid",
+                            "props": {
+                                "columns": 2,
+                                "gap": "30px"
+                            },
+                            "children": [
+                                {
+                                    "id": "video-2",
+                                    "type": "Video",
+                                    "props": {
+                                        "src": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+                                        "aspectRatio": "16/9"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "video-3",
+                                    "type": "Video",
+                                    "props": {
+                                        "src": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+                                        "aspectRatio": "16/9"
+                                    },
+                                    "children": []
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
         },
         {
-          "id": "navbar-demo",
-          "type": "Section",
-          "props": {
-            "padding": "60px 40px",
-            "backgroundColor": "#f8f9fa"
-          },
-          "children": [
-            {
-              "id": "navbar-demo-title",
-              "type": "Text",
-              "props": {
-                "text": "Navbar Component",
-                "fontSize": "32px",
-                "marginBottom": "30px"
-              },
-              "children": []
-            },
-            {
-              "id": "navbar-1",
-              "type": "Navbar",
-              "props": {
-                "logoText": "Brand",
+            "id": "forms",
+            "name": "Forms",
+            "slug": "forms",
+            "components": [
+                {
+                    "id": "nav-forms",
+                    "type": "Navbar",
+                    "props": {
+                        "logoText": "Component Showcase",
+                        "links": [
+                            {
+                                "text": "Home",
+                                "href": "/"
+                            },
+                            {
+                                "text": "Layout",
+                                "href": "/layout"
+                            },
+                            {
+                                "text": "Content",
+                                "href": "/content"
+                            },
+                            {
+                                "text": "Media",
+                                "href": "/media"
+                            },
+                            {
+                                "text": "Forms",
+                                "href": "/forms"
+                            },
+                            {
+                                "text": "Interactive",
+                                "href": "/interactive"
+                            },
+                            {
+                                "text": "Marketing",
+                                "href": "/marketing"
+                            },
+                            {
+                                "text": "UI Elements",
+                                "href": "/ui-elements"
+                            }
+                        ],
+                        "ctaText": "Get Started",
+                        "ctaLink": "/layout"
+                    },
+                    "children": [],
+                    "isGlobal": "GlobalNavbar"
+                },
+                {
+                    "id": "forms-hero",
+                    "type": "Section",
+                    "props": {
+                        "padding": "60px 40px",
+                        "backgroundColor": "#0f3460"
+                    },
+                    "children": [
+                        {
+                            "id": "forms-title",
+                            "type": "Text",
+                            "props": {
+                                "text": "Form Components",
+                                "fontSize": "48px",
+                                "textAlign": "center",
+                                "color": "#ffffff"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "forms-desc",
+                            "type": "Text",
+                            "props": {
+                                "text": "Contact forms and input components",
+                                "fontSize": "18px",
+                                "textAlign": "center",
+                                "color": "#e8e8e8",
+                                "marginTop": "20px"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "form-demo",
+                    "type": "Section",
+                    "props": {
+                        "padding": "60px 40px"
+                    },
+                    "children": [
+                        {
+                            "id": "form-demo-title",
+                            "type": "Text",
+                            "props": {
+                                "text": "Contact Form",
+                                "fontSize": "32px",
+                                "marginBottom": "30px",
+                                "textAlign": "center"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "form-1",
+                            "type": "Form",
+                            "props": {
+                                "title": "Get in Touch",
+                                "description": "Fill out the form below and we'll get back to you soon",
+                                "fields": [
+                                    {
+                                        "id": "name",
+                                        "type": "text",
+                                        "label": "Full Name",
+                                        "placeholder": "John Doe",
+                                        "required": true
+                                    },
+                                    {
+                                        "id": "email",
+                                        "type": "email",
+                                        "label": "Email Address",
+                                        "placeholder": "john@example.com",
+                                        "required": true
+                                    },
+                                    {
+                                        "id": "phone",
+                                        "type": "tel",
+                                        "label": "Phone Number",
+                                        "placeholder": "+1 (555) 123-4567"
+                                    },
+                                    {
+                                        "id": "subject",
+                                        "type": "select",
+                                        "label": "Subject",
+                                        "required": true,
+                                        "options": [
+                                            "General Inquiry",
+                                            "Support",
+                                            "Sales",
+                                            "Partnership"
+                                        ]
+                                    },
+                                    {
+                                        "id": "message",
+                                        "type": "textarea",
+                                        "label": "Message",
+                                        "placeholder": "Tell us more about your inquiry...",
+                                        "required": true
+                                    },
+                                    {
+                                        "id": "newsletter",
+                                        "type": "checkbox",
+                                        "label": "Subscribe to our newsletter"
+                                    }
+                                ],
+                                "submitText": "Send Message"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "divider-10",
+                    "type": "Divider",
+                    "props": {},
+                    "children": []
+                },
+                {
+                    "id": "form-demo-2",
+                    "type": "Section",
+                    "props": {
+                        "padding": "60px 40px",
+                        "backgroundColor": "#f8f9fa"
+                    },
+                    "children": [
+                        {
+                            "id": "form-demo-2-title",
+                            "type": "Text",
+                            "props": {
+                                "text": "Signup Form",
+                                "fontSize": "32px",
+                                "marginBottom": "30px",
+                                "textAlign": "center"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "form-2",
+                            "type": "Form",
+                            "props": {
+                                "title": "Create Account",
+                                "description": "Join thousands of users already using our platform",
+                                "fields": [
+                                    {
+                                        "id": "username",
+                                        "type": "text",
+                                        "label": "Username",
+                                        "placeholder": "Choose a username",
+                                        "required": true
+                                    },
+                                    {
+                                        "id": "email",
+                                        "type": "email",
+                                        "label": "Email",
+                                        "placeholder": "your@email.com",
+                                        "required": true
+                                    },
+                                    {
+                                        "id": "password",
+                                        "type": "text",
+                                        "label": "Password",
+                                        "placeholder": "Create a strong password",
+                                        "required": true
+                                    },
+                                    {
+                                        "id": "terms",
+                                        "type": "checkbox",
+                                        "label": "I agree to the Terms and Conditions",
+                                        "required": true
+                                    }
+                                ],
+                                "submitText": "Sign Up"
+                            },
+                            "children": []
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "interactive",
+            "name": "Interactive",
+            "slug": "interactive",
+            "components": [
+                {
+                    "id": "nav-interactive",
+                    "type": "Navbar",
+                    "props": {
+                        "logoText": "Component Showcase",
+                        "links": [
+                            {
+                                "text": "Home",
+                                "href": "/"
+                            },
+                            {
+                                "text": "Layout",
+                                "href": "/layout"
+                            },
+                            {
+                                "text": "Content",
+                                "href": "/content"
+                            },
+                            {
+                                "text": "Media",
+                                "href": "/media"
+                            },
+                            {
+                                "text": "Forms",
+                                "href": "/forms"
+                            },
+                            {
+                                "text": "Interactive",
+                                "href": "/interactive"
+                            },
+                            {
+                                "text": "Marketing",
+                                "href": "/marketing"
+                            },
+                            {
+                                "text": "UI Elements",
+                                "href": "/ui-elements"
+                            }
+                        ],
+                        "ctaText": "Get Started",
+                        "ctaLink": "/layout"
+                    },
+                    "children": [],
+                    "isGlobal": "GlobalNavbar"
+                },
+                {
+                    "id": "interactive-hero",
+                    "type": "Section",
+                    "props": {
+                        "padding": "60px 40px",
+                        "backgroundColor": "#0f3460"
+                    },
+                    "children": [
+                        {
+                            "id": "interactive-title",
+                            "type": "Text",
+                            "props": {
+                                "text": "Interactive Components",
+                                "fontSize": "48px",
+                                "textAlign": "center",
+                                "color": "#ffffff"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "interactive-desc",
+                            "type": "Text",
+                            "props": {
+                                "text": "Dynamic components for engaging user experiences",
+                                "fontSize": "18px",
+                                "textAlign": "center",
+                                "color": "#e8e8e8",
+                                "marginTop": "20px"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "accordion-demo",
+                    "type": "Section",
+                    "props": {
+                        "padding": "60px 40px"
+                    },
+                    "children": [
+                        {
+                            "id": "accordion-demo-title",
+                            "type": "Text",
+                            "props": {
+                                "text": "Accordion Component",
+                                "fontSize": "32px",
+                                "marginBottom": "30px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "accordion-1",
+                            "type": "Accordion",
+                            "props": {
+                                "items": [
+                                    {
+                                        "title": "What is your return policy?",
+                                        "content": "We offer a 30-day money-back guarantee on all purchases. If you're not satisfied with your purchase, you can return it within 30 days for a full refund."
+                                    },
+                                    {
+                                        "title": "How long does shipping take?",
+                                        "content": "Standard shipping typically takes 5-7 business days. Express shipping options are available at checkout for faster delivery."
+                                    },
+                                    {
+                                        "title": "Do you offer international shipping?",
+                                        "content": "Yes, we ship to over 100 countries worldwide. International shipping times vary by location but typically take 10-14 business days."
+                                    },
+                                    {
+                                        "title": "How can I track my order?",
+                                        "content": "Once your order ships, you'll receive a tracking number via email. You can use this number to track your package on our website or the carrier's website."
+                                    }
+                                ]
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "divider-11",
+                    "type": "Divider",
+                    "props": {},
+                    "children": []
+                },
+                {
+                    "id": "tabs-demo",
+                    "type": "Section",
+                    "props": {
+                        "padding": "60px 40px",
+                        "backgroundColor": "#f8f9fa"
+                    },
+                    "children": [
+                        {
+                            "id": "tabs-demo-title",
+                            "type": "Text",
+                            "props": {
+                                "text": "Tabs Component",
+                                "fontSize": "32px",
+                                "marginBottom": "30px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "tabs-1",
+                            "type": "Tabs",
+                            "props": {
+                                "tabs": [
+                                    {
+                                        "label": "Overview",
+                                        "content": "Get a comprehensive overview of our product features and capabilities. Our platform is designed to help you achieve your goals faster and more efficiently."
+                                    },
+                                    {
+                                        "label": "Features",
+                                        "content": "Explore our powerful features including real-time collaboration, advanced analytics, automated workflows, and seamless integrations with your favorite tools."
+                                    },
+                                    {
+                                        "label": "Pricing",
+                                        "content": "Choose from flexible pricing plans that scale with your needs. We offer monthly and annual billing options with discounts for annual commitments."
+                                    },
+                                    {
+                                        "label": "Support",
+                                        "content": "Our dedicated support team is available 24/7 to help you succeed. Access our knowledge base, video tutorials, and live chat support whenever you need assistance."
+                                    }
+                                ],
+                                "variant": "underline"
+                            },
+                            "children": []
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "marketing",
+            "name": "Marketing",
+            "slug": "marketing",
+            "components": [
+                {
+                    "id": "nav-marketing",
+                    "type": "Navbar",
+                    "props": {
+                        "logoText": "Component Showcase",
+                        "links": [
+                            {
+                                "text": "Home",
+                                "href": "/"
+                            },
+                            {
+                                "text": "Layout",
+                                "href": "/layout"
+                            },
+                            {
+                                "text": "Content",
+                                "href": "/content"
+                            },
+                            {
+                                "text": "Media",
+                                "href": "/media"
+                            },
+                            {
+                                "text": "Forms",
+                                "href": "/forms"
+                            },
+                            {
+                                "text": "Interactive",
+                                "href": "/interactive"
+                            },
+                            {
+                                "text": "Marketing",
+                                "href": "/marketing"
+                            },
+                            {
+                                "text": "UI Elements",
+                                "href": "/ui-elements"
+                            }
+                        ],
+                        "ctaText": "Get Started",
+                        "ctaLink": "/layout"
+                    },
+                    "children": [],
+                    "isGlobal": "GlobalNavbar"
+                },
+                {
+                    "id": "marketing-hero",
+                    "type": "Section",
+                    "props": {
+                        "padding": "60px 40px",
+                        "backgroundColor": "#0f3460"
+                    },
+                    "children": [
+                        {
+                            "id": "marketing-title",
+                            "type": "Text",
+                            "props": {
+                                "text": "Marketing Components",
+                                "fontSize": "48px",
+                                "textAlign": "center",
+                                "color": "#ffffff"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "marketing-desc",
+                            "type": "Text",
+                            "props": {
+                                "text": "Components designed to convert and engage",
+                                "fontSize": "18px",
+                                "textAlign": "center",
+                                "color": "#e8e8e8",
+                                "marginTop": "20px"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "testimonial-demo",
+                    "type": "Section",
+                    "props": {
+                        "padding": "60px 40px"
+                    },
+                    "children": [
+                        {
+                            "id": "testimonial-demo-title",
+                            "type": "Text",
+                            "props": {
+                                "text": "Testimonial Component",
+                                "fontSize": "32px",
+                                "marginBottom": "30px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "testimonial-grid",
+                            "type": "Grid",
+                            "props": {
+                                "columns": 3,
+                                "gap": "30px"
+                            },
+                            "children": [
+                                {
+                                    "id": "testimonial-1",
+                                    "type": "Testimonial",
+                                    "props": {
+                                        "quote": "This product has completely transformed how we work. The efficiency gains are remarkable.",
+                                        "author": "Sarah Johnson",
+                                        "role": "CEO",
+                                        "company": "TechCorp",
+                                        "rating": 5
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "testimonial-2",
+                                    "type": "Testimonial",
+                                    "props": {
+                                        "quote": "Outstanding support and incredible features. Highly recommend to anyone looking to scale.",
+                                        "author": "Michael Chen",
+                                        "role": "CTO",
+                                        "company": "StartupXYZ",
+                                        "rating": 5
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "testimonial-3",
+                                    "type": "Testimonial",
+                                    "props": {
+                                        "quote": "The best investment we've made this year. ROI was visible within the first month.",
+                                        "author": "Emily Rodriguez",
+                                        "role": "Director",
+                                        "company": "Growth Inc",
+                                        "rating": 5
+                                    },
+                                    "children": []
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "divider-12",
+                    "type": "Divider",
+                    "props": {},
+                    "children": []
+                },
+                {
+                    "id": "pricing-demo",
+                    "type": "Section",
+                    "props": {
+                        "padding": "60px 40px",
+                        "backgroundColor": "#f8f9fa"
+                    },
+                    "children": [
+                        {
+                            "id": "pricing-demo-title",
+                            "type": "Text",
+                            "props": {
+                                "text": "Pricing Card Component",
+                                "fontSize": "32px",
+                                "marginBottom": "30px",
+                                "textAlign": "center"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "pricing-grid",
+                            "type": "Grid",
+                            "props": {
+                                "columns": 3,
+                                "gap": "30px"
+                            },
+                            "children": [
+                                {
+                                    "id": "pricing-1",
+                                    "type": "PricingCard",
+                                    "props": {
+                                        "title": "Starter",
+                                        "price": "$29",
+                                        "period": "mo",
+                                        "description": "Perfect for individuals",
+                                        "features": [
+                                            "5 Projects",
+                                            "10GB Storage",
+                                            "Basic Support",
+                                            "Core Features"
+                                        ],
+                                        "buttonText": "GET STARTED",
+                                        "buttonVariant": "secondary"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "pricing-2",
+                                    "type": "PricingCard",
+                                    "props": {
+                                        "title": "Professional",
+                                        "price": "$79",
+                                        "period": "mo",
+                                        "description": "For growing teams",
+                                        "features": [
+                                            "Unlimited Projects",
+                                            "100GB Storage",
+                                            "Priority Support",
+                                            "Advanced Features",
+                                            "Team Collaboration"
+                                        ],
+                                        "buttonText": "GET STARTED",
+                                        "buttonVariant": "primary",
+                                        "featured": true,
+                                        "badge": "POPULAR"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "pricing-3",
+                                    "type": "PricingCard",
+                                    "props": {
+                                        "title": "Enterprise",
+                                        "price": "$199",
+                                        "period": "mo",
+                                        "description": "For large organizations",
+                                        "features": [
+                                            "Unlimited Everything",
+                                            "1TB Storage",
+                                            "24/7 Support",
+                                            "Custom Features",
+                                            "Dedicated Manager",
+                                            "SLA Guarantee"
+                                        ],
+                                        "buttonText": "CONTACT SALES",
+                                        "buttonVariant": "secondary"
+                                    },
+                                    "children": []
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "divider-13",
+                    "type": "Divider",
+                    "props": {},
+                    "children": []
+                },
+                {
+                    "id": "feature-demo",
+                    "type": "Section",
+                    "props": {
+                        "padding": "60px 40px"
+                    },
+                    "children": [
+                        {
+                            "id": "feature-demo-title",
+                            "type": "Text",
+                            "props": {
+                                "text": "Feature Component",
+                                "fontSize": "32px",
+                                "marginBottom": "30px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "feature-grid",
+                            "type": "Grid",
+                            "props": {
+                                "columns": 3,
+                                "gap": "30px"
+                            },
+                            "children": [
+                                {
+                                    "id": "feature-1",
+                                    "type": "Feature",
+                                    "props": {
+                                        "icon": "⚡",
+                                        "title": "Lightning Fast",
+                                        "description": "Optimized performance for instant loading and smooth interactions",
+                                        "layout": "vertical"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "feature-2",
+                                    "type": "Feature",
+                                    "props": {
+                                        "icon": "🔒",
+                                        "title": "Secure",
+                                        "description": "Enterprise-grade security with end-to-end encryption",
+                                        "layout": "vertical"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "feature-3",
+                                    "type": "Feature",
+                                    "props": {
+                                        "icon": "📱",
+                                        "title": "Responsive",
+                                        "description": "Works perfectly on all devices and screen sizes",
+                                        "layout": "vertical"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "feature-4",
+                                    "type": "Feature",
+                                    "props": {
+                                        "icon": "🎨",
+                                        "title": "Customizable",
+                                        "description": "Fully customizable to match your brand identity",
+                                        "layout": "vertical"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "feature-5",
+                                    "type": "Feature",
+                                    "props": {
+                                        "icon": "🚀",
+                                        "title": "Scalable",
+                                        "description": "Grows with your business from startup to enterprise",
+                                        "layout": "vertical"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "feature-6",
+                                    "type": "Feature",
+                                    "props": {
+                                        "icon": "💡",
+                                        "title": "Intuitive",
+                                        "description": "Easy to use with minimal learning curve",
+                                        "layout": "vertical"
+                                    },
+                                    "children": []
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "divider-14",
+                    "type": "Divider",
+                    "props": {},
+                    "children": []
+                },
+                {
+                    "id": "stats-demo",
+                    "type": "Section",
+                    "props": {
+                        "padding": "60px 40px",
+                        "backgroundColor": "#f8f9fa"
+                    },
+                    "children": [
+                        {
+                            "id": "stats-demo-title",
+                            "type": "Text",
+                            "props": {
+                                "text": "Stats Component",
+                                "fontSize": "32px",
+                                "marginBottom": "30px",
+                                "textAlign": "center"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "stats-1",
+                            "type": "Stats",
+                            "props": {
+                                "stats": [
+                                    {
+                                        "value": "10K+",
+                                        "label": "Active Users"
+                                    },
+                                    {
+                                        "value": "500+",
+                                        "label": "Companies"
+                                    },
+                                    {
+                                        "value": "99.9%",
+                                        "label": "Uptime"
+                                    },
+                                    {
+                                        "value": "24/7",
+                                        "label": "Support"
+                                    }
+                                ],
+                                "layout": "horizontal"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "divider-15",
+                    "type": "Divider",
+                    "props": {},
+                    "children": []
+                },
+                {
+                    "id": "cta-demo",
+                    "type": "Section",
+                    "props": {
+                        "padding": "60px 40px"
+                    },
+                    "children": [
+                        {
+                            "id": "cta-demo-title",
+                            "type": "Text",
+                            "props": {
+                                "text": "CTA Component",
+                                "fontSize": "32px",
+                                "marginBottom": "30px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "cta-1",
+                            "type": "CTA",
+                            "props": {
+                                "title": "Ready to Get Started?",
+                                "description": "Join thousands of users already building amazing things with our platform",
+                                "buttonText": "Start Free Trial",
+                                "buttonLink": "#"
+                            },
+                            "children": []
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "ui-elements",
+            "name": "UI Elements",
+            "slug": "ui-elements",
+            "components": [
+                {
+                    "id": "nav-ui",
+                    "type": "Navbar",
+                    "props": {
+                        "logoText": "Component Showcase",
+                        "links": [
+                            {
+                                "text": "Home",
+                                "href": "/"
+                            },
+                            {
+                                "text": "Layout",
+                                "href": "/layout"
+                            },
+                            {
+                                "text": "Content",
+                                "href": "/content"
+                            },
+                            {
+                                "text": "Media",
+                                "href": "/media"
+                            },
+                            {
+                                "text": "Forms",
+                                "href": "/forms"
+                            },
+                            {
+                                "text": "Interactive",
+                                "href": "/interactive"
+                            },
+                            {
+                                "text": "Marketing",
+                                "href": "/marketing"
+                            },
+                            {
+                                "text": "UI Elements",
+                                "href": "/ui-elements"
+                            }
+                        ],
+                        "ctaText": "Get Started",
+                        "ctaLink": "/layout"
+                    },
+                    "children": [],
+                    "isGlobal": "GlobalNavbar"
+                },
+                {
+                    "id": "ui-hero",
+                    "type": "Section",
+                    "props": {
+                        "padding": "60px 40px",
+                        "backgroundColor": "#0f3460"
+                    },
+                    "children": [
+                        {
+                            "id": "ui-title",
+                            "type": "Text",
+                            "props": {
+                                "text": "UI Elements",
+                                "fontSize": "48px",
+                                "textAlign": "center",
+                                "color": "#ffffff"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "ui-desc",
+                            "type": "Text",
+                            "props": {
+                                "text": "Small but essential UI components",
+                                "fontSize": "18px",
+                                "textAlign": "center",
+                                "color": "#e8e8e8",
+                                "marginTop": "20px"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "divider-demo",
+                    "type": "Section",
+                    "props": {
+                        "padding": "60px 40px"
+                    },
+                    "children": [
+                        {
+                            "id": "divider-demo-title",
+                            "type": "Text",
+                            "props": {
+                                "text": "Divider Component",
+                                "fontSize": "32px",
+                                "marginBottom": "30px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "divider-text-1",
+                            "type": "Text",
+                            "props": {
+                                "text": "Content above divider",
+                                "fontSize": "16px",
+                                "marginBottom": "20px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "divider-16",
+                            "type": "Divider",
+                            "props": {
+                                "thickness": "1px",
+                                "color": "#e0e0e0"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "divider-text-2",
+                            "type": "Text",
+                            "props": {
+                                "text": "Content below divider",
+                                "fontSize": "16px",
+                                "marginTop": "20px",
+                                "marginBottom": "30px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "divider-17",
+                            "type": "Divider",
+                            "props": {
+                                "thickness": "2px",
+                                "color": "#3498db",
+                                "text": "OR"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "divider-text-3",
+                            "type": "Text",
+                            "props": {
+                                "text": "Divider with text",
+                                "fontSize": "16px",
+                                "marginTop": "20px"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "divider-18",
+                    "type": "Divider",
+                    "props": {},
+                    "children": []
+                },
+                {
+                    "id": "spacer-demo",
+                    "type": "Section",
+                    "props": {
+                        "padding": "60px 40px",
+                        "backgroundColor": "#f8f9fa"
+                    },
+                    "children": [
+                        {
+                            "id": "spacer-demo-title",
+                            "type": "Text",
+                            "props": {
+                                "text": "Spacer Component",
+                                "fontSize": "32px",
+                                "marginBottom": "30px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "spacer-text-1",
+                            "type": "Text",
+                            "props": {
+                                "text": "Content before spacer",
+                                "fontSize": "16px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "spacer-3",
+                            "type": "Spacer",
+                            "props": {
+                                "height": "40px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "spacer-text-2",
+                            "type": "Text",
+                            "props": {
+                                "text": "Content after 40px spacer",
+                                "fontSize": "16px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "spacer-4",
+                            "type": "Spacer",
+                            "props": {
+                                "height": "80px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "spacer-text-3",
+                            "type": "Text",
+                            "props": {
+                                "text": "Content after 80px spacer",
+                                "fontSize": "16px"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "divider-19",
+                    "type": "Divider",
+                    "props": {},
+                    "children": []
+                },
+                {
+                    "id": "badge-demo",
+                    "type": "Section",
+                    "props": {
+                        "padding": "60px 40px"
+                    },
+                    "children": [
+                        {
+                            "id": "badge-demo-title",
+                            "type": "Text",
+                            "props": {
+                                "text": "Badge Component",
+                                "fontSize": "32px",
+                                "marginBottom": "30px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "badge-container",
+                            "type": "Container",
+                            "props": {
+                                "display": "flex",
+                                "flexDirection": "row",
+                                "gap": "15px",
+                                "flexWrap": "wrap",
+                                "alignItems": "center"
+                            },
+                            "children": [
+                                {
+                                    "id": "badge-primary",
+                                    "type": "Badge",
+                                    "props": {
+                                        "text": "Primary",
+                                        "variant": "primary",
+                                        "size": "medium"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "badge-success",
+                                    "type": "Badge",
+                                    "props": {
+                                        "text": "Success",
+                                        "variant": "success",
+                                        "size": "medium"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "badge-warning",
+                                    "type": "Badge",
+                                    "props": {
+                                        "text": "Warning",
+                                        "variant": "warning",
+                                        "size": "medium"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "badge-error",
+                                    "type": "Badge",
+                                    "props": {
+                                        "text": "Error",
+                                        "variant": "error",
+                                        "size": "medium"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "badge-info",
+                                    "type": "Badge",
+                                    "props": {
+                                        "text": "Info",
+                                        "variant": "info",
+                                        "size": "medium"
+                                    },
+                                    "children": []
+                                }
+                            ]
+                        },
+                        {
+                            "id": "spacer-5",
+                            "type": "Spacer",
+                            "props": {
+                                "height": "30px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "badge-sizes",
+                            "type": "Container",
+                            "props": {
+                                "display": "flex",
+                                "flexDirection": "row",
+                                "gap": "15px",
+                                "flexWrap": "wrap",
+                                "alignItems": "center"
+                            },
+                            "children": [
+                                {
+                                    "id": "badge-small",
+                                    "type": "Badge",
+                                    "props": {
+                                        "text": "Small",
+                                        "variant": "primary",
+                                        "size": "small"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "badge-medium",
+                                    "type": "Badge",
+                                    "props": {
+                                        "text": "Medium",
+                                        "variant": "primary",
+                                        "size": "medium"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "badge-large",
+                                    "type": "Badge",
+                                    "props": {
+                                        "text": "Large",
+                                        "variant": "primary",
+                                        "size": "large"
+                                    },
+                                    "children": []
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "divider-20",
+                    "type": "Divider",
+                    "props": {},
+                    "children": []
+                },
+                {
+                    "id": "alert-demo",
+                    "type": "Section",
+                    "props": {
+                        "padding": "60px 40px",
+                        "backgroundColor": "#f8f9fa"
+                    },
+                    "children": [
+                        {
+                            "id": "alert-demo-title",
+                            "type": "Text",
+                            "props": {
+                                "text": "Alert Component",
+                                "fontSize": "32px",
+                                "marginBottom": "30px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "alert-success",
+                            "type": "Alert",
+                            "props": {
+                                "title": "Success",
+                                "message": "Your changes have been saved successfully!",
+                                "type": "success"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "spacer-6",
+                            "type": "Spacer",
+                            "props": {
+                                "height": "20px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "alert-info",
+                            "type": "Alert",
+                            "props": {
+                                "title": "Information",
+                                "message": "New features are available in the latest update. Check them out!",
+                                "type": "info"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "spacer-7",
+                            "type": "Spacer",
+                            "props": {
+                                "height": "20px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "alert-warning",
+                            "type": "Alert",
+                            "props": {
+                                "title": "Warning",
+                                "message": "Your subscription will expire in 7 days. Please renew to continue using premium features.",
+                                "type": "warning"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "spacer-8",
+                            "type": "Spacer",
+                            "props": {
+                                "height": "20px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "alert-error",
+                            "type": "Alert",
+                            "props": {
+                                "title": "Error",
+                                "message": "Failed to process your request. Please try again or contact support.",
+                                "type": "error"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "ui-footer",
+                    "type": "Footer",
+                    "props": {
+                        "logoText": "Component Showcase",
+                        "description": "A comprehensive design system with all components you need"
+                    },
+                    "children": [],
+                    "isGlobal": "GlobalFooter"
+                }
+            ]
+        }
+    ],
+    "globalComponents": {
+        "GlobalNavbar": {
+            "id": "nav-home",
+            "type": "Navbar",
+            "props": {
+                "logoText": "Component Showcase",
                 "links": [
-                  { "text": "Products", "href": "#" },
-                  { "text": "Solutions", "href": "#" },
-                  { "text": "Resources", "href": "#" },
-                  { "text": "Pricing", "href": "#" }
-                ],
-                "ctaText": "Sign Up",
-                "ctaLink": "#"
-              },
-              "children": []
-            }
-          ]
-        },
-        {
-          "id": "divider-2",
-          "type": "Divider",
-          "props": {},
-          "children": []
-        },
-        {
-          "id": "section-demo",
-          "type": "Section",
-          "props": {
-            "padding": "60px 40px"
-          },
-          "children": [
-            {
-              "id": "section-demo-title",
-              "type": "Text",
-              "props": {
-                "text": "Section Component",
-                "fontSize": "32px",
-                "marginBottom": "30px"
-              },
-              "children": []
-            },
-            {
-              "id": "section-1",
-              "type": "Section",
-              "props": {
-                "padding": "40px",
-                "backgroundColor": "#e8f4f8"
-              },
-              "children": [
-                {
-                  "id": "section-content",
-                  "type": "Text",
-                  "props": {
-                    "text": "This is a Section component with custom background and padding. Sections are perfect for grouping related content.",
-                    "fontSize": "16px"
-                  },
-                  "children": []
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "id": "divider-3",
-          "type": "Divider",
-          "props": {},
-          "children": []
-        },
-        {
-          "id": "container-demo",
-          "type": "Section",
-          "props": {
-            "padding": "60px 40px",
-            "backgroundColor": "#f8f9fa"
-          },
-          "children": [
-            {
-              "id": "container-demo-title",
-              "type": "Text",
-              "props": {
-                "text": "Container Component",
-                "fontSize": "32px",
-                "marginBottom": "30px"
-              },
-              "children": []
-            },
-            {
-              "id": "container-1",
-              "type": "Container",
-              "props": {
-                "maxWidth": "800px",
-                "padding": "30px",
-                "backgroundColor": "#ffffff",
-                "borderRadius": "8px"
-              },
-              "children": [
-                {
-                  "id": "container-text",
-                  "type": "Text",
-                  "props": {
-                    "text": "Container with max-width constraint",
-                    "fontSize": "18px",
-                    "marginBottom": "15px"
-                  },
-                  "children": []
-                },
-                {
-                  "id": "container-desc",
-                  "type": "Text",
-                  "props": {
-                    "text": "Containers help constrain content width and provide consistent spacing. This container has a max-width of 800px.",
-                    "fontSize": "14px",
-                    "color": "#666666"
-                  },
-                  "children": []
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "id": "divider-4",
-          "type": "Divider",
-          "props": {},
-          "children": []
-        },
-        {
-          "id": "grid-demo",
-          "type": "Section",
-          "props": {
-            "padding": "60px 40px"
-          },
-          "children": [
-            {
-              "id": "grid-demo-title",
-              "type": "Text",
-              "props": {
-                "text": "Grid Component",
-                "fontSize": "32px",
-                "marginBottom": "30px"
-              },
-              "children": []
-            },
-            {
-              "id": "grid-1",
-              "type": "Grid",
-              "props": {
-                "columns": 3,
-                "gap": "20px"
-              },
-              "children": [
-                {
-                  "id": "grid-item-1",
-                  "type": "Container",
-                  "props": {
-                    "padding": "30px",
-                    "backgroundColor": "#e3f2fd",
-                    "borderRadius": "8px"
-                  },
-                  "children": [
                     {
-                      "id": "grid-text-1",
-                      "type": "Text",
-                      "props": {
-                        "text": "Grid Item 1",
-                        "fontSize": "18px",
-                        "textAlign": "center"
-                      },
-                      "children": []
-                    }
-                  ]
-                },
-                {
-                  "id": "grid-item-2",
-                  "type": "Container",
-                  "props": {
-                    "padding": "30px",
-                    "backgroundColor": "#f3e5f5",
-                    "borderRadius": "8px"
-                  },
-                  "children": [
+                        "text": "Home",
+                        "href": "/"
+                    },
                     {
-                      "id": "grid-text-2",
-                      "type": "Text",
-                      "props": {
-                        "text": "Grid Item 2",
-                        "fontSize": "18px",
-                        "textAlign": "center"
-                      },
-                      "children": []
-                    }
-                  ]
-                },
-                {
-                  "id": "grid-item-3",
-                  "type": "Container",
-                  "props": {
-                    "padding": "30px",
-                    "backgroundColor": "#fff3e0",
-                    "borderRadius": "8px"
-                  },
-                  "children": [
+                        "text": "Layout",
+                        "href": "/layout"
+                    },
                     {
-                      "id": "grid-text-3",
-                      "type": "Text",
-                      "props": {
-                        "text": "Grid Item 3",
-                        "fontSize": "18px",
-                        "textAlign": "center"
-                      },
-                      "children": []
+                        "text": "Content",
+                        "href": "/content"
+                    },
+                    {
+                        "text": "Media",
+                        "href": "/media"
+                    },
+                    {
+                        "text": "Forms",
+                        "href": "/forms"
+                    },
+                    {
+                        "text": "Interactive",
+                        "href": "/interactive"
+                    },
+                    {
+                        "text": "Marketing",
+                        "href": "/marketing"
+                    },
+                    {
+                        "text": "UI Elements",
+                        "href": "/ui-elements"
                     }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "id": "divider-5",
-          "type": "Divider",
-          "props": {},
-          "children": []
-        },
-        {
-          "id": "footer-demo",
-          "type": "Section",
-          "props": {
-            "padding": "60px 40px",
-            "backgroundColor": "#f8f9fa"
-          },
-          "children": [
-            {
-              "id": "footer-demo-title",
-              "type": "Text",
-              "props": {
-                "text": "Footer Component",
-                "fontSize": "32px",
-                "marginBottom": "30px"
-              },
-              "children": []
-            },
-            {
-              "id": "footer-1",
-              "type": "Footer",
-              "props": {
-                "logoText": "Your Brand",
-                "description": "Building the future of web design",
-                "sections": [
-                  {
-                    "title": "PRODUCT",
-                    "links": [
-                      { "text": "Features", "href": "#" },
-                      { "text": "Pricing", "href": "#" },
-                      { "text": "Security", "href": "#" }
-                    ]
-                  },
-                  {
-                    "title": "COMPANY",
-                    "links": [
-                      { "text": "About", "href": "#" },
-                      { "text": "Blog", "href": "#" },
-                      { "text": "Careers", "href": "#" }
-                    ]
-                  }
-                ]
-              },
-              "children": []
-            }
-          ]
-        }
-      ]
-    }
-,
-    {
-      "id": "content",
-      "name": "Content",
-      "path": "/content",
-      "components": [
-        {
-          "id": "nav-content",
-          "type": "Navbar",
-          "props": {
-            "logoText": "Component Showcase",
-            "links": [
-              { "text": "Home", "href": "/" },
-              { "text": "Layout", "href": "/layout" },
-              { "text": "Content", "href": "/content" },
-              { "text": "Media", "href": "/media" },
-              { "text": "Forms", "href": "/forms" },
-              { "text": "Interactive", "href": "/interactive" },
-              { "text": "Marketing", "href": "/marketing" },
-              { "text": "UI Elements", "href": "/ui-elements" }
-            ]
-          },
-          "children": []
-        },
-        {
-          "id": "content-hero",
-          "type": "Section",
-          "props": {
-            "padding": "60px 40px",
-            "backgroundColor": "#0f3460"
-          },
-          "children": [
-            {
-              "id": "content-title",
-              "type": "Text",
-              "props": {
-                "text": "Content Components",
-                "fontSize": "48px",
-                "textAlign": "center",
-                "color": "#ffffff"
-              },
-              "children": []
-            },
-            {
-              "id": "content-desc",
-              "type": "Text",
-              "props": {
-                "text": "Core content components for building engaging pages",
-                "fontSize": "18px",
-                "textAlign": "center",
-                "color": "#e8e8e8",
-                "marginTop": "20px"
-              },
-              "children": []
-            }
-          ]
-        },
-        {
-          "id": "hero-demo",
-          "type": "Section",
-          "props": {
-            "padding": "60px 40px"
-          },
-          "children": [
-            {
-              "id": "hero-demo-title",
-              "type": "Text",
-              "props": {
-                "text": "Hero Component",
-                "fontSize": "32px",
-                "marginBottom": "30px"
-              },
-              "children": []
-            },
-            {
-              "id": "hero-1",
-              "type": "Hero",
-              "props": {
-                "title": "BUILD SOMETHING AMAZING",
-                "badge": "NEW RELEASE",
-                "description": "Create stunning websites with our powerful component library. Fast, flexible, and fully customizable.",
-                "primaryButtonText": "GET STARTED",
-                "primaryButtonLink": "#",
-                "secondaryButtonText": "LEARN MORE",
-                "secondaryButtonLink": "#",
-                "alignment": "center",
-                "size": "lg"
-              },
-              "children": []
-            }
-          ]
-        },
-        {
-          "id": "divider-6",
-          "type": "Divider",
-          "props": {},
-          "children": []
-        },
-        {
-          "id": "card-demo",
-          "type": "Section",
-          "props": {
-            "padding": "60px 40px",
-            "backgroundColor": "#f8f9fa"
-          },
-          "children": [
-            {
-              "id": "card-demo-title",
-              "type": "Text",
-              "props": {
-                "text": "Card Component",
-                "fontSize": "32px",
-                "marginBottom": "30px"
-              },
-              "children": []
-            },
-            {
-              "id": "cards-grid",
-              "type": "Grid",
-              "props": {
-                "columns": 3,
-                "gap": "30px"
-              },
-              "children": [
-                {
-                  "id": "card-1",
-                  "type": "Card",
-                  "props": {
-                    "title": "Design",
-                    "description": "Beautiful, modern designs that capture attention and drive engagement.",
-                    "image": "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400&h=300&fit=crop",
-                    "linkText": "Learn More",
-                    "linkHref": "#"
-                  },
-                  "children": []
-                },
-                {
-                  "id": "card-2",
-                  "type": "Card",
-                  "props": {
-                    "title": "Development",
-                    "description": "Clean, maintainable code built with modern best practices.",
-                    "image": "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&h=300&fit=crop",
-                    "linkText": "Learn More",
-                    "linkHref": "#"
-                  },
-                  "children": []
-                },
-                {
-                  "id": "card-3",
-                  "type": "Card",
-                  "props": {
-                    "title": "Performance",
-                    "description": "Optimized for speed and efficiency across all devices.",
-                    "image": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=300&fit=crop",
-                    "linkText": "Learn More",
-                    "linkHref": "#"
-                  },
-                  "children": []
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "id": "divider-7",
-          "type": "Divider",
-          "props": {},
-          "children": []
-        },
-        {
-          "id": "text-demo",
-          "type": "Section",
-          "props": {
-            "padding": "60px 40px"
-          },
-          "children": [
-            {
-              "id": "text-demo-title",
-              "type": "Text",
-              "props": {
-                "text": "Text Component",
-                "fontSize": "32px",
-                "marginBottom": "30px"
-              },
-              "children": []
-            },
-            {
-              "id": "text-1",
-              "type": "Text",
-              "props": {
-                "text": "Large Heading",
-                "fontSize": "42px",
-                "fontWeight": "bold",
-                "marginBottom": "20px"
-              },
-              "children": []
-            },
-            {
-              "id": "text-2",
-              "type": "Text",
-              "props": {
-                "text": "Medium Heading",
-                "fontSize": "28px",
-                "fontWeight": "600",
-                "marginBottom": "20px"
-              },
-              "children": []
-            },
-            {
-              "id": "text-3",
-              "type": "Text",
-              "props": {
-                "text": "Body Text - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.",
-                "fontSize": "16px",
-                "lineHeight": "1.6",
-                "marginBottom": "20px"
-              },
-              "children": []
-            },
-            {
-              "id": "text-4",
-              "type": "Text",
-              "props": {
-                "text": "Small Text - Additional details or captions",
-                "fontSize": "14px",
-                "color": "#666666"
-              },
-              "children": []
-            }
-          ]
-        },
-        {
-          "id": "divider-8",
-          "type": "Divider",
-          "props": {},
-          "children": []
-        },
-        {
-          "id": "button-demo",
-          "type": "Section",
-          "props": {
-            "padding": "60px 40px",
-            "backgroundColor": "#f8f9fa"
-          },
-          "children": [
-            {
-              "id": "button-demo-title",
-              "type": "Text",
-              "props": {
-                "text": "Button Component",
-                "fontSize": "32px",
-                "marginBottom": "30px"
-              },
-              "children": []
-            },
-            {
-              "id": "button-container",
-              "type": "Container",
-              "props": {
-                "display": "flex",
-                "flexDirection": "row",
-                "gap": "20px",
-                "flexWrap": "wrap"
-              },
-              "children": [
-                {
-                  "id": "btn-primary",
-                  "type": "Button",
-                  "props": {
-                    "text": "Primary Button",
-                    "variant": "primary",
-                    "size": "medium"
-                  },
-                  "children": []
-                },
-                {
-                  "id": "btn-secondary",
-                  "type": "Button",
-                  "props": {
-                    "text": "Secondary Button",
-                    "variant": "secondary",
-                    "size": "medium"
-                  },
-                  "children": []
-                },
-                {
-                  "id": "btn-large",
-                  "type": "Button",
-                  "props": {
-                    "text": "Large Button",
-                    "variant": "primary",
-                    "size": "large"
-                  },
-                  "children": []
-                },
-                {
-                  "id": "btn-small",
-                  "type": "Button",
-                  "props": {
-                    "text": "Small Button",
-                    "variant": "primary",
-                    "size": "small"
-                  },
-                  "children": []
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    }
-,
-    {
-      "id": "media",
-      "name": "Media",
-      "path": "/media",
-      "components": [
-        {
-          "id": "nav-media",
-          "type": "Navbar",
-          "props": {
-            "logoText": "Component Showcase",
-            "links": [
-              { "text": "Home", "href": "/" },
-              { "text": "Layout", "href": "/layout" },
-              { "text": "Content", "href": "/content" },
-              { "text": "Media", "href": "/media" },
-              { "text": "Forms", "href": "/forms" },
-              { "text": "Interactive", "href": "/interactive" },
-              { "text": "Marketing", "href": "/marketing" },
-              { "text": "UI Elements", "href": "/ui-elements" }
-            ]
-          },
-          "children": []
-        },
-        {
-          "id": "media-hero",
-          "type": "Section",
-          "props": {
-            "padding": "60px 40px",
-            "backgroundColor": "#0f3460"
-          },
-          "children": [
-            {
-              "id": "media-title",
-              "type": "Text",
-              "props": {
-                "text": "Media Components",
-                "fontSize": "48px",
-                "textAlign": "center",
-                "color": "#ffffff"
-              },
-              "children": []
-            },
-            {
-              "id": "media-desc",
-              "type": "Text",
-              "props": {
-                "text": "Images and videos with responsive layouts",
-                "fontSize": "18px",
-                "textAlign": "center",
-                "color": "#e8e8e8",
-                "marginTop": "20px"
-              },
-              "children": []
-            }
-          ]
-        },
-        {
-          "id": "image-demo",
-          "type": "Section",
-          "props": {
-            "padding": "60px 40px"
-          },
-          "children": [
-            {
-              "id": "image-demo-title",
-              "type": "Text",
-              "props": {
-                "text": "Image Component",
-                "fontSize": "32px",
-                "marginBottom": "30px"
-              },
-              "children": []
-            },
-            {
-              "id": "image-grid",
-              "type": "Grid",
-              "props": {
-                "columns": 2,
-                "gap": "30px"
-              },
-              "children": [
-                {
-                  "id": "image-1",
-                  "type": "Image",
-                  "props": {
-                    "src": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&h=600&fit=crop",
-                    "alt": "Abstract Architecture",
-                    "aspectRatio": "16/9",
-                    "objectFit": "cover"
-                  },
-                  "children": []
-                },
-                {
-                  "id": "image-2",
-                  "type": "Image",
-                  "props": {
-                    "src": "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=800&h=600&fit=crop",
-                    "alt": "Modern Office",
-                    "aspectRatio": "16/9",
-                    "objectFit": "cover"
-                  },
-                  "children": []
-                }
-              ]
-            },
-            {
-              "id": "spacer-1",
-              "type": "Spacer",
-              "props": {
-                "height": "40px"
-              },
-              "children": []
-            },
-            {
-              "id": "image-3",
-              "type": "Image",
-              "props": {
-                "src": "https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&h=400&fit=crop",
-                "alt": "Team Collaboration",
-                "aspectRatio": "21/9",
-                "objectFit": "cover"
-              },
-              "children": []
-            }
-          ]
-        },
-        {
-          "id": "divider-9",
-          "type": "Divider",
-          "props": {},
-          "children": []
-        },
-        {
-          "id": "video-demo",
-          "type": "Section",
-          "props": {
-            "padding": "60px 40px",
-            "backgroundColor": "#f8f9fa"
-          },
-          "children": [
-            {
-              "id": "video-demo-title",
-              "type": "Text",
-              "props": {
-                "text": "Video Component",
-                "fontSize": "32px",
-                "marginBottom": "30px"
-              },
-              "children": []
-            },
-            {
-              "id": "video-1",
-              "type": "Video",
-              "props": {
-                "src": "https://www.youtube.com/embed/dQw4w9WgXcQ",
-                "aspectRatio": "16/9",
-                "autoplay": false,
-                "controls": true
-              },
-              "children": []
-            },
-            {
-              "id": "spacer-2",
-              "type": "Spacer",
-              "props": {
-                "height": "30px"
-              },
-              "children": []
-            },
-            {
-              "id": "video-grid",
-              "type": "Grid",
-              "props": {
-                "columns": 2,
-                "gap": "30px"
-              },
-              "children": [
-                {
-                  "id": "video-2",
-                  "type": "Video",
-                  "props": {
-                    "src": "https://www.youtube.com/embed/dQw4w9WgXcQ",
-                    "aspectRatio": "16/9"
-                  },
-                  "children": []
-                },
-                {
-                  "id": "video-3",
-                  "type": "Video",
-                  "props": {
-                    "src": "https://www.youtube.com/embed/dQw4w9WgXcQ",
-                    "aspectRatio": "16/9"
-                  },
-                  "children": []
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "forms",
-      "name": "Forms",
-      "path": "/forms",
-      "components": [
-        {
-          "id": "nav-forms",
-          "type": "Navbar",
-          "props": {
-            "logoText": "Component Showcase",
-            "links": [
-              { "text": "Home", "href": "/" },
-              { "text": "Layout", "href": "/layout" },
-              { "text": "Content", "href": "/content" },
-              { "text": "Media", "href": "/media" },
-              { "text": "Forms", "href": "/forms" },
-              { "text": "Interactive", "href": "/interactive" },
-              { "text": "Marketing", "href": "/marketing" },
-              { "text": "UI Elements", "href": "/ui-elements" }
-            ]
-          },
-          "children": []
-        },
-        {
-          "id": "forms-hero",
-          "type": "Section",
-          "props": {
-            "padding": "60px 40px",
-            "backgroundColor": "#0f3460"
-          },
-          "children": [
-            {
-              "id": "forms-title",
-              "type": "Text",
-              "props": {
-                "text": "Form Components",
-                "fontSize": "48px",
-                "textAlign": "center",
-                "color": "#ffffff"
-              },
-              "children": []
-            },
-            {
-              "id": "forms-desc",
-              "type": "Text",
-              "props": {
-                "text": "Contact forms and input components",
-                "fontSize": "18px",
-                "textAlign": "center",
-                "color": "#e8e8e8",
-                "marginTop": "20px"
-              },
-              "children": []
-            }
-          ]
-        },
-        {
-          "id": "form-demo",
-          "type": "Section",
-          "props": {
-            "padding": "60px 40px"
-          },
-          "children": [
-            {
-              "id": "form-demo-title",
-              "type": "Text",
-              "props": {
-                "text": "Contact Form",
-                "fontSize": "32px",
-                "marginBottom": "30px",
-                "textAlign": "center"
-              },
-              "children": []
-            },
-            {
-              "id": "form-1",
-              "type": "Form",
-              "props": {
-                "title": "Get in Touch",
-                "description": "Fill out the form below and we'll get back to you soon",
-                "fields": [
-                  {
-                    "id": "name",
-                    "type": "text",
-                    "label": "Full Name",
-                    "placeholder": "John Doe",
-                    "required": true
-                  },
-                  {
-                    "id": "email",
-                    "type": "email",
-                    "label": "Email Address",
-                    "placeholder": "john@example.com",
-                    "required": true
-                  },
-                  {
-                    "id": "phone",
-                    "type": "tel",
-                    "label": "Phone Number",
-                    "placeholder": "+1 (555) 123-4567"
-                  },
-                  {
-                    "id": "subject",
-                    "type": "select",
-                    "label": "Subject",
-                    "required": true,
-                    "options": ["General Inquiry", "Support", "Sales", "Partnership"]
-                  },
-                  {
-                    "id": "message",
-                    "type": "textarea",
-                    "label": "Message",
-                    "placeholder": "Tell us more about your inquiry...",
-                    "required": true
-                  },
-                  {
-                    "id": "newsletter",
-                    "type": "checkbox",
-                    "label": "Subscribe to our newsletter"
-                  }
                 ],
-                "submitText": "Send Message"
-              },
-              "children": []
-            }
-          ]
-        },
-        {
-          "id": "divider-10",
-          "type": "Divider",
-          "props": {},
-          "children": []
-        },
-        {
-          "id": "form-demo-2",
-          "type": "Section",
-          "props": {
-            "padding": "60px 40px",
-            "backgroundColor": "#f8f9fa"
-          },
-          "children": [
-            {
-              "id": "form-demo-2-title",
-              "type": "Text",
-              "props": {
-                "text": "Signup Form",
-                "fontSize": "32px",
-                "marginBottom": "30px",
-                "textAlign": "center"
-              },
-              "children": []
+                "ctaText": "Get Started",
+                "ctaLink": "/layout"
             },
-            {
-              "id": "form-2",
-              "type": "Form",
-              "props": {
-                "title": "Create Account",
-                "description": "Join thousands of users already using our platform",
-                "fields": [
-                  {
-                    "id": "username",
-                    "type": "text",
-                    "label": "Username",
-                    "placeholder": "Choose a username",
-                    "required": true
-                  },
-                  {
-                    "id": "email",
-                    "type": "email",
-                    "label": "Email",
-                    "placeholder": "your@email.com",
-                    "required": true
-                  },
-                  {
-                    "id": "password",
-                    "type": "text",
-                    "label": "Password",
-                    "placeholder": "Create a strong password",
-                    "required": true
-                  },
-                  {
-                    "id": "terms",
-                    "type": "checkbox",
-                    "label": "I agree to the Terms and Conditions",
-                    "required": true
-                  }
-                ],
-                "submitText": "Sign Up"
-              },
-              "children": []
-            }
-          ]
+            "children": [],
+            "isGlobal": "GlobalNavbar"
+        },
+        "GlobalFooter": {
+            "id": "home-footer",
+            "type": "Footer",
+            "props": {
+                "logoText": "Component Showcase",
+                "description": "A comprehensive design system with all components you need"
+            },
+            "children": [],
+            "isGlobal": "GlobalFooter"
         }
-      ]
     }
-,
-    {
-      "id": "interactive",
-      "name": "Interactive",
-      "path": "/interactive",
-      "components": [
-        {
-          "id": "nav-interactive",
-          "type": "Navbar",
-          "props": {
-            "logoText": "Component Showcase",
-            "links": [
-              { "text": "Home", "href": "/" },
-              { "text": "Layout", "href": "/layout" },
-              { "text": "Content", "href": "/content" },
-              { "text": "Media", "href": "/media" },
-              { "text": "Forms", "href": "/forms" },
-              { "text": "Interactive", "href": "/interactive" },
-              { "text": "Marketing", "href": "/marketing" },
-              { "text": "UI Elements", "href": "/ui-elements" }
-            ]
-          },
-          "children": []
-        },
-        {
-          "id": "interactive-hero",
-          "type": "Section",
-          "props": {
-            "padding": "60px 40px",
-            "backgroundColor": "#0f3460"
-          },
-          "children": [
-            {
-              "id": "interactive-title",
-              "type": "Text",
-              "props": {
-                "text": "Interactive Components",
-                "fontSize": "48px",
-                "textAlign": "center",
-                "color": "#ffffff"
-              },
-              "children": []
-            },
-            {
-              "id": "interactive-desc",
-              "type": "Text",
-              "props": {
-                "text": "Dynamic components for engaging user experiences",
-                "fontSize": "18px",
-                "textAlign": "center",
-                "color": "#e8e8e8",
-                "marginTop": "20px"
-              },
-              "children": []
-            }
-          ]
-        },
-        {
-          "id": "accordion-demo",
-          "type": "Section",
-          "props": {
-            "padding": "60px 40px"
-          },
-          "children": [
-            {
-              "id": "accordion-demo-title",
-              "type": "Text",
-              "props": {
-                "text": "Accordion Component",
-                "fontSize": "32px",
-                "marginBottom": "30px"
-              },
-              "children": []
-            },
-            {
-              "id": "accordion-1",
-              "type": "Accordion",
-              "props": {
-                "items": [
-                  {
-                    "title": "What is your return policy?",
-                    "content": "We offer a 30-day money-back guarantee on all purchases. If you're not satisfied with your purchase, you can return it within 30 days for a full refund."
-                  },
-                  {
-                    "title": "How long does shipping take?",
-                    "content": "Standard shipping typically takes 5-7 business days. Express shipping options are available at checkout for faster delivery."
-                  },
-                  {
-                    "title": "Do you offer international shipping?",
-                    "content": "Yes, we ship to over 100 countries worldwide. International shipping times vary by location but typically take 10-14 business days."
-                  },
-                  {
-                    "title": "How can I track my order?",
-                    "content": "Once your order ships, you'll receive a tracking number via email. You can use this number to track your package on our website or the carrier's website."
-                  }
-                ]
-              },
-              "children": []
-            }
-          ]
-        },
-        {
-          "id": "divider-11",
-          "type": "Divider",
-          "props": {},
-          "children": []
-        },
-        {
-          "id": "tabs-demo",
-          "type": "Section",
-          "props": {
-            "padding": "60px 40px",
-            "backgroundColor": "#f8f9fa"
-          },
-          "children": [
-            {
-              "id": "tabs-demo-title",
-              "type": "Text",
-              "props": {
-                "text": "Tabs Component",
-                "fontSize": "32px",
-                "marginBottom": "30px"
-              },
-              "children": []
-            },
-            {
-              "id": "tabs-1",
-              "type": "Tabs",
-              "props": {
-                "tabs": [
-                  {
-                    "label": "Overview",
-                    "content": "Get a comprehensive overview of our product features and capabilities. Our platform is designed to help you achieve your goals faster and more efficiently."
-                  },
-                  {
-                    "label": "Features",
-                    "content": "Explore our powerful features including real-time collaboration, advanced analytics, automated workflows, and seamless integrations with your favorite tools."
-                  },
-                  {
-                    "label": "Pricing",
-                    "content": "Choose from flexible pricing plans that scale with your needs. We offer monthly and annual billing options with discounts for annual commitments."
-                  },
-                  {
-                    "label": "Support",
-                    "content": "Our dedicated support team is available 24/7 to help you succeed. Access our knowledge base, video tutorials, and live chat support whenever you need assistance."
-                  }
-                ],
-                "variant": "underline"
-              },
-              "children": []
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "marketing",
-      "name": "Marketing",
-      "path": "/marketing",
-      "components": [
-        {
-          "id": "nav-marketing",
-          "type": "Navbar",
-          "props": {
-            "logoText": "Component Showcase",
-            "links": [
-              { "text": "Home", "href": "/" },
-              { "text": "Layout", "href": "/layout" },
-              { "text": "Content", "href": "/content" },
-              { "text": "Media", "href": "/media" },
-              { "text": "Forms", "href": "/forms" },
-              { "text": "Interactive", "href": "/interactive" },
-              { "text": "Marketing", "href": "/marketing" },
-              { "text": "UI Elements", "href": "/ui-elements" }
-            ]
-          },
-          "children": []
-        },
-        {
-          "id": "marketing-hero",
-          "type": "Section",
-          "props": {
-            "padding": "60px 40px",
-            "backgroundColor": "#0f3460"
-          },
-          "children": [
-            {
-              "id": "marketing-title",
-              "type": "Text",
-              "props": {
-                "text": "Marketing Components",
-                "fontSize": "48px",
-                "textAlign": "center",
-                "color": "#ffffff"
-              },
-              "children": []
-            },
-            {
-              "id": "marketing-desc",
-              "type": "Text",
-              "props": {
-                "text": "Components designed to convert and engage",
-                "fontSize": "18px",
-                "textAlign": "center",
-                "color": "#e8e8e8",
-                "marginTop": "20px"
-              },
-              "children": []
-            }
-          ]
-        },
-        {
-          "id": "testimonial-demo",
-          "type": "Section",
-          "props": {
-            "padding": "60px 40px"
-          },
-          "children": [
-            {
-              "id": "testimonial-demo-title",
-              "type": "Text",
-              "props": {
-                "text": "Testimonial Component",
-                "fontSize": "32px",
-                "marginBottom": "30px"
-              },
-              "children": []
-            },
-            {
-              "id": "testimonial-grid",
-              "type": "Grid",
-              "props": {
-                "columns": 3,
-                "gap": "30px"
-              },
-              "children": [
-                {
-                  "id": "testimonial-1",
-                  "type": "Testimonial",
-                  "props": {
-                    "quote": "This product has completely transformed how we work. The efficiency gains are remarkable.",
-                    "author": "Sarah Johnson",
-                    "role": "CEO",
-                    "company": "TechCorp",
-                    "rating": 5
-                  },
-                  "children": []
-                },
-                {
-                  "id": "testimonial-2",
-                  "type": "Testimonial",
-                  "props": {
-                    "quote": "Outstanding support and incredible features. Highly recommend to anyone looking to scale.",
-                    "author": "Michael Chen",
-                    "role": "CTO",
-                    "company": "StartupXYZ",
-                    "rating": 5
-                  },
-                  "children": []
-                },
-                {
-                  "id": "testimonial-3",
-                  "type": "Testimonial",
-                  "props": {
-                    "quote": "The best investment we've made this year. ROI was visible within the first month.",
-                    "author": "Emily Rodriguez",
-                    "role": "Director",
-                    "company": "Growth Inc",
-                    "rating": 5
-                  },
-                  "children": []
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "id": "divider-12",
-          "type": "Divider",
-          "props": {},
-          "children": []
-        },
-        {
-          "id": "pricing-demo",
-          "type": "Section",
-          "props": {
-            "padding": "60px 40px",
-            "backgroundColor": "#f8f9fa"
-          },
-          "children": [
-            {
-              "id": "pricing-demo-title",
-              "type": "Text",
-              "props": {
-                "text": "Pricing Card Component",
-                "fontSize": "32px",
-                "marginBottom": "30px",
-                "textAlign": "center"
-              },
-              "children": []
-            },
-            {
-              "id": "pricing-grid",
-              "type": "Grid",
-              "props": {
-                "columns": 3,
-                "gap": "30px"
-              },
-              "children": [
-                {
-                  "id": "pricing-1",
-                  "type": "PricingCard",
-                  "props": {
-                    "title": "Starter",
-                    "price": "$29",
-                    "period": "mo",
-                    "description": "Perfect for individuals",
-                    "features": [
-                      "5 Projects",
-                      "10GB Storage",
-                      "Basic Support",
-                      "Core Features"
-                    ],
-                    "buttonText": "GET STARTED",
-                    "buttonVariant": "secondary"
-                  },
-                  "children": []
-                },
-                {
-                  "id": "pricing-2",
-                  "type": "PricingCard",
-                  "props": {
-                    "title": "Professional",
-                    "price": "$79",
-                    "period": "mo",
-                    "description": "For growing teams",
-                    "features": [
-                      "Unlimited Projects",
-                      "100GB Storage",
-                      "Priority Support",
-                      "Advanced Features",
-                      "Team Collaboration"
-                    ],
-                    "buttonText": "GET STARTED",
-                    "buttonVariant": "primary",
-                    "featured": true,
-                    "badge": "POPULAR"
-                  },
-                  "children": []
-                },
-                {
-                  "id": "pricing-3",
-                  "type": "PricingCard",
-                  "props": {
-                    "title": "Enterprise",
-                    "price": "$199",
-                    "period": "mo",
-                    "description": "For large organizations",
-                    "features": [
-                      "Unlimited Everything",
-                      "1TB Storage",
-                      "24/7 Support",
-                      "Custom Features",
-                      "Dedicated Manager",
-                      "SLA Guarantee"
-                    ],
-                    "buttonText": "CONTACT SALES",
-                    "buttonVariant": "secondary"
-                  },
-                  "children": []
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "id": "divider-13",
-          "type": "Divider",
-          "props": {},
-          "children": []
-        },
-        {
-          "id": "feature-demo",
-          "type": "Section",
-          "props": {
-            "padding": "60px 40px"
-          },
-          "children": [
-            {
-              "id": "feature-demo-title",
-              "type": "Text",
-              "props": {
-                "text": "Feature Component",
-                "fontSize": "32px",
-                "marginBottom": "30px"
-              },
-              "children": []
-            },
-            {
-              "id": "feature-grid",
-              "type": "Grid",
-              "props": {
-                "columns": 3,
-                "gap": "30px"
-              },
-              "children": [
-                {
-                  "id": "feature-1",
-                  "type": "Feature",
-                  "props": {
-                    "icon": "⚡",
-                    "title": "Lightning Fast",
-                    "description": "Optimized performance for instant loading and smooth interactions",
-                    "layout": "vertical"
-                  },
-                  "children": []
-                },
-                {
-                  "id": "feature-2",
-                  "type": "Feature",
-                  "props": {
-                    "icon": "🔒",
-                    "title": "Secure",
-                    "description": "Enterprise-grade security with end-to-end encryption",
-                    "layout": "vertical"
-                  },
-                  "children": []
-                },
-                {
-                  "id": "feature-3",
-                  "type": "Feature",
-                  "props": {
-                    "icon": "📱",
-                    "title": "Responsive",
-                    "description": "Works perfectly on all devices and screen sizes",
-                    "layout": "vertical"
-                  },
-                  "children": []
-                },
-                {
-                  "id": "feature-4",
-                  "type": "Feature",
-                  "props": {
-                    "icon": "🎨",
-                    "title": "Customizable",
-                    "description": "Fully customizable to match your brand identity",
-                    "layout": "vertical"
-                  },
-                  "children": []
-                },
-                {
-                  "id": "feature-5",
-                  "type": "Feature",
-                  "props": {
-                    "icon": "🚀",
-                    "title": "Scalable",
-                    "description": "Grows with your business from startup to enterprise",
-                    "layout": "vertical"
-                  },
-                  "children": []
-                },
-                {
-                  "id": "feature-6",
-                  "type": "Feature",
-                  "props": {
-                    "icon": "💡",
-                    "title": "Intuitive",
-                    "description": "Easy to use with minimal learning curve",
-                    "layout": "vertical"
-                  },
-                  "children": []
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "id": "divider-14",
-          "type": "Divider",
-          "props": {},
-          "children": []
-        },
-        {
-          "id": "stats-demo",
-          "type": "Section",
-          "props": {
-            "padding": "60px 40px",
-            "backgroundColor": "#f8f9fa"
-          },
-          "children": [
-            {
-              "id": "stats-demo-title",
-              "type": "Text",
-              "props": {
-                "text": "Stats Component",
-                "fontSize": "32px",
-                "marginBottom": "30px",
-                "textAlign": "center"
-              },
-              "children": []
-            },
-            {
-              "id": "stats-1",
-              "type": "Stats",
-              "props": {
-                "stats": [
-                  {
-                    "value": "10K+",
-                    "label": "Active Users"
-                  },
-                  {
-                    "value": "500+",
-                    "label": "Companies"
-                  },
-                  {
-                    "value": "99.9%",
-                    "label": "Uptime"
-                  },
-                  {
-                    "value": "24/7",
-                    "label": "Support"
-                  }
-                ],
-                "layout": "horizontal"
-              },
-              "children": []
-            }
-          ]
-        },
-        {
-          "id": "divider-15",
-          "type": "Divider",
-          "props": {},
-          "children": []
-        },
-        {
-          "id": "cta-demo",
-          "type": "Section",
-          "props": {
-            "padding": "60px 40px"
-          },
-          "children": [
-            {
-              "id": "cta-demo-title",
-              "type": "Text",
-              "props": {
-                "text": "CTA Component",
-                "fontSize": "32px",
-                "marginBottom": "30px"
-              },
-              "children": []
-            },
-            {
-              "id": "cta-1",
-              "type": "CTA",
-              "props": {
-                "title": "Ready to Get Started?",
-                "description": "Join thousands of users already building amazing things with our platform",
-                "buttonText": "Start Free Trial",
-                "buttonLink": "#"
-              },
-              "children": []
-            }
-          ]
-        }
-      ]
-    }
-,
-    {
-      "id": "ui-elements",
-      "name": "UI Elements",
-      "path": "/ui-elements",
-      "components": [
-        {
-          "id": "nav-ui",
-          "type": "Navbar",
-          "props": {
-            "logoText": "Component Showcase",
-            "links": [
-              { "text": "Home", "href": "/" },
-              { "text": "Layout", "href": "/layout" },
-              { "text": "Content", "href": "/content" },
-              { "text": "Media", "href": "/media" },
-              { "text": "Forms", "href": "/forms" },
-              { "text": "Interactive", "href": "/interactive" },
-              { "text": "Marketing", "href": "/marketing" },
-              { "text": "UI Elements", "href": "/ui-elements" }
-            ]
-          },
-          "children": []
-        },
-        {
-          "id": "ui-hero",
-          "type": "Section",
-          "props": {
-            "padding": "60px 40px",
-            "backgroundColor": "#0f3460"
-          },
-          "children": [
-            {
-              "id": "ui-title",
-              "type": "Text",
-              "props": {
-                "text": "UI Elements",
-                "fontSize": "48px",
-                "textAlign": "center",
-                "color": "#ffffff"
-              },
-              "children": []
-            },
-            {
-              "id": "ui-desc",
-              "type": "Text",
-              "props": {
-                "text": "Small but essential UI components",
-                "fontSize": "18px",
-                "textAlign": "center",
-                "color": "#e8e8e8",
-                "marginTop": "20px"
-              },
-              "children": []
-            }
-          ]
-        },
-        {
-          "id": "divider-demo",
-          "type": "Section",
-          "props": {
-            "padding": "60px 40px"
-          },
-          "children": [
-            {
-              "id": "divider-demo-title",
-              "type": "Text",
-              "props": {
-                "text": "Divider Component",
-                "fontSize": "32px",
-                "marginBottom": "30px"
-              },
-              "children": []
-            },
-            {
-              "id": "divider-text-1",
-              "type": "Text",
-              "props": {
-                "text": "Content above divider",
-                "fontSize": "16px",
-                "marginBottom": "20px"
-              },
-              "children": []
-            },
-            {
-              "id": "divider-16",
-              "type": "Divider",
-              "props": {
-                "thickness": "1px",
-                "color": "#e0e0e0"
-              },
-              "children": []
-            },
-            {
-              "id": "divider-text-2",
-              "type": "Text",
-              "props": {
-                "text": "Content below divider",
-                "fontSize": "16px",
-                "marginTop": "20px",
-                "marginBottom": "30px"
-              },
-              "children": []
-            },
-            {
-              "id": "divider-17",
-              "type": "Divider",
-              "props": {
-                "thickness": "2px",
-                "color": "#3498db",
-                "text": "OR"
-              },
-              "children": []
-            },
-            {
-              "id": "divider-text-3",
-              "type": "Text",
-              "props": {
-                "text": "Divider with text",
-                "fontSize": "16px",
-                "marginTop": "20px"
-              },
-              "children": []
-            }
-          ]
-        },
-        {
-          "id": "divider-18",
-          "type": "Divider",
-          "props": {},
-          "children": []
-        },
-        {
-          "id": "spacer-demo",
-          "type": "Section",
-          "props": {
-            "padding": "60px 40px",
-            "backgroundColor": "#f8f9fa"
-          },
-          "children": [
-            {
-              "id": "spacer-demo-title",
-              "type": "Text",
-              "props": {
-                "text": "Spacer Component",
-                "fontSize": "32px",
-                "marginBottom": "30px"
-              },
-              "children": []
-            },
-            {
-              "id": "spacer-text-1",
-              "type": "Text",
-              "props": {
-                "text": "Content before spacer",
-                "fontSize": "16px"
-              },
-              "children": []
-            },
-            {
-              "id": "spacer-3",
-              "type": "Spacer",
-              "props": {
-                "height": "40px"
-              },
-              "children": []
-            },
-            {
-              "id": "spacer-text-2",
-              "type": "Text",
-              "props": {
-                "text": "Content after 40px spacer",
-                "fontSize": "16px"
-              },
-              "children": []
-            },
-            {
-              "id": "spacer-4",
-              "type": "Spacer",
-              "props": {
-                "height": "80px"
-              },
-              "children": []
-            },
-            {
-              "id": "spacer-text-3",
-              "type": "Text",
-              "props": {
-                "text": "Content after 80px spacer",
-                "fontSize": "16px"
-              },
-              "children": []
-            }
-          ]
-        },
-        {
-          "id": "divider-19",
-          "type": "Divider",
-          "props": {},
-          "children": []
-        },
-        {
-          "id": "badge-demo",
-          "type": "Section",
-          "props": {
-            "padding": "60px 40px"
-          },
-          "children": [
-            {
-              "id": "badge-demo-title",
-              "type": "Text",
-              "props": {
-                "text": "Badge Component",
-                "fontSize": "32px",
-                "marginBottom": "30px"
-              },
-              "children": []
-            },
-            {
-              "id": "badge-container",
-              "type": "Container",
-              "props": {
-                "display": "flex",
-                "flexDirection": "row",
-                "gap": "15px",
-                "flexWrap": "wrap",
-                "alignItems": "center"
-              },
-              "children": [
-                {
-                  "id": "badge-primary",
-                  "type": "Badge",
-                  "props": {
-                    "text": "Primary",
-                    "variant": "primary",
-                    "size": "medium"
-                  },
-                  "children": []
-                },
-                {
-                  "id": "badge-success",
-                  "type": "Badge",
-                  "props": {
-                    "text": "Success",
-                    "variant": "success",
-                    "size": "medium"
-                  },
-                  "children": []
-                },
-                {
-                  "id": "badge-warning",
-                  "type": "Badge",
-                  "props": {
-                    "text": "Warning",
-                    "variant": "warning",
-                    "size": "medium"
-                  },
-                  "children": []
-                },
-                {
-                  "id": "badge-error",
-                  "type": "Badge",
-                  "props": {
-                    "text": "Error",
-                    "variant": "error",
-                    "size": "medium"
-                  },
-                  "children": []
-                },
-                {
-                  "id": "badge-info",
-                  "type": "Badge",
-                  "props": {
-                    "text": "Info",
-                    "variant": "info",
-                    "size": "medium"
-                  },
-                  "children": []
-                }
-              ]
-            },
-            {
-              "id": "spacer-5",
-              "type": "Spacer",
-              "props": {
-                "height": "30px"
-              },
-              "children": []
-            },
-            {
-              "id": "badge-sizes",
-              "type": "Container",
-              "props": {
-                "display": "flex",
-                "flexDirection": "row",
-                "gap": "15px",
-                "flexWrap": "wrap",
-                "alignItems": "center"
-              },
-              "children": [
-                {
-                  "id": "badge-small",
-                  "type": "Badge",
-                  "props": {
-                    "text": "Small",
-                    "variant": "primary",
-                    "size": "small"
-                  },
-                  "children": []
-                },
-                {
-                  "id": "badge-medium",
-                  "type": "Badge",
-                  "props": {
-                    "text": "Medium",
-                    "variant": "primary",
-                    "size": "medium"
-                  },
-                  "children": []
-                },
-                {
-                  "id": "badge-large",
-                  "type": "Badge",
-                  "props": {
-                    "text": "Large",
-                    "variant": "primary",
-                    "size": "large"
-                  },
-                  "children": []
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "id": "divider-20",
-          "type": "Divider",
-          "props": {},
-          "children": []
-        },
-        {
-          "id": "alert-demo",
-          "type": "Section",
-          "props": {
-            "padding": "60px 40px",
-            "backgroundColor": "#f8f9fa"
-          },
-          "children": [
-            {
-              "id": "alert-demo-title",
-              "type": "Text",
-              "props": {
-                "text": "Alert Component",
-                "fontSize": "32px",
-                "marginBottom": "30px"
-              },
-              "children": []
-            },
-            {
-              "id": "alert-success",
-              "type": "Alert",
-              "props": {
-                "title": "Success",
-                "message": "Your changes have been saved successfully!",
-                "type": "success"
-              },
-              "children": []
-            },
-            {
-              "id": "spacer-6",
-              "type": "Spacer",
-              "props": {
-                "height": "20px"
-              },
-              "children": []
-            },
-            {
-              "id": "alert-info",
-              "type": "Alert",
-              "props": {
-                "title": "Information",
-                "message": "New features are available in the latest update. Check them out!",
-                "type": "info"
-              },
-              "children": []
-            },
-            {
-              "id": "spacer-7",
-              "type": "Spacer",
-              "props": {
-                "height": "20px"
-              },
-              "children": []
-            },
-            {
-              "id": "alert-warning",
-              "type": "Alert",
-              "props": {
-                "title": "Warning",
-                "message": "Your subscription will expire in 7 days. Please renew to continue using premium features.",
-                "type": "warning"
-              },
-              "children": []
-            },
-            {
-              "id": "spacer-8",
-              "type": "Spacer",
-              "props": {
-                "height": "20px"
-              },
-              "children": []
-            },
-            {
-              "id": "alert-error",
-              "type": "Alert",
-              "props": {
-                "title": "Error",
-                "message": "Failed to process your request. Please try again or contact support.",
-                "type": "error"
-              },
-              "children": []
-            }
-          ]
-        },
-        {
-          "id": "ui-footer",
-          "type": "Footer",
-          "props": {
-            "logoText": "Component Showcase",
-            "description": "Complete component library for modern web applications"
-          },
-          "children": []
-        }
-      ]
-    }
-  ]
 }
+
+

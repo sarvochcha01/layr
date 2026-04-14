@@ -14,12 +14,24 @@
                     "id": "nav-1",
                     "type": "Navbar",
                     "props": {
-                        "logoText": "AURA \u00B7 STUDIO",
+                        "logoText": "AURA · STUDIO",
                         "links": [
-                            { "text": "New Arrivals", "href": "#" },
-                            { "text": "Collections", "href": "#" },
-                            { "text": "Journal", "href": "#" },
-                            { "text": "About", "href": "#" }
+                            {
+                                "text": "New Arrivals",
+                                "href": "#"
+                            },
+                            {
+                                "text": "Collections",
+                                "href": "#"
+                            },
+                            {
+                                "text": "Journal",
+                                "href": "#"
+                            },
+                            {
+                                "text": "About",
+                                "href": "#"
+                            }
                         ],
                         "ctaText": "Cart (0)",
                         "backgroundColor": "#FDFBF7",
@@ -27,7 +39,8 @@
                         "linkColor": "#78716C",
                         "linkHoverColor": "#292524"
                     },
-                    "children": []
+                    "children": [],
+                    "isGlobal": "GlobalNavbar"
                 },
                 {
                     "id": "hero-section",
@@ -127,7 +140,7 @@
                             "id": "trusted-text",
                             "type": "Text",
                             "props": {
-                                "content": "Free international shipping on orders over $150 \u2014 Carbon neutral delivery",
+                                "content": "Free international shipping on orders over $150 — Carbon neutral delivery",
                                 "tag": "p",
                                 "size": "sm",
                                 "letterSpacing": "0.05em"
@@ -174,7 +187,7 @@
                                     "type": "Card",
                                     "props": {
                                         "title": "Ceramic Vase",
-                                        "description": "$45.00 \u2014 Handcrafted in Portugal",
+                                        "description": "$45.00 — Handcrafted in Portugal",
                                         "buttonText": "Add to Cart",
                                         "backgroundColor": "#FFFFFF",
                                         "textColor": "#292524",
@@ -186,7 +199,11 @@
                                         {
                                             "id": "p1-img",
                                             "type": "Image",
-                                            "props": { "src": "https://images.unsplash.com/photo-1612196808214-b8e1d615c010?w=600", "height": "300px", "objectFit": "cover" },
+                                            "props": {
+                                                "src": "https://images.unsplash.com/photo-1612196808214-b8e1d615c010?w=600",
+                                                "height": "300px",
+                                                "objectFit": "cover"
+                                            },
                                             "children": []
                                         }
                                     ]
@@ -196,7 +213,7 @@
                                     "type": "Card",
                                     "props": {
                                         "title": "Linen Throw",
-                                        "description": "$85.00 \u2014 100% Organic Cotton",
+                                        "description": "$85.00 — 100% Organic Cotton",
                                         "buttonText": "Add to Cart",
                                         "backgroundColor": "#FFFFFF",
                                         "textColor": "#292524",
@@ -208,7 +225,11 @@
                                         {
                                             "id": "p2-img",
                                             "type": "Image",
-                                            "props": { "src": "https://images.unsplash.com/photo-1544207945-8cedb53df426?w=600", "height": "300px", "objectFit": "cover" },
+                                            "props": {
+                                                "src": "https://images.unsplash.com/photo-1544207945-8cedb53df426?w=600",
+                                                "height": "300px",
+                                                "objectFit": "cover"
+                                            },
                                             "children": []
                                         }
                                     ]
@@ -218,7 +239,7 @@
                                     "type": "Card",
                                     "props": {
                                         "title": "Oak Chair",
-                                        "description": "$220.00 \u2014 Minimalist Design",
+                                        "description": "$220.00 — Minimalist Design",
                                         "buttonText": "Add to Cart",
                                         "backgroundColor": "#FFFFFF",
                                         "textColor": "#292524",
@@ -230,7 +251,11 @@
                                         {
                                             "id": "p3-img",
                                             "type": "Image",
-                                            "props": { "src": "https://images.unsplash.com/photo-1506898667547-42e22a46e125?w=600", "height": "300px", "objectFit": "cover" },
+                                            "props": {
+                                                "src": "https://images.unsplash.com/photo-1506898667547-42e22a46e125?w=600",
+                                                "height": "300px",
+                                                "objectFit": "cover"
+                                            },
                                             "children": []
                                         }
                                     ]
@@ -291,35 +316,152 @@
                     "id": "footer-1",
                     "type": "Footer",
                     "props": {
-                        "logoText": "AURA \u00B7 STUDIO",
+                        "logoText": "AURA · STUDIO",
                         "description": "Crafting beautiful objects for mindful living.",
-                        "copyright": "\u00A9 2024 Aura Studio. All rights reserved.",
+                        "copyright": "© 2024 Aura Studio. All rights reserved.",
                         "backgroundColor": "#292524",
                         "textColor": "#A8A29E",
                         "sections": [
                             {
                                 "title": "Shop",
                                 "links": [
-                                    { "text": "All Products", "href": "#" },
-                                    { "text": "New Arrivals", "href": "#" },
-                                    { "text": "Living", "href": "#" },
-                                    { "text": "Dining", "href": "#" }
+                                    {
+                                        "text": "All Products",
+                                        "href": "#"
+                                    },
+                                    {
+                                        "text": "New Arrivals",
+                                        "href": "#"
+                                    },
+                                    {
+                                        "text": "Living",
+                                        "href": "#"
+                                    },
+                                    {
+                                        "text": "Dining",
+                                        "href": "#"
+                                    }
                                 ]
                             },
                             {
                                 "title": "Support",
                                 "links": [
-                                    { "text": "FAQ", "href": "#" },
-                                    { "text": "Shipping & Returns", "href": "#" },
-                                    { "text": "Care Guide", "href": "#" },
-                                    { "text": "Contact Us", "href": "#" }
+                                    {
+                                        "text": "FAQ",
+                                        "href": "#"
+                                    },
+                                    {
+                                        "text": "Shipping & Returns",
+                                        "href": "#"
+                                    },
+                                    {
+                                        "text": "Care Guide",
+                                        "href": "#"
+                                    },
+                                    {
+                                        "text": "Contact Us",
+                                        "href": "#"
+                                    }
                                 ]
                             }
                         ]
                     },
-                    "children": []
+                    "children": [],
+                    "isGlobal": "GlobalFooter"
                 }
             ]
         }
-    ]
+    ],
+    "globalComponents": {
+        "GlobalNavbar": {
+            "id": "nav-1",
+            "type": "Navbar",
+            "props": {
+                "logoText": "AURA · STUDIO",
+                "links": [
+                    {
+                        "text": "New Arrivals",
+                        "href": "#"
+                    },
+                    {
+                        "text": "Collections",
+                        "href": "#"
+                    },
+                    {
+                        "text": "Journal",
+                        "href": "#"
+                    },
+                    {
+                        "text": "About",
+                        "href": "#"
+                    }
+                ],
+                "ctaText": "Cart (0)",
+                "backgroundColor": "#FDFBF7",
+                "textColor": "#292524",
+                "linkColor": "#78716C",
+                "linkHoverColor": "#292524"
+            },
+            "children": [],
+            "isGlobal": "GlobalNavbar"
+        },
+        "GlobalFooter": {
+            "id": "footer-1",
+            "type": "Footer",
+            "props": {
+                "logoText": "AURA · STUDIO",
+                "description": "Crafting beautiful objects for mindful living.",
+                "copyright": "© 2024 Aura Studio. All rights reserved.",
+                "backgroundColor": "#292524",
+                "textColor": "#A8A29E",
+                "sections": [
+                    {
+                        "title": "Shop",
+                        "links": [
+                            {
+                                "text": "All Products",
+                                "href": "#"
+                            },
+                            {
+                                "text": "New Arrivals",
+                                "href": "#"
+                            },
+                            {
+                                "text": "Living",
+                                "href": "#"
+                            },
+                            {
+                                "text": "Dining",
+                                "href": "#"
+                            }
+                        ]
+                    },
+                    {
+                        "title": "Support",
+                        "links": [
+                            {
+                                "text": "FAQ",
+                                "href": "#"
+                            },
+                            {
+                                "text": "Shipping & Returns",
+                                "href": "#"
+                            },
+                            {
+                                "text": "Care Guide",
+                                "href": "#"
+                            },
+                            {
+                                "text": "Contact Us",
+                                "href": "#"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "children": [],
+            "isGlobal": "GlobalFooter"
+        }
+    }
 }
+

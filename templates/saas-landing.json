@@ -16,10 +16,22 @@
                     "props": {
                         "logoText": "Nexus",
                         "links": [
-                            { "text": "Platform", "href": "#" },
-                            { "text": "Solutions", "href": "#" },
-                            { "text": "Pricing", "href": "page:pricing" },
-                            { "text": "Company", "href": "#" }
+                            {
+                                "text": "Platform",
+                                "href": "#"
+                            },
+                            {
+                                "text": "Solutions",
+                                "href": "#"
+                            },
+                            {
+                                "text": "Pricing",
+                                "href": "page:pricing"
+                            },
+                            {
+                                "text": "Company",
+                                "href": "#"
+                            }
                         ],
                         "ctaText": "Get Early Access",
                         "backgroundColor": "#0A0A0A",
@@ -27,7 +39,8 @@
                         "linkColor": "#A3A3A3",
                         "linkHoverColor": "#FFFFFF"
                     },
-                    "children": []
+                    "children": [],
+                    "isGlobal": "GlobalNavbar"
                 },
                 {
                     "id": "hero-section",
@@ -48,7 +61,7 @@
                             "id": "hero-badge",
                             "type": "Badge",
                             "props": {
-                                "text": "v2.0 is now live \u2192",
+                                "text": "v2.0 is now live →",
                                 "variant": "info",
                                 "marginBottom": "2rem"
                             },
@@ -162,31 +175,61 @@
                                 {
                                     "id": "logo-1",
                                     "type": "Text",
-                                    "props": { "content": "Acme Corp", "tag": "p", "size": "xl", "weight": "bold", "color": "#000000" },
+                                    "props": {
+                                        "content": "Acme Corp",
+                                        "tag": "p",
+                                        "size": "xl",
+                                        "weight": "bold",
+                                        "color": "#000000"
+                                    },
                                     "children": []
                                 },
                                 {
                                     "id": "logo-2",
                                     "type": "Text",
-                                    "props": { "content": "GlobalTech", "tag": "p", "size": "xl", "weight": "bold", "color": "#000000" },
+                                    "props": {
+                                        "content": "GlobalTech",
+                                        "tag": "p",
+                                        "size": "xl",
+                                        "weight": "bold",
+                                        "color": "#000000"
+                                    },
                                     "children": []
                                 },
                                 {
                                     "id": "logo-3",
                                     "type": "Text",
-                                    "props": { "content": "Quantum", "tag": "p", "size": "xl", "weight": "bold", "color": "#000000" },
+                                    "props": {
+                                        "content": "Quantum",
+                                        "tag": "p",
+                                        "size": "xl",
+                                        "weight": "bold",
+                                        "color": "#000000"
+                                    },
                                     "children": []
                                 },
                                 {
                                     "id": "logo-4",
                                     "type": "Text",
-                                    "props": { "content": "Starlight", "tag": "p", "size": "xl", "weight": "bold", "color": "#000000" },
+                                    "props": {
+                                        "content": "Starlight",
+                                        "tag": "p",
+                                        "size": "xl",
+                                        "weight": "bold",
+                                        "color": "#000000"
+                                    },
                                     "children": []
                                 },
                                 {
                                     "id": "logo-5",
                                     "type": "Text",
-                                    "props": { "content": "Horizon", "tag": "p", "size": "xl", "weight": "bold", "color": "#000000" },
+                                    "props": {
+                                        "content": "Horizon",
+                                        "tag": "p",
+                                        "size": "xl",
+                                        "weight": "bold",
+                                        "color": "#000000"
+                                    },
                                     "children": []
                                 }
                             ]
@@ -215,19 +258,39 @@
                                 {
                                     "id": "features-pretitle",
                                     "type": "Text",
-                                    "props": { "content": "FEATURES", "tag": "p", "size": "sm", "weight": "bold", "color": "#3B82F6", "letterSpacing": "0.1em", "marginBottom": "0.5rem" },
+                                    "props": {
+                                        "content": "FEATURES",
+                                        "tag": "p",
+                                        "size": "sm",
+                                        "weight": "bold",
+                                        "color": "#3B82F6",
+                                        "letterSpacing": "0.1em",
+                                        "marginBottom": "0.5rem"
+                                    },
                                     "children": []
                                 },
                                 {
                                     "id": "features-title",
                                     "type": "Text",
-                                    "props": { "content": "Everything you need to ship faster.", "tag": "h2", "size": "4xl", "weight": "bold", "color": "#0F172A", "marginBottom": "1rem" },
+                                    "props": {
+                                        "content": "Everything you need to ship faster.",
+                                        "tag": "h2",
+                                        "size": "4xl",
+                                        "weight": "bold",
+                                        "color": "#0F172A",
+                                        "marginBottom": "1rem"
+                                    },
                                     "children": []
                                 },
                                 {
                                     "id": "features-desc",
                                     "type": "Text",
-                                    "props": { "content": "We've built a comprehensive suite of tools designed specifically for high-performing engineering teams.", "tag": "p", "size": "lg", "color": "#475569" },
+                                    "props": {
+                                        "content": "We've built a comprehensive suite of tools designed specifically for high-performing engineering teams.",
+                                        "tag": "p",
+                                        "size": "lg",
+                                        "color": "#475569"
+                                    },
                                     "children": []
                                 }
                             ]
@@ -244,7 +307,7 @@
                                     "id": "feat-1",
                                     "type": "Feature",
                                     "props": {
-                                        "icon": "\u26A1",
+                                        "icon": "⚡",
                                         "title": "Instant Deployments",
                                         "description": "Push your code and see it live globally in under 3 seconds using our edge network.",
                                         "backgroundColor": "#FFFFFF",
@@ -259,7 +322,7 @@
                                     "id": "feat-2",
                                     "type": "Feature",
                                     "props": {
-                                        "icon": "\uD83D\uDD12",
+                                        "icon": "🔒",
                                         "title": "Zero-Trust Security",
                                         "description": "Built-in DDoS protection, automatic SSL, and role-based access control by default.",
                                         "backgroundColor": "#FFFFFF",
@@ -274,7 +337,7 @@
                                     "id": "feat-3",
                                     "type": "Feature",
                                     "props": {
-                                        "icon": "\uD83D\uDCCA",
+                                        "icon": "📊",
                                         "title": "Real-time Analytics",
                                         "description": "Deep insights into your application performance, traffic, and user behavior out of the box.",
                                         "backgroundColor": "#FFFFFF",
@@ -330,31 +393,56 @@
                     "props": {
                         "logoText": "Nexus",
                         "description": "The elite platform for shipping software faster and safer.",
-                        "copyright": "\u00A9 2024 Nexus Inc. All rights reserved.",
+                        "copyright": "© 2024 Nexus Inc. All rights reserved.",
                         "backgroundColor": "#0A0A0A",
                         "textColor": "#A3A3A3",
                         "sections": [
                             {
                                 "title": "Platform",
                                 "links": [
-                                    { "text": "Features", "href": "#" },
-                                    { "text": "Integrations", "href": "#" },
-                                    { "text": "Pricing", "href": "page:pricing" },
-                                    { "text": "Changelog", "href": "#" }
+                                    {
+                                        "text": "Features",
+                                        "href": "#"
+                                    },
+                                    {
+                                        "text": "Integrations",
+                                        "href": "#"
+                                    },
+                                    {
+                                        "text": "Pricing",
+                                        "href": "page:pricing"
+                                    },
+                                    {
+                                        "text": "Changelog",
+                                        "href": "#"
+                                    }
                                 ]
                             },
                             {
                                 "title": "Resources",
                                 "links": [
-                                    { "text": "Documentation", "href": "#" },
-                                    { "text": "API Reference", "href": "#" },
-                                    { "text": "Blog", "href": "#" },
-                                    { "text": "Community", "href": "#" }
+                                    {
+                                        "text": "Documentation",
+                                        "href": "#"
+                                    },
+                                    {
+                                        "text": "API Reference",
+                                        "href": "#"
+                                    },
+                                    {
+                                        "text": "Blog",
+                                        "href": "#"
+                                    },
+                                    {
+                                        "text": "Community",
+                                        "href": "#"
+                                    }
                                 ]
                             }
                         ]
                     },
-                    "children": []
+                    "children": [],
+                    "isGlobal": "GlobalFooter"
                 }
             ]
         },
@@ -369,16 +457,31 @@
                     "props": {
                         "logoText": "Nexus",
                         "links": [
-                            { "text": "Platform", "href": "page:home" },
-                            { "text": "Solutions", "href": "#" },
-                            { "text": "Pricing", "href": "#" },
-                            { "text": "Company", "href": "#" }
+                            {
+                                "text": "Platform",
+                                "href": "#"
+                            },
+                            {
+                                "text": "Solutions",
+                                "href": "#"
+                            },
+                            {
+                                "text": "Pricing",
+                                "href": "page:pricing"
+                            },
+                            {
+                                "text": "Company",
+                                "href": "#"
+                            }
                         ],
                         "ctaText": "Get Early Access",
                         "backgroundColor": "#0A0A0A",
-                        "textColor": "#FFFFFF"
+                        "textColor": "#FFFFFF",
+                        "linkColor": "#A3A3A3",
+                        "linkHoverColor": "#FFFFFF"
                     },
-                    "children": []
+                    "children": [],
+                    "isGlobal": "GlobalNavbar"
                 },
                 {
                     "id": "pricing-header",
@@ -393,13 +496,26 @@
                         {
                             "id": "pt-title",
                             "type": "Text",
-                            "props": { "content": "Simple, transparent pricing.", "tag": "h1", "size": "5xl", "weight": "bold", "color": "#FFFFFF", "marginBottom": "1rem" },
+                            "props": {
+                                "content": "Simple, transparent pricing.",
+                                "tag": "h1",
+                                "size": "5xl",
+                                "weight": "bold",
+                                "color": "#FFFFFF",
+                                "marginBottom": "1rem"
+                            },
                             "children": []
                         },
                         {
                             "id": "pt-desc",
                             "type": "Text",
-                            "props": { "content": "No hidden fees. Cancel anytime.", "tag": "p", "size": "xl", "color": "#A3A3A3", "marginBottom": "3rem" },
+                            "props": {
+                                "content": "No hidden fees. Cancel anytime.",
+                                "tag": "p",
+                                "size": "xl",
+                                "color": "#A3A3A3",
+                                "marginBottom": "3rem"
+                            },
                             "children": []
                         },
                         {
@@ -423,11 +539,26 @@
                                         "period": "forever",
                                         "description": "Perfect for side projects and learning.",
                                         "features": [
-                                            { "text": "1 User", "included": true },
-                                            { "text": "1GB Storage", "included": true },
-                                            { "text": "Community Support", "included": true },
-                                            { "text": "Custom Domains", "included": false },
-                                            { "text": "Analytics", "included": false }
+                                            {
+                                                "text": "1 User",
+                                                "included": true
+                                            },
+                                            {
+                                                "text": "1GB Storage",
+                                                "included": true
+                                            },
+                                            {
+                                                "text": "Community Support",
+                                                "included": true
+                                            },
+                                            {
+                                                "text": "Custom Domains",
+                                                "included": false
+                                            },
+                                            {
+                                                "text": "Analytics",
+                                                "included": false
+                                            }
                                         ],
                                         "buttonText": "Start for Free",
                                         "featured": false,
@@ -445,11 +576,26 @@
                                         "period": "/month",
                                         "description": "For professionals and small teams.",
                                         "features": [
-                                            { "text": "Unlimited Users", "included": true },
-                                            { "text": "100GB Storage", "included": true },
-                                            { "text": "Priority Support", "included": true },
-                                            { "text": "Custom Domains", "included": true },
-                                            { "text": "Advanced Analytics", "included": true }
+                                            {
+                                                "text": "Unlimited Users",
+                                                "included": true
+                                            },
+                                            {
+                                                "text": "100GB Storage",
+                                                "included": true
+                                            },
+                                            {
+                                                "text": "Priority Support",
+                                                "included": true
+                                            },
+                                            {
+                                                "text": "Custom Domains",
+                                                "included": true
+                                            },
+                                            {
+                                                "text": "Advanced Analytics",
+                                                "included": true
+                                            }
                                         ],
                                         "buttonText": "Upgrade to Pro",
                                         "featured": true,
@@ -467,13 +613,151 @@
                     "type": "Footer",
                     "props": {
                         "logoText": "Nexus",
-                        "copyright": "\u00A9 2024 Nexus Inc. All rights reserved.",
+                        "description": "The elite platform for shipping software faster and safer.",
+                        "copyright": "© 2024 Nexus Inc. All rights reserved.",
                         "backgroundColor": "#0A0A0A",
-                        "textColor": "#A3A3A3"
+                        "textColor": "#A3A3A3",
+                        "sections": [
+                            {
+                                "title": "Platform",
+                                "links": [
+                                    {
+                                        "text": "Features",
+                                        "href": "#"
+                                    },
+                                    {
+                                        "text": "Integrations",
+                                        "href": "#"
+                                    },
+                                    {
+                                        "text": "Pricing",
+                                        "href": "page:pricing"
+                                    },
+                                    {
+                                        "text": "Changelog",
+                                        "href": "#"
+                                    }
+                                ]
+                            },
+                            {
+                                "title": "Resources",
+                                "links": [
+                                    {
+                                        "text": "Documentation",
+                                        "href": "#"
+                                    },
+                                    {
+                                        "text": "API Reference",
+                                        "href": "#"
+                                    },
+                                    {
+                                        "text": "Blog",
+                                        "href": "#"
+                                    },
+                                    {
+                                        "text": "Community",
+                                        "href": "#"
+                                    }
+                                ]
+                            }
+                        ]
                     },
-                    "children": []
+                    "children": [],
+                    "isGlobal": "GlobalFooter"
                 }
             ]
         }
-    ]
+    ],
+    "globalComponents": {
+        "GlobalNavbar": {
+            "id": "nav-1",
+            "type": "Navbar",
+            "props": {
+                "logoText": "Nexus",
+                "links": [
+                    {
+                        "text": "Platform",
+                        "href": "#"
+                    },
+                    {
+                        "text": "Solutions",
+                        "href": "#"
+                    },
+                    {
+                        "text": "Pricing",
+                        "href": "page:pricing"
+                    },
+                    {
+                        "text": "Company",
+                        "href": "#"
+                    }
+                ],
+                "ctaText": "Get Early Access",
+                "backgroundColor": "#0A0A0A",
+                "textColor": "#FFFFFF",
+                "linkColor": "#A3A3A3",
+                "linkHoverColor": "#FFFFFF"
+            },
+            "children": [],
+            "isGlobal": "GlobalNavbar"
+        },
+        "GlobalFooter": {
+            "id": "footer-1",
+            "type": "Footer",
+            "props": {
+                "logoText": "Nexus",
+                "description": "The elite platform for shipping software faster and safer.",
+                "copyright": "© 2024 Nexus Inc. All rights reserved.",
+                "backgroundColor": "#0A0A0A",
+                "textColor": "#A3A3A3",
+                "sections": [
+                    {
+                        "title": "Platform",
+                        "links": [
+                            {
+                                "text": "Features",
+                                "href": "#"
+                            },
+                            {
+                                "text": "Integrations",
+                                "href": "#"
+                            },
+                            {
+                                "text": "Pricing",
+                                "href": "page:pricing"
+                            },
+                            {
+                                "text": "Changelog",
+                                "href": "#"
+                            }
+                        ]
+                    },
+                    {
+                        "title": "Resources",
+                        "links": [
+                            {
+                                "text": "Documentation",
+                                "href": "#"
+                            },
+                            {
+                                "text": "API Reference",
+                                "href": "#"
+                            },
+                            {
+                                "text": "Blog",
+                                "href": "#"
+                            },
+                            {
+                                "text": "Community",
+                                "href": "#"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "children": [],
+            "isGlobal": "GlobalFooter"
+        }
+    }
 }
+
