@@ -137,3 +137,46 @@ export function buildComponentStyle(props: Record<string, any>): React.CSSProper
     return style;
 }
 
+/**
+ * Extracts user-set style overrides that should take priority over theme defaults.
+ * Components should spread this LAST in their style object:
+ *   style={{ ...cssVars, border: "theme-default", ...getUserStyleOverrides(rest) }}
+ *
+ * Only returns properties that the user explicitly set (non-empty).
+ */
+export function getUserStyleOverrides(props: Record<string, any>): React.CSSProperties {
+    const style: React.CSSProperties = {};
+
+    // Border overrides — individual properties override theme shorthand
+    if (props.borderRadius_css) style.borderRadius = ensureUnit(props.borderRadius_css);
+
+    // If user sets any border property, build a proper border override
+    const hasBorderWidth = !!props.borderWidth_css;
+    const hasBorderColor = !!props.borderColor;
+    const hasBorderStyle = !!props.borderStyle_css;
+
+    if (hasBorderWidth) style.borderWidth = ensureUnit(props.borderWidth_css);
+    if (hasBorderColor) style.borderColor = props.borderColor;
+    if (hasBorderStyle) style.borderStyle = props.borderStyle_css as any;
+
+    // If user set width+style+color, also override the shorthand `border` property
+    // so it takes precedence over theme's `border: "..." ` shorthand
+    if (hasBorderWidth || hasBorderColor || hasBorderStyle) {
+        const w = ensureUnit(props.borderWidth_css) || "1px";
+        const s = props.borderStyle_css || "solid";
+        const c = props.borderColor || "currentColor";
+        style.border = `${w} ${s} ${c}`;
+    }
+
+    // Effects
+    if (props.boxShadow) style.boxShadow = props.boxShadow;
+
+    // Typography
+    if (props.fontSize_css) style.fontSize = ensureUnit(props.fontSize_css);
+    if (props.fontWeight_css) style.fontWeight = props.fontWeight_css;
+    if (props.lineHeight_css) style.lineHeight = props.lineHeight_css;
+    if (props.letterSpacing_css) style.letterSpacing = ensureUnit(props.letterSpacing_css);
+    if (props.textAlign_css) style.textAlign = props.textAlign_css as any;
+
+    return style;
+}

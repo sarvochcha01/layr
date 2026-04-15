@@ -9,10 +9,30 @@ import { ComponentDefinition } from "@/types/editor";
 import { GOOGLE_FONTS, loadGoogleFont, getFontFamilyValue } from "@/lib/fonts";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
+
+/** Props that, when set explicitly, override the global theme */
+const STYLE_OVERRIDE_KEYS = [
+  "backgroundColor",
+  "textColor",
+  "color",
+  "fontFamily_override",
+  "borderRadius_css",
+  "borderWidth_css",
+  "borderColor",
+  "borderStyle_css",
+  "boxShadow",
+  "fontSize_css",
+  "fontWeight_css",
+  "letterSpacing_css",
+] as const;
+
 interface OverrideEntry {
   id: string;
   type: string;
-  themeStyle: string;
+  /** Set if component has explicit themeStyle */
+  themeStyle?: string;
+  /** Which style props are explicitly overridden */
+  styleOverrides: string[];
   label: string;
 }
 
@@ -105,12 +125,24 @@ function collectOverrides(
 ): OverrideEntry[] {
   const results: OverrideEntry[] = [];
   for (const comp of components) {
-    const ts = comp.props?.themeStyle;
-    if (ts && typeof ts === "string") {
+    const props = comp.props || {};
+    const ts = props.themeStyle;
+    const styleOverrides: string[] = [];
+
+    // Check for explicit style overrides
+    for (const key of STYLE_OVERRIDE_KEYS) {
+      if (props[key] && typeof props[key] === "string" && props[key].trim()) {
+        styleOverrides.push(key);
+      }
+    }
+
+    // Include if has theme override OR style overrides
+    if ((ts && typeof ts === "string") || styleOverrides.length > 0) {
       results.push({
         id: comp.id,
         type: comp.type,
-        themeStyle: ts,
+        themeStyle: ts && typeof ts === "string" ? ts : undefined,
+        styleOverrides,
         label: parentLabel ? `${comp.type} (in ${parentLabel})` : comp.type,
       });
     }
@@ -238,13 +270,18 @@ export function ThemeStylePanel({
 
   const hasOverrides = Object.values(themeOverrides).some(Boolean);
 
-  const resetOne = (id: string) => {
-    onUpdateComponent?.(id, { themeStyle: undefined });
+  const resetOne = (entry: OverrideEntry) => {
+    const updates: Record<string, any> = {};
+    if (entry.themeStyle) updates.themeStyle = undefined;
+    for (const key of entry.styleOverrides) {
+      updates[key] = undefined;
+    }
+    onUpdateComponent?.(entry.id, updates);
   };
 
   const resetAll = () => {
     for (const o of overrides) {
-      onUpdateComponent?.(o.id, { themeStyle: undefined });
+      resetOne(o);
     }
   };
 
@@ -629,7 +666,23 @@ export function ThemeStylePanel({
 
                     <div className="p-2 space-y-1">
                       {overrides.map((entry) => {
-                        const themeDef = THEME_STYLES[entry.themeStyle as ThemeStyleVariant];
+                        const themeDef = entry.themeStyle ? THEME_STYLES[entry.themeStyle as ThemeStyleVariant] : null;
+                        const overrideLabel = entry.themeStyle
+                          ? `Theme: ${themeDef?.name || entry.themeStyle}`
+                          : entry.styleOverrides.map((k) => {
+                              if (k === "backgroundColor") return "bg color";
+                              if (k === "textColor" || k === "color") return "text color";
+                              if (k === "fontFamily_override") return "font";
+                              if (k === "borderRadius_css") return "radius";
+                              if (k === "borderWidth_css") return "border width";
+                              if (k === "borderColor") return "border color";
+                              if (k === "borderStyle_css") return "border style";
+                              if (k === "boxShadow") return "shadow";
+                              if (k === "fontSize_css") return "font size";
+                              if (k === "fontWeight_css") return "font weight";
+                              if (k === "letterSpacing_css") return "spacing";
+                              return k;
+                            }).join(", ");
                         return (
                           <div
                             key={entry.id}
@@ -649,17 +702,19 @@ export function ThemeStylePanel({
                                   </div>
                                 </div>
                               ) : (
-                                <div className="w-8 h-8 rounded-md flex-shrink-0 border border-border bg-muted flex items-center justify-center text-xs text-muted-foreground">?</div>
+                                <div className="w-8 h-8 rounded-md flex-shrink-0 border border-amber-500/30 bg-amber-500/10 flex items-center justify-center">
+                                  <Paintbrush className="w-3.5 h-3.5 text-amber-500" />
+                                </div>
                               )}
                               <div className="min-w-0">
                                 <div className="text-sm font-medium text-foreground truncate">{entry.type}</div>
                                 <div className="text-[11px] text-muted-foreground truncate">
-                                  Using: <span className="text-foreground/70 font-medium">{themeDef?.name || entry.themeStyle}</span>
+                                  {overrideLabel}
                                 </div>
                               </div>
                             </div>
                             <button
-                              onClick={() => resetOne(entry.id)}
+                              onClick={() => resetOne(entry)}
                               className="flex items-center gap-1 px-2 py-1.5 text-xs font-medium rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors opacity-0 group-hover:opacity-100"
                               title="Remove override"
                             >

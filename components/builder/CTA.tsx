@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { ThemeStyleVariant, getThemeCSSVars } from "@/lib/themeStyles";
+import { getUserStyleOverrides } from "@/lib/buildStyle";
 import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
 
 interface CTAProps {
@@ -73,6 +74,7 @@ export function CTA({
     ...(width ? { width } : {}),
     ...(height ? { minHeight: height } : {}),
     transition: "all 300ms ease",
+    ...getUserStyleOverrides(rest),
   };
 
   return (

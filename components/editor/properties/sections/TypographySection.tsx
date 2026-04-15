@@ -196,6 +196,15 @@ function FontPicker({
 }
 
 export function TypographySection({ props, updateProp }: StyleSectionProps) {
+  // Get active theme defaults
+  const { globalThemeStyle, isGlobalThemeEnabled } = useThemeStyle();
+  const activeThemeKey = props.themeStyle || (isGlobalThemeEnabled ? globalThemeStyle : null);
+  const activeTheme = activeThemeKey ? THEME_STYLES[activeThemeKey as keyof typeof THEME_STYLES] : null;
+
+  const themeHeadingWeight = activeTheme?.style.headingWeight || "700";
+  const themeLetterSpacing = activeTheme?.style.letterSpacing || "0";
+  const themeFont = activeTheme?.style.fontFamily || "Inter";
+
   return (
     <AccordionItem value="typography" className="border-b-0 border-t border-border/50">
       <AccordionTrigger className={sectionTriggerClass}>
@@ -218,10 +227,20 @@ export function TypographySection({ props, updateProp }: StyleSectionProps) {
             <Input value={props.fontSize_css || ""} onChange={(e) => updateProp("fontSize_css", e.target.value)} placeholder="16px" className="h-8 text-xs" />
           </div>
           <div className="space-y-1.5">
-            <Label className={labelClass}>Font Weight</Label>
+            <div className="flex items-center justify-between">
+              <Label className={labelClass}>Font Weight</Label>
+              {props.fontWeight_css && activeTheme && (
+                <button
+                  onClick={() => updateProp("fontWeight_css", undefined)}
+                  className="text-[10px] text-primary hover:text-primary/80 font-medium"
+                >
+                  Use theme
+                </button>
+              )}
+            </div>
             <div className="relative border rounded-md">
               <select value={props.fontWeight_css || ""} onChange={(e) => updateProp("fontWeight_css", e.target.value)} className={selectClass}>
-                <option className="bg-background text-foreground" value="">Default</option>
+                <option className="bg-background text-foreground" value="">{activeTheme ? `Theme (${themeHeadingWeight})` : "Default"}</option>
                 <option className="bg-background text-foreground" value="100">Thin (100)</option>
                 <option className="bg-background text-foreground" value="300">Light (300)</option>
                 <option className="bg-background text-foreground" value="400">Normal (400)</option>
@@ -238,8 +257,18 @@ export function TypographySection({ props, updateProp }: StyleSectionProps) {
             <Input value={props.lineHeight_css || ""} onChange={(e) => updateProp("lineHeight_css", e.target.value)} placeholder="1.5" className="h-8 text-xs" />
           </div>
           <div className="space-y-1.5">
-            <Label className={labelClass}>Letter Spacing</Label>
-            <Input value={props.letterSpacing_css || ""} onChange={(e) => updateProp("letterSpacing_css", e.target.value)} placeholder="0px" className="h-8 text-xs" />
+            <div className="flex items-center justify-between">
+              <Label className={labelClass}>Letter Spacing</Label>
+              {props.letterSpacing_css && activeTheme && (
+                <button
+                  onClick={() => updateProp("letterSpacing_css", undefined)}
+                  className="text-[10px] text-primary hover:text-primary/80 font-medium"
+                >
+                  Use theme
+                </button>
+              )}
+            </div>
+            <Input value={props.letterSpacing_css || ""} onChange={(e) => updateProp("letterSpacing_css", e.target.value)} placeholder={themeLetterSpacing} className="h-8 text-xs" />
           </div>
         </div>
         <div className="space-y-1.5">

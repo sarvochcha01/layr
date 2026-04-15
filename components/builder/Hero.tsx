@@ -125,13 +125,13 @@ export function Hero({
 
       {/* Animated grid background — only without bg image */}
       {!backgroundImage && (
-        <div className="absolute inset-0 opacity-15 pointer-events-none">
+        <div className="absolute inset-0 opacity-[0.07] pointer-events-none">
           <div
             className="absolute inset-0"
             style={{
               backgroundImage: `
-                linear-gradient(var(--theme-border) 1px, transparent 1px),
-                linear-gradient(90deg, var(--theme-border) 1px, transparent 1px)
+                linear-gradient(var(--theme-text) 1px, transparent 1px),
+                linear-gradient(90deg, var(--theme-text) 1px, transparent 1px)
               `,
               backgroundSize: "50px 50px",
               animation: "grid-flow 20s linear infinite",

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { ThemeStyleVariant, getThemeCSSVars } from "@/lib/themeStyles";
+import { getUserStyleOverrides } from "@/lib/buildStyle";
 import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
 import {
   Zap, Shield, Star, Heart, Settings, Globe, Lock, Cpu,
@@ -121,6 +122,7 @@ export function Feature({
     backdropFilter: "var(--theme-backdrop)",
     ...(width ? { width } : {}),
     ...(height ? { height } : {}),
+    ...getUserStyleOverrides(rest),
   };
 
   const resolvedIconColor = iconColor || "var(--theme-accent)";

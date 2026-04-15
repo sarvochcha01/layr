@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { buildComponentStyle } from "@/lib/buildStyle";
+import { buildComponentStyle, getUserStyleOverrides } from "@/lib/buildStyle";
 import { ThemeStyleVariant, getThemeCSSVars } from "@/lib/themeStyles";
 import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
 
@@ -98,6 +98,7 @@ export function Button({
             color: textColor || "var(--theme-accent-fg)",
             border: `var(--theme-border-width) solid var(--theme-border)`,
           }),
+    ...getUserStyleOverrides(rest),
   };
 
   const resolveHref = (

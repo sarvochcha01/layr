@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { ThemeStyleVariant, getThemeCSSVars } from "@/lib/themeStyles";
+import { getUserStyleOverrides } from "@/lib/buildStyle";
 import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
 
 interface CardProps {
@@ -85,6 +86,7 @@ export function Card({
         : "none",
     transition: "all 300ms ease",
     backdropFilter: "var(--theme-backdrop)",
+    ...getUserStyleOverrides(rest),
   };
 
   // Build bottom background image style

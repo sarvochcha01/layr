@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Check, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeStyleVariant, getThemeCSSVars } from "@/lib/themeStyles";
+import { getUserStyleOverrides } from "@/lib/buildStyle";
 import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
 
 interface Feature {
@@ -84,6 +85,7 @@ export function PricingCard({
         transition: "transform 300ms cubic-bezier(0.34,1.56,0.64,1), box-shadow 300ms ease",
         ...(width ? { width } : {}),
         ...(height ? { height } : {}),
+        ...getUserStyleOverrides(rest),
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}

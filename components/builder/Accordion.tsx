@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeStyleVariant, getThemeCSSVars } from "@/lib/themeStyles";
+import { getUserStyleOverrides } from "@/lib/buildStyle";
 import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
 
 interface AccordionItem {
@@ -70,6 +71,7 @@ export function Accordion({
     overflow: "hidden",
     ...(width ? { width } : { width: "100%" }),
     ...(height ? { height } : {}),
+    ...getUserStyleOverrides(rest),
   };
 
   return (

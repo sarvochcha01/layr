@@ -2,6 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { ThemeStyleVariant, getThemeCSSVars } from "@/lib/themeStyles";
+import { getUserStyleOverrides } from "@/lib/buildStyle";
 import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
 
 interface FormField {
@@ -58,6 +59,7 @@ export function Form({
     padding: "24px",
     ...(width ? { width } : {}),
     ...(height ? { height } : {}),
+    ...getUserStyleOverrides(rest),
   };
 
   const inputStyle: React.CSSProperties = {

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeStyleVariant, getThemeCSSVars } from "@/lib/themeStyles";
+import { getUserStyleOverrides } from "@/lib/buildStyle";
 import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
 
 interface TestimonialProps {
@@ -57,7 +58,7 @@ export function Testimonial({
     backgroundColor: backgroundColor || (isMinimal ? "transparent" : "var(--theme-surface)"),
     color: textColor || "var(--theme-text)",
     border: isMinimal ? "none" : `var(--theme-border-width) solid ${isFeatured ? "var(--theme-accent)" : "var(--theme-border)"}`,
-    borderRadius: isMinimal ? "0" : isFeatured ? "24px" : "var(--theme-radius)",
+    borderRadius: isMinimal ? "0" : "var(--theme-radius)",
     padding: isMinimal ? "16px" : isFeatured ? "40px" : "32px",
     backdropFilter: "var(--theme-backdrop)",
     boxShadow: hovered
@@ -71,6 +72,7 @@ export function Testimonial({
     transition: "transform 300ms cubic-bezier(0.34,1.56,0.64,1), box-shadow 300ms ease",
     ...(width ? { width } : {}),
     ...(height ? { height } : {}),
+    ...getUserStyleOverrides(rest),
   };
 
   return (

@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import { ThemeStyleVariant, getThemeCSSVars } from "@/lib/themeStyles";
+import { getUserStyleOverrides } from "@/lib/buildStyle";
 import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
 
 interface BadgeProps {
@@ -54,6 +55,7 @@ export function Badge({
     background: backgroundColor || colors.bg,
     color: textColor || colors.text,
     ...sizeStyles[size],
+    ...getUserStyleOverrides(rest),
   };
 
   return (

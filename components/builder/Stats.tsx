@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { ThemeStyleVariant, getThemeCSSVars } from "@/lib/themeStyles";
+import { getUserStyleOverrides } from "@/lib/buildStyle";
 import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
 
 interface Stat {
@@ -149,6 +150,7 @@ export function Stats({
     backdropFilter: "var(--theme-backdrop)",
     ...(width ? { width } : {}),
     ...(height ? { height } : {}),
+    ...getUserStyleOverrides(rest),
   };
 
   const resolvedAccent = accentColor || "var(--theme-text)";

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { ThemeStyleVariant, getThemeCSSVars } from "@/lib/themeStyles";
+import { getUserStyleOverrides } from "@/lib/buildStyle";
 import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
 
 interface Tab {
@@ -63,6 +64,7 @@ export function Tabs({
     borderRadius: "var(--theme-radius)",
     ...(width ? { width } : {}),
     ...(height ? { height } : {}),
+    ...getUserStyleOverrides(rest),
   };
 
   return (

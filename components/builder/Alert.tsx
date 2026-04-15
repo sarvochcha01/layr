@@ -1,6 +1,7 @@
 import { AlertCircle, CheckCircle, Info, XCircle, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeStyleVariant, getThemeCSSVars } from "@/lib/themeStyles";
+import { getUserStyleOverrides } from "@/lib/buildStyle";
 import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
 
 interface AlertProps {
@@ -59,6 +60,7 @@ export function Alert({
     borderLeftWidth: "4px",
     borderLeftColor: accent,
     ...(width ? { width } : {}),
+    ...getUserStyleOverrides(rest),
   };
 
   return (

@@ -377,6 +377,50 @@ export function setGlobalThemeOverrides(overrides: typeof _globalOverrides) {
   _globalOverrides = overrides;
 }
 
+// ─── Color Derivation Helpers ────────────────────────────────────────────────
+
+function _hexToRgb(hex: string): [number, number, number] {
+  const h = hex.replace("#", "");
+  const full = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
+  return [
+    parseInt(full.slice(0, 2), 16),
+    parseInt(full.slice(2, 4), 16),
+    parseInt(full.slice(4, 6), 16),
+  ];
+}
+
+function _isLight(hex: string): boolean {
+  try {
+    const [r, g, b] = _hexToRgb(hex);
+    // Relative luminance formula
+    return (r * 299 + g * 587 + b * 114) / 1000 > 128;
+  } catch {
+    return false;
+  }
+}
+
+function _shiftColor(hex: string, amount: number): string {
+  try {
+    const [r, g, b] = _hexToRgb(hex);
+    const clamp = (v: number) => Math.max(0, Math.min(255, v));
+    const rr = clamp(r + amount).toString(16).padStart(2, "0");
+    const gg = clamp(g + amount).toString(16).padStart(2, "0");
+    const bb = clamp(b + amount).toString(16).padStart(2, "0");
+    return `#${rr}${gg}${bb}`;
+  } catch {
+    return hex;
+  }
+}
+
+function _withAlpha(hex: string, alpha: number): string {
+  try {
+    const [r, g, b] = _hexToRgb(hex);
+    return `rgba(${r},${g},${b},${alpha})`;
+  } catch {
+    return hex;
+  }
+}
+
 /**
  * Returns CSS custom properties to inject onto any component root element.
  * Components use var(--theme-bg), var(--theme-text), etc. for all colors.
@@ -401,6 +445,30 @@ export function getThemeCSSVars(
   const bodyFont = merged.fontFamily || s.fontFamily;
   const headingFont = merged.headingFontFamily || s.headingFontFamily;
 
+  // Derive related colors when any override is active
+  const hasBgOverride = !!merged.bgColor;
+  const hasTextOverride = !!merged.textColor;
+  const hasAccentOverride = !!merged.accentColor;
+
+  // Surface = slightly different from bg (lighter if dark, darker if light)
+  const surface = hasBgOverride ? _shiftColor(bg, _isLight(bg) ? -5 : 8) : c.surface;
+  // Input bg = slightly different from surface
+  const inputBg = hasBgOverride ? _shiftColor(bg, _isLight(bg) ? -3 : 12) : c.inputBg;
+  // Text muted = text with opacity
+  const textMuted = hasTextOverride ? _withAlpha(text, 0.55) : c.textMuted;
+  // Border = accent-tinted if accent override, else from text with low opacity
+  const border = hasBgOverride || hasAccentOverride
+    ? (hasAccentOverride ? _withAlpha(accent, 0.2) : _withAlpha(text, _isLight(bg) ? 0.1 : 0.08))
+    : c.border;
+  // Divider
+  const divider = hasBgOverride || hasAccentOverride
+    ? (hasAccentOverride ? _withAlpha(accent, 0.12) : _withAlpha(text, 0.06))
+    : c.divider;
+  // Accent foreground = contrast text on accent
+  const accentFg = hasAccentOverride ? (_isLight(accent) ? "#000000" : "#ffffff") : c.accentFg;
+  // Accent hover = slightly darker accent
+  const accentHover = hasAccentOverride ? _shiftColor(accent, -15) : c.accentHover;
+
   // Ensure fonts are loaded
   if (typeof window !== "undefined") {
     loadGoogleFonts([bodyFont, headingFont].filter(Boolean));
@@ -408,15 +476,15 @@ export function getThemeCSSVars(
 
   return {
     "--theme-bg": bg,
-    "--theme-surface": c.surface,
-    "--theme-border": c.border,
+    "--theme-surface": surface,
+    "--theme-border": border,
     "--theme-text": text,
-    "--theme-text-muted": c.textMuted,
+    "--theme-text-muted": textMuted,
     "--theme-accent": accent,
-    "--theme-accent-fg": c.accentFg,
-    "--theme-accent-hover": c.accentHover,
-    "--theme-input-bg": c.inputBg,
-    "--theme-divider": c.divider,
+    "--theme-accent-fg": accentFg,
+    "--theme-accent-hover": accentHover,
+    "--theme-input-bg": inputBg,
+    "--theme-divider": divider,
     "--theme-radius": s.radius,
     "--theme-border-width": s.borderWidth,
     "--theme-shadow": s.shadow,
