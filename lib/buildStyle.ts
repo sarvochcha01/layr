@@ -134,12 +134,6 @@ export function buildComponentStyle(props: Record<string, any>): React.CSSProper
         style.overflow = props.overflow_css as any;
     }
 
-    // Debug logging — remove after confirming it works
-    const cssKeys = Object.keys(style);
-    if (cssKeys.length > 0) {
-        console.log("[buildComponentStyle] output:", JSON.stringify(style));
-    }
-
     return style;
 }
 

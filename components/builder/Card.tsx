@@ -34,7 +34,6 @@ export function Card({
   title = "Card Title",
   description = "A short description of this card's content goes here.",
   image = "https://images.unsplash.com/photo-1557683316-973673baf926?w=800&h=400&fit=crop",
-  image = "https://images.unsplash.com/photo-1557683316-973673baf926?w=200&h=100&fit=crop",
   topImage,
   topImageHeight = "208px",
   topImageObjectFit = "cover",
@@ -57,7 +56,13 @@ export function Card({
 }: CardProps) {
   const [hovered, setHovered] = useState(false);
 
-  const baseStyle = buildComponentStyle({ backgroundColor, textColor, width, height, ...rest });
+  const baseStyle = buildComponentStyle({
+    backgroundColor,
+    textColor,
+    width,
+    height,
+    ...rest,
+  });
 
   // Determine which image to show (priority: topImage > image for backward compatibility)
   const showTopImage = topImage || image;
@@ -84,9 +89,12 @@ export function Card({
       )}
       style={{
         ...baseStyle,
-        transition: "transform 300ms cubic-bezier(0.34,1.56,0.64,1), box-shadow 300ms ease, border-color 300ms ease",
+        transition:
+          "transform 300ms cubic-bezier(0.34,1.56,0.64,1), box-shadow 300ms ease, border-color 300ms ease",
         transform: hovered ? "translateY(-4px)" : "translateY(0)",
-        boxShadow: hovered ? "0 16px 40px rgba(0,0,0,0.35)" : "0 0 0 rgba(0,0,0,0)",
+        boxShadow: hovered
+          ? "0 16px 40px rgba(0,0,0,0.35)"
+          : "0 0 0 rgba(0,0,0,0)",
         borderColor: hovered ? "rgba(255,255,255,0.15)" : undefined,
       }}
       onMouseEnter={() => setHovered(true)}
@@ -106,22 +114,17 @@ export function Card({
           <img
             src={showTopImage}
             alt={title || "Card image"}
-            className="w-full h-52 object-cover"
+            className="w-full"
             style={{
+              height: topImageHeight,
+              objectFit: topImageObjectFit,
               transition: "transform 500ms cubic-bezier(0.25,0.46,0.45,0.94)",
               transform: hovered ? "scale(1.04)" : "scale(1)",
-            className="w-full"
-            style={{ 
-              height: topImageHeight,
-              objectFit: topImageObjectFit 
             }}
           />
         </div>
       )}
 
-      {/* Icon */}
-      {icon && !image && (
-        <div className="mb-5 flex-shrink-0">
       {/* Icon — show when there's no top image */}
       {showIcon && (
         <div className="mb-5 flex-shrink-0 relative z-10">
@@ -131,7 +134,9 @@ export function Card({
               backgroundColor: iconBg,
               color: iconColor,
               transition: "transform 300ms cubic-bezier(0.34,1.56,0.64,1)",
-              transform: hovered ? "scale(1.1) rotate(-3deg)" : "scale(1) rotate(0deg)",
+              transform: hovered
+                ? "scale(1.1) rotate(-3deg)"
+                : "scale(1) rotate(0deg)",
             }}
           >
             {icon || "•"}
@@ -166,9 +171,7 @@ export function Card({
             >
               <a href={buttonLink} className="inline-flex items-center gap-1.5">
                 {buttonText}
-                <span
-                  className="text-xs transition-transform duration-200 group-hover/btn:translate-x-1"
-                >
+                <span className="text-xs transition-transform duration-200 group-hover/btn:translate-x-1">
                   →
                 </span>
               </a>

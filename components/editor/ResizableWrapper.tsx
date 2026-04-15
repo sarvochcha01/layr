@@ -13,23 +13,23 @@ interface ResizableWrapperProps {
   className?: string;
 }
 
-type ResizeHandle = 
-  | "top" 
-  | "right" 
-  | "bottom" 
-  | "left" 
-  | "top-left" 
-  | "top-right" 
-  | "bottom-left" 
+type ResizeHandle =
+  | "top"
+  | "right"
+  | "bottom"
+  | "left"
+  | "top-left"
+  | "top-right"
+  | "bottom-left"
   | "bottom-right";
 
 const getCursorForHandle = (handle: ResizeHandle | null): string => {
   if (!handle) return "";
   const cursorMap: Record<ResizeHandle, string> = {
-    "top": "n-resize",
-    "right": "e-resize",
-    "bottom": "s-resize",
-    "left": "w-resize",
+    top: "n-resize",
+    right: "e-resize",
+    bottom: "s-resize",
+    left: "w-resize",
     "top-left": "nw-resize",
     "top-right": "ne-resize",
     "bottom-left": "sw-resize",
@@ -57,7 +57,9 @@ export function ResizableWrapper({
 
   // Keep onResize in a ref so it never causes the effect to re-register
   const onResizeRef = useRef(onResize);
-  useEffect(() => { onResizeRef.current = onResize; }, [onResize]);
+  useEffect(() => {
+    onResizeRef.current = onResize;
+  }, [onResize]);
 
   const handleMouseDown = (e: React.MouseEvent, handle: ResizeHandle) => {
     if (isPreviewMode) return;
@@ -87,11 +89,15 @@ export function ResizableWrapper({
       let newWidth = startSizeRef.current.width;
       let newHeight = startSizeRef.current.height;
 
-      if (activeHandle.includes("right")) newWidth = Math.max(100, newWidth + deltaX);
-      else if (activeHandle.includes("left")) newWidth = Math.max(100, newWidth - deltaX);
+      if (activeHandle.includes("right"))
+        newWidth = Math.max(100, newWidth + deltaX);
+      else if (activeHandle.includes("left"))
+        newWidth = Math.max(100, newWidth - deltaX);
 
-      if (activeHandle.includes("bottom")) newHeight = Math.max(50, newHeight + deltaY);
-      else if (activeHandle.includes("top")) newHeight = Math.max(50, newHeight - deltaY);
+      if (activeHandle.includes("bottom"))
+        newHeight = Math.max(50, newHeight + deltaY);
+      else if (activeHandle.includes("top"))
+        newHeight = Math.max(50, newHeight - deltaY);
 
       const updates: { width?: string; height?: string } = {};
       if (activeHandle.includes("left") || activeHandle.includes("right"))
@@ -149,10 +155,8 @@ export function ResizableWrapper({
         pointerEvents: isResizing ? "none" : "auto",
       }}
     >
-      {/* Inner wrapper clips content without clipping handles */}
-      <div className="w-full h-full overflow-hidden">
-        {children}
-      </div>
+      {/* Inner wrapper allows animations and shadows to extend beyond bounds */}
+      <div className="w-full h-full overflow-visible">{children}</div>
 
       {/* Handles render outside overflow so they're never clipped */}
       {showHandles && (

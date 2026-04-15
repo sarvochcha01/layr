@@ -24,8 +24,8 @@ export function Feature({
   description = "Explain the value of this feature in a way that resonates with your audience.",
   layout = "vertical",
   iconSize = "md",
-  backgroundColor,
-  textColor,
+  backgroundColor = "#1a1a1a",
+  textColor = "#ffffff",
   iconColor = "#3b82f6",
   width,
   height,
@@ -39,7 +39,13 @@ export function Feature({
     lg: "text-3xl w-14 h-14",
   };
 
-  const baseStyle = buildComponentStyle({ backgroundColor, textColor, width, height, ...rest });
+  const baseStyle = buildComponentStyle({
+    backgroundColor,
+    textColor,
+    width,
+    height,
+    ...rest,
+  });
 
   return (
     <div
@@ -49,12 +55,11 @@ export function Feature({
       )}
       style={{
         ...baseStyle,
-        transition: "background-color 250ms ease, transform 300ms cubic-bezier(0.34,1.56,0.64,1), border-color 250ms ease",
-        transform: hovered ? "translateY(-3px)" : "translateY(0)",
-        backgroundColor: hovered
-          ? backgroundColor || "rgba(255,255,255,0.04)"
-          : backgroundColor || "transparent",
-        borderColor: hovered ? `${iconColor}40` : undefined,
+        transition:
+          "transform 300ms cubic-bezier(0.34,1.56,0.64,1), box-shadow 300ms ease, border-color 300ms ease",
+        transform: hovered ? "translateY(-4px)" : "translateY(0)",
+        boxShadow: hovered ? "0 16px 40px rgba(0,0,0,0.35)" : "none",
+        borderColor: hovered ? "rgba(255,255,255,0.12)" : undefined,
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -68,14 +73,22 @@ export function Feature({
         style={{
           background: `linear-gradient(135deg, ${iconColor}15, ${iconColor}25)`,
           color: iconColor,
-          transition: "transform 350ms cubic-bezier(0.34,1.56,0.64,1), background 250ms ease",
-          transform: hovered ? "scale(1.15) rotate(-5deg)" : "scale(1) rotate(0deg)",
+          transition:
+            "transform 350ms cubic-bezier(0.34,1.56,0.64,1), background 250ms ease",
+          transform: hovered
+            ? "scale(1.15) rotate(-5deg)"
+            : "scale(1) rotate(0deg)",
         }}
       >
         {icon}
       </div>
 
-      <div className={cn("min-w-0", layout === "vertical" ? "text-center" : "flex-1")}>
+      <div
+        className={cn(
+          "min-w-0",
+          layout === "vertical" ? "text-center" : "flex-1",
+        )}
+      >
         <h3
           className="text-lg font-semibold mb-2 tracking-tight break-words text-foreground"
           style={{ fontFamily: "'Inter', sans-serif" }}

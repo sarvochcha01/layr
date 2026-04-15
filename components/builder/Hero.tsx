@@ -17,6 +17,7 @@ interface HeroProps {
   alignment?: "left" | "center" | "right";
   size?: "sm" | "md" | "lg" | "xl";
   showScrollIndicator?: boolean;
+  isPreviewMode?: boolean;
   className?: string;
   width?: string;
   height?: string;
@@ -32,12 +33,13 @@ export function Hero({
   primaryButtonLink = "#",
   secondaryButtonText = "VIEW DOCUMENTATION",
   secondaryButtonLink = "#",
-  backgroundImage="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=700&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mzh8fHdlYnNpdGUlMjBiYWNrZ3JvdW5kfGVufDB8fDB8fHww",
+  backgroundImage = "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=700&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mzh8fHdlYnNpdGUlMjBiYWNrZ3JvdW5kfGVufDB8fDB8fHww",
   backgroundColor = "#0d0d0d",
   textColor = "#ffffff",
   alignment = "center",
   size = "xl",
   showScrollIndicator = true,
+  isPreviewMode = false,
   className,
   width,
   height,
@@ -56,7 +58,13 @@ export function Hero({
     right: "text-right",
   };
 
-  const baseStyle = buildComponentStyle({ backgroundColor, textColor, width, height, ...rest });
+  const baseStyle = buildComponentStyle({
+    backgroundColor,
+    textColor,
+    width,
+    height,
+    ...rest,
+  });
 
   if (backgroundImage) {
     baseStyle.backgroundImage = `url(${backgroundImage})`;
@@ -100,7 +108,8 @@ export function Hero({
           <div
             className="absolute top-[-10%] left-[-5%] w-[600px] h-[600px] rounded-full blur-3xl"
             style={{
-              background: "radial-gradient(circle, #6366f1 0%, transparent 70%)",
+              background:
+                "radial-gradient(circle, #6366f1 0%, transparent 70%)",
               animation: "orb-breathe 8s ease-in-out infinite",
               opacity: 0.3,
             }}
@@ -108,7 +117,8 @@ export function Hero({
           <div
             className="absolute bottom-[-10%] right-[-5%] w-[500px] h-[500px] rounded-full blur-3xl"
             style={{
-              background: "radial-gradient(circle, #8b5cf6 0%, transparent 70%)",
+              background:
+                "radial-gradient(circle, #8b5cf6 0%, transparent 70%)",
               animation: "orb-breathe 10s ease-in-out infinite 2s",
               opacity: 0.2,
             }}
@@ -144,7 +154,11 @@ export function Hero({
           <div
             className={cn(
               "mb-8 hero-badge",
-              alignment === "center" ? "flex justify-center" : alignment === "right" ? "flex justify-end" : "",
+              alignment === "center"
+                ? "flex justify-center"
+                : alignment === "right"
+                  ? "flex justify-end"
+                  : "",
             )}
           >
             <span
@@ -168,7 +182,8 @@ export function Hero({
               <span
                 className="inline-block"
                 style={{
-                  background: "linear-gradient(135deg, #a5b4fc 0%, #c4b5fd 100%)",
+                  background:
+                    "linear-gradient(135deg, #a5b4fc 0%, #c4b5fd 100%)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                   backgroundClip: "text",
@@ -186,7 +201,11 @@ export function Hero({
         {/* Description */}
         <p
           className="text-base sm:text-lg mb-12 leading-relaxed max-w-2xl text-muted-foreground hero-desc"
-          style={alignment === "center" ? { marginLeft: "auto", marginRight: "auto" } : {}}
+          style={
+            alignment === "center"
+              ? { marginLeft: "auto", marginRight: "auto" }
+              : {}
+          }
         >
           {description}
         </p>
@@ -195,56 +214,28 @@ export function Hero({
         <div
           className={cn(
             "flex flex-col sm:flex-row gap-4 hero-ctas",
-            alignment === "center" ? "justify-center items-center" : alignment === "right" ? "justify-end items-center" : "items-start",
+            alignment === "center"
+              ? "justify-center items-center"
+              : alignment === "right"
+                ? "justify-end items-center"
+                : "items-start",
           )}
         >
-          <Button
-            size="lg"
-            className="w-full sm:w-auto px-8 py-3 text-sm font-bold tracking-wider rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground border-0 transition-all duration-300 hover:scale-[1.03] active:scale-[0.98]"
-            asChild
-          >
-            <a href={primaryButtonLink}>
-              {primaryButtonText}
-              <span className="ml-2 transition-transform duration-200 group-hover:translate-x-1">→</span>
-            </a>
-          </Button>
-
-          {secondaryButtonText && (
-            <Button
-              variant="outline"
-              size="lg"
-              className="w-full sm:w-auto px-8 py-3 text-sm font-bold tracking-wider rounded-xl border-border bg-card hover:bg-muted text-foreground transition-all duration-300 hover:scale-[1.03] active:scale-[0.98]"
-              asChild
-            >
-              <a href={secondaryButtonLink}>{secondaryButtonText}</a>
-            </Button>
-          )}
-        </div>
-
-        {/* Tech Stack Badges */}
-        <div
-          className={cn(
-            "flex flex-wrap gap-6 mt-16 text-xs text-muted-foreground font-semibold uppercase tracking-wider hero-tech",
-            alignment === "center" ? "justify-center" : alignment === "right" ? "justify-end" : "",
-          )}
-        >
-          {["VUE.JS", "REACT", "SUPABASE", "VERCEL"].map((tech) => (
-            <div key={tech} className="flex items-center gap-2 hover:text-foreground transition-colors duration-200 cursor-default">
-              <span className="w-1 h-1 rounded-full bg-primary" />
-              <span>{tech}</span>
-            </div>
-          ))}
-        </div>
           {primaryButtonText && (
             <div style={isPreviewMode ? undefined : { pointerEvents: "none" }}>
               <Button
                 size="lg"
-                className="w-full sm:w-auto px-8 py-3 text-sm font-bold tracking-wider rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground border-0 transition-all duration-300"
+                className="w-full sm:w-auto px-8 py-3 text-sm font-bold tracking-wider rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground border-0 transition-all duration-300 hover:scale-[1.03] active:scale-[0.98]"
                 asChild
               >
-                <a href={isPreviewMode ? primaryButtonLink : "#"} onClick={(e) => handleLinkClick(e, primaryButtonLink)}>
+                <a
+                  href={isPreviewMode ? primaryButtonLink : "#"}
+                  onClick={(e) => handleLinkClick(e, primaryButtonLink)}
+                >
                   {primaryButtonText}
-                  <span className="ml-2">→</span>
+                  <span className="ml-2 transition-transform duration-200 group-hover:translate-x-1">
+                    →
+                  </span>
                 </a>
               </Button>
             </div>
@@ -255,15 +246,40 @@ export function Hero({
               <Button
                 variant="outline"
                 size="lg"
-                className="w-full sm:w-auto px-8 py-3 text-sm font-bold tracking-wider rounded-xl border-border bg-card hover:bg-muted text-foreground transition-all duration-300"
+                className="w-full sm:w-auto px-8 py-3 text-sm font-bold tracking-wider rounded-xl border-border bg-card hover:bg-muted text-foreground transition-all duration-300 hover:scale-[1.03] active:scale-[0.98]"
                 asChild
               >
-                <a href={isPreviewMode ? secondaryButtonLink : "#"} onClick={(e) => handleLinkClick(e, secondaryButtonLink)}>
+                <a
+                  href={isPreviewMode ? secondaryButtonLink : "#"}
+                  onClick={(e) => handleLinkClick(e, secondaryButtonLink)}
+                >
                   {secondaryButtonText}
                 </a>
               </Button>
             </div>
           )}
+        </div>
+
+        {/* Tech Stack Badges */}
+        <div
+          className={cn(
+            "flex flex-wrap gap-6 mt-16 text-xs text-muted-foreground font-semibold uppercase tracking-wider hero-tech",
+            alignment === "center"
+              ? "justify-center"
+              : alignment === "right"
+                ? "justify-end"
+                : "",
+          )}
+        >
+          {["VUE.JS", "REACT", "SUPABASE", "VERCEL"].map((tech) => (
+            <div
+              key={tech}
+              className="flex items-center gap-2 hover:text-foreground transition-colors duration-200 cursor-default"
+            >
+              <span className="w-1 h-1 rounded-full bg-primary" />
+              <span>{tech}</span>
+            </div>
+          ))}
         </div>
       </div>
 
