@@ -1193,7 +1193,7 @@ function getDefaultProps(componentType: string): Record<string, any> {
       title: "Getting Started",
       description:
         "Everything you need to know to get up and running quickly. Our platform makes it easy to build beautiful websites.",
-      image: "https://placehold.co/600x300/e0e7ff/4f46e5?text=Card+Image",
+      image: "https://images.unsplash.com/photo-1557683316-973673baf926?w=800&h=400&fit=crop",
       buttonText: "Learn More",
       buttonLink: "#",
       variant: "elevated",
