@@ -172,7 +172,7 @@ export function Form({
       {description && <p className="mb-6 text-muted-foreground">{description}</p>}
 
       <form action={action} method={method} className="space-y-4">
-        {fields.map(renderField)}
+        {fields.map((field) => renderField(field))}
 
         <Button
           type="submit"
