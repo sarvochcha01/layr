@@ -26,7 +26,7 @@ export function Testimonial({
   role = "CTO",
   company = "NEXUS DIGITAL",
   avatar,
-  rating = 5,
+  rating,
   variant = "card",
   backgroundColor = "#1a1a1a",
   textColor = "#ffffff",
@@ -36,7 +36,27 @@ export function Testimonial({
 }: TestimonialProps) {
   const [hovered, setHovered] = useState(false);
 
-  const baseStyle = buildComponentStyle({ backgroundColor, textColor, width, height, ...rest });
+  const baseStyle = buildComponentStyle({
+    backgroundColor,
+    textColor,
+    width,
+    height,
+    ...rest,
+  });
+
+  // Ensure rating is a number, default to 5 if not provided
+  const numericRating =
+    rating === undefined || rating === null
+      ? 5
+      : typeof rating === "string"
+        ? parseFloat(rating) || 0
+        : rating;
+
+  console.log("Testimonial rating:", {
+    rating,
+    numericRating,
+    type: typeof rating,
+  });
 
   return (
     <div
@@ -45,7 +65,8 @@ export function Testimonial({
       )}
       style={{
         ...baseStyle,
-        transition: "transform 300ms cubic-bezier(0.34,1.56,0.64,1), box-shadow 300ms ease, border-color 300ms ease",
+        transition:
+          "transform 300ms cubic-bezier(0.34,1.56,0.64,1), box-shadow 300ms ease, border-color 300ms ease",
         transform: hovered ? "translateY(-4px)" : "translateY(0)",
         boxShadow: hovered ? "0 16px 40px rgba(0,0,0,0.35)" : "none",
         borderColor: hovered ? "rgba(255,255,255,0.12)" : undefined,
@@ -54,20 +75,25 @@ export function Testimonial({
       onMouseLeave={() => setHovered(false)}
     >
       {/* Rating Stars */}
-      {rating > 0 && (
+      {numericRating > 0 && (
         <div className="flex gap-1 mb-6">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <Star
-              key={i}
-              className={cn("w-5 h-5")}
-              style={{
-                fill: i < rating ? "hsl(var(--primary))" : "transparent",
-                color: i < rating ? "hsl(var(--primary))" : "hsl(var(--muted))",
-                transition: `transform 300ms cubic-bezier(0.34,1.56,0.64,1) ${i * 40}ms`,
-                transform: hovered ? "scale(1.2)" : "scale(1)",
-              }}
-            />
-          ))}
+          {Array.from({ length: 5 }).map((_, i) => {
+            const isFilled = i < numericRating;
+            return (
+              <Star
+                key={i}
+                className={cn("w-5 h-5")}
+                fill={isFilled ? "currentColor" : "none"}
+                style={{
+                  color: isFilled
+                    ? "hsl(var(--primary))"
+                    : "hsl(var(--muted-foreground))",
+                  transition: `transform 300ms cubic-bezier(0.34,1.56,0.64,1) ${i * 40}ms`,
+                  transform: hovered ? "scale(1.2)" : "scale(1)",
+                }}
+              />
+            );
+          })}
         </div>
       )}
 
@@ -99,7 +125,8 @@ export function Testimonial({
           <div
             className="w-12 h-12 rounded-full flex items-center justify-center text-sm font-semibold bg-muted"
             style={{
-              transition: "transform 300ms cubic-bezier(0.34,1.56,0.64,1), background-color 200ms ease",
+              transition:
+                "transform 300ms cubic-bezier(0.34,1.56,0.64,1), background-color 200ms ease",
               transform: hovered ? "scale(1.08)" : "scale(1)",
               backgroundColor: hovered ? "rgba(99,102,241,0.3)" : undefined,
             }}
@@ -108,9 +135,12 @@ export function Testimonial({
           </div>
         )}
         <div className="min-w-0">
-          <div className="text-sm font-semibold truncate text-foreground">{author}</div>
+          <div className="text-sm font-semibold truncate text-foreground">
+            {author}
+          </div>
           <div className="text-xs text-muted-foreground truncate uppercase tracking-wider">
-            {role}{company && `, ${company}`}
+            {role}
+            {company && `, ${company}`}
           </div>
         </div>
       </div>
