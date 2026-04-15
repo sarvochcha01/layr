@@ -1,7 +1,6 @@
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
+"use client";
+
 import { cn } from "@/lib/utils";
-import { buildComponentStyle } from "@/lib/buildStyle";
 import { ThemeStyleVariant, getThemeCSSVars } from "@/lib/themeStyles";
 import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
 
@@ -31,8 +30,6 @@ interface FormProps {
   [key: string]: any;
 }
 
-const inputClasses = "w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-card text-foreground placeholder:text-muted-foreground";
-
 export function Form({
   title,
   description,
@@ -49,21 +46,40 @@ export function Form({
   themeStyle,
   ...rest
 }: FormProps) {
-  const baseStyle = buildComponentStyle({
-    backgroundColor,
-    textColor,
-    width,
-    height,
-    ...rest,
-  });
   const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
   const cssVars = getThemeCSSVars(effectiveTheme);
 
+  const rootStyle: React.CSSProperties = {
+    ...cssVars,
+    backgroundColor: backgroundColor || "var(--theme-surface)",
+    color: textColor || "var(--theme-text)",
+    borderRadius: "var(--theme-radius)",
+    border: `var(--theme-border-width) solid var(--theme-border)`,
+    padding: "24px",
+    ...(width ? { width } : {}),
+    ...(height ? { height } : {}),
+  };
 
-  // If no background color is set, make it transparent (inherit from parent)
-  if (!backgroundColor && !rest.backgroundType) {
-    baseStyle.backgroundColor = "transparent";
-  }
+  const inputStyle: React.CSSProperties = {
+    width: "100%",
+    padding: "10px 14px",
+    background: "var(--theme-input-bg)",
+    color: "var(--theme-text)",
+    border: "1px solid var(--theme-border)",
+    borderRadius: "var(--theme-radius)",
+    fontSize: "14px",
+    outline: "none",
+    transition: "border-color 200ms ease, box-shadow 200ms ease",
+  };
+
+  const labelStyle: React.CSSProperties = {
+    display: "block",
+    fontSize: "13px",
+    fontWeight: 600,
+    color: "var(--theme-text)",
+    marginBottom: "6px",
+    letterSpacing: "var(--theme-letter-spacing)",
+  };
 
   const renderField = (field: FormField) => {
     const fieldId = `field-${field.id}`;
@@ -71,38 +87,40 @@ export function Form({
     switch (field.type) {
       case "textarea":
         return (
-          <div key={field.id} className="space-y-2">
-            <Label htmlFor={fieldId} className="text-foreground/80">
+          <div key={field.id} className="space-y-1.5">
+            <label htmlFor={fieldId} style={labelStyle}>
               {field.label}
-            </Label>
+              {field.required && <span style={{ color: "var(--theme-accent)", marginLeft: 4 }}>*</span>}
+            </label>
             <textarea
               id={fieldId}
               name={field.id}
               placeholder={field.placeholder}
               required={field.required}
-              className={cn(
-        inputClasses, "min-h-[100px]")}
+              className="focus:ring-2 focus:ring-[color:var(--theme-accent)]"
+              style={{ ...inputStyle, minHeight: "100px", resize: "vertical" }}
             />
           </div>
         );
 
       case "select":
         return (
-          <div key={field.id} className="space-y-2">
-            <Label htmlFor={fieldId} className="text-foreground/80">
+          <div key={field.id} className="space-y-1.5">
+            <label htmlFor={fieldId} style={labelStyle}>
               {field.label}
-            </Label>
+              {field.required && <span style={{ color: "var(--theme-accent)", marginLeft: 4 }}>*</span>}
+            </label>
             <select
               id={fieldId}
               name={field.id}
               required={field.required}
-              className={inputClasses}
+              style={inputStyle}
             >
-              <option value="" className="bg-card">
+              <option value="" style={{ background: "var(--theme-surface)", color: "var(--theme-text-muted)" }}>
                 Select an option
               </option>
               {field.options?.map((option, index) => (
-                <option key={index} value={option} className="bg-card">
+                <option key={index} value={option} style={{ background: "var(--theme-surface)", color: "var(--theme-text)" }}>
                   {option}
                 </option>
               ))}
@@ -112,41 +130,49 @@ export function Form({
 
       case "checkbox":
         return (
-          <div key={field.id} className="flex items-center space-x-2">
+          <div key={field.id} className="flex items-center gap-3 py-1">
             <input
               type="checkbox"
               id={fieldId}
               name={field.id}
               required={field.required}
-              className="rounded border-border focus:ring-primary bg-card"
+              style={{
+                width: 18,
+                height: 18,
+                accentColor: "var(--theme-accent)",
+                cursor: "pointer",
+              }}
             />
-            <Label htmlFor={fieldId} className="text-foreground/80">
+            <label htmlFor={fieldId} style={{ ...labelStyle, marginBottom: 0, cursor: "pointer" }}>
               {field.label}
-            </Label>
+            </label>
           </div>
         );
 
       case "radio":
         return (
-          <div key={field.id} className="space-y-2">
-            <Label className="text-foreground/80">{field.label}</Label>
-            <div className="space-y-2">
+          <div key={field.id} className="space-y-1.5">
+            <label style={labelStyle}>
+              {field.label}
+              {field.required && <span style={{ color: "var(--theme-accent)", marginLeft: 4 }}>*</span>}
+            </label>
+            <div className="space-y-2 pl-1">
               {field.options?.map((option, index) => (
-                <div key={index} className="flex items-center space-x-2">
+                <div key={index} className="flex items-center gap-3">
                   <input
                     type="radio"
                     id={`${fieldId}-${index}`}
                     name={field.id}
                     value={option}
                     required={field.required}
-                    className="border-border focus:ring-primary bg-card"
+                    style={{ accentColor: "var(--theme-accent)", width: 16, height: 16, cursor: "pointer" }}
                   />
-                  <Label
+                  <label
                     htmlFor={`${fieldId}-${index}`}
-                    className="text-foreground/80"
+                    style={{ fontSize: "14px", color: "var(--theme-text)", cursor: "pointer" }}
                   >
                     {option}
-                  </Label>
+                  </label>
                 </div>
               ))}
             </div>
@@ -154,19 +180,20 @@ export function Form({
         );
 
       default:
-        // text, email, tel — all use the same consistent styling
         return (
-          <div key={field.id} className="space-y-2">
-            <Label htmlFor={fieldId} className="text-foreground/80">
+          <div key={field.id} className="space-y-1.5">
+            <label htmlFor={fieldId} style={labelStyle}>
               {field.label}
-            </Label>
+              {field.required && <span style={{ color: "var(--theme-accent)", marginLeft: 4 }}>*</span>}
+            </label>
             <input
               type={field.type}
               id={fieldId}
               name={field.id}
               placeholder={field.placeholder}
               required={field.required}
-              className={inputClasses}
+              className="focus:ring-2 focus:ring-[color:var(--theme-accent)]"
+              style={inputStyle}
             />
           </div>
         );
@@ -174,20 +201,42 @@ export function Form({
   };
 
   return (
-    <div className={cn("w-full", className)} style={{ ...baseStyle, ...cssVars }}>
-      {title && <h2 className="text-2xl font-bold mb-2 text-foreground">{title}</h2>}
+    <div className={cn("w-full", className)} style={rootStyle}>
+      {title && (
+        <h2
+          className="text-2xl mb-2"
+          style={{
+            fontWeight: "var(--theme-heading-weight)" as any,
+            color: "var(--theme-text)",
+            letterSpacing: "var(--theme-letter-spacing)",
+          }}
+        >
+          {title}
+        </h2>
+      )}
+      {description && (
+        <p className="mb-6 text-sm" style={{ color: "var(--theme-text-muted)" }}>
+          {description}
+        </p>
+      )}
 
-      {description && <p className="mb-6 text-muted-foreground">{description}</p>}
-
-      <form action={action} method={method} className="space-y-4">
+      <form action={action} method={method} className="space-y-5">
         {fields.map((field) => renderField(field))}
 
-        <Button
+        <button
           type="submit"
-          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+          className="w-full py-3 text-sm font-bold tracking-wider transition-all duration-200 hover:opacity-90 hover:scale-[1.02] active:scale-[0.98]"
+          style={{
+            background: "var(--theme-accent)",
+            color: "var(--theme-accent-fg)",
+            borderRadius: "var(--theme-radius)",
+            border: `var(--theme-border-width) solid var(--theme-border)`,
+            boxShadow: "var(--theme-hard-shadow, none)",
+            cursor: "pointer",
+          }}
         >
           {submitText}
-        </Button>
+        </button>
       </form>
     </div>
   );

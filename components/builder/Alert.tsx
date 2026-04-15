@@ -1,6 +1,5 @@
 import { AlertCircle, CheckCircle, Info, XCircle, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { buildComponentStyle } from "@/lib/buildStyle";
 import { ThemeStyleVariant, getThemeCSSVars } from "@/lib/themeStyles";
 import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
 
@@ -17,6 +16,20 @@ interface AlertProps {
   [key: string]: any;
 }
 
+const icons = {
+  info: Info,
+  success: CheckCircle,
+  warning: AlertCircle,
+  error: XCircle,
+};
+
+const semanticColors: Record<string, { accent: string }> = {
+  info: { accent: "var(--theme-accent)" },
+  success: { accent: "#4ade80" },
+  warning: { accent: "#fbbf24" },
+  error: { accent: "#f87171" },
+};
+
 export function Alert({
   title,
   message = "This is an alert message",
@@ -29,66 +42,50 @@ export function Alert({
   themeStyle,
   ...rest
 }: AlertProps) {
-  const variantConfig = {
-    info: {
-      icon: Info,
-      bgClass: "bg-card border-primary/20",
-      textClass: "text-foreground/80",
-      iconClass: "text-primary",
-    },
-    success: {
-      icon: CheckCircle,
-      bgClass: "bg-[#1a1a1a] border-green-500/20",
-      textClass: "text-gray-300",
-      iconClass: "text-green-400",
-    },
-    warning: {
-      icon: AlertCircle,
-      bgClass: "bg-[#1a1a1a] border-yellow-500/20",
-      textClass: "text-gray-300",
-      iconClass: "text-yellow-400",
-    },
-    error: {
-      icon: XCircle,
-      bgClass: "bg-[#1a1a1a] border-red-500/20",
-      textClass: "text-gray-300",
-      iconClass: "text-red-400",
-    },
-  };
-
-  const config = variantConfig[variant];
-  const Icon = config.icon;
-
-  const baseStyle = buildComponentStyle({
-    backgroundColor,
-    textColor,
-    width,
-    ...rest,
-  });
   const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
   const cssVars = getThemeCSSVars(effectiveTheme);
+  const Icon = icons[variant] || Info;
+  const accent = semanticColors[variant]?.accent || "var(--theme-accent)";
 
+  const rootStyle: React.CSSProperties = {
+    ...cssVars,
+    display: "flex",
+    gap: "12px",
+    padding: "16px",
+    borderRadius: "var(--theme-radius)",
+    backgroundColor: backgroundColor || "var(--theme-surface)",
+    color: textColor || "var(--theme-text)",
+    border: `var(--theme-border-width) solid ${variant === "info" ? "var(--theme-border)" : accent}`,
+    borderLeftWidth: "4px",
+    borderLeftColor: accent,
+    ...(width ? { width } : {}),
+  };
 
   return (
-    <div
-      className={cn(
-        "p-4 rounded-lg border flex gap-3",
-        !backgroundColor && config.bgClass,
-        !textColor && config.textClass,
-      )}
-      style={{ ...baseStyle, ...cssVars }}
-    >
-      <Icon className={cn("w-5 h-5 flex-shrink-0", config.iconClass)} />
-
-      <div className="flex-1">
-        {title && <div className="font-semibold mb-1">{title}</div>}
-        <div className="text-sm">{message}</div>
+    <div style={rootStyle}>
+      <Icon
+        className="w-5 h-5 flex-shrink-0 mt-0.5"
+        style={{ color: accent }}
+      />
+      <div className="flex-1 min-w-0">
+        {title && (
+          <div
+            className="font-semibold mb-1"
+            style={{ color: "var(--theme-text)" }}
+          >
+            {title}
+          </div>
+        )}
+        <div className="text-sm" style={{ color: "var(--theme-text-muted)" }}>
+          {message}
+        </div>
       </div>
 
       {dismissible && (
         <button
           onClick={onDismiss}
           className="flex-shrink-0 hover:opacity-75 transition-opacity"
+          style={{ color: "var(--theme-text-muted)" }}
         >
           <X className="w-5 h-5" />
         </button>

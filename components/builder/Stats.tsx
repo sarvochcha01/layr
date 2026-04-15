@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
-import { buildComponentStyle } from "@/lib/buildStyle";
 import { ThemeStyleVariant, getThemeCSSVars } from "@/lib/themeStyles";
 import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
 
@@ -35,7 +34,6 @@ function useCountUp(target: number, duration = 1800, shouldStart = false) {
     const tick = (now: number) => {
       const elapsed = now - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      // Ease-out cubic
       const eased = 1 - Math.pow(1 - progress, 3);
       setCount(Math.round(eased * target));
       if (progress < 1) requestAnimationFrame(tick);
@@ -56,7 +54,6 @@ function AnimatedStat({
   accentColor: string;
   shouldStart: boolean;
 }) {
-  // Try to parse numeric value for counting; keep as-is if not a pure number
   const numericPart = parseFloat(stat.value.replace(/[^0-9.]/g, ""));
   const prefix = stat.value.match(/^[^0-9]*/)?.[0] || "";
   const isNumeric = !isNaN(numericPart);
@@ -75,12 +72,15 @@ function AnimatedStat({
     >
       <div
         className="text-4xl sm:text-5xl font-bold mb-2 tracking-tight tabular-nums"
-        style={{ fontFamily: "'Inter', sans-serif", color: accentColor }}
+        style={{ color: accentColor }}
       >
         {displayValue}
         {stat.suffix}
       </div>
-      <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-gray-500">
+      <div
+        className="text-[10px] font-semibold uppercase tracking-[0.2em]"
+        style={{ color: "var(--theme-text-muted)" }}
+      >
         {stat.label}
       </div>
     </div>
@@ -96,9 +96,9 @@ export function Stats({
   ],
   layout = "horizontal",
   columns = 4,
-  backgroundColor = "#0d0d0d",
-  textColor = "#ffffff",
-  accentColor = "#ffffff",
+  backgroundColor,
+  textColor,
+  accentColor,
   width,
   height,
   themeStyle,
@@ -106,6 +106,8 @@ export function Stats({
 }: StatsProps) {
   const [visible, setVisible] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const cssVars = getThemeCSSVars(effectiveTheme);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -118,10 +120,15 @@ export function Stats({
 
   const gridCols = { 2: "grid-cols-2", 3: "grid-cols-3", 4: "grid-cols-2 sm:grid-cols-4" };
 
-  const baseStyle = buildComponentStyle({ backgroundColor, textColor, width, height, ...rest });
-  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
-  const cssVars = getThemeCSSVars(effectiveTheme);
+  const rootStyle: React.CSSProperties = {
+    ...cssVars,
+    backgroundColor: backgroundColor || "var(--theme-bg)",
+    color: textColor || "var(--theme-text)",
+    ...(width ? { width } : {}),
+    ...(height ? { height } : {}),
+  };
 
+  const resolvedAccent = accentColor || "var(--theme-text)";
 
   return (
     <div
@@ -132,14 +139,11 @@ export function Stats({
           ? `grid ${gridCols[columns]} gap-12`
           : "flex justify-around items-center flex-wrap gap-12",
       )}
-      style={{ ...baseStyle, ...cssVars }}
+      style={rootStyle}
     >
       {stats.map((stat, index) => (
-        <div
-          key={index}
-          style={{ transitionDelay: `${index * 120}ms` }}
-        >
-          <AnimatedStat stat={stat} accentColor={accentColor} shouldStart={visible} />
+        <div key={index} style={{ transitionDelay: `${index * 120}ms` }}>
+          <AnimatedStat stat={stat} accentColor={resolvedAccent} shouldStart={visible} />
         </div>
       ))}
     </div>

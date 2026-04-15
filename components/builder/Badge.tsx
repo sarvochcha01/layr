@@ -1,5 +1,4 @@
 import { cn } from "@/lib/utils";
-import { buildComponentStyle } from "@/lib/buildStyle";
 import { ThemeStyleVariant, getThemeCSSVars } from "@/lib/themeStyles";
 import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
 
@@ -24,39 +23,41 @@ export function Badge({
   themeStyle,
   ...rest
 }: BadgeProps) {
-  const variantClasses = {
-    default: "bg-[#2a2a2a] text-gray-300",
-    success: "bg-green-500/20 text-green-400",
-    warning: "bg-yellow-500/20 text-yellow-400",
-    error: "bg-red-500/20 text-red-400",
-    info: "bg-primary/20 text-primary",
-  };
-
-  const sizeClasses = {
-    sm: "px-2 py-0.5 text-xs",
-    md: "px-3 py-1 text-sm",
-    lg: "px-4 py-1.5 text-base",
-  };
-
-  const baseStyle = buildComponentStyle({
-    backgroundColor,
-    textColor,
-    ...rest,
-  });
   const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
   const cssVars = getThemeCSSVars(effectiveTheme);
 
+  // Semantic variant accents (still works across themes)
+  const variantColors: Record<string, { bg: string; text: string }> = {
+    default: { bg: "var(--theme-surface)", text: "var(--theme-text)" },
+    success: { bg: "rgba(34,197,94,0.15)", text: "#4ade80" },
+    warning: { bg: "rgba(234,179,8,0.15)", text: "#fbbf24" },
+    error: { bg: "rgba(239,68,68,0.15)", text: "#f87171" },
+    info: { bg: "color-mix(in srgb, var(--theme-accent) 15%, transparent)", text: "var(--theme-accent)" },
+  };
+
+  const sizeStyles: Record<string, React.CSSProperties> = {
+    sm: { padding: "2px 8px", fontSize: "11px" },
+    md: { padding: "4px 12px", fontSize: "13px" },
+    lg: { padding: "6px 16px", fontSize: "14px" },
+  };
+
+  const colors = variantColors[variant] || variantColors.default;
+
+  const badgeStyle: React.CSSProperties = {
+    ...cssVars,
+    display: "inline-flex",
+    alignItems: "center",
+    fontWeight: 600,
+    letterSpacing: "var(--theme-letter-spacing)",
+    borderRadius: rounded ? "9999px" : "var(--theme-radius)",
+    border: `var(--theme-border-width) solid var(--theme-border)`,
+    background: backgroundColor || colors.bg,
+    color: textColor || colors.text,
+    ...sizeStyles[size],
+  };
 
   return (
-    <span
-      className={cn(
-        "inline-flex items-center font-medium",
-        !backgroundColor && variantClasses[variant],
-        sizeClasses[size],
-        rounded ? "rounded-full" : "rounded",
-      )}
-      style={{ ...baseStyle, ...cssVars }}
-    >
+    <span style={badgeStyle}>
       {text}
     </span>
   );

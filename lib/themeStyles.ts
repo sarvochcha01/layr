@@ -213,7 +213,7 @@ export const THEME_STYLES: Record<ThemeStyleVariant, ThemeStyleConfig> = {
     previewColors: ["#0f0b1e", "#f1f5f9", "#a78bfa"],
     colors: {
       bg: "#0f0b1e",
-      surface: "rgba(255,255,255,0.06)",
+      surface: "rgba(30,20,60,0.85)",
       border: "rgba(167,139,250,0.2)",
       text: "#f1f5f9",
       textMuted: "rgba(241,245,249,0.5)",

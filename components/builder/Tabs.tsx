@@ -1,8 +1,7 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { buildComponentStyle } from "@/lib/buildStyle";
 import { ThemeStyleVariant, getThemeCSSVars } from "@/lib/themeStyles";
 import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
 
@@ -33,74 +32,71 @@ export function Tabs({
   ],
   defaultTab = 0,
   variant = "underline",
-  backgroundColor = "#0d0d0d",
-  tabHeadingColor = "#9ca3af",
-  contentTextColor = "#e5e7eb",
-  activeTabColor = "#3b82f6",
+  backgroundColor,
+  tabHeadingColor,
+  contentTextColor,
+  activeTabColor,
   width,
   height,
   themeStyle,
   ...rest
 }: TabsProps) {
   const [activeTab, setActiveTab] = useState(defaultTab);
-  const [prevTab, setPrevTab] = useState<number | null>(null);
   const [animating, setAnimating] = useState(false);
+
+  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const cssVars = getThemeCSSVars(effectiveTheme);
 
   const handleTabChange = (index: number) => {
     if (index === activeTab || animating) return;
-    setPrevTab(activeTab);
     setAnimating(true);
     setTimeout(() => {
       setActiveTab(index);
       setAnimating(false);
-      setPrevTab(null);
     }, 160);
   };
 
-  const baseStyle = buildComponentStyle({
-    backgroundColor: rest.backgroundType === "gradient" ? undefined : backgroundColor,
-    backgroundType: rest.backgroundType,
-    gradientStart: rest.gradientStart,
-    gradientEnd: rest.gradientEnd,
-    gradientDirection: rest.gradientDirection,
-    gradientAngle: rest.gradientAngle,
-    backgroundGradient: rest.backgroundGradient,
-    width,
-    height,
-    ...rest,
-  });
-  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
-  const cssVars = getThemeCSSVars(effectiveTheme);
-
+  const rootStyle: React.CSSProperties = {
+    ...cssVars,
+    backgroundColor: backgroundColor || "var(--theme-bg)",
+    color: contentTextColor || "var(--theme-text)",
+    borderRadius: "var(--theme-radius)",
+    ...(width ? { width } : {}),
+    ...(height ? { height } : {}),
+  };
 
   return (
-    <div style={{ ...baseStyle, ...cssVars }} className="rounded-lg">
+    <div style={rootStyle} className="overflow-hidden">
       {/* Tab Headers */}
       <div
-        className={cn(
-        "flex gap-1 relative",
-          variant === "bordered" && "border-b border-border",
-        )}
+        className={cn("flex gap-1 relative")}
+        style={{
+          borderBottom: variant === "bordered" || variant === "underline"
+            ? `1px solid var(--theme-border)`
+            : "none",
+        }}
       >
         {tabs.map((tab, index) => {
           const isActive = activeTab === index;
+          const aColor = activeTabColor || "var(--theme-accent)";
+          const iColor = tabHeadingColor || "var(--theme-text-muted)";
 
           return (
             <button
               key={index}
               onClick={() => handleTabChange(index)}
-              className={cn(
-                "px-4 py-2.5 font-medium text-sm relative transition-colors duration-200",
-                variant === "underline" && "border-b-2",
-                variant === "pills" && "rounded-lg",
-                variant === "bordered" && "border-b-2 -mb-px",
-              )}
+              className="px-4 py-2.5 font-medium text-sm relative transition-all duration-200"
               style={{
-                borderColor: isActive && variant !== "pills" ? activeTabColor : "transparent",
-                color: isActive ? activeTabColor : tabHeadingColor,
+                borderBottom: variant !== "pills"
+                  ? `2px solid ${isActive ? aColor : "transparent"}`
+                  : "none",
+                color: isActive ? aColor : iColor,
                 backgroundColor:
-                  isActive && variant === "pills" ? `${activeTabColor}20` : "transparent",
-                transition: "color 200ms ease, background-color 200ms ease, border-color 200ms ease",
+                  isActive && variant === "pills"
+                    ? "color-mix(in srgb, var(--theme-accent) 15%, transparent)"
+                    : "transparent",
+                borderRadius: variant === "pills" ? "var(--theme-radius)" : undefined,
+                marginBottom: variant === "bordered" ? "-1px" : undefined,
               }}
             >
               {tab.label}
@@ -109,11 +105,11 @@ export function Tabs({
         })}
       </div>
 
-      {/* Tab Content with fade transition */}
+      {/* Tab Content */}
       <div
-        className="py-6 px-1 leading-relaxed"
+        className="py-6 px-4 leading-relaxed text-sm"
         style={{
-          color: contentTextColor,
+          color: contentTextColor || "var(--theme-text)",
           opacity: animating ? 0 : 1,
           transform: animating ? "translateY(4px)" : "translateY(0)",
           transition: "opacity 160ms ease, transform 160ms ease",
