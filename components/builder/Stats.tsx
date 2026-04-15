@@ -51,11 +51,13 @@ function AnimatedStat({
   accentColor,
   shouldStart,
   variant,
+  themeName,
 }: {
   stat: Stat;
   accentColor: string;
   shouldStart: boolean;
   variant: string;
+  themeName?: string;
 }) {
   const numericPart = parseFloat(stat.value.replace(/[^0-9.]/g, ""));
   const prefix = stat.value.match(/^[^0-9]*/)?.[0] || "";
@@ -63,8 +65,10 @@ function AnimatedStat({
   const counted = useCountUp(isNumeric ? numericPart : 0, 1600, shouldStart && isNumeric);
   const displayValue = isNumeric ? `${prefix}${counted}` : stat.value;
 
+  const isNeoBrutalistCards = variant === "cards" && themeName === "neobrutalist";
+
   const cardStyle: React.CSSProperties = variant === "cards" ? {
-    backgroundColor: "var(--theme-surface)",
+    backgroundColor: isNeoBrutalistCards ? "var(--theme-accent)" : "var(--theme-surface)",
     border: `var(--theme-border-width) solid var(--theme-border)`,
     borderRadius: "var(--theme-radius)",
     padding: "24px 16px",
@@ -84,14 +88,14 @@ function AnimatedStat({
     >
       <div
         className="text-4xl sm:text-5xl font-bold mb-2 tracking-tight tabular-nums"
-        style={{ color: accentColor }}
+        style={{ color: isNeoBrutalistCards ? "var(--theme-accent-fg)" : accentColor }}
       >
         {displayValue}
         {stat.suffix}
       </div>
       <div
         className="text-[10px] font-semibold uppercase tracking-[0.2em]"
-        style={{ color: "var(--theme-text-muted)" }}
+        style={{ color: isNeoBrutalistCards ? "var(--theme-accent-fg)" : "var(--theme-text-muted)" }}
       >
         {stat.label}
       </div>
@@ -174,7 +178,7 @@ export function Stats({
             } : {}),
           }}
         >
-          <AnimatedStat stat={stat} accentColor={resolvedAccent} shouldStart={visible} variant={variant} />
+          <AnimatedStat stat={stat} accentColor={resolvedAccent} shouldStart={visible} variant={variant} themeName={effectiveTheme} />
         </div>
       ))}
     </div>

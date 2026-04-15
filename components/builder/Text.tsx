@@ -2,6 +2,7 @@ import { cn } from "@/lib/utils";
 import { buildComponentStyle } from "@/lib/buildStyle";
 import { ThemeStyleVariant, getThemeCSSVars } from "@/lib/themeStyles";
 import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
+import { loadGoogleFont, getFontFamilyValue } from "@/lib/fonts";
 
 interface TextProps {
   children?: React.ReactNode;
@@ -77,6 +78,11 @@ export function Text({
   const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
   const cssVars = getThemeCSSVars(effectiveTheme);
 
+  // Per-component font override
+  const fontOverride = rest.fontFamily_override;
+  if (fontOverride && typeof window !== "undefined") {
+    loadGoogleFont(fontOverride);
+  }
 
   return (
     <Component
@@ -86,7 +92,13 @@ export function Text({
         alignClasses[align],
         className
       )}
-      style={{ ...baseStyle, ...cssVars }}
+      style={{
+        ...baseStyle,
+        backgroundColor: rest.backgroundColor || "var(--theme-bg)",
+        color: color || "var(--theme-text)",
+        ...cssVars,
+        ...(fontOverride ? { fontFamily: getFontFamilyValue(fontOverride) } : {}),
+      }}
     >
       {children || content}
     </Component>

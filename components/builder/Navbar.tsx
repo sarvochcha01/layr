@@ -109,7 +109,7 @@ export function Navbar({
               style={{
                 fontWeight: "var(--theme-heading-weight)" as any,
                 color: textColor || "var(--theme-text)",
-                fontFamily: "'Inter', sans-serif",
+                fontFamily: "var(--theme-heading-font)",
               }}
             >
               {logoText}

@@ -7,6 +7,7 @@
  */
 
 import React from "react";
+import { getFontFamilyValue, loadGoogleFonts } from "./fonts";
 
 export type ThemeStyleVariant =
   | "dark-pro"
@@ -65,6 +66,10 @@ export interface ThemeStyleConfig {
     headingWeight: string;
     /** Letter spacing */
     letterSpacing: string;
+    /** Body / UI font family (Google Fonts name) */
+    fontFamily: string;
+    /** Heading font family (Google Fonts name) */
+    headingFontFamily: string;
   };
 }
 
@@ -93,6 +98,8 @@ export const THEME_STYLES: Record<ThemeStyleVariant, ThemeStyleConfig> = {
       shadow: "0 4px 24px rgba(0,0,0,0.4)",
       headingWeight: "700",
       letterSpacing: "-0.02em",
+      fontFamily: "Inter",
+      headingFontFamily: "Inter",
     },
   },
 
@@ -120,6 +127,8 @@ export const THEME_STYLES: Record<ThemeStyleVariant, ThemeStyleConfig> = {
       shadow: "0 2px 12px rgba(0,0,0,0.08)",
       headingWeight: "700",
       letterSpacing: "-0.01em",
+      fontFamily: "DM Sans",
+      headingFontFamily: "DM Sans",
     },
   },
 
@@ -147,6 +156,8 @@ export const THEME_STYLES: Record<ThemeStyleVariant, ThemeStyleConfig> = {
       shadow: "0 4px 32px rgba(0,0,0,0.6)",
       headingWeight: "800",
       letterSpacing: "-0.01em",
+      fontFamily: "DM Sans",
+      headingFontFamily: "Playfair Display",
     },
   },
 
@@ -174,6 +185,8 @@ export const THEME_STYLES: Record<ThemeStyleVariant, ThemeStyleConfig> = {
       shadow: "none",
       headingWeight: "900",
       letterSpacing: "0.05em",
+      fontFamily: "Space Mono",
+      headingFontFamily: "Space Mono",
     },
   },
 
@@ -202,6 +215,8 @@ export const THEME_STYLES: Record<ThemeStyleVariant, ThemeStyleConfig> = {
       hardShadow: "5px 5px 0px #1a1a1a",
       headingWeight: "900",
       letterSpacing: "0",
+      fontFamily: "Archivo",
+      headingFontFamily: "Archivo",
     },
   },
 
@@ -230,6 +245,8 @@ export const THEME_STYLES: Record<ThemeStyleVariant, ThemeStyleConfig> = {
       backdrop: "blur(12px)",
       headingWeight: "700",
       letterSpacing: "-0.01em",
+      fontFamily: "Sora",
+      headingFontFamily: "Plus Jakarta Sans",
     },
   },
 
@@ -257,6 +274,8 @@ export const THEME_STYLES: Record<ThemeStyleVariant, ThemeStyleConfig> = {
       shadow: "0 6px 28px rgba(0,0,0,0.45)",
       headingWeight: "800",
       letterSpacing: "-0.02em",
+      fontFamily: "Outfit",
+      headingFontFamily: "Outfit",
     },
   },
 
@@ -284,6 +303,8 @@ export const THEME_STYLES: Record<ThemeStyleVariant, ThemeStyleConfig> = {
       shadow: "0 0 20px rgba(240,171,252,0.15), 0 4px 24px rgba(0,0,0,0.6)",
       headingWeight: "800",
       letterSpacing: "0.03em",
+      fontFamily: "Rajdhani",
+      headingFontFamily: "Orbitron",
     },
   },
 
@@ -311,6 +332,8 @@ export const THEME_STYLES: Record<ThemeStyleVariant, ThemeStyleConfig> = {
       shadow: "0 4px 20px rgba(0,0,0,0.4)",
       headingWeight: "700",
       letterSpacing: "-0.01em",
+      fontFamily: "Nunito",
+      headingFontFamily: "Lora",
     },
   },
 
@@ -338,27 +361,58 @@ export const THEME_STYLES: Record<ThemeStyleVariant, ThemeStyleConfig> = {
       shadow: "0 4px 24px rgba(0,0,0,0.45)",
       headingWeight: "700",
       letterSpacing: "-0.01em",
+      fontFamily: "IBM Plex Sans",
+      headingFontFamily: "IBM Plex Sans",
     },
   },
 };
+
+// ─── Global Override Storage ─────────────────────────────────────────────────
+// Module-level variable set by ThemeStyleContext so getThemeCSSVars auto-applies
+// user customizations without modifying every component call site.
+let _globalOverrides: { accentColor?: string; bgColor?: string; textColor?: string; fontFamily?: string; headingFontFamily?: string } = {};
+
+/** Called by ThemeStyleContext when user changes customizations */
+export function setGlobalThemeOverrides(overrides: typeof _globalOverrides) {
+  _globalOverrides = overrides;
+}
 
 /**
  * Returns CSS custom properties to inject onto any component root element.
  * Components use var(--theme-bg), var(--theme-text), etc. for all colors.
  * This eliminates Tailwind CSS variable conflicts entirely.
+ *
+ * Automatically merges global user overrides from the customize panel.
+ * Optional explicit `overrides` param takes precedence over global.
  */
-export function getThemeCSSVars(themeId: ThemeStyleVariant = "dark-pro"): React.CSSProperties {
+export function getThemeCSSVars(
+  themeId: ThemeStyleVariant = "dark-pro",
+  overrides?: { accentColor?: string; bgColor?: string; textColor?: string; fontFamily?: string; headingFontFamily?: string },
+): React.CSSProperties {
   const theme = THEME_STYLES[themeId] || THEME_STYLES["dark-pro"];
   const c = theme.colors;
   const s = theme.style;
 
+  // Resolve overrides: explicit param > global overrides > theme defaults
+  const merged = { ..._globalOverrides, ...overrides };
+  const bg = merged.bgColor || c.bg;
+  const text = merged.textColor || c.text;
+  const accent = merged.accentColor || c.accent;
+  const bodyFont = merged.fontFamily || s.fontFamily;
+  const headingFont = merged.headingFontFamily || s.headingFontFamily;
+
+  // Ensure fonts are loaded
+  if (typeof window !== "undefined") {
+    loadGoogleFonts([bodyFont, headingFont].filter(Boolean));
+  }
+
   return {
-    "--theme-bg": c.bg,
+    "--theme-bg": bg,
     "--theme-surface": c.surface,
     "--theme-border": c.border,
-    "--theme-text": c.text,
+    "--theme-text": text,
     "--theme-text-muted": c.textMuted,
-    "--theme-accent": c.accent,
+    "--theme-accent": accent,
     "--theme-accent-fg": c.accentFg,
     "--theme-accent-hover": c.accentHover,
     "--theme-input-bg": c.inputBg,
@@ -370,6 +424,10 @@ export function getThemeCSSVars(themeId: ThemeStyleVariant = "dark-pro"): React.
     "--theme-backdrop": s.backdrop || "none",
     "--theme-heading-weight": s.headingWeight,
     "--theme-letter-spacing": s.letterSpacing,
+    "--theme-font": bodyFont ? getFontFamilyValue(bodyFont) : "'Inter', system-ui, sans-serif",
+    "--theme-heading-font": headingFont ? getFontFamilyValue(headingFont) : getFontFamilyValue(bodyFont || "Inter"),
+    // Apply body font directly so all components auto-inherit
+    fontFamily: bodyFont ? getFontFamilyValue(bodyFont) : "'Inter', system-ui, sans-serif",
   } as React.CSSProperties;
 }
 

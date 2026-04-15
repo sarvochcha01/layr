@@ -93,7 +93,7 @@ export function PricingCard({
         <div className="flex items-center justify-between mb-4">
           <h3
             className="text-xl tracking-tight"
-            style={{ fontWeight: "var(--theme-heading-weight)" as any, color: "var(--theme-text)", fontFamily: "'Inter', sans-serif" }}
+            style={{ fontWeight: "var(--theme-heading-weight)" as any, color: "var(--theme-text)", fontFamily: "var(--theme-heading-font)" }}
           >
             {title}
           </h3>

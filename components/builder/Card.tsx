@@ -164,6 +164,7 @@ export function Card({
               fontWeight: "var(--theme-heading-weight)" as any,
               color: "var(--theme-text)",
               letterSpacing: "var(--theme-letter-spacing)",
+              fontFamily: "var(--theme-heading-font)",
             }}
           >
             {title}
