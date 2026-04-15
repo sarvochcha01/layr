@@ -38,7 +38,7 @@ const SECTION_ICONS: Record<SectionIcon, React.ElementType> = {
 };
 
 // ── Style Section Components ──────────────────────────────
-const STYLE_SECTION_MAP: Record<StyleSectionType, React.ComponentType<{ props: Record<string, any>; updateProp: (k: string, v: any) => void }>> = {
+const STYLE_SECTION_MAP: Record<StyleSectionType, React.ComponentType<{ props: Record<string, any>; updateProp: (k: string, v: any) => void; componentType?: string }>> = {
   fill: FillSection,
   dimensions: DimensionsSection,
   spacing: SpacingSection,
@@ -531,7 +531,7 @@ export function ComponentProperties({ type, props, updateProp, pages }: Componen
       {/* Shared Style Sections — only the ones this component needs */}
       {schema.styleSections.map((sectionType) => {
         const SectionComponent = STYLE_SECTION_MAP[sectionType];
-        return <SectionComponent key={sectionType} props={props} updateProp={updateProp} />;
+        return <SectionComponent key={sectionType} props={props} updateProp={updateProp} componentType={type} />;
       })}
     </Accordion>
   );

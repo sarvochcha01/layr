@@ -30,7 +30,6 @@ export const COMPONENT_SCHEMAS: Record<string, ComponentPropertySchema> = {
           { key: "primaryButtonLink", label: "Primary Button Link", type: "link-editor", placeholder: "https://example.com" },
           { key: "secondaryButtonText", label: "Secondary Button Text", type: "text", placeholder: "Optional" },
           { key: "secondaryButtonLink", label: "Secondary Button Link", type: "link-editor", placeholder: "https://example.com" },
-          { key: "backgroundImage", label: "Background Image URL", type: "text", placeholder: "https://example.com/bg.jpg" },
           {
             key: "alignment", label: "Alignment", type: "select",
             options: [
@@ -209,7 +208,6 @@ export const COMPONENT_SCHEMAS: Record<string, ComponentPropertySchema> = {
         title: "Card Content",
         icon: "type",
         fields: [
-          { key: "image", label: "Image URL", type: "text", placeholder: "https://example.com/image.jpg" },
           { key: "icon", label: "Icon (emoji/text)", type: "text", placeholder: "•" },
           { key: "title", label: "Title", type: "text", placeholder: "Card title" },
           { key: "description", label: "Description", type: "textarea", placeholder: "Card description", rows: 3 },
@@ -222,6 +220,34 @@ export const COMPONENT_SCHEMAS: Record<string, ComponentPropertySchema> = {
               { label: "Bordered", value: "bordered" },
               { label: "Shadow", value: "shadow" },
               { label: "Elevated", value: "elevated" },
+            ],
+          },
+        ],
+      },
+      {
+        id: "images",
+        title: "Images",
+        icon: "image",
+        fields: [
+          { key: "topImage", label: "Top Image URL", type: "text", placeholder: "https://example.com/image.jpg" },
+          {
+            key: "topImageObjectFit", label: "Top Image Fit", type: "select",
+            options: [
+              { label: "Cover (Fill & Crop)", value: "cover" },
+              { label: "Contain (Fit Inside)", value: "contain" },
+              { label: "Fill (Stretch)", value: "fill" },
+              { label: "Scale Down", value: "scale-down" },
+              { label: "None (Original Size)", value: "none" },
+            ],
+          },
+          { key: "bottomBackgroundImageUrl", label: "Bottom Background Image URL", type: "text", placeholder: "https://example.com/bg.jpg" },
+          {
+            key: "bottomBackgroundSize", label: "Bottom Background Fit", type: "select",
+            options: [
+              { label: "Cover", value: "cover" },
+              { label: "Contain", value: "contain" },
+              { label: "Auto", value: "auto" },
+              { label: "Stretch", value: "100% 100%" },
             ],
           },
         ],
