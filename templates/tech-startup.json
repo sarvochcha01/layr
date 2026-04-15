@@ -1,0 +1,849 @@
+{
+    "name": "AI Tech Startup Platform",
+    "description": "A futuristic tech startup website featuring AI/ML capabilities, gradient designs, and modern animations",
+    "category": "Technology",
+    "thumbnail": "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400",
+    "featured": true,
+    "pages": [
+        {
+            "id": "home",
+            "name": "Home",
+            "slug": "index",
+            "components": [
+                {
+                    "id": "nav-main",
+                    "type": "Navbar",
+                    "props": {
+                        "logoText": "NEURAL",
+                        "links": [
+                            {"text": "Platform", "href": "#platform"},
+                            {"text": "Solutions", "href": "page:solutions"},
+                            {"text": "Pricing", "href": "page:pricing"},
+                            {"text": "Docs", "href": "#docs"}
+                        ],
+                        "ctaText": "Get Started",
+                        "backgroundColor": "#0D0D0D",
+                        "textColor": "#FFFFFF",
+                        "linkColor": "#B0B0B0",
+                        "linkHoverColor": "#FFFFFF"
+                    },
+                    "children": [],
+                    "isGlobal": "GlobalNavbar"
+                },
+                {
+                    "id": "hero-main",
+                    "type": "Container",
+                    "props": {
+                        "padding": "140px 40px",
+                        "backgroundColor": "#0D0D0D",
+                        "minHeight": "95vh",
+                        "display": "flex",
+                        "flexDirection": "column",
+                        "justifyContent": "center",
+                        "alignItems": "center",
+                        "textAlign": "center"
+                    },
+                    "children": [
+                        {
+                            "id": "hero-badge",
+                            "type": "Badge",
+                            "props": {
+                                "text": "🚀 Now in Public Beta",
+                                "variant": "info",
+                                "marginBottom": "2rem"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "hero-title",
+                            "type": "Text",
+                            "props": {
+                                "content": "The Future of AI-Powered Development",
+                                "tag": "h1",
+                                "size": "6xl",
+                                "weight": "900",
+                                "color": "#FFFFFF",
+                                "marginBottom": "2rem",
+                                "lineHeight": "1.1",
+                                "maxWidth": "1100px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "hero-desc",
+                            "type": "Text",
+                            "props": {
+                                "content": "Build, deploy, and scale intelligent applications with our cutting-edge AI infrastructure. From prototype to production in minutes, not months.",
+                                "tag": "p",
+                                "size": "xl",
+                                "color": "#B0B0B0",
+                                "marginBottom": "3rem",
+                                "maxWidth": "700px"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "hero-cta",
+                            "type": "Container",
+                            "props": {
+                                "display": "flex",
+                                "gap": "1.5rem",
+                                "justifyContent": "center"
+                            },
+                            "children": [
+                                {
+                                    "id": "hero-btn-1",
+                                    "type": "Button",
+                                    "props": {
+                                        "text": "Start Building Free",
+                                        "variant": "default",
+                                        "size": "lg"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "hero-btn-2",
+                                    "type": "Button",
+                                    "props": {
+                                        "text": "Watch Demo",
+                                        "variant": "outline",
+                                        "size": "lg"
+                                    },
+                                    "children": []
+                                }
+                            ]
+                        },
+                        {
+                            "id": "hero-image",
+                            "type": "Image",
+                            "props": {
+                                "src": "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200",
+                                "alt": "AI Platform Dashboard",
+                                "marginTop": "5rem",
+                                "borderRadius": "16px",
+                                "boxShadow": "0 30px 60px -12px rgba(138, 43, 226, 0.3)"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "stats-section",
+                    "type": "Container",
+                    "props": {
+                        "padding": "80px 40px",
+                        "backgroundColor": "#0D0D0D",
+                        "borderTop": "1px solid #2A2A2A"
+                    },
+                    "children": [
+                        {
+                            "id": "stats-grid",
+                            "type": "Grid",
+                            "props": {
+                                "columns": 4,
+                                "gap": "3rem",
+                                "textAlign": "center"
+                            },
+                            "children": [
+                                {
+                                    "id": "stat-1",
+                                    "type": "Stats",
+                                    "props": {
+                                        "value": "10M+",
+                                        "label": "API Calls Daily",
+                                        "valueColor": "#FFFFFF",
+                                        "labelColor": "#B0B0B0"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "stat-2",
+                                    "type": "Stats",
+                                    "props": {
+                                        "value": "99.99%",
+                                        "label": "Uptime SLA",
+                                        "valueColor": "#FFFFFF",
+                                        "labelColor": "#B0B0B0"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "stat-3",
+                                    "type": "Stats",
+                                    "props": {
+                                        "value": "50K+",
+                                        "label": "Developers",
+                                        "valueColor": "#FFFFFF",
+                                        "labelColor": "#B0B0B0"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "stat-4",
+                                    "type": "Stats",
+                                    "props": {
+                                        "value": "<100ms",
+                                        "label": "Response Time",
+                                        "valueColor": "#FFFFFF",
+                                        "labelColor": "#B0B0B0"
+                                    },
+                                    "children": []
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "features-section",
+                    "type": "Container",
+                    "props": {
+                        "padding": "120px 40px",
+                        "backgroundColor": "#FFFFFF"
+                    },
+                    "children": [
+                        {
+                            "id": "features-header",
+                            "type": "Container",
+                            "props": {
+                                "textAlign": "center",
+                                "marginBottom": "5rem"
+                            },
+                            "children": [
+                                {
+                                    "id": "features-pretitle",
+                                    "type": "Text",
+                                    "props": {
+                                        "content": "PLATFORM CAPABILITIES",
+                                        "tag": "p",
+                                        "size": "sm",
+                                        "weight": "700",
+                                        "color": "#8B5CF6",
+                                        "letterSpacing": "0.15em",
+                                        "marginBottom": "1rem"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "features-title",
+                                    "type": "Text",
+                                    "props": {
+                                        "content": "Everything you need to build intelligent apps",
+                                        "tag": "h2",
+                                        "size": "5xl",
+                                        "weight": "bold",
+                                        "color": "#000000",
+                                        "marginBottom": "1.5rem"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "features-desc",
+                                    "type": "Text",
+                                    "props": {
+                                        "content": "A complete AI development platform with enterprise-grade infrastructure",
+                                        "tag": "p",
+                                        "size": "lg",
+                                        "color": "#666666",
+                                        "maxWidth": "600px",
+                                        "marginLeft": "auto",
+                                        "marginRight": "auto"
+                                    },
+                                    "children": []
+                                }
+                            ]
+                        },
+                        {
+                            "id": "features-grid",
+                            "type": "Grid",
+                            "props": {
+                                "columns": 3,
+                                "gap": "2.5rem"
+                            },
+                            "children": [
+                                {
+                                    "id": "feat-1",
+                                    "type": "Feature",
+                                    "props": {
+                                        "icon": "🧠",
+                                        "title": "Neural Networks",
+                                        "description": "Pre-trained models and custom training pipelines for any use case. Deploy state-of-the-art AI in minutes.",
+                                        "backgroundColor": "#F9FAFB",
+                                        "textColor": "#000000",
+                                        "padding": "2rem",
+                                        "borderRadius": "12px"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "feat-2",
+                                    "type": "Feature",
+                                    "props": {
+                                        "icon": "⚡",
+                                        "title": "Lightning Fast",
+                                        "description": "Global edge network with intelligent caching. Your AI models respond in milliseconds, not seconds.",
+                                        "backgroundColor": "#F9FAFB",
+                                        "textColor": "#000000",
+                                        "padding": "2rem",
+                                        "borderRadius": "12px"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "feat-3",
+                                    "type": "Feature",
+                                    "props": {
+                                        "icon": "🔐",
+                                        "title": "Enterprise Security",
+                                        "description": "SOC 2 compliant with end-to-end encryption. Your data and models are always protected.",
+                                        "backgroundColor": "#F9FAFB",
+                                        "textColor": "#000000",
+                                        "padding": "2rem",
+                                        "borderRadius": "12px"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "feat-4",
+                                    "type": "Feature",
+                                    "props": {
+                                        "icon": "📊",
+                                        "title": "Real-time Analytics",
+                                        "description": "Monitor performance, track usage, and optimize costs with comprehensive dashboards and alerts.",
+                                        "backgroundColor": "#F9FAFB",
+                                        "textColor": "#000000",
+                                        "padding": "2rem",
+                                        "borderRadius": "12px"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "feat-5",
+                                    "type": "Feature",
+                                    "props": {
+                                        "icon": "🔄",
+                                        "title": "Auto-Scaling",
+                                        "description": "Automatically scale from zero to millions of requests. Pay only for what you use.",
+                                        "backgroundColor": "#F9FAFB",
+                                        "textColor": "#000000",
+                                        "padding": "2rem",
+                                        "borderRadius": "12px"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "feat-6",
+                                    "type": "Feature",
+                                    "props": {
+                                        "icon": "🛠️",
+                                        "title": "Developer Tools",
+                                        "description": "SDKs for all major languages, comprehensive docs, and a thriving developer community.",
+                                        "backgroundColor": "#F9FAFB",
+                                        "textColor": "#000000",
+                                        "padding": "2rem",
+                                        "borderRadius": "12px"
+                                    },
+                                    "children": []
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "testimonials-section",
+                    "type": "Container",
+                    "props": {
+                        "padding": "120px 40px",
+                        "backgroundColor": "#F9FAFB"
+                    },
+                    "children": [
+                        {
+                            "id": "testimonials-title",
+                            "type": "Text",
+                            "props": {
+                                "content": "Trusted by innovative teams",
+                                "tag": "h2",
+                                "size": "4xl",
+                                "weight": "bold",
+                                "color": "#000000",
+                                "textAlign": "center",
+                                "marginBottom": "4rem"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "testimonials-grid",
+                            "type": "Grid",
+                            "props": {
+                                "columns": 3,
+                                "gap": "2.5rem"
+                            },
+                            "children": [
+                                {
+                                    "id": "testimonial-1",
+                                    "type": "Testimonial",
+                                    "props": {
+                                        "quote": "Neural has transformed how we build AI features. What used to take weeks now takes hours.",
+                                        "author": "Sarah Chen",
+                                        "role": "CTO, TechCorp",
+                                        "backgroundColor": "#FFFFFF",
+                                        "textColor": "#000000"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "testimonial-2",
+                                    "type": "Testimonial",
+                                    "props": {
+                                        "quote": "The performance is incredible. Our AI models respond faster than ever, and our users love it.",
+                                        "author": "Marcus Rodriguez",
+                                        "role": "Lead Engineer, DataFlow",
+                                        "backgroundColor": "#FFFFFF",
+                                        "textColor": "#000000"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "testimonial-3",
+                                    "type": "Testimonial",
+                                    "props": {
+                                        "quote": "Best AI platform we've used. The developer experience is unmatched.",
+                                        "author": "Emily Watson",
+                                        "role": "VP Engineering, CloudScale",
+                                        "backgroundColor": "#FFFFFF",
+                                        "textColor": "#000000"
+                                    },
+                                    "children": []
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "cta-section",
+                    "type": "Container",
+                    "props": {
+                        "padding": "120px 40px",
+                        "backgroundColor": "#8B5CF6",
+                        "textAlign": "center"
+                    },
+                    "children": [
+                        {
+                            "id": "cta-title",
+                            "type": "Text",
+                            "props": {
+                                "content": "Ready to build the future?",
+                                "tag": "h2",
+                                "size": "5xl",
+                                "weight": "bold",
+                                "color": "#FFFFFF",
+                                "marginBottom": "1.5rem"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "cta-desc",
+                            "type": "Text",
+                            "props": {
+                                "content": "Join thousands of developers building intelligent applications",
+                                "tag": "p",
+                                "size": "xl",
+                                "color": "#E9D5FF",
+                                "marginBottom": "3rem"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "cta-btn",
+                            "type": "Button",
+                            "props": {
+                                "text": "Get Started Free",
+                                "variant": "secondary",
+                                "size": "lg"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "footer-main",
+                    "type": "Footer",
+                    "props": {
+                        "logoText": "NEURAL",
+                        "description": "The AI development platform for the modern era.",
+                        "copyright": "© 2024 Neural Inc. All rights reserved.",
+                        "backgroundColor": "#0D0D0D",
+                        "textColor": "#B0B0B0",
+                        "sections": [
+                            {
+                                "title": "Product",
+                                "links": [
+                                    {"text": "Platform", "href": "#"},
+                                    {"text": "Solutions", "href": "page:solutions"},
+                                    {"text": "Pricing", "href": "page:pricing"},
+                                    {"text": "Documentation", "href": "#"}
+                                ]
+                            },
+                            {
+                                "title": "Company",
+                                "links": [
+                                    {"text": "About", "href": "#"},
+                                    {"text": "Blog", "href": "#"},
+                                    {"text": "Careers", "href": "#"},
+                                    {"text": "Contact", "href": "#"}
+                                ]
+                            }
+                        ]
+                    },
+                    "children": [],
+                    "isGlobal": "GlobalFooter"
+                }
+            ]
+        },
+        {
+            "id": "solutions",
+            "name": "Solutions",
+            "slug": "solutions",
+            "components": [
+                {
+                    "id": "nav-solutions",
+                    "type": "Navbar",
+                    "props": {
+                        "logoText": "NEURAL",
+                        "links": [
+                            {"text": "Platform", "href": "#platform"},
+                            {"text": "Solutions", "href": "page:solutions"},
+                            {"text": "Pricing", "href": "page:pricing"},
+                            {"text": "Docs", "href": "#docs"}
+                        ],
+                        "ctaText": "Get Started",
+                        "backgroundColor": "#0D0D0D",
+                        "textColor": "#FFFFFF",
+                        "linkColor": "#B0B0B0",
+                        "linkHoverColor": "#FFFFFF"
+                    },
+                    "children": [],
+                    "isGlobal": "GlobalNavbar"
+                },
+                {
+                    "id": "solutions-hero",
+                    "type": "Container",
+                    "props": {
+                        "padding": "100px 40px",
+                        "backgroundColor": "#0D0D0D",
+                        "textAlign": "center"
+                    },
+                    "children": [
+                        {
+                            "id": "solutions-hero-title",
+                            "type": "Text",
+                            "props": {
+                                "content": "Solutions for Every Use Case",
+                                "tag": "h1",
+                                "size": "6xl",
+                                "weight": "900",
+                                "color": "#FFFFFF",
+                                "marginBottom": "1.5rem"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "solutions-hero-desc",
+                            "type": "Text",
+                            "props": {
+                                "content": "From startups to enterprises, we power AI applications across industries",
+                                "tag": "p",
+                                "size": "xl",
+                                "color": "#B0B0B0"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "solutions-grid",
+                    "type": "Container",
+                    "props": {
+                        "padding": "100px 40px",
+                        "backgroundColor": "#FFFFFF"
+                    },
+                    "children": [
+                        {
+                            "id": "solutions-items",
+                            "type": "Grid",
+                            "props": {
+                                "columns": 2,
+                                "gap": "3rem"
+                            },
+                            "children": [
+                                {
+                                    "id": "solution-1",
+                                    "type": "Feature",
+                                    "props": {
+                                        "icon": "💬",
+                                        "title": "Conversational AI",
+                                        "description": "Build intelligent chatbots and virtual assistants with natural language understanding. Support multiple languages and integrate with any platform.",
+                                        "backgroundColor": "#F9FAFB",
+                                        "textColor": "#000000",
+                                        "padding": "3rem",
+                                        "borderRadius": "12px"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "solution-2",
+                                    "type": "Feature",
+                                    "props": {
+                                        "icon": "🔍",
+                                        "title": "Computer Vision",
+                                        "description": "Image recognition, object detection, and video analysis at scale. Process millions of images with state-of-the-art accuracy.",
+                                        "backgroundColor": "#F9FAFB",
+                                        "textColor": "#000000",
+                                        "padding": "3rem",
+                                        "borderRadius": "12px"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "solution-3",
+                                    "type": "Feature",
+                                    "props": {
+                                        "icon": "📈",
+                                        "title": "Predictive Analytics",
+                                        "description": "Forecast trends, detect anomalies, and make data-driven decisions with machine learning models trained on your data.",
+                                        "backgroundColor": "#F9FAFB",
+                                        "textColor": "#000000",
+                                        "padding": "3rem",
+                                        "borderRadius": "12px"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "solution-4",
+                                    "type": "Feature",
+                                    "props": {
+                                        "icon": "🎯",
+                                        "title": "Personalization",
+                                        "description": "Deliver personalized experiences with recommendation engines and content optimization powered by deep learning.",
+                                        "backgroundColor": "#F9FAFB",
+                                        "textColor": "#000000",
+                                        "padding": "3rem",
+                                        "borderRadius": "12px"
+                                    },
+                                    "children": []
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "footer-solutions",
+                    "type": "Footer",
+                    "props": {
+                        "logoText": "NEURAL",
+                        "description": "The AI development platform for the modern era.",
+                        "copyright": "© 2024 Neural Inc. All rights reserved.",
+                        "backgroundColor": "#0D0D0D",
+                        "textColor": "#B0B0B0",
+                        "sections": [
+                            {
+                                "title": "Product",
+                                "links": [
+                                    {"text": "Platform", "href": "#"},
+                                    {"text": "Solutions", "href": "page:solutions"},
+                                    {"text": "Pricing", "href": "page:pricing"},
+                                    {"text": "Documentation", "href": "#"}
+                                ]
+                            },
+                            {
+                                "title": "Company",
+                                "links": [
+                                    {"text": "About", "href": "#"},
+                                    {"text": "Blog", "href": "#"},
+                                    {"text": "Careers", "href": "#"},
+                                    {"text": "Contact", "href": "#"}
+                                ]
+                            }
+                        ]
+                    },
+                    "children": [],
+                    "isGlobal": "GlobalFooter"
+                }
+            ]
+        },
+        {
+            "id": "pricing",
+            "name": "Pricing",
+            "slug": "pricing",
+            "components": [
+                {
+                    "id": "nav-pricing",
+                    "type": "Navbar",
+                    "props": {
+                        "logoText": "NEURAL",
+                        "links": [
+                            {"text": "Platform", "href": "#platform"},
+                            {"text": "Solutions", "href": "page:solutions"},
+                            {"text": "Pricing", "href": "page:pricing"},
+                            {"text": "Docs", "href": "#docs"}
+                        ],
+                        "ctaText": "Get Started",
+                        "backgroundColor": "#0D0D0D",
+                        "textColor": "#FFFFFF",
+                        "linkColor": "#B0B0B0",
+                        "linkHoverColor": "#FFFFFF"
+                    },
+                    "children": [],
+                    "isGlobal": "GlobalNavbar"
+                },
+                {
+                    "id": "pricing-hero",
+                    "type": "Container",
+                    "props": {
+                        "padding": "100px 40px",
+                        "backgroundColor": "#0D0D0D",
+                        "textAlign": "center"
+                    },
+                    "children": [
+                        {
+                            "id": "pricing-hero-title",
+                            "type": "Text",
+                            "props": {
+                                "content": "Simple, transparent pricing",
+                                "tag": "h1",
+                                "size": "6xl",
+                                "weight": "900",
+                                "color": "#FFFFFF",
+                                "marginBottom": "1.5rem"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "pricing-hero-desc",
+                            "type": "Text",
+                            "props": {
+                                "content": "Start free, scale as you grow",
+                                "tag": "p",
+                                "size": "xl",
+                                "color": "#B0B0B0",
+                                "marginBottom": "4rem"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "pricing-cards",
+                            "type": "Grid",
+                            "props": {
+                                "columns": 3,
+                                "gap": "2rem",
+                                "maxWidth": "1200px",
+                                "marginLeft": "auto",
+                                "marginRight": "auto"
+                            },
+                            "children": [
+                                {
+                                    "id": "plan-starter",
+                                    "type": "PricingCard",
+                                    "props": {
+                                        "title": "Starter",
+                                        "price": "$0",
+                                        "period": "/month",
+                                        "description": "Perfect for side projects and experimentation",
+                                        "features": [
+                                            {"text": "100K API calls/month", "included": true},
+                                            {"text": "Basic models", "included": true},
+                                            {"text": "Community support", "included": true},
+                                            {"text": "Advanced models", "included": false},
+                                            {"text": "Priority support", "included": false}
+                                        ],
+                                        "buttonText": "Start Free",
+                                        "featured": false,
+                                        "backgroundColor": "#1A1A1A",
+                                        "textColor": "#FFFFFF"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "plan-pro",
+                                    "type": "PricingCard",
+                                    "props": {
+                                        "title": "Pro",
+                                        "price": "$99",
+                                        "period": "/month",
+                                        "description": "For professional developers and small teams",
+                                        "features": [
+                                            {"text": "5M API calls/month", "included": true},
+                                            {"text": "All models", "included": true},
+                                            {"text": "Priority support", "included": true},
+                                            {"text": "Custom training", "included": true},
+                                            {"text": "SLA guarantee", "included": false}
+                                        ],
+                                        "buttonText": "Start Pro Trial",
+                                        "featured": true,
+                                        "backgroundColor": "#8B5CF6",
+                                        "textColor": "#FFFFFF"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "plan-enterprise",
+                                    "type": "PricingCard",
+                                    "props": {
+                                        "title": "Enterprise",
+                                        "price": "Custom",
+                                        "period": "",
+                                        "description": "For large-scale production deployments",
+                                        "features": [
+                                            {"text": "Unlimited API calls", "included": true},
+                                            {"text": "All models + custom", "included": true},
+                                            {"text": "Dedicated support", "included": true},
+                                            {"text": "99.99% SLA", "included": true},
+                                            {"text": "On-premise option", "included": true}
+                                        ],
+                                        "buttonText": "Contact Sales",
+                                        "featured": false,
+                                        "backgroundColor": "#1A1A1A",
+                                        "textColor": "#FFFFFF"
+                                    },
+                                    "children": []
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "footer-pricing",
+                    "type": "Footer",
+                    "props": {
+                        "logoText": "NEURAL",
+                        "description": "The AI development platform for the modern era.",
+                        "copyright": "© 2024 Neural Inc. All rights reserved.",
+                        "backgroundColor": "#0D0D0D",
+                        "textColor": "#B0B0B0",
+                        "sections": [
+                            {
+                                "title": "Product",
+                                "links": [
+                                    {"text": "Platform", "href": "#"},
+                                    {"text": "Solutions", "href": "page:solutions"},
+                                    {"text": "Pricing", "href": "page:pricing"},
+                                    {"text": "Documentation", "href": "#"}
+                                ]
+                            },
+                            {
+                                "title": "Company",
+                                "links": [
+                                    {"text": "About", "href": "#"},
+                                    {"text": "Blog", "href": "#"},
+                                    {"text": "Careers", "href": "#"},
+                                    {"text": "Contact", "href": "#"}
+                                ]
+                            }
+                        ]
+                    },
+                    "children": [],
+                    "isGlobal": "GlobalFooter"
+                }
+            ]
+        }
+    ]
+}

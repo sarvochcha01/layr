@@ -6,17 +6,23 @@ import { COMPONENT_REGISTRY } from "@/components/builder";
 import { cn } from "@/lib/utils";
 import { buildComponentStyle } from "@/lib/buildStyle";
 import { ResizableWrapper } from "./ResizableWrapper";
+import { useCtrlDrag } from "@/hooks/useCtrlDrag";
+import { useCanvasZoom } from "@/hooks/useCanvasZoom";
 
 interface CanvasProps {
   components: ComponentDefinition[];
   selectedComponentIds: string[];
   onSelectComponent: (id: string | null) => void;
   onUpdateComponent?: (id: string, updates: Record<string, any>) => void;
+  onRepositionComponent?: (componentId: string, targetId: string | null, position: "top" | "bottom" | "left" | "right" | "center" | "inside") => void;
   viewport?: "desktop" | "tablet" | "mobile";
   isPreviewMode?: boolean;
   onNavigate?: (slug: string) => void;
   pages?: any[];
+  currentPageSlug?: string;
   showOutlines?: boolean;
+  outlineColor?: "black" | "white";
+  showComponentTags?: boolean;
   pageBackground?: {
     backgroundColor?: string;
     backgroundType?: "solid" | "gradient" | "image";
@@ -25,6 +31,8 @@ interface CanvasProps {
     backgroundSize?: string;
     backgroundPosition?: string;
   };
+  onZoomChange?: (zoom: number, pan: { x: number; y: number }) => void;
+  onComponentDoubleClick?: (componentId: string) => void;
 }
 
 function DropZone({
@@ -84,7 +92,11 @@ function ComponentWrapper({
   isPreviewMode,
   onNavigate,
   pages,
+  currentPageSlug,
   showOutlines,
+  outlineColor,
+  showComponentTags,
+  onComponentDoubleClick,
 }: {
   component: ComponentDefinition;
   isSelected: boolean;
@@ -96,7 +108,11 @@ function ComponentWrapper({
   isPreviewMode?: boolean;
   onNavigate?: (slug: string) => void;
   pages?: any[];
+  currentPageSlug?: string;
   showOutlines?: boolean;
+  outlineColor?: "black" | "white";
+  showComponentTags?: boolean;
+  onComponentDoubleClick?: (componentId: string) => void;
 }) {
   const Component =
     COMPONENT_REGISTRY[component.type as keyof typeof COMPONENT_REGISTRY];
@@ -151,6 +167,7 @@ function ComponentWrapper({
     <div
       ref={setNodeRef}
       data-component-id={component.id}
+      data-component-type={component.type}
       className={cn(
         "relative group min-w-0",
         shouldTakeFullHeight && "flex self-stretch",
@@ -176,7 +193,9 @@ function ComponentWrapper({
           !isPreviewMode &&
             showOutlines &&
             !isSelected &&
-            "outline outline-1 outline-dashed outline-gray-300",
+            (outlineColor === "white" 
+              ? "outline outline-1 outline-dashed outline-white" 
+              : "outline outline-1 outline-dashed outline-black"),
         )}
       >
         <div
@@ -188,14 +207,35 @@ function ComponentWrapper({
                   onSelect();
                 }
           }
+          onDoubleClick={
+            isPreviewMode
+              ? undefined
+              : (e) => {
+                  e.stopPropagation();
+                  if (onComponentDoubleClick) {
+                    onComponentDoubleClick(component.id);
+                  }
+                }
+          }
         >
         {/* Selection overlay and DRAG HANDLE */}
-        {!isPreviewMode && isSelected && (
+        {!isPreviewMode && showComponentTags && (
           <div
             {...listeners}
             {...attributes}
-            className="absolute -top-6 left-0 bg-primary text-primary-foreground text-xs px-2 py-1 rounded z-10 cursor-grab active:cursor-grabbing hover:bg-primary/90 transition-colors"
-            title="Drag to move this component"
+            className={cn(
+              "absolute -top-6 left-0 text-xs px-2 py-1 rounded z-10 transition-colors",
+              isSelected 
+                ? "bg-primary text-primary-foreground cursor-grab active:cursor-grabbing hover:bg-primary/90" 
+                : "bg-muted text-muted-foreground cursor-pointer hover:bg-muted/80"
+            )}
+            title={isSelected ? "Drag to move this component" : "Click to select"}
+            onClick={(e) => {
+              if (!isSelected) {
+                e.stopPropagation();
+                onSelect();
+              }
+            }}
           >
             <div className="flex items-center gap-1">
               <span className="opacity-75">⋮⋮</span>
@@ -212,6 +252,7 @@ function ComponentWrapper({
             isPreviewMode={isPreviewMode}
             onNavigate={onNavigate}
             pages={pages}
+            currentPageSlug={currentPageSlug}
           >
             {component.children.length > 0 &&
               (component.type === "Grid" || component.type === "Container" ? (
@@ -229,7 +270,11 @@ function ComponentWrapper({
                         isPreviewMode={isPreviewMode}
                         onNavigate={onNavigate}
                         pages={pages}
+                        currentPageSlug={currentPageSlug}
                         showOutlines={showOutlines}
+                        outlineColor={outlineColor}
+                        showComponentTags={showComponentTags}
+                        onComponentDoubleClick={onComponentDoubleClick}
                       />
                     </React.Fragment>
                   ))}
@@ -256,7 +301,11 @@ function ComponentWrapper({
                         isPreviewMode={isPreviewMode}
                         onNavigate={onNavigate}
                         pages={pages}
+                        currentPageSlug={currentPageSlug}
                         showOutlines={showOutlines}
+                        outlineColor={outlineColor}
+                        showComponentTags={showComponentTags}
+                        onComponentDoubleClick={onComponentDoubleClick}
                       />
                       {!isPreviewMode &&
                         index < component.children.length - 1 && (
@@ -287,6 +336,7 @@ function ComponentWrapper({
             isPreviewMode={isPreviewMode}
             onNavigate={onNavigate}
             pages={pages}
+            currentPageSlug={currentPageSlug}
           />
         )}
         </div>
@@ -304,7 +354,11 @@ function ComponentRenderer({
   isPreviewMode,
   onNavigate,
   pages,
+  currentPageSlug,
   showOutlines,
+  outlineColor,
+  showComponentTags,
+  onComponentDoubleClick,
 }: {
   component: ComponentDefinition;
   selectedComponentIds: string[];
@@ -314,7 +368,11 @@ function ComponentRenderer({
   isPreviewMode?: boolean;
   onNavigate?: (slug: string) => void;
   pages?: any[];
+  currentPageSlug?: string;
   showOutlines?: boolean;
+  outlineColor?: "black" | "white";
+  showComponentTags?: boolean;
+  onComponentDoubleClick?: (componentId: string) => void;
 }) {
   return (
     <ComponentWrapper
@@ -328,7 +386,11 @@ function ComponentRenderer({
       isPreviewMode={isPreviewMode}
       onNavigate={onNavigate}
       pages={pages}
+      currentPageSlug={currentPageSlug}
       showOutlines={showOutlines}
+      outlineColor={outlineColor}
+      showComponentTags={showComponentTags}
+      onComponentDoubleClick={onComponentDoubleClick}
     />
   );
 }
@@ -338,13 +400,77 @@ export function Canvas({
   selectedComponentIds,
   onSelectComponent,
   onUpdateComponent,
+  onRepositionComponent,
   viewport = "desktop",
   isPreviewMode = false,
   onNavigate,
   pages,
+  currentPageSlug,
   showOutlines = false,
+  outlineColor = "black",
+  showComponentTags = true,
   pageBackground,
+  onZoomChange,
+  onComponentDoubleClick,
 }: CanvasProps) {
+  // Ctrl+Click drag functionality
+  const { isDragging, draggedComponentId } = useCtrlDrag({
+    isEnabled: !isPreviewMode,
+    onDragStart: (componentId) => {
+      console.log('🎯 Ctrl+Drag started for component:', componentId);
+    },
+    onDragEnd: (componentId, targetId, position) => {
+      console.log('🎯 Ctrl+Drag ended:', { componentId, targetId, position });
+      if (onRepositionComponent && targetId) {
+        console.log('🎯 Calling onRepositionComponent...');
+        onRepositionComponent(componentId, targetId, position);
+      } else {
+        console.log('⚠️ onRepositionComponent not available or no targetId');
+      }
+    },
+  });
+
+  // Canvas zoom and pan functionality (controlled externally)
+  const { zoom, pan, isPanning } = useCanvasZoom({
+    isEnabled: !isPreviewMode,
+    minZoom: 0.25,
+    maxZoom: 2,
+    zoomSpeed: 0.1,
+  });
+
+  // Notify parent of zoom changes
+  React.useEffect(() => {
+    if (onZoomChange) {
+      onZoomChange(zoom, pan);
+    }
+  }, [zoom, pan, onZoomChange]);
+
+  // Add Ctrl key detection for cursor change
+  React.useEffect(() => {
+    if (isPreviewMode) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey || e.metaKey) {
+        document.body.classList.add('ctrl-drag-mode');
+      }
+    };
+
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (!e.ctrlKey && !e.metaKey) {
+        document.body.classList.remove('ctrl-drag-mode');
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('keyup', handleKeyUp);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('keyup', handleKeyUp);
+      document.body.classList.remove('ctrl-drag-mode');
+    };
+  }, [isPreviewMode]);
+
   // Build page background style
   const pageStyle: React.CSSProperties = {};
   
@@ -377,51 +503,68 @@ export function Canvas({
       onClick={isPreviewMode ? undefined : () => onSelectComponent(null)}
       tabIndex={isPreviewMode ? undefined : 0}
     >
-      {components.length === 0 ? (
-        /* Empty state - single drop zone */
-        <DropZone
-          targetId={undefined}
-          position="inside"
-          className="min-h-[200px] flex items-center justify-center border-2 border-dashed border-gray-300 rounded-lg"
-          emptyStateText="Drag components here to start building"
-        />
-      ) : (
-        <>
-          <div className="space-y-4">
-            {/* Initial drop zone at the top */}
+      {/* Canvas content with zoom and pan - only apply transform in edit mode */}
+      <div
+        style={
+          isPreviewMode
+            ? undefined
+            : {
+                transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
+                transformOrigin: 'center center',
+                transition: isPanning ? 'none' : 'transform 0.1s ease-out',
+              }
+        }
+      >
+        {components.length === 0 ? (
+          /* Empty state - single drop zone */
+          <DropZone
+            targetId={undefined}
+            position="inside"
+            className="min-h-[200px] flex items-center justify-center border-2 border-dashed border-gray-300 rounded-lg"
+            emptyStateText="Drag components here to start building"
+          />
+        ) : (
+          <>
+            <div className="space-y-4">
+              {/* Initial drop zone at the top */}
+              {!isPreviewMode && (
+                <DropZone targetId={undefined} position="before" />
+              )}
+
+              {/* Render components with drop zones between them */}
+              {components.map((component, index) => (
+                <div key={component.id}>
+                  <ComponentRenderer
+                    component={component}
+                    selectedComponentIds={selectedComponentIds}
+                    onSelectComponent={onSelectComponent}
+                    onUpdateComponent={onUpdateComponent}
+                    viewport={viewport}
+                    isPreviewMode={isPreviewMode}
+                    onNavigate={onNavigate}
+                    pages={pages}
+                    currentPageSlug={currentPageSlug}
+                    showOutlines={showOutlines}
+                    outlineColor={outlineColor}
+                    showComponentTags={showComponentTags}
+                    onComponentDoubleClick={onComponentDoubleClick}
+                  />
+
+                  {/* Drop zone after each component */}
+                  {!isPreviewMode && index < components.length - 1 && (
+                    <DropZone targetId={component.id} position="after" />
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Final drop zone at the bottom */}
             {!isPreviewMode && (
-              <DropZone targetId={undefined} position="before" />
+              <DropZone targetId={undefined} position="inside" className="mt-4" />
             )}
-
-            {/* Render components with drop zones between them */}
-            {components.map((component, index) => (
-              <div key={component.id}>
-                <ComponentRenderer
-                  component={component}
-                  selectedComponentIds={selectedComponentIds}
-                  onSelectComponent={onSelectComponent}
-                  onUpdateComponent={onUpdateComponent}
-                  viewport={viewport}
-                  isPreviewMode={isPreviewMode}
-                  onNavigate={onNavigate}
-                  pages={pages}
-                  showOutlines={showOutlines}
-                />
-
-                {/* Drop zone after each component */}
-                {!isPreviewMode && index < components.length - 1 && (
-                  <DropZone targetId={component.id} position="after" />
-                )}
-              </div>
-            ))}
-          </div>
-
-          {/* Final drop zone at the bottom */}
-          {!isPreviewMode && (
-            <DropZone targetId={undefined} position="inside" className="mt-4" />
-          )}
-        </>
-      )}
+          </>
+        )}
+      </div>
     </div>
   );
 }

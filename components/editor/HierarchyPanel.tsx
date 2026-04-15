@@ -93,15 +93,19 @@ export function HierarchyPanel({
     return (
       <div key={component.id}>
         <div
+          data-hierarchy-id={component.id}
           className={cn(
             "flex items-center py-1 px-2 hover:bg-muted cursor-pointer group",
             isSelected && "bg-primary/10 border-r-2 border-primary"
           )}
           style={{ paddingLeft: `${level * 16 + 8}px` }}
-          onClick={() => onSelectComponent(component.id)}
-          onDoubleClick={() => {
+          onClick={() => {
             onSelectComponent(component.id);
-            // Find the component element in the canvas and scroll to it
+            // Expand this component if it has children
+            if (hasChildren && !isExpanded) {
+              toggleExpanded(component.id);
+            }
+            // Scroll to the component in the canvas
             const el = document.querySelector(`[data-component-id="${component.id}"]`);
             if (el) {
               el.scrollIntoView({ behavior: "smooth", block: "center" });

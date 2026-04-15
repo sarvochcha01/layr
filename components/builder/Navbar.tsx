@@ -31,6 +31,7 @@ interface NavbarProps {
   linkHoverColor?: string;
   onNavigate?: (slug: string) => void;
   pages?: any[];
+  currentPageSlug?: string;
   [key: string]: any;
 }
 
@@ -57,6 +58,7 @@ export function Navbar({
   linkHoverColor,
   onNavigate,
   pages,
+  currentPageSlug,
   ...rest
 }: NavbarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -119,7 +121,30 @@ export function Navbar({
         {viewport === "desktop" && links.length > 0 && (
           <div className="flex items-center space-x-1 ml-8">
             {links.map((link, index) => {
-              const isActive = index === 0; // First link active by default
+              // Determine if this link is active based on current page
+              let isActive = false;
+              
+              if (currentPageSlug) {
+                // Check if link matches current page
+                if (link.href.startsWith("page:")) {
+                  const pageId = link.href.replace("page:", "");
+                  const linkedPage = pages?.find((p: any) => p.id === pageId);
+                  if (linkedPage) {
+                    isActive = linkedPage.slug === currentPageSlug;
+                  }
+                } else {
+                  let linkSlug = link.href.replace(/^\//, "").replace(/\.html$/, "");
+                  if (!linkSlug || linkSlug === "#") {
+                    linkSlug = link.text.toLowerCase().replace(/\s+/g, "-");
+                    if (linkSlug === "home") linkSlug = "index";
+                  }
+                  isActive = linkSlug === currentPageSlug;
+                }
+              } else {
+                // Fallback: first link active by default
+                isActive = index === 0;
+              }
+              
               const handleClick = (e: React.MouseEvent) => {
                 e.preventDefault();
                 e.stopPropagation();
