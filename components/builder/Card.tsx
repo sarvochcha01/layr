@@ -9,6 +9,12 @@ interface CardProps {
   title?: string;
   description?: string;
   image?: string;
+  topImage?: string;
+  topImageHeight?: string;
+  topImageObjectFit?: "cover" | "contain" | "fill" | "scale-down" | "none";
+  bottomBackgroundImageUrl?: string;
+  bottomBackgroundSize?: string;
+  bottomBackgroundPosition?: string;
   icon?: string;
   iconBg?: string;
   iconColor?: string;
@@ -28,6 +34,13 @@ export function Card({
   title = "Card Title",
   description = "A short description of this card's content goes here.",
   image = "https://images.unsplash.com/photo-1557683316-973673baf926?w=800&h=400&fit=crop",
+  image = "https://images.unsplash.com/photo-1557683316-973673baf926?w=200&h=100&fit=crop",
+  topImage,
+  topImageHeight = "208px",
+  topImageObjectFit = "cover",
+  bottomBackgroundImageUrl,
+  bottomBackgroundSize = "cover",
+  bottomBackgroundPosition = "center",
   icon,
   buttonText,
   buttonLink = "#",
@@ -46,12 +59,27 @@ export function Card({
 
   const baseStyle = buildComponentStyle({ backgroundColor, textColor, width, height, ...rest });
 
+  // Determine which image to show (priority: topImage > image for backward compatibility)
+  const showTopImage = topImage || image;
+  const showIcon = icon && !showTopImage;
+
+  // Build bottom background image style
+  const bottomBackgroundStyle = bottomBackgroundImageUrl
+    ? {
+        backgroundImage: `url(${bottomBackgroundImageUrl})`,
+        backgroundSize: bottomBackgroundSize,
+        backgroundPosition: bottomBackgroundPosition,
+        backgroundRepeat: "no-repeat",
+      }
+    : {};
+
   return (
     <div
       className={cn(
         "rounded-2xl p-6 min-w-0 w-full h-full flex flex-col",
         "border border-border",
         "overflow-hidden",
+        "relative",
         className,
       )}
       style={{
@@ -64,16 +92,28 @@ export function Card({
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {/* Image */}
-      {image && (
-        <div className="-mx-6 -mt-6 mb-5 flex-shrink-0 overflow-hidden">
+      {/* Bottom Background Image Layer */}
+      {bottomBackgroundImageUrl && (
+        <div
+          className="absolute inset-0 rounded-2xl"
+          style={bottomBackgroundStyle}
+        />
+      )}
+
+      {/* Top Image */}
+      {showTopImage && (
+        <div className="-mx-6 -mt-6 mb-5 flex-shrink-0 overflow-hidden relative z-10">
           <img
-            src={image}
+            src={showTopImage}
             alt={title || "Card image"}
             className="w-full h-52 object-cover"
             style={{
               transition: "transform 500ms cubic-bezier(0.25,0.46,0.45,0.94)",
               transform: hovered ? "scale(1.04)" : "scale(1)",
+            className="w-full"
+            style={{ 
+              height: topImageHeight,
+              objectFit: topImageObjectFit 
             }}
           />
         </div>
@@ -82,6 +122,9 @@ export function Card({
       {/* Icon */}
       {icon && !image && (
         <div className="mb-5 flex-shrink-0">
+      {/* Icon — show when there's no top image */}
+      {showIcon && (
+        <div className="mb-5 flex-shrink-0 relative z-10">
           <div
             className="w-12 h-12 rounded-xl flex items-center justify-center text-xl font-bold backdrop-blur-sm"
             style={{
@@ -97,7 +140,7 @@ export function Card({
       )}
 
       {/* Content */}
-      <div className="space-y-3 min-w-0 flex-1 overflow-hidden">
+      <div className="space-y-3 min-w-0 flex-1 overflow-hidden relative z-10">
         {title && (
           <h3
             className="text-xl font-semibold break-words leading-tight tracking-tight line-clamp-2"

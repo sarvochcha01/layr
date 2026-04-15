@@ -84,6 +84,7 @@ export interface PropertyFieldProps {
 export interface StyleSectionProps {
   props: Record<string, any>;
   updateProp: (key: string, value: any) => void;
+  componentType?: string;
 }
 
 export interface ComponentPropertiesProps {

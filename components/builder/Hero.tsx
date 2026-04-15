@@ -32,7 +32,7 @@ export function Hero({
   primaryButtonLink = "#",
   secondaryButtonText = "VIEW DOCUMENTATION",
   secondaryButtonLink = "#",
-  backgroundImage,
+  backgroundImage="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=700&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mzh8fHdlYnNpdGUlMjBiYWNrZ3JvdW5kfGVufDB8fDB8fHww",
   backgroundColor = "#0d0d0d",
   textColor = "#ffffff",
   alignment = "center",
@@ -234,6 +234,36 @@ export function Hero({
               <span>{tech}</span>
             </div>
           ))}
+        </div>
+          {primaryButtonText && (
+            <div style={isPreviewMode ? undefined : { pointerEvents: "none" }}>
+              <Button
+                size="lg"
+                className="w-full sm:w-auto px-8 py-3 text-sm font-bold tracking-wider rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground border-0 transition-all duration-300"
+                asChild
+              >
+                <a href={isPreviewMode ? primaryButtonLink : "#"} onClick={(e) => handleLinkClick(e, primaryButtonLink)}>
+                  {primaryButtonText}
+                  <span className="ml-2">→</span>
+                </a>
+              </Button>
+            </div>
+          )}
+
+          {secondaryButtonText && (
+            <div style={isPreviewMode ? undefined : { pointerEvents: "none" }}>
+              <Button
+                variant="outline"
+                size="lg"
+                className="w-full sm:w-auto px-8 py-3 text-sm font-bold tracking-wider rounded-xl border-border bg-card hover:bg-muted text-foreground transition-all duration-300"
+                asChild
+              >
+                <a href={isPreviewMode ? secondaryButtonLink : "#"} onClick={(e) => handleLinkClick(e, secondaryButtonLink)}>
+                  {secondaryButtonText}
+                </a>
+              </Button>
+            </div>
+          )}
         </div>
       </div>
 

@@ -32,6 +32,7 @@ import {
   Sparkles,
   BoxSelect,
   Play,
+  Pause,
   RotateCcw,
   Settings,
   ZoomIn,
@@ -39,6 +40,7 @@ import {
   Keyboard,
   ChevronDown,
   ChevronRight,
+  ChevronLeft,
   Plus,
   Trash2,
   Check,
@@ -162,6 +164,8 @@ export function EditorLayout({
   const [outlineColor, setOutlineColor] = useState<"black" | "white">("black");
   const [showComponentTags, setShowComponentTags] = useState(false);
   const [canvasZoom, setCanvasZoom] = useState(100);
+  const [isLeftPanelOpen, setIsLeftPanelOpen] = useState(true);
+  const [isRightPanelOpen, setIsRightPanelOpen] = useState(true);
   
   // Editable shortcuts state
   const [customShortcuts, setCustomShortcuts] = useState([
@@ -377,9 +381,9 @@ export function EditorLayout({
             <button
               onClick={() => setIsPreviewMode(!isPreviewMode)}
               className="p-2 hover:bg-muted rounded-md transition-colors text-muted-foreground hover:text-foreground"
-              title="Preview"
+              title={isPreviewMode ? "Stop Preview" : "Preview"}
             >
-              <Play className="w-4 h-4" />
+              {isPreviewMode ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
             </button>
             
             <div className="relative">
@@ -654,12 +658,22 @@ export function EditorLayout({
           {/* Left Sidebar */}
           {!isPreviewMode && (
             <>
-              <div
-                className="bg-card border-r border-border flex flex-col"
-                style={{ width: `${leftPanelWidth}px`, flexShrink: 0, flexGrow: 0 }}
-              >
-                {/* Controlled Tabs — activeTab state drives everything */}
-                <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col h-full w-full">
+              {isLeftPanelOpen && (
+                <div
+                  className="bg-card border-r border-border flex flex-col relative"
+                  style={{ width: `${leftPanelWidth}px`, flexShrink: 0, flexGrow: 0 }}
+                >
+                  {/* Collapse Button */}
+                  <button
+                    onClick={() => setIsLeftPanelOpen(false)}
+                    className="absolute top-2 right-2 z-20 p-1 hover:bg-muted rounded transition-colors text-muted-foreground hover:text-foreground"
+                    title="Collapse Panel"
+                  >
+                    <ChevronLeft className="w-3.5 h-3.5" />
+                  </button>
+                  
+                  {/* Controlled Tabs — activeTab state drives everything */}
+                  <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col h-full w-full">
                   <div className="flex-shrink-0 px-2 py-2 border-b border-border bg-card">
                     <TabsList className="w-full grid grid-cols-3 bg-muted gap-0.5 p-1 h-auto rounded-md border border-border">
                       <TabsTrigger
@@ -769,12 +783,26 @@ export function EditorLayout({
                   </div>
                 </Tabs>
               </div>
+              )}
+
+              {/* Left Panel Expand Button (when collapsed) */}
+              {!isLeftPanelOpen && (
+                <button
+                  onClick={() => setIsLeftPanelOpen(true)}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 z-20 p-2 bg-card border border-border hover:bg-muted rounded transition-colors text-muted-foreground hover:text-foreground shadow-lg"
+                  title="Expand Panel"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              )}
 
               {/* Left Resize Handle */}
-              <div
-                className="w-[1px] bg-border hover:bg-primary cursor-ew-resize transition-colors flex-shrink-0 z-10"
-                onMouseDown={(e) => startResize("left", e)}
-              />
+              {isLeftPanelOpen && (
+                <div
+                  className="w-[1px] bg-border hover:bg-primary cursor-ew-resize transition-colors flex-shrink-0 z-10"
+                  onMouseDown={(e) => startResize("left", e)}
+                />
+              )}
             </>
           )}
 
@@ -833,28 +861,54 @@ export function EditorLayout({
           {/* Right Sidebar */}
           {!isPreviewMode && (
             <>
-              <div
-                className="w-[1px] bg-border hover:bg-primary cursor-ew-resize transition-colors flex-shrink-0 z-10"
-                onMouseDown={(e) => startResize("right", e)}
-              />
-              <div
-                className="bg-card border-l border-border flex flex-col overflow-hidden"
-                style={{ width: `${rightPanelWidth}px`, flexShrink: 0, flexGrow: 0 }}
-              >
-                <PropertiesPanel
-                  selectedComponent={selectedComponent}
-                  onUpdateComponent={onUpdateComponent}
-                  onDeleteComponent={onDeleteComponent}
-                  onDuplicateComponent={onDuplicateComponent}
-                  pages={pages}
-                  currentPage={pages.find(p => p.id === currentPageId)}
-                  onUpdatePage={(updates) => onPageUpdate?.(currentPageId, updates)}
-                  globalComponents={globalComponents}
-                  onMarkAsGlobal={onMarkAsGlobal}
-                  onUnmarkGlobal={onUnmarkGlobal}
-                  onApplyGlobalTemplate={onApplyGlobalTemplate}
+              {/* Right Resize Handle */}
+              {isRightPanelOpen && (
+                <div
+                  className="w-[1px] bg-border hover:bg-primary cursor-ew-resize transition-colors flex-shrink-0 z-10"
+                  onMouseDown={(e) => startResize("right", e)}
                 />
-              </div>
+              )}
+              
+              {isRightPanelOpen && (
+                <div
+                  className="bg-card border-l border-border flex flex-col overflow-hidden relative"
+                  style={{ width: `${rightPanelWidth}px`, flexShrink: 0, flexGrow: 0 }}
+                >
+                  {/* Collapse Button */}
+                  <button
+                    onClick={() => setIsRightPanelOpen(false)}
+                    className="absolute top-2 left-2 z-20 p-1 hover:bg-muted rounded transition-colors text-muted-foreground hover:text-foreground"
+                    title="Collapse Panel"
+                  >
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </button>
+                  
+                  <PropertiesPanel
+                    selectedComponent={selectedComponent}
+                    onUpdateComponent={onUpdateComponent}
+                    onDeleteComponent={onDeleteComponent}
+                    onDuplicateComponent={onDuplicateComponent}
+                    pages={pages}
+                    currentPage={pages.find(p => p.id === currentPageId)}
+                    onUpdatePage={(updates) => onPageUpdate?.(currentPageId, updates)}
+                    globalComponents={globalComponents}
+                    onMarkAsGlobal={onMarkAsGlobal}
+                    onUnmarkGlobal={onUnmarkGlobal}
+                    onApplyGlobalTemplate={onApplyGlobalTemplate}
+                  />
+                </div>
+              )}
+              
+              {/* Right Panel Expand Button (when collapsed) */}
+              {!isRightPanelOpen && (
+                <button
+                  onClick={() => setIsRightPanelOpen(true)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 z-20 p-2 bg-card border border-border hover:bg-muted rounded transition-colors text-muted-foreground hover:text-foreground shadow-lg"
+                  title="Expand Panel"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+              )}
             </>
           )}
         </div>

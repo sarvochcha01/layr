@@ -24,8 +24,13 @@ function LocalTextInput({ value, onChange, placeholder, className }: { value: st
   return <Input value={localValue} onChange={(e) => setLocalValue(e.target.value)} onBlur={commit} onKeyDown={(e) => { if (e.key === "Enter") { commit(); (e.target as HTMLInputElement).blur(); } }} placeholder={placeholder} className={className} />;
 }
 
-export function FillSection({ props, updateProp }: StyleSectionProps) {
+export function FillSection({ props, updateProp, componentType }: StyleSectionProps) {
   const bgType = props.backgroundType || "solid";
+  
+  // For Card components, hide the image option
+  const availableTypes = componentType === "Card" 
+    ? (["solid", "gradient"] as const)
+    : (["solid", "gradient", "image"] as const);
 
   return (
     <AccordionItem value="fill" className="border-b-0 border-t border-border/50">
@@ -40,7 +45,7 @@ export function FillSection({ props, updateProp }: StyleSectionProps) {
         <div className="space-y-1.5">
           <Label className={labelClass}>Background Type</Label>
           <div className="flex gap-1 border rounded-md p-0.5">
-            {(["solid", "gradient", "image"] as const).map((t) => (
+            {availableTypes.map((t) => (
               <button
                 key={t}
                 onClick={() => {
