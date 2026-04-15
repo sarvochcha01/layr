@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Settings2, Type, Paintbrush, Link as LinkIcon, ImageIcon, LayoutGrid } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -16,7 +16,7 @@ import {
 
 import { COMPONENT_SCHEMAS } from "./registry";
 import { FieldDefinition, SectionIcon, StyleSectionType } from "./types";
-import { TextField, TextareaField, ColorField, SelectField, SwitchField } from "./fields";
+import { TextField, TextareaField, ColorField, SelectField, SwitchField, LinkField } from "./fields";
 import {
   FillSection,
   DimensionsSection,
@@ -49,7 +49,61 @@ const STYLE_SECTION_MAP: Record<StyleSectionType, React.ComponentType<{ props: R
 };
 
 // ═══════════════════════════════════════════════════════════
+// Local-state text input for array editors
+// Commits on blur/Enter to avoid keystroke lag
+// ═══════════════════════════════════════════════════════════
+
+function LocalInput({
+  value,
+  onChange,
+  placeholder,
+  className,
+  type = "text",
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  className?: string;
+  type?: string;
+}) {
+  const [localValue, setLocalValue] = useState(value || "");
+  const prevValueRef = useRef(value);
+
+  useEffect(() => {
+    if (value !== prevValueRef.current) {
+      setLocalValue(value || "");
+      prevValueRef.current = value;
+    }
+  }, [value]);
+
+  const commitValue = () => {
+    if (localValue !== value) {
+      onChange(localValue);
+      prevValueRef.current = localValue;
+    }
+  };
+
+  return (
+    <Input
+      type={type}
+      value={localValue}
+      onChange={(e) => setLocalValue(e.target.value)}
+      onBlur={commitValue}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") {
+          commitValue();
+          (e.target as HTMLInputElement).blur();
+        }
+      }}
+      placeholder={placeholder}
+      className={className}
+    />
+  );
+}
+
+// ═══════════════════════════════════════════════════════════
 // Custom Array Editors — for complex props like links, items
+// All use LocalInput to prevent keystroke lag
 // ═══════════════════════════════════════════════════════════
 
 function NavLinksEditor({ links, updateProp, pages }: { links: any[]; updateProp: (k: string, v: any) => void; pages?: Page[] }) {
@@ -66,40 +120,15 @@ function NavLinksEditor({ links, updateProp, pages }: { links: any[]; updateProp
           </div>
           <div className="space-y-1.5">
             <Label className="text-[10px] uppercase text-muted-foreground font-semibold">Label</Label>
-            <Input value={link.text || ""} onChange={(e) => { const n = [...links]; n[index] = { ...link, text: e.target.value }; updateProp("links", n); }} placeholder="Link text" className="h-7 text-xs bg-background" />
+            <LocalInput value={link.text || ""} onChange={(val) => { const n = [...links]; n[index] = { ...link, text: val }; updateProp("links", n); }} placeholder="Link text" className="h-7 text-xs bg-background" />
           </div>
           <div className="space-y-1.5">
             <Label className="text-[10px] uppercase text-muted-foreground font-semibold">Destination</Label>
-            <div className="grid grid-cols-[1fr_2fr] gap-2 items-start">
-              <div className="relative border border-border rounded-md focus-within:ring-1 focus-within:ring-primary bg-background">
-                <select value={link.href?.startsWith("page:") ? "page" : "url"}
-                  onChange={(e) => {
-                    const n = [...links];
-                    if (e.target.value === "page" && pages && pages.length > 0) {
-                      n[index] = { ...link, href: `page:${pages[0].id}` };
-                    } else {
-                      n[index] = { ...link, href: "" };
-                    }
-                    updateProp("links", n);
-                  }}
-                  className="w-full h-7 px-1 text-xs bg-background text-foreground appearance-none focus:outline-none">
-                  <option className="bg-background text-foreground" value="url">URL</option>
-                  <option className="bg-background text-foreground" value="page">Page</option>
-                </select>
-              </div>
-              {link.href?.startsWith("page:") ? (
-                <div className="relative border border-border rounded-md focus-within:ring-1 focus-within:ring-primary bg-background">
-                  <select value={link.href} onChange={(e) => { const n = [...links]; n[index] = { ...link, href: e.target.value }; updateProp("links", n); }}
-                    className="w-full h-7 px-1 text-xs bg-background text-foreground appearance-none focus:outline-none">
-                    {(pages || []).map((page) => (
-                      <option className="bg-background text-foreground" key={page.id} value={`page:${page.id}`}>{page.name}</option>
-                    ))}
-                  </select>
-                </div>
-              ) : (
-                <Input value={link.href || ""} onChange={(e) => { const n = [...links]; n[index] = { ...link, href: e.target.value }; updateProp("links", n); }} placeholder="URL" className="h-7 text-xs bg-background" />
-              )}
-            </div>
+            <LinkField
+              value={link.href || ""}
+              onChange={(val) => { const n = [...links]; n[index] = { ...link, href: val }; updateProp("links", n); }}
+              pages={pages}
+            />
           </div>
           <div className="flex items-center justify-between pt-2">
             <Label htmlFor={`external-${index}`} className="text-[10px] uppercase text-muted-foreground font-semibold cursor-pointer">Open in new tab</Label>
@@ -117,7 +146,7 @@ function NavLinksEditor({ links, updateProp, pages }: { links: any[]; updateProp
   );
 }
 
-function FooterSectionsEditor({ sections, updateProp }: { sections: any[]; updateProp: (k: string, v: any) => void }) {
+function FooterSectionsEditor({ sections, updateProp, pages }: { sections: any[]; updateProp: (k: string, v: any) => void; pages?: Page[] }) {
   return (
     <div className="space-y-3">
       {(sections || []).map((section: any, sectionIndex: number) => (
@@ -131,16 +160,22 @@ function FooterSectionsEditor({ sections, updateProp }: { sections: any[]; updat
           </div>
           <div className="space-y-1.5">
             <Label className="text-[10px] uppercase text-muted-foreground font-semibold">Title</Label>
-            <Input value={section.title || ""} onChange={(e) => { const n = [...sections]; n[sectionIndex] = { ...section, title: e.target.value }; updateProp("sections", n); }} placeholder="Section title" className="h-7 text-xs bg-background" />
+            <LocalInput value={section.title || ""} onChange={(val) => { const n = [...sections]; n[sectionIndex] = { ...section, title: val }; updateProp("sections", n); }} placeholder="Section title" className="h-7 text-xs bg-background" />
           </div>
           <div className="space-y-2 pt-1 border-t border-border">
             <Label className="text-[10px] uppercase text-muted-foreground font-semibold">Links</Label>
             {(section.links || []).map((link: any, linkIndex: number) => (
-              <div key={linkIndex} className="grid grid-cols-[1fr_1fr_auto] gap-2 items-start bg-background p-2 rounded border border-border/50">
-                <Input value={link.text || ""} onChange={(e) => { const ns = [...sections]; const nl = [...(section.links || [])]; nl[linkIndex] = { ...link, text: e.target.value }; ns[sectionIndex] = { ...section, links: nl }; updateProp("sections", ns); }} placeholder="Link text" className="h-7 text-xs" />
-                <Input value={link.href || ""} onChange={(e) => { const ns = [...sections]; const nl = [...(section.links || [])]; nl[linkIndex] = { ...link, href: e.target.value }; ns[sectionIndex] = { ...section, links: nl }; updateProp("sections", ns); }} placeholder="URL" className="h-7 text-xs" />
-                <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive hover:bg-destructive/10"
+              <div key={linkIndex} className="bg-background p-2 rounded border border-border/50 relative pt-7 space-y-2">
+                <Button variant="ghost" size="icon" className="absolute top-1 right-1 h-5 w-5 text-destructive hover:text-destructive hover:bg-destructive/10"
                   onClick={() => { const ns = [...sections]; ns[sectionIndex] = { ...section, links: (section.links || []).filter((_: any, i: number) => i !== linkIndex) }; updateProp("sections", ns); }}>&times;</Button>
+                <div className="grid grid-cols-[auto_1fr] gap-2 items-center">
+                  <Label className="text-[10px] uppercase text-muted-foreground font-semibold w-10">Label</Label>
+                  <LocalInput value={link.text || ""} onChange={(val) => { const ns = [...sections]; const nl = [...(section.links || [])]; nl[linkIndex] = { ...link, text: val }; ns[sectionIndex] = { ...section, links: nl }; updateProp("sections", ns); }} placeholder="Link text" className="h-7 text-xs" />
+                </div>
+                <div className="grid grid-cols-[auto_1fr] gap-2 items-center">
+                  <Label className="text-[10px] uppercase text-muted-foreground font-semibold w-10">Link</Label>
+                  <LinkField value={link.href || ""} onChange={(val) => { const ns = [...sections]; const nl = [...(section.links || [])]; nl[linkIndex] = { ...link, href: val }; ns[sectionIndex] = { ...section, links: nl }; updateProp("sections", ns); }} pages={pages} />
+                </div>
               </div>
             ))}
             <Button variant="outline" size="sm" className="w-full text-[10px] h-6 border-dashed mt-2"
@@ -158,7 +193,7 @@ function FooterSectionsEditor({ sections, updateProp }: { sections: any[]; updat
   );
 }
 
-function SocialLinksEditor({ socialLinks, updateProp }: { socialLinks: any[]; updateProp: (k: string, v: any) => void }) {
+function SocialLinksEditor({ socialLinks, updateProp, pages }: { socialLinks: any[]; updateProp: (k: string, v: any) => void; pages?: Page[] }) {
   return (
     <div className="space-y-3">
       {(socialLinks || []).map((social: any, index: number) => (
@@ -172,16 +207,16 @@ function SocialLinksEditor({ socialLinks, updateProp }: { socialLinks: any[]; up
           </div>
           <div className="space-y-1.5">
             <Label className="text-[10px] uppercase text-muted-foreground font-semibold">Platform</Label>
-            <Input value={social.platform || ""} onChange={(e) => { const n = [...socialLinks]; n[index] = { ...social, platform: e.target.value }; updateProp("socialLinks", n); }} placeholder="Platform name" className="h-7 text-xs bg-background" />
+            <LocalInput value={social.platform || ""} onChange={(val) => { const n = [...socialLinks]; n[index] = { ...social, platform: val }; updateProp("socialLinks", n); }} placeholder="Platform name" className="h-7 text-xs bg-background" />
           </div>
           <div className="grid grid-cols-2 gap-2">
-            <div className="space-y-1.5">
+            <div className="space-y-1.5 col-span-2">
               <Label className="text-[10px] uppercase text-muted-foreground font-semibold">URL</Label>
-              <Input value={social.href || ""} onChange={(e) => { const n = [...socialLinks]; n[index] = { ...social, href: e.target.value }; updateProp("socialLinks", n); }} placeholder="URL" className="h-7 text-xs bg-background" />
+              <LinkField value={social.href || ""} onChange={(val) => { const n = [...socialLinks]; n[index] = { ...social, href: val }; updateProp("socialLinks", n); }} pages={pages} />
             </div>
-            <div className="space-y-1.5">
+            <div className="space-y-1.5 col-span-2">
               <Label className="text-[10px] uppercase text-muted-foreground font-semibold">Icon</Label>
-              <Input value={social.icon || ""} onChange={(e) => { const n = [...socialLinks]; n[index] = { ...social, icon: e.target.value }; updateProp("socialLinks", n); }} placeholder="Emoji or text" className="h-7 text-xs bg-background" />
+              <LocalInput value={social.icon || ""} onChange={(val) => { const n = [...socialLinks]; n[index] = { ...social, icon: val }; updateProp("socialLinks", n); }} placeholder="Emoji or text" className="h-7 text-xs bg-background" />
             </div>
           </div>
         </div>
@@ -204,8 +239,8 @@ function AccordionItemsEditor({ items, updateProp }: { items: any[]; updateProp:
             <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive hover:text-destructive hover:bg-destructive/10 pointer-events-auto"
               onClick={() => updateProp("items", items.filter((_: any, i: number) => i !== index))}>&times;</Button>
           </div>
-          <Input value={item.title || ""} onChange={(e) => { const n = [...items]; n[index] = { ...item, title: e.target.value }; updateProp("items", n); }} placeholder="Title" className="h-7 text-xs bg-background" />
-          <Input value={item.content || ""} onChange={(e) => { const n = [...items]; n[index] = { ...item, content: e.target.value }; updateProp("items", n); }} placeholder="Content" className="h-7 text-xs bg-background" />
+          <LocalInput value={item.title || ""} onChange={(val) => { const n = [...items]; n[index] = { ...item, title: val }; updateProp("items", n); }} placeholder="Title" className="h-7 text-xs bg-background" />
+          <LocalInput value={item.content || ""} onChange={(val) => { const n = [...items]; n[index] = { ...item, content: val }; updateProp("items", n); }} placeholder="Content" className="h-7 text-xs bg-background" />
         </div>
       ))}
       <Button variant="outline" size="sm" className="w-full text-xs h-8 border-dashed"
@@ -226,8 +261,8 @@ function TabItemsEditor({ tabs, updateProp }: { tabs: any[]; updateProp: (k: str
             <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive hover:text-destructive hover:bg-destructive/10 pointer-events-auto"
               onClick={() => updateProp("tabs", tabs.filter((_: any, i: number) => i !== index))}>&times;</Button>
           </div>
-          <Input value={tab.label || ""} onChange={(e) => { const n = [...tabs]; n[index] = { ...tab, label: e.target.value }; updateProp("tabs", n); }} placeholder="Tab label" className="h-7 text-xs bg-background" />
-          <Input value={tab.content || ""} onChange={(e) => { const n = [...tabs]; n[index] = { ...tab, content: e.target.value }; updateProp("tabs", n); }} placeholder="Content" className="h-7 text-xs bg-background" />
+          <LocalInput value={tab.label || ""} onChange={(val) => { const n = [...tabs]; n[index] = { ...tab, label: val }; updateProp("tabs", n); }} placeholder="Tab label" className="h-7 text-xs bg-background" />
+          <LocalInput value={tab.content || ""} onChange={(val) => { const n = [...tabs]; n[index] = { ...tab, content: val }; updateProp("tabs", n); }} placeholder="Content" className="h-7 text-xs bg-background" />
         </div>
       ))}
       <Button variant="outline" size="sm" className="w-full text-xs h-8 border-dashed"
@@ -249,9 +284,9 @@ function StatsItemsEditor({ stats, updateProp }: { stats: any[]; updateProp: (k:
               onClick={() => updateProp("stats", stats.filter((_: any, i: number) => i !== index))}>&times;</Button>
           </div>
           <div className="grid grid-cols-3 gap-2">
-            <Input value={stat.value || ""} onChange={(e) => { const n = [...stats]; n[index] = { ...stat, value: e.target.value }; updateProp("stats", n); }} placeholder="Value" className="h-7 text-xs bg-background" />
-            <Input value={stat.label || ""} onChange={(e) => { const n = [...stats]; n[index] = { ...stat, label: e.target.value }; updateProp("stats", n); }} placeholder="Label" className="h-7 text-xs bg-background" />
-            <Input value={stat.suffix || ""} onChange={(e) => { const n = [...stats]; n[index] = { ...stat, suffix: e.target.value }; updateProp("stats", n); }} placeholder="Suffix" className="h-7 text-xs bg-background" />
+            <LocalInput value={stat.value || ""} onChange={(val) => { const n = [...stats]; n[index] = { ...stat, value: val }; updateProp("stats", n); }} placeholder="Value" className="h-7 text-xs bg-background" />
+            <LocalInput value={stat.label || ""} onChange={(val) => { const n = [...stats]; n[index] = { ...stat, label: val }; updateProp("stats", n); }} placeholder="Label" className="h-7 text-xs bg-background" />
+            <LocalInput value={stat.suffix || ""} onChange={(val) => { const n = [...stats]; n[index] = { ...stat, suffix: val }; updateProp("stats", n); }} placeholder="Suffix" className="h-7 text-xs bg-background" />
           </div>
         </div>
       ))}
@@ -271,7 +306,7 @@ function PricingFeaturesEditor({ features, updateProp }: { features: any[]; upda
         return (
           <div key={index} className="flex items-center gap-2 p-2 bg-muted border border-border rounded-md">
             <Switch checked={featureObj.included} onCheckedChange={(checked) => { const n = [...features]; n[index] = { ...featureObj, included: checked }; updateProp("features", n); }} className="scale-75" />
-            <Input value={featureObj.text || ""} onChange={(e) => { const n = [...features]; n[index] = { ...featureObj, text: e.target.value }; updateProp("features", n); }} placeholder="Feature text" className="h-7 text-xs bg-background flex-1" />
+            <LocalInput value={featureObj.text || ""} onChange={(val) => { const n = [...features]; n[index] = { ...featureObj, text: val }; updateProp("features", n); }} placeholder="Feature text" className="h-7 text-xs bg-background flex-1" />
             <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive hover:text-destructive hover:bg-destructive/10"
               onClick={() => updateProp("features", features.filter((_: any, i: number) => i !== index))}>&times;</Button>
           </div>
@@ -295,7 +330,7 @@ function FormFieldsEditor({ fields, updateProp }: { fields: any[]; updateProp: (
             <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive hover:text-destructive hover:bg-destructive/10 pointer-events-auto"
               onClick={() => updateProp("fields", fields.filter((_: any, i: number) => i !== index))}>&times;</Button>
           </div>
-          <Input value={field.label || ""} onChange={(e) => { const n = [...fields]; n[index] = { ...field, label: e.target.value }; updateProp("fields", n); }} placeholder="Label" className="h-7 text-xs bg-background" />
+          <LocalInput value={field.label || ""} onChange={(val) => { const n = [...fields]; n[index] = { ...field, label: val }; updateProp("fields", n); }} placeholder="Label" className="h-7 text-xs bg-background" />
           <div className="grid grid-cols-2 gap-2">
             <div className="relative border border-border rounded-md bg-background">
               <select value={field.type || "text"} onChange={(e) => { const n = [...fields]; n[index] = { ...field, type: e.target.value }; updateProp("fields", n); }}
@@ -309,7 +344,7 @@ function FormFieldsEditor({ fields, updateProp }: { fields: any[]; updateProp: (
                 <option value="radio">Radio</option>
               </select>
             </div>
-            <Input value={field.placeholder || ""} onChange={(e) => { const n = [...fields]; n[index] = { ...field, placeholder: e.target.value }; updateProp("fields", n); }} placeholder="Placeholder" className="h-7 text-xs bg-background" />
+            <LocalInput value={field.placeholder || ""} onChange={(val) => { const n = [...fields]; n[index] = { ...field, placeholder: val }; updateProp("fields", n); }} placeholder="Placeholder" className="h-7 text-xs bg-background" />
           </div>
           <div className="flex items-center justify-between">
             <Label className="text-[10px] uppercase text-muted-foreground font-semibold">Required</Label>
@@ -364,9 +399,9 @@ export function ComponentProperties({ type, props, updateProp, pages }: Componen
         case "nav-links":
           return <NavLinksEditor key={field.key} links={value || []} updateProp={updateProp} pages={pages} />;
         case "footer-sections":
-          return <FooterSectionsEditor key={field.key} sections={value || []} updateProp={updateProp} />;
+          return <FooterSectionsEditor key={field.key} sections={value || []} updateProp={updateProp} pages={pages} />;
         case "social-links":
-          return <SocialLinksEditor key={field.key} socialLinks={value || []} updateProp={updateProp} />;
+          return <SocialLinksEditor key={field.key} socialLinks={value || []} updateProp={updateProp} pages={pages} />;
         case "accordion-items":
           return <AccordionItemsEditor key={field.key} items={value || []} updateProp={updateProp} />;
         case "tab-items":
@@ -454,6 +489,15 @@ export function ComponentProperties({ type, props, updateProp, pages }: Componen
             value={value ?? field.defaultValue ?? 0}
             onChange={(e) => updateProp(field.key, parseFloat(e.target.value))}
             className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
+          />
+        )}
+        {field.type === "link-editor" && (
+          <LinkField
+            id={field.key}
+            value={value || ""}
+            onChange={(v) => updateProp(field.key, v)}
+            pages={pages}
+            placeholder={field.placeholder}
           />
         )}
       </div>

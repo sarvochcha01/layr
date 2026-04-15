@@ -20,6 +20,9 @@ interface HeroProps {
   className?: string;
   width?: string;
   height?: string;
+  isPreviewMode?: boolean;
+  onNavigate?: (slug: string) => void;
+  pages?: any[];
   [key: string]: any;
 }
 
@@ -41,6 +44,9 @@ export function Hero({
   className,
   width,
   height,
+  isPreviewMode = false,
+  onNavigate,
+  pages,
   ...rest
 }: HeroProps) {
   const sizeClasses = {
@@ -73,6 +79,21 @@ export function Hero({
   // Split title to highlight "FUTURE" word
   const titleParts = title.split("FUTURE");
   const hasHighlight = titleParts.length > 1;
+
+  /** Handle link clicks — prevent navigation in edit mode, use onNavigate for page: links */
+  const handleLinkClick = (e: React.MouseEvent, href: string) => {
+    if (!isPreviewMode) {
+      e.preventDefault();
+      return;
+    }
+    if (href.startsWith("page:") && onNavigate) {
+      e.preventDefault();
+      const pageId = href.substring(5);
+      const page = pages?.find((p: any) => p.id === pageId);
+      if (page) onNavigate(page.slug);
+    }
+    // For external URLs in preview mode, let the default behavior happen
+  };
 
   return (
     <section
@@ -145,7 +166,7 @@ export function Hero({
 
         {/* Title */}
         <h1
-          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-8 leading-[1.1] tracking-tight"
+          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 leading-[1.1] tracking-tight"
           style={{ fontFamily: "'Inter', sans-serif" }}
         >
           {hasHighlight ? (
@@ -170,6 +191,20 @@ export function Hero({
           )}
         </h1>
 
+        {/* Subtitle */}
+        {subtitle && (
+          <p
+            className="text-lg sm:text-xl md:text-2xl font-medium mb-8 text-foreground/70"
+            style={{
+              ...(alignment === "center"
+                ? { marginLeft: "auto", marginRight: "auto" }
+                : {}),
+            }}
+          >
+            {subtitle}
+          </p>
+        )}
+
         {/* Description */}
         <p
           className="text-base sm:text-lg mb-12 leading-relaxed max-w-2xl text-muted-foreground"
@@ -193,26 +228,32 @@ export function Hero({
                 : "items-start",
           )}
         >
-          <Button
-            size="lg"
-            className="w-full sm:w-auto px-8 py-3 text-sm font-bold tracking-wider rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground border-0 transition-all duration-300"
-            asChild
-          >
-            <a href={primaryButtonLink}>
-              {primaryButtonText}
-              <span className="ml-2">→</span>
-            </a>
-          </Button>
-
-          {secondaryButtonText && (
+          <div style={isPreviewMode ? undefined : { pointerEvents: "none" }}>
             <Button
-              variant="outline"
               size="lg"
-              className="w-full sm:w-auto px-8 py-3 text-sm font-bold tracking-wider rounded-xl border-border bg-card hover:bg-muted text-foreground transition-all duration-300"
+              className="w-full sm:w-auto px-8 py-3 text-sm font-bold tracking-wider rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground border-0 transition-all duration-300"
               asChild
             >
-              <a href={secondaryButtonLink}>{secondaryButtonText}</a>
+              <a href={isPreviewMode ? primaryButtonLink : "#"} onClick={(e) => handleLinkClick(e, primaryButtonLink)}>
+                {primaryButtonText}
+                <span className="ml-2">→</span>
+              </a>
             </Button>
+          </div>
+
+          {secondaryButtonText && (
+            <div style={isPreviewMode ? undefined : { pointerEvents: "none" }}>
+              <Button
+                variant="outline"
+                size="lg"
+                className="w-full sm:w-auto px-8 py-3 text-sm font-bold tracking-wider rounded-xl border-border bg-card hover:bg-muted text-foreground transition-all duration-300"
+                asChild
+              >
+                <a href={isPreviewMode ? secondaryButtonLink : "#"} onClick={(e) => handleLinkClick(e, secondaryButtonLink)}>
+                  {secondaryButtonText}
+                </a>
+              </Button>
+            </div>
           )}
         </div>
 

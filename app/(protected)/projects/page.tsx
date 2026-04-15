@@ -32,6 +32,11 @@ export default function ProjectsPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [projectName, setProjectName] = useState("");
   const [projectDescription, setProjectDescription] = useState("");
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [projectToDelete, setProjectToDelete] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
 
   const { user, loading: authLoading } = useAuth();
 
@@ -103,20 +108,23 @@ export default function ProjectsPage() {
     projectId: string,
     projectName: string
   ) => {
-    if (!confirm(`Are you sure you want to delete "${projectName}"?`)) {
-      return;
-    }
+    setProjectToDelete({ id: projectId, name: projectName });
+    setDeleteConfirmOpen(true);
+  };
 
-    if (!user) {
+  const confirmDelete = async () => {
+    if (!projectToDelete || !user) {
       toast.error("You must be logged in");
       return;
     }
 
     deleteProjectMutation.mutate(
-      { projectId, userId: user.uid },
+      { projectId: projectToDelete.id, userId: user.uid },
       {
         onSuccess: () => {
-          toast.success(`Project "${projectName}" deleted successfully`);
+          toast.success(`Project "${projectToDelete.name}" deleted successfully`);
+          setDeleteConfirmOpen(false);
+          setProjectToDelete(null);
         },
         onError: (error: Error) => {
           toast.error(error.message || "Failed to delete project");
@@ -251,6 +259,37 @@ export default function ProjectsPage() {
           </Dialog>
         </div>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Project</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete "{projectToDelete?.name}"? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setDeleteConfirmOpen(false);
+                setProjectToDelete(null);
+              }}
+              disabled={deleteProjectMutation.isPending}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={confirmDelete}
+              disabled={deleteProjectMutation.isPending}
+            >
+              {deleteProjectMutation.isPending ? "Deleting..." : "Delete"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

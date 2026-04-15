@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { buildComponentStyle } from "@/lib/buildStyle";
 
@@ -32,6 +31,9 @@ interface FooterProps {
   className?: string;
   width?: string;
   height?: string;
+  isPreviewMode?: boolean;
+  onNavigate?: (slug: string) => void;
+  pages?: any[];
   children?: React.ReactNode;
   [key: string]: any;
 }
@@ -85,6 +87,9 @@ export function Footer({
   className,
   width,
   height,
+  isPreviewMode = false,
+  onNavigate,
+  pages,
   children,
   ...rest
 }: FooterProps) {
@@ -98,6 +103,20 @@ export function Footer({
     height,
     ...rest,
   });
+
+  /** Handle link clicks — prevent navigation in edit mode, use onNavigate for page: links */
+  const handleLinkClick = (e: React.MouseEvent, href: string) => {
+    if (!isPreviewMode) {
+      e.preventDefault();
+      return;
+    }
+    if (href.startsWith("page:") && onNavigate) {
+      e.preventDefault();
+      const pageId = href.substring(5);
+      const page = pages?.find((p: any) => p.id === pageId);
+      if (page) onNavigate(page.slug);
+    }
+  };
 
   return (
     <footer
@@ -136,11 +155,12 @@ export function Footer({
                 {socialLinks.map((social, index) => (
                   <a
                     key={index}
-                    href={social.href}
+                    href={isPreviewMode ? social.href : "#"}
                     className="w-10 h-10 rounded-lg flex items-center justify-center text-sm transition-all duration-200 hover:bg-muted text-muted-foreground hover:text-foreground"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    target={isPreviewMode ? "_blank" : undefined}
+                    rel={isPreviewMode ? "noopener noreferrer" : undefined}
                     title={social.platform}
+                    onClick={(e) => handleLinkClick(e, social.href)}
                   >
                     {social.icon || social.platform.charAt(0)}
                   </a>
@@ -158,12 +178,13 @@ export function Footer({
               <ul className="space-y-3">
                 {section.links.map((link, linkIndex) => (
                   <li key={linkIndex}>
-                    <Link
-                      href={link.href}
+                    <a
+                      href={isPreviewMode ? link.href : "#"}
                       className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-200"
+                      onClick={(e) => handleLinkClick(e, link.href)}
                     >
                       {link.text}
-                    </Link>
+                    </a>
                   </li>
                 ))}
               </ul>
@@ -177,18 +198,20 @@ export function Footer({
             {copyright || defaultCopyright}
           </p>
           <div className="flex items-center gap-6 text-xs text-muted-foreground">
-            <Link
-              href={privacyLink}
+            <a
+              href={isPreviewMode ? privacyLink : "#"}
               className="hover:text-foreground transition-colors"
+              onClick={(e) => handleLinkClick(e, privacyLink)}
             >
               Privacy Policy
-            </Link>
-            <Link
-              href={termsLink}
+            </a>
+            <a
+              href={isPreviewMode ? termsLink : "#"}
               className="hover:text-foreground transition-colors"
+              onClick={(e) => handleLinkClick(e, termsLink)}
             >
               Terms of Service
-            </Link>
+            </a>
             <div className="flex items-center gap-2">
               <span className="w-4 h-4 rounded-full bg-primary/20 flex items-center justify-center">
                 <span className="w-2 h-2 rounded-full bg-primary"></span>

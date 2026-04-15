@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -32,6 +31,7 @@ interface NavbarProps {
   linkHoverColor?: string;
   onNavigate?: (slug: string) => void;
   pages?: any[];
+  currentPageSlug?: string;
   [key: string]: any;
 }
 
@@ -58,6 +58,7 @@ export function Navbar({
   linkHoverColor,
   onNavigate,
   pages,
+  currentPageSlug,
   ...rest
 }: NavbarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -77,6 +78,20 @@ export function Navbar({
     height,
     ...rest,
   });
+
+  /** Handle CTA link click: prevent navigation in edit mode */
+  const handleCtaClick = (e: React.MouseEvent) => {
+    if (!isPreviewMode) {
+      e.preventDefault();
+      return;
+    }
+    if (ctaLink.startsWith("page:") && onNavigate) {
+      e.preventDefault();
+      const pageId = ctaLink.substring(5);
+      const page = pages?.find((p: any) => p.id === pageId);
+      if (page) onNavigate(page.slug);
+    }
+  };
 
   return (
     <div className="relative">
@@ -106,7 +121,30 @@ export function Navbar({
         {viewport === "desktop" && links.length > 0 && (
           <div className="flex items-center space-x-1 ml-8">
             {links.map((link, index) => {
-              const isActive = index === 0; // First link active by default
+              // Determine if this link is active based on current page
+              let isActive = false;
+              
+              if (currentPageSlug) {
+                // Check if link matches current page
+                if (link.href.startsWith("page:")) {
+                  const pageId = link.href.replace("page:", "");
+                  const linkedPage = pages?.find((p: any) => p.id === pageId);
+                  if (linkedPage) {
+                    isActive = linkedPage.slug === currentPageSlug;
+                  }
+                } else {
+                  let linkSlug = link.href.replace(/^\//, "").replace(/\.html$/, "");
+                  if (!linkSlug || linkSlug === "#") {
+                    linkSlug = link.text.toLowerCase().replace(/\s+/g, "-");
+                    if (linkSlug === "home") linkSlug = "index";
+                  }
+                  isActive = linkSlug === currentPageSlug;
+                }
+              } else {
+                // Fallback: first link active by default
+                isActive = index === 0;
+              }
+              
               const handleClick = (e: React.MouseEvent) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -114,7 +152,12 @@ export function Navbar({
                 if (onNavigate && !link.external) {
                   let slug = link.href;
                   if (slug.startsWith("page:")) {
-                    slug = slug.replace("page:", "");
+                    const pageId = slug.replace("page:", "");
+                    const page = pages?.find((p: any) => p.id === pageId);
+                    if (page) {
+                      onNavigate(page.slug);
+                    }
+                    return;
                   } else {
                     slug = slug.replace(/^\//, "").replace(/\.html$/, "");
                   }
@@ -132,8 +175,22 @@ export function Navbar({
                   href={link.external ? link.href : "#"}
                   className={cn(
                     "px-4 py-2 text-sm font-medium transition-colors duration-200 relative",
-                    isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground",
+                    // Only apply Tailwind text classes if no custom linkColor is set
+                    !linkColor && (isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground"),
                   )}
+                  style={{
+                    color: linkColor || undefined,
+                  }}
+                  onMouseEnter={(e) => {
+                    if (linkHoverColor) {
+                      (e.currentTarget as HTMLElement).style.color = linkHoverColor;
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (linkColor || linkHoverColor) {
+                      (e.currentTarget as HTMLElement).style.color = linkColor || "";
+                    }
+                  }}
                   onClick={handleClick}
                   {...(link.external &&
                     isPreviewMode && {
@@ -230,14 +287,12 @@ export function Navbar({
                     {ctaText}
                   </a>
                 ) : (
-                  <Link
+                  <a
                     href={isPreviewMode ? ctaLink : "#"}
-                    onClick={
-                      isPreviewMode ? undefined : (e) => e.preventDefault()
-                    }
+                    onClick={handleCtaClick}
                   >
                     {ctaText}
-                  </Link>
+                  </a>
                 )}
               </Button>
             </div>
@@ -289,6 +344,9 @@ export function Navbar({
                   key={index}
                   href={link.external ? link.href : "#"}
                   className="block px-4 py-3 text-sm font-medium rounded-lg transition-colors text-foreground/80 hover:bg-muted hover:text-foreground"
+                  style={{
+                    color: linkColor || undefined,
+                  }}
                   onClick={handleClick}
                   {...(link.external &&
                     isPreviewMode && {

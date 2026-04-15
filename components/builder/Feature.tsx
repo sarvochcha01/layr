@@ -1,5 +1,41 @@
 import { cn } from "@/lib/utils";
 import { buildComponentStyle } from "@/lib/buildStyle";
+import {
+  Zap, Shield, Star, Heart, Settings, Globe, Lock, Cpu,
+  Layers, Code, Rocket, Target, Eye, Bell, Award, BarChart3,
+  CheckCircle, Cloud, Database, PenTool, Smartphone, Users,
+  Sparkles, TrendingUp, Lightbulb, Package, type LucideIcon,
+} from "lucide-react";
+
+/** Map of icon names to Lucide components */
+const ICON_MAP: Record<string, LucideIcon> = {
+  zap: Zap,
+  shield: Shield,
+  star: Star,
+  heart: Heart,
+  settings: Settings,
+  globe: Globe,
+  lock: Lock,
+  cpu: Cpu,
+  layers: Layers,
+  code: Code,
+  rocket: Rocket,
+  target: Target,
+  eye: Eye,
+  bell: Bell,
+  award: Award,
+  chart: BarChart3,
+  check: CheckCircle,
+  cloud: Cloud,
+  database: Database,
+  pen: PenTool,
+  phone: Smartphone,
+  users: Users,
+  sparkles: Sparkles,
+  trending: TrendingUp,
+  lightbulb: Lightbulb,
+  package: Package,
+};
 
 interface FeatureProps {
   icon?: string;
@@ -16,7 +52,7 @@ interface FeatureProps {
 }
 
 export function Feature({
-  icon = "•",
+  icon = "zap",
   title = "Feature Title",
   description = "Explain the value of this feature in a way that resonates with your audience.",
   layout = "vertical",
@@ -29,9 +65,9 @@ export function Feature({
   ...rest
 }: FeatureProps) {
   const iconSizes = {
-    sm: "text-xl w-10 h-10",
-    md: "text-2xl w-12 h-12",
-    lg: "text-3xl w-14 h-14",
+    sm: { container: "w-10 h-10", icon: "w-5 h-5" },
+    md: { container: "w-12 h-12", icon: "w-6 h-6" },
+    lg: { container: "w-14 h-14", icon: "w-7 h-7" },
   };
 
   const baseStyle = buildComponentStyle({
@@ -41,6 +77,10 @@ export function Feature({
     height,
     ...rest,
   });
+
+  // Resolve icon: try Lucide icon map first, fall back to text display
+  const iconKey = (icon || "zap").toLowerCase().trim();
+  const IconComponent = ICON_MAP[iconKey];
 
   return (
     <div
@@ -54,7 +94,7 @@ export function Feature({
       <div
         className={cn(
           "rounded-xl flex items-center justify-center flex-shrink-0",
-          iconSizes[iconSize],
+          iconSizes[iconSize].container,
           layout === "vertical" && "mx-auto mb-5",
         )}
         style={{
@@ -62,7 +102,13 @@ export function Feature({
           color: iconColor,
         }}
       >
-        {icon}
+        {IconComponent ? (
+          <IconComponent className={iconSizes[iconSize].icon} />
+        ) : (
+          <span className={cn("font-bold", iconSize === "sm" ? "text-xl" : iconSize === "lg" ? "text-3xl" : "text-2xl")}>
+            {icon}
+          </span>
+        )}
       </div>
 
       <div

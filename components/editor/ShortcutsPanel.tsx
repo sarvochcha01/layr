@@ -27,12 +27,21 @@ export function ShortcutsPanel({ onClose }: ShortcutsPanelProps) {
       ],
     },
     {
+      category: "Canvas",
+      items: [
+        { keys: ["Ctrl", "Scroll"], description: "Zoom in/out" },
+        { keys: ["Ctrl", "Middle Click"], description: "Pan canvas" },
+      ],
+    },
+    {
       category: "Components",
       items: [
         { keys: ["Delete"], description: "Delete selected" },
         { keys: ["Ctrl", "D"], description: "Duplicate selected" },
         { keys: ["Ctrl", "C"], description: "Copy component" },
         { keys: ["Ctrl", "V"], description: "Paste component" },
+        { keys: ["Ctrl", "Drag"], description: "Insert or place inside container" },
+        { keys: ["Ctrl", "Shift", "Drag"], description: "Swap component positions" },
       ],
     },
     {

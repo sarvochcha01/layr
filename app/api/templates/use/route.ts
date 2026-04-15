@@ -50,6 +50,8 @@ export async function POST(request: Request) {
             name: projectName,
             userId,
             pages,
+            globalComponents: templateData.globalComponents || {},
+            customComponents: templateData.customComponents || {},
             createdAt: serverTimestamp(),
             updatedAt: serverTimestamp(),
             templateId,

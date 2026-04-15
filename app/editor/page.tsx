@@ -521,6 +521,67 @@ export default function EditorPage() {
     );
   };
 
+  const handleRepositionComponent = (
+    componentId: string,
+    targetId: string | null,
+    position: "top" | "bottom" | "left" | "right" | "center" | "inside",
+  ) => {
+    console.log('📦 handleRepositionComponent called:', { componentId, targetId, position });
+    console.log('📦 Current components:', components);
+    
+    if (position === "center") {
+      // Special handling for swap - need to swap positions in the tree
+      const previousComponents = [...components];
+      
+      updateCurrentPageComponents((prev) => {
+        console.log('📦 Swapping components:', componentId, 'with', targetId);
+        const result = swapComponentsInTree(prev, componentId, targetId);
+        
+        // Check if swap actually happened (it returns original if validation fails)
+        if (result === prev) {
+          toast.error("Cannot swap: one component is inside the other");
+          return prev;
+        }
+        
+        console.log('📦 New components after swap:', result);
+        return result;
+      });
+      
+      // Only show success if components actually changed
+      if (components !== previousComponents) {
+        toast.success("Components swapped positions");
+      }
+    } else {
+      // Map the edge positions to the tree manipulation positions
+      let treePosition: "before" | "after" | "inside";
+      
+      if (position === "top" || position === "left") {
+        treePosition = "before";
+      } else if (position === "bottom" || position === "right") {
+        treePosition = "after";
+      } else {
+        treePosition = "inside";
+      }
+      
+      updateCurrentPageComponents((prev) => {
+        console.log('📦 Previous components:', prev);
+        const result = repositionComponentInTree(prev, componentId, targetId, treePosition);
+        console.log('📦 New components after reposition:', result);
+        return result;
+      });
+      
+      const positionLabels = {
+        top: "above",
+        bottom: "below",
+        left: "left of",
+        right: "right of",
+        inside: "inside"
+      };
+      
+      toast.success(`Component moved ${positionLabels[position as keyof typeof positionLabels]} target`);
+    }
+  };
+
   // Recursively find and update components with matching isGlobal name
   const syncGlobalInComponents = (
     components: ComponentDefinition[],
@@ -701,6 +762,28 @@ export default function EditorPage() {
 
     let firstNewOrUpdatedPageId: string | null = null;
 
+    // Automatically extract Navbar and Footer as Global Components
+    let aiNavbar: ComponentDefinition | null = null;
+    let aiFooter: ComponentDefinition | null = null;
+    
+    for (const page of aiPages) {
+      if (!aiNavbar && page.components) {
+        aiNavbar = page.components.find(c => c.type === "Navbar") || null;
+      }
+      if (!aiFooter && page.components) {
+        aiFooter = page.components.find(c => c.type === "Footer") || null;
+      }
+    }
+
+    if (aiNavbar || aiFooter) {
+      setGlobalComponents(prev => {
+        const next = { ...prev };
+        if (aiNavbar) next["GlobalNavbar"] = { ...aiNavbar, isGlobal: "GlobalNavbar", id: generateId() };
+        if (aiFooter) next["GlobalFooter"] = { ...aiFooter, isGlobal: "GlobalFooter", id: generateId() };
+        return next;
+      });
+    }
+
     setPages((prev) => {
       const updatedPages = [...prev];
 
@@ -744,7 +827,71 @@ export default function EditorPage() {
         }
       }
 
-      return updatedPages;
+      // Automatically link references to paths with their internal page IDs
+      const pathMap = new Map<string, string>();
+      for (const p of updatedPages) {
+        const pSlug = p.slug || "";
+        if (pSlug) {
+          pathMap.set(pSlug, p.id);
+          pathMap.set('/' + pSlug, p.id);
+          if (pSlug === 'index') pathMap.set('/', p.id);
+        }
+        if (p.path) pathMap.set(p.path, p.id);
+      }
+
+      const traverseAndLink = (comps: ComponentDefinition[]): ComponentDefinition[] => {
+        return comps.map(comp => {
+          const newProps = { ...comp.props };
+          
+          const linkFields = ["href", "linkUrl", "buttonLink", "primaryButtonLink", "secondaryButtonLink", "action", "privacyLink", "termsLink"];
+          for (const field of linkFields) {
+            if (typeof newProps[field] === "string" && pathMap.has(newProps[field])) {
+              newProps[field] = `page:${pathMap.get(newProps[field])}`;
+            }
+          }
+
+          if (Array.isArray(newProps.links)) {
+            newProps.links = newProps.links.map((link: any) => ({
+              ...link,
+              href: typeof link.href === "string" && pathMap.has(link.href) ? `page:${pathMap.get(link.href)}` : link.href
+            }));
+          }
+          
+          if (Array.isArray(newProps.sections)) {
+            newProps.sections = newProps.sections.map((section: any) => ({
+              ...section,
+              links: Array.isArray(section.links) ? section.links.map((link: any) => ({
+                ...link,
+                href: typeof link.href === "string" && pathMap.has(link.href) ? `page:${pathMap.get(link.href)}` : link.href
+              })) : section.links
+            }));
+          }
+
+          let newIsGlobal = comp.isGlobal;
+          if (comp.type === "Navbar" && aiNavbar) newIsGlobal = "GlobalNavbar";
+          if (comp.type === "Footer" && aiFooter) newIsGlobal = "GlobalFooter";
+
+          return {
+            ...comp,
+            isGlobal: newIsGlobal,
+            props: newProps,
+            children: traverseAndLink(comp.children)
+          };
+        });
+      };
+
+      const generatedSlugs = aiPages.map(p => {
+        let slug = p.path ? p.path.replace(/^\//, "").replace(/\.html$/, "") : (p.name || "Untitled").toLowerCase().replace(/\s+/g, "-");
+        return (!slug || slug === "/") ? "index" : slug;
+      });
+
+      return updatedPages.map(p => {
+        const pSlug = p.slug || "";
+        if (pSlug && generatedSlugs.includes(pSlug)) {
+          return { ...p, components: traverseAndLink(p.components) };
+        }
+        return p;
+      });
     });
 
     // Switch to the first new/updated page
@@ -949,6 +1096,7 @@ export default function EditorPage() {
           onDeleteComponent={deleteComponent}
           onDuplicateComponent={duplicateComponent}
           onAddComponent={addComponent}
+          onRepositionComponent={handleRepositionComponent}
           projectName={projectName}
           onProjectNameChange={handleProjectNameChange}
           pages={pages}
@@ -1045,7 +1193,7 @@ function getDefaultProps(componentType: string): Record<string, any> {
       title: "Getting Started",
       description:
         "Everything you need to know to get up and running quickly. Our platform makes it easy to build beautiful websites.",
-      image: "https://placehold.co/600x300/e0e7ff/4f46e5?text=Card+Image",
+      image: "https://images.unsplash.com/photo-1557683316-973673baf926?w=800&h=400&fit=crop",
       buttonText: "Learn More",
       buttonLink: "#",
       variant: "elevated",
@@ -1371,18 +1519,38 @@ function repositionComponentInTree(
 ): ComponentDefinition[] {
   // Find the component
   const componentToMove = findComponentInTree(components, componentId);
-  if (!componentToMove) return components;
+  if (!componentToMove) {
+    console.warn('Component to move not found:', componentId);
+    return components;
+  }
+
+  // Deep clone the component to avoid reference issues
+  const cloneComponent = (comp: ComponentDefinition): ComponentDefinition => ({
+    ...comp,
+    props: { ...comp.props },
+    children: comp.children.map(cloneComponent),
+  });
+
+  const clonedComponent = cloneComponent(componentToMove);
 
   // Check if trying to drop inside itself or its children
   const isTargetInsideSelf = (compId: string | null | undefined): boolean => {
     if (!compId) return false;
     if (compId === componentId) return true;
-    const targetComp = findComponentInTree(components, compId);
-    // This is simple validation, ideally we would check the whole ancestry chain
-    return false; // Skip deep ancestry check for now to avoid complexity
+    
+    // Check if target is a descendant of the component being moved
+    const checkDescendants = (comp: ComponentDefinition): boolean => {
+      if (comp.id === compId) return true;
+      return comp.children.some(checkDescendants);
+    };
+    
+    return checkDescendants(componentToMove);
   };
 
-  if (isTargetInsideSelf(targetId)) return components;
+  if (isTargetInsideSelf(targetId)) {
+    console.warn('Cannot drop component inside itself');
+    return components;
+  }
 
   // Remove from old position
   const componentsWithoutOriginal = removeComponentFromTree(
@@ -1391,12 +1559,15 @@ function repositionComponentInTree(
   );
 
   // Insert into new position
-  return insertComponent(
+  const result = insertComponent(
     componentsWithoutOriginal,
-    componentToMove,
+    clonedComponent,
     targetId,
     position,
   );
+
+  console.log('Reposition complete. Component moved from', componentId, 'to', targetId, position);
+  return result;
 }
 
 function findComponentInTree(
@@ -1593,4 +1764,93 @@ function clearGlobalFlagInTree(
     }
     return comp;
   });
+}
+
+// Swap two components in the tree, handling different nesting levels
+function swapComponentsInTree(
+  components: ComponentDefinition[],
+  componentId1: string,
+  componentId2: string | null,
+): ComponentDefinition[] {
+  if (!componentId2) return components;
+  
+  // Find both components
+  const comp1 = findComponentInTree(components, componentId1);
+  const comp2 = findComponentInTree(components, componentId2);
+  
+  if (!comp1 || !comp2) {
+    console.warn('One or both components not found for swap');
+    return components;
+  }
+  
+  // Check if one component is an ancestor of the other
+  const isAncestor = (ancestor: ComponentDefinition, descendantId: string): boolean => {
+    if (ancestor.id === descendantId) return true;
+    return ancestor.children.some(child => isAncestor(child, descendantId));
+  };
+  
+  if (isAncestor(comp1, componentId2)) {
+    console.warn('Cannot swap: comp2 is inside comp1');
+    return components;
+  }
+  
+  if (isAncestor(comp2, componentId1)) {
+    console.warn('Cannot swap: comp1 is inside comp2');
+    return components;
+  }
+  
+  console.log('Swapping:', comp1.type, '(', componentId1, ') with', comp2.type, '(', componentId2, ')');
+  
+  // Helper to find parent and index of a component
+  interface ComponentLocation {
+    parent: ComponentDefinition[];
+    index: number;
+  }
+  
+  const findLocation = (
+    items: ComponentDefinition[],
+    targetId: string,
+  ): ComponentLocation | null => {
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].id === targetId) {
+        return { parent: items, index: i };
+      }
+      if (items[i].children.length > 0) {
+        const found = findLocation(items[i].children, targetId);
+        if (found) return found;
+      }
+    }
+    return null;
+  };
+  
+  // Deep clone the entire tree to avoid mutations
+  const deepClone = (comps: ComponentDefinition[]): ComponentDefinition[] => {
+    return comps.map(comp => ({
+      ...comp,
+      props: { ...comp.props },
+      children: deepClone(comp.children),
+    }));
+  };
+  
+  const clonedTree = deepClone(components);
+  
+  // Find locations in the cloned tree
+  const loc1 = findLocation(clonedTree, componentId1);
+  const loc2 = findLocation(clonedTree, componentId2);
+  
+  if (!loc1 || !loc2) {
+    console.warn('Could not find locations for swap');
+    return components;
+  }
+  
+  // Store references to the components at their locations
+  const temp1 = loc1.parent[loc1.index];
+  const temp2 = loc2.parent[loc2.index];
+  
+  // Perform the swap
+  loc1.parent[loc1.index] = temp2;
+  loc2.parent[loc2.index] = temp1;
+  
+  console.log('Swap complete');
+  return clonedTree;
 }

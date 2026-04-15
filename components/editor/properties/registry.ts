@@ -27,9 +27,9 @@ export const COMPONENT_SCHEMAS: Record<string, ComponentPropertySchema> = {
           { key: "badge", label: "Badge Text", type: "text", placeholder: "Badge text" },
           { key: "description", label: "Description", type: "textarea", placeholder: "Enter description", rows: 3 },
           { key: "primaryButtonText", label: "Primary Button Text", type: "text", placeholder: "Button text" },
-          { key: "primaryButtonLink", label: "Primary Button Link", type: "text", placeholder: "#" },
+          { key: "primaryButtonLink", label: "Primary Button Link", type: "link-editor", placeholder: "https://example.com" },
           { key: "secondaryButtonText", label: "Secondary Button Text", type: "text", placeholder: "Optional" },
-          { key: "secondaryButtonLink", label: "Secondary Button Link", type: "text", placeholder: "#" },
+          { key: "secondaryButtonLink", label: "Secondary Button Link", type: "link-editor", placeholder: "https://example.com" },
           { key: "backgroundImage", label: "Background Image URL", type: "text", placeholder: "https://example.com/bg.jpg" },
           {
             key: "alignment", label: "Alignment", type: "select",
@@ -152,7 +152,7 @@ export const COMPONENT_SCHEMAS: Record<string, ComponentPropertySchema> = {
         title: "Link Settings",
         icon: "link",
         fields: [
-          { key: "href", label: "Link URL", type: "text", placeholder: "https://example.com or page:pageId", editorType: "link" },
+          { key: "href", label: "Link URL", type: "link-editor", placeholder: "https://example.com" },
         ],
       },
     ],
@@ -195,7 +195,7 @@ export const COMPONENT_SCHEMAS: Record<string, ComponentPropertySchema> = {
               { label: "Eager", value: "eager" },
             ],
           },
-          { key: "link", label: "Link URL (optional)", type: "text", placeholder: "https://example.com" },
+          { key: "link", label: "Link URL (optional)", type: "link-editor", placeholder: "https://example.com" },
         ],
       },
     ],
@@ -214,7 +214,7 @@ export const COMPONENT_SCHEMAS: Record<string, ComponentPropertySchema> = {
           { key: "title", label: "Title", type: "text", placeholder: "Card title" },
           { key: "description", label: "Description", type: "textarea", placeholder: "Card description", rows: 3 },
           { key: "buttonText", label: "Button Text", type: "text", placeholder: "Learn More" },
-          { key: "buttonLink", label: "Button Link", type: "text", placeholder: "#" },
+          { key: "buttonLink", label: "Button Link", type: "link-editor", placeholder: "https://example.com" },
           {
             key: "variant", label: "Card Style", type: "select",
             options: [
@@ -244,7 +244,7 @@ export const COMPONENT_SCHEMAS: Record<string, ComponentPropertySchema> = {
           { key: "logo", label: "Logo Image URL", type: "text", placeholder: "https://example.com/logo.png" },
           { key: "logoText", label: "Logo Text", type: "text", placeholder: "Brand Name" },
           { key: "ctaText", label: "CTA Button Text", type: "text", placeholder: "Get Started" },
-          { key: "ctaLink", label: "CTA Button Link", type: "text", placeholder: "https://example.com" },
+          { key: "ctaLink", label: "CTA Button Link", type: "link-editor", placeholder: "https://example.com" },
           { key: "ctaExternal", label: "CTA is External Link", type: "switch" },
         ],
       },
@@ -296,8 +296,8 @@ export const COMPONENT_SCHEMAS: Record<string, ComponentPropertySchema> = {
           { key: "logoText", label: "Logo Text", type: "text", placeholder: "Brand Name" },
           { key: "description", label: "Description", type: "textarea", placeholder: "Brief description", rows: 3 },
           { key: "copyright", label: "Copyright Text", type: "text", placeholder: "© 2024 All rights reserved" },
-          { key: "privacyLink", label: "Privacy Policy Link", type: "text", placeholder: "#" },
-          { key: "termsLink", label: "Terms of Service Link", type: "text", placeholder: "#" },
+          { key: "privacyLink", label: "Privacy Policy Link", type: "link-editor", placeholder: "https://example.com" },
+          { key: "termsLink", label: "Terms of Service Link", type: "link-editor", placeholder: "https://example.com" },
         ],
       },
       {
@@ -472,6 +472,7 @@ export const COMPONENT_SCHEMAS: Record<string, ComponentPropertySchema> = {
           },
           { key: "gapCustom", label: "Custom Gap", type: "text", placeholder: "20px" },
           { key: "responsive", label: "Responsive Breakpoints", type: "switch" },
+          { key: "equalHeight", label: "Equal Height Children", type: "switch" },
         ],
       },
     ],
@@ -560,7 +561,7 @@ export const COMPONENT_SCHEMAS: Record<string, ComponentPropertySchema> = {
           { key: "title", label: "Title", type: "text", placeholder: "Contact Us" },
           { key: "description", label: "Description", type: "textarea", placeholder: "Fill out the form below", rows: 2 },
           { key: "submitText", label: "Submit Button Text", type: "text", placeholder: "Submit" },
-          { key: "action", label: "Form Action URL", type: "text", placeholder: "#" },
+          { key: "action", label: "Form Action URL", type: "link-editor", placeholder: "https://example.com" },
           {
             key: "method", label: "Method", type: "select",
             options: [
@@ -640,7 +641,7 @@ export const COMPONENT_SCHEMAS: Record<string, ComponentPropertySchema> = {
           { key: "avatar", label: "Avatar URL", type: "text", placeholder: "https://example.com/avatar.jpg" },
           {
             key: "rating", label: "Rating (0-5)", type: "number",
-            min: 0, max: 5, step: 1,
+            min: 0, max: 5, step: 0.5,
           },
           {
             key: "variant", label: "Style", type: "select",
@@ -668,7 +669,7 @@ export const COMPONENT_SCHEMAS: Record<string, ComponentPropertySchema> = {
           { key: "period", label: "Period", type: "text", placeholder: "mo" },
           { key: "description", label: "Description", type: "textarea", placeholder: "Plan description", rows: 2 },
           { key: "buttonText", label: "Button Text", type: "text", placeholder: "GET STARTED" },
-          { key: "buttonLink", label: "Button Link", type: "text", placeholder: "#" },
+          { key: "buttonLink", label: "Button Link", type: "link-editor", placeholder: "https://example.com" },
           {
             key: "buttonVariant", label: "Button Style", type: "select",
             options: [
@@ -692,7 +693,37 @@ export const COMPONENT_SCHEMAS: Record<string, ComponentPropertySchema> = {
         title: "Feature Content",
         icon: "type",
         fields: [
-          { key: "icon", label: "Icon (emoji/text)", type: "text", placeholder: "•" },
+          {
+            key: "icon", label: "Icon", type: "select",
+            options: [
+              { label: "⚡ Zap", value: "zap" },
+              { label: "🛡️ Shield", value: "shield" },
+              { label: "⭐ Star", value: "star" },
+              { label: "❤️ Heart", value: "heart" },
+              { label: "⚙️ Settings", value: "settings" },
+              { label: "🌐 Globe", value: "globe" },
+              { label: "🔒 Lock", value: "lock" },
+              { label: "💻 CPU", value: "cpu" },
+              { label: "📚 Layers", value: "layers" },
+              { label: "💡 Code", value: "code" },
+              { label: "🚀 Rocket", value: "rocket" },
+              { label: "🎯 Target", value: "target" },
+              { label: "👁️ Eye", value: "eye" },
+              { label: "🔔 Bell", value: "bell" },
+              { label: "🏆 Award", value: "award" },
+              { label: "📊 Chart", value: "chart" },
+              { label: "✅ Check", value: "check" },
+              { label: "☁️ Cloud", value: "cloud" },
+              { label: "🗄️ Database", value: "database" },
+              { label: "✏️ Pen", value: "pen" },
+              { label: "📱 Phone", value: "phone" },
+              { label: "👥 Users", value: "users" },
+              { label: "✨ Sparkles", value: "sparkles" },
+              { label: "📈 Trending", value: "trending" },
+              { label: "💡 Lightbulb", value: "lightbulb" },
+              { label: "📦 Package", value: "package" },
+            ],
+          },
           { key: "title", label: "Title", type: "text", placeholder: "Feature Title" },
           { key: "description", label: "Description", type: "textarea", placeholder: "Feature description", rows: 3 },
           {
@@ -757,9 +788,9 @@ export const COMPONENT_SCHEMAS: Record<string, ComponentPropertySchema> = {
           { key: "title", label: "Title", type: "text", placeholder: "Ready to get started?" },
           { key: "description", label: "Description", type: "textarea", placeholder: "Join thousands of users today", rows: 2 },
           { key: "primaryButtonText", label: "Primary Button Text", type: "text", placeholder: "Start Free Trial" },
-          { key: "primaryButtonLink", label: "Primary Button Link", type: "text", placeholder: "#" },
+          { key: "primaryButtonLink", label: "Primary Button Link", type: "link-editor", placeholder: "https://example.com" },
           { key: "secondaryButtonText", label: "Secondary Button Text", type: "text", placeholder: "Optional secondary button" },
-          { key: "secondaryButtonLink", label: "Secondary Button Link", type: "text", placeholder: "#" },
+          { key: "secondaryButtonLink", label: "Secondary Button Link", type: "link-editor", placeholder: "https://example.com" },
           {
             key: "alignment", label: "Alignment", type: "select",
             options: [

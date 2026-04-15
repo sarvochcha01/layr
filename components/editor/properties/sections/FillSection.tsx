@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Paintbrush } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,6 +14,15 @@ const labelClass = "text-xs font-medium text-muted-foreground";
 const selectClass = "w-full h-8 px-2 text-xs bg-transparent appearance-none focus:outline-none";
 const sectionTriggerClass = "hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50";
 const sectionContentClass = "px-4 pb-4 pt-2 space-y-4";
+
+/** Local-state input that commits on blur/Enter to prevent keystroke lag */
+function LocalTextInput({ value, onChange, placeholder, className }: { value: string; onChange: (v: string) => void; placeholder?: string; className?: string }) {
+  const [localValue, setLocalValue] = useState(value || "");
+  const prevRef = useRef(value);
+  useEffect(() => { if (value !== prevRef.current) { setLocalValue(value || ""); prevRef.current = value; } }, [value]);
+  const commit = () => { if (localValue !== value) { onChange(localValue); prevRef.current = localValue; } };
+  return <Input value={localValue} onChange={(e) => setLocalValue(e.target.value)} onBlur={commit} onKeyDown={(e) => { if (e.key === "Enter") { commit(); (e.target as HTMLInputElement).blur(); } }} placeholder={placeholder} className={className} />;
+}
 
 export function FillSection({ props, updateProp }: StyleSectionProps) {
   const bgType = props.backgroundType || "solid";
@@ -117,7 +126,7 @@ export function FillSection({ props, updateProp }: StyleSectionProps) {
           <>
             <div className="space-y-1.5">
               <Label className={labelClass}>Image URL</Label>
-              <Input value={props.backgroundImageUrl || ""} onChange={(e) => updateProp("backgroundImageUrl", e.target.value)} placeholder="https://example.com/bg.jpg" className="h-8 text-xs" />
+              <LocalTextInput value={props.backgroundImageUrl || ""} onChange={(v) => updateProp("backgroundImageUrl", v)} placeholder="https://example.com/bg.jpg" className="h-8 text-xs" />
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1.5">

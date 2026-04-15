@@ -15,6 +15,14 @@ interface AIChatPanelProps {
   onMessagesChange?: (messages: ChatMessage[]) => void;
 }
 
+export const AI_MODELS = [
+  { id: "gemini-1.5-flash-latest", name: "Gemini 1.5 Flash (Fast & Free)" },
+  { id: "gemini-1.5-pro-latest", name: "Gemini 1.5 Pro (High Quality)" },
+  { id: "gemini-flash-latest", name: "Gemini Flash Latest" },
+  { id: "gemini-1.0-pro", name: "Gemini 1.0 Pro" },
+  { id: "gemini-pro", name: "Gemini Pro" },
+];
+
 export function AIChatPanel({ 
   onApplyComponents, 
   onApplyPages, 
@@ -26,16 +34,26 @@ export function AIChatPanel({
 }: AIChatPanelProps) {
   const [internalMessages, setInternalMessages] = useState<ChatMessage[]>([]);
   const messages = externalMessages ?? internalMessages;
+  
+  // Use a ref to keep track of the latest messages for async callbacks
+  const messagesRef = useRef<ChatMessage[]>(messages);
+  useEffect(() => {
+    messagesRef.current = messages;
+  }, [messages]);
+
   const setMessages = (updater: ChatMessage[] | ((prev: ChatMessage[]) => ChatMessage[])) => {
-    const newMessages = typeof updater === 'function' ? updater(messages) : updater;
+    const newMessages = typeof updater === 'function' ? updater(messagesRef.current) : updater;
     if (onMessagesChange) {
       onMessagesChange(newMessages);
     } else {
       setInternalMessages(newMessages);
     }
+    // Optimistically update the ref to prevent stale closures within the same render cycle
+    messagesRef.current = newMessages;
   };
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedModel, setSelectedModel] = useState(AI_MODELS[0].id);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -78,6 +96,7 @@ export function AIChatPanel({
           existingComponents,
           customComponents,
           globalComponents,
+          model: selectedModel,
         }),
       });
 
@@ -149,10 +168,21 @@ export function AIChatPanel({
     <div className="h-full flex flex-col">
       {/* Header */}
       <div className="p-3 border-b border-border flex items-center justify-between">
-        <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider flex items-center gap-1.5">
-          <Sparkles className="w-3.5 h-3.5 text-purple-400" />
-          AI Builder
-        </h3>
+        <div className="flex items-center gap-2">
+          <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+            AI Builder
+          </h3>
+          <select 
+            value={selectedModel}
+            onChange={(e) => setSelectedModel(e.target.value)}
+            className="text-[10px] bg-card border border-border rounded px-1.5 py-0.5 text-muted-foreground outline-none focus:border-primary/50 max-w-[120px] truncate"
+          >
+            {AI_MODELS.map(m => (
+              <option key={m.id} value={m.id}>{m.name}</option>
+            ))}
+          </select>
+        </div>
         {messages.length > 0 && (
           <button
             onClick={clearChat}

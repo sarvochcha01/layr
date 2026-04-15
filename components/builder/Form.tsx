@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { buildComponentStyle } from "@/lib/buildStyle";
@@ -29,6 +28,8 @@ interface FormProps {
   [key: string]: any;
 }
 
+const inputClasses = "w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-card text-foreground placeholder:text-muted-foreground";
+
 export function Form({
   title,
   description,
@@ -52,6 +53,11 @@ export function Form({
     ...rest,
   });
 
+  // If no background color is set, make it transparent (inherit from parent)
+  if (!backgroundColor && !rest.backgroundType) {
+    baseStyle.backgroundColor = "transparent";
+  }
+
   const renderField = (field: FormField) => {
     const fieldId = `field-${field.id}`;
 
@@ -67,7 +73,7 @@ export function Form({
               name={field.id}
               placeholder={field.placeholder}
               required={field.required}
-              className="w-full min-h-[100px] px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-card text-foreground placeholder:text-muted-foreground"
+              className={cn(inputClasses, "min-h-[100px]")}
             />
           </div>
         );
@@ -82,7 +88,7 @@ export function Form({
               id={fieldId}
               name={field.id}
               required={field.required}
-              className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-card text-foreground"
+              className={inputClasses}
             >
               <option value="" className="bg-card">
                 Select an option
@@ -140,18 +146,19 @@ export function Form({
         );
 
       default:
+        // text, email, tel — all use the same consistent styling
         return (
           <div key={field.id} className="space-y-2">
             <Label htmlFor={fieldId} className="text-foreground/80">
               {field.label}
             </Label>
-            <Input
+            <input
               type={field.type}
               id={fieldId}
               name={field.id}
               placeholder={field.placeholder}
               required={field.required}
-              className="bg-card border-border text-foreground placeholder:text-muted-foreground focus:ring-primary"
+              className={inputClasses}
             />
           </div>
         );
@@ -159,13 +166,13 @@ export function Form({
   };
 
   return (
-    <div className={cn("w-full max-w-md mx-auto", className)} style={baseStyle}>
+    <div className={cn("w-full", className)} style={baseStyle}>
       {title && <h2 className="text-2xl font-bold mb-2 text-foreground">{title}</h2>}
 
       {description && <p className="mb-6 text-muted-foreground">{description}</p>}
 
       <form action={action} method={method} className="space-y-4">
-        {fields.map(renderField)}
+        {fields.map((field) => renderField(field))}
 
         <Button
           type="submit"

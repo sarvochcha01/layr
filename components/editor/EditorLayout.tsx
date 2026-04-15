@@ -8,7 +8,7 @@ import {
   CustomComponents,
   ChatMessage,
 } from "@/types/editor";
-import { HierarchyPanel } from "./HierarchyPanel";
+import { HierarchyPanel, HierarchyPanelRef } from "./HierarchyPanel";
 import { ComponentPalette } from "./ComponentPalette";
 import { Canvas } from "./Canvas";
 import { PropertiesPanel } from "./PropertiesPanel";
@@ -34,6 +34,14 @@ import {
   Play,
   RotateCcw,
   Settings,
+  ZoomIn,
+  Maximize2,
+  Keyboard,
+  ChevronDown,
+  ChevronRight,
+  Plus,
+  Trash2,
+  Check,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -61,6 +69,7 @@ interface EditorLayoutProps {
   onDeleteComponent: (id: string) => void;
   onDuplicateComponent: (id: string) => void;
   onAddComponent?: (componentType: string) => void;
+  onRepositionComponent?: (componentId: string, targetId: string | null, position: "top" | "bottom" | "left" | "right" | "center" | "inside") => void;
   projectName?: string;
   onProjectNameChange?: (name: string) => void;
   pages: Page[];
@@ -106,6 +115,7 @@ export function EditorLayout({
   onDeleteComponent,
   onDuplicateComponent,
   onAddComponent,
+  onRepositionComponent,
   projectName,
   onProjectNameChange,
   pages,
@@ -138,19 +148,36 @@ export function EditorLayout({
   onChatHistoryChange,
 }: EditorLayoutProps) {
   const router = useRouter();
+  const hierarchyPanelRef = useRef<HierarchyPanelRef>(null);
   const [viewport, setViewport] = useState<Viewport>("desktop");
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [showCodeEditor, setShowCodeEditor] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedName, setEditedName] = useState(projectName || "");
   const [showExportMenu, setShowExportMenu] = useState(false);
+  const [showSettingsMenu, setShowSettingsMenu] = useState(false);
+  const [showShortcutsSection, setShowShortcutsSection] = useState(false);
+  const [showOutlinesMenu, setShowOutlinesMenu] = useState(false);
   const [showOutlines, setShowOutlines] = useState(false);
+  const [outlineColor, setOutlineColor] = useState<"black" | "white">("black");
+  const [showComponentTags, setShowComponentTags] = useState(false);
+  const [canvasZoom, setCanvasZoom] = useState(100);
+  
+  // Editable shortcuts state
+  const [customShortcuts, setCustomShortcuts] = useState([
+    { id: 1, name: "Canvas Zoom", shortcut: "Ctrl + Scroll" },
+    { id: 2, name: "Canvas Pan", shortcut: "Ctrl + Middle Click" },
+    { id: 3, name: "Insert Component", shortcut: "Ctrl + Drag" },
+    { id: 4, name: "Swap Components", shortcut: "Ctrl + Shift + Drag" },
+  ]);
+  const [editingShortcutId, setEditingShortcutId] = useState<number | null>(null);
+  
   // Controlled tab state so AI panel can be closed programmatically
   const [activeTab, setActiveTab] = useState("components");
 
   // Panel widths
   const [leftPanelWidth, setLeftPanelWidth] = useState(280);
-  const [rightPanelWidth, setRightPanelWidth] = useState(480);
+  const [rightPanelWidth, setRightPanelWidth] = useState(280);
 
   const isResizingRef = useRef<string | null>(null);
   const startPosRef = useRef({ x: 0, y: 0 });
@@ -330,11 +357,22 @@ export function EditorLayout({
           </div>
 
           <div className="flex items-center space-x-3">
-            <div className="flex items-center space-x-1 bg-background border border-border rounded-md p-1">
-              <button className="px-4 py-1.5 text-xs font-medium bg-primary text-primary-foreground rounded transition-colors">DESIGN</button>
-              <button className="px-4 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors">PROTOTYPE</button>
-              <button className="px-4 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors">INSPECT</button>
-            </div>
+            
+            {/* Conditional Reset Zoom Button - Only shows when zoom is not 100% */}
+            {canvasZoom !== 100 && (
+              <button
+                onClick={() => {
+                  if ((window as any).__resetCanvasZoom) {
+                    (window as any).__resetCanvasZoom();
+                  }
+                }}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 hover:bg-primary/20 text-primary rounded-md transition-colors text-xs font-medium"
+                title="Reset Zoom to 100%"
+              >
+                <Maximize2 className="w-3.5 h-3.5" />
+                <span>{canvasZoom}%</span>
+              </button>
+            )}
 
             <button
               onClick={() => setIsPreviewMode(!isPreviewMode)}
@@ -343,6 +381,96 @@ export function EditorLayout({
             >
               <Play className="w-4 h-4" />
             </button>
+            
+            <div className="relative">
+              <button
+                onClick={() => setShowOutlinesMenu(!showOutlinesMenu)}
+                className={`p-2 rounded-md transition-colors ${showOutlines || !showComponentTags ? "bg-primary/10 text-primary" : "hover:bg-muted text-muted-foreground hover:text-foreground"}`}
+                title="View Options"
+              >
+                <BoxSelect className="w-4 h-4" />
+              </button>
+              {showOutlinesMenu && (
+                <>
+                  {/* Click-outside overlay */}
+                  <div className="fixed inset-0 z-40" onClick={() => setShowOutlinesMenu(false)} />
+                  <div className="absolute left-0 top-full mt-2 w-64 bg-card rounded-lg shadow-xl border border-border overflow-hidden z-50">
+                    <div className="px-4 py-3 border-b border-border">
+                      <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">View Options</div>
+                    </div>
+                    
+                    {/* Component Outlines Toggle */}
+                    <div className="px-4 py-3 border-b border-border">
+                      <label className="flex items-center justify-between cursor-pointer">
+                        <span className="text-sm text-foreground">Component Outlines</span>
+                        <button
+                          onClick={() => setShowOutlines(!showOutlines)}
+                          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                            showOutlines ? "bg-primary" : "bg-muted"
+                          }`}
+                        >
+                          <span
+                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                              showOutlines ? "translate-x-5" : "translate-x-0.5"
+                            }`}
+                          />
+                        </button>
+                      </label>
+                      
+                      {/* Outline Color Options */}
+                      {showOutlines && (
+                        <div className="mt-3 space-y-2">
+                          <div className="text-xs text-muted-foreground mb-2">Outline Color</div>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => setOutlineColor("black")}
+                              className={`flex-1 px-3 py-2 text-xs rounded-md border transition-colors ${
+                                outlineColor === "black"
+                                  ? "border-primary bg-primary/10 text-primary"
+                                  : "border-border hover:bg-muted text-foreground"
+                              }`}
+                            >
+                              Black
+                            </button>
+                            <button
+                              onClick={() => setOutlineColor("white")}
+                              className={`flex-1 px-3 py-2 text-xs rounded-md border transition-colors ${
+                                outlineColor === "white"
+                                  ? "border-primary bg-primary/10 text-primary"
+                                  : "border-border hover:bg-muted text-foreground"
+                              }`}
+                            >
+                              White
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Component Tags Toggle */}
+                    <div className="px-4 py-3">
+                      <label className="flex items-center justify-between cursor-pointer">
+                        <span className="text-sm text-foreground">Component Labels</span>
+                        <button
+                          onClick={() => setShowComponentTags(!showComponentTags)}
+                          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                            showComponentTags ? "bg-primary" : "bg-muted"
+                          }`}
+                        >
+                          <span
+                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                              showComponentTags ? "translate-x-5" : "translate-x-0.5"
+                            }`}
+                          />
+                        </button>
+                      </label>
+                      <p className="text-xs text-muted-foreground mt-1">Show component type labels</p>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+            
             <button
               onClick={onUndo}
               disabled={!canUndo}
@@ -351,9 +479,128 @@ export function EditorLayout({
             >
               <RotateCcw className="w-4 h-4" />
             </button>
-            <button className="p-2 hover:bg-muted rounded-md transition-colors text-muted-foreground hover:text-foreground">
-              <Settings className="w-4 h-4" />
-            </button>
+            
+            <div className="relative">
+              <button
+                onClick={() => setShowSettingsMenu(!showSettingsMenu)}
+                className="p-2 hover:bg-muted rounded-md transition-colors text-muted-foreground hover:text-foreground"
+                title="Settings"
+              >
+                <Settings className="w-4 h-4" />
+              </button>
+              {showSettingsMenu && (
+                <>
+                  {/* Click-outside overlay */}
+                  <div className="fixed inset-0 z-40" onClick={() => setShowSettingsMenu(false)} />
+                  <div className="absolute right-0 top-full mt-2 w-80 bg-card rounded-lg shadow-xl border border-border overflow-hidden z-50 max-h-[600px] overflow-y-auto">
+                    {/* Canvas Section */}
+                    <div className="px-4 py-3 border-b border-border">
+                      <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Canvas</div>
+                    </div>
+                    <button
+                      onClick={() => {
+                        if ((window as any).__resetCanvasZoom) {
+                          (window as any).__resetCanvasZoom();
+                        }
+                        setShowSettingsMenu(false);
+                      }}
+                      className="w-full text-left px-4 py-3 text-sm hover:bg-muted transition-colors flex items-center justify-between border-b border-border"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Maximize2 className="w-4 h-4 text-muted-foreground" />
+                        <span className="text-foreground">Reset Zoom</span>
+                      </div>
+                      <span className="text-xs text-muted-foreground">{canvasZoom}%</span>
+                    </button>
+                    
+                    {/* Keyboard Shortcuts Section - Collapsible */}
+                    <div className="border-b border-border">
+                      <button
+                        onClick={() => setShowShortcutsSection(!showShortcutsSection)}
+                        className="w-full text-left px-4 py-3 text-sm hover:bg-muted transition-colors flex items-center justify-between"
+                      >
+                        <div className="flex items-center gap-2">
+                          <Keyboard className="w-4 h-4 text-muted-foreground" />
+                          <span className="text-foreground">Keyboard Shortcuts</span>
+                        </div>
+                        {showShortcutsSection ? (
+                          <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                        ) : (
+                          <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                        )}
+                      </button>
+                      
+                      {showShortcutsSection && (
+                        <div className="px-4 pb-3 space-y-2">
+                          {customShortcuts.map((shortcut) => (
+                            <div key={shortcut.id} className="flex items-center gap-2 py-1.5">
+                              <div className="flex-1 min-w-0">
+                                <div className="text-xs text-muted-foreground mb-1">{shortcut.name}</div>
+                                {editingShortcutId === shortcut.id ? (
+                                  <input
+                                    type="text"
+                                    value={shortcut.shortcut}
+                                    onChange={(e) => {
+                                      setCustomShortcuts(prev =>
+                                        prev.map(s =>
+                                          s.id === shortcut.id
+                                            ? { ...s, shortcut: e.target.value }
+                                            : s
+                                        )
+                                      );
+                                    }}
+                                    onBlur={() => setEditingShortcutId(null)}
+                                    onKeyDown={(e) => {
+                                      if (e.key === 'Enter') {
+                                        setEditingShortcutId(null);
+                                      }
+                                    }}
+                                    autoFocus
+                                    className="w-full px-2 py-1 text-xs bg-background border border-border rounded focus:outline-none focus:ring-1 focus:ring-primary"
+                                  />
+                                ) : (
+                                  <button
+                                    onClick={() => setEditingShortcutId(shortcut.id)}
+                                    className="w-full text-left px-2 py-1 text-xs bg-muted hover:bg-muted/80 rounded font-mono transition-colors"
+                                  >
+                                    {shortcut.shortcut}
+                                  </button>
+                                )}
+                              </div>
+                              <button
+                                onClick={() => {
+                                  setCustomShortcuts(prev => prev.filter(s => s.id !== shortcut.id));
+                                }}
+                                className="p-1 hover:bg-destructive/10 rounded transition-colors"
+                                title="Delete shortcut"
+                              >
+                                <Trash2 className="w-3 h-3 text-muted-foreground hover:text-destructive" />
+                              </button>
+                            </div>
+                          ))}
+                          
+                          {/* Add New Shortcut */}
+                          <button
+                            onClick={() => {
+                              const newId = Math.max(...customShortcuts.map(s => s.id), 0) + 1;
+                              setCustomShortcuts(prev => [
+                                ...prev,
+                                { id: newId, name: "New Shortcut", shortcut: "Ctrl + ?" }
+                              ]);
+                              setEditingShortcutId(newId);
+                            }}
+                            className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs text-muted-foreground hover:text-foreground border border-dashed border-border hover:border-primary/50 rounded transition-colors mt-2"
+                          >
+                            <Plus className="w-3 h-3" />
+                            <span>Add Shortcut</span>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
 
             <div className="w-px h-6 bg-border" />
 
@@ -370,9 +617,10 @@ export function EditorLayout({
             <div className="relative">
               <button
                 onClick={() => setShowExportMenu(!showExportMenu)}
-                className="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-md text-xs font-medium transition-colors"
+                className="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-md text-xs font-medium transition-colors flex items-center space-x-2"
               >
-                Publish
+                <Download className="w-4 h-4" />
+                <span>Export</span>
               </button>
               {showExportMenu && (
                 <>
@@ -452,6 +700,7 @@ export function EditorLayout({
 
                   <TabsContent value="layers" className="flex-1 min-h-0 m-0 p-0 border-none data-[state=inactive]:hidden overflow-y-auto">
                     <HierarchyPanel
+                      ref={hierarchyPanelRef}
                       components={components}
                       selectedComponentIds={selectedComponentIds}
                       onSelectComponent={onSelectComponent}
@@ -545,6 +794,7 @@ export function EditorLayout({
                   selectedComponentIds={isPreviewMode ? [] : selectedComponentIds}
                   onSelectComponent={isPreviewMode ? () => {} : onSelectComponent}
                   onUpdateComponent={onUpdateComponent}
+                  onRepositionComponent={onRepositionComponent}
                   viewport={viewport}
                   isPreviewMode={isPreviewMode}
                   onNavigate={(slug) => {
@@ -552,8 +802,29 @@ export function EditorLayout({
                     if (targetPage) onPageSelect(targetPage.id);
                   }}
                   pages={pages}
+                  currentPageSlug={pages.find(p => p.id === currentPageId)?.slug}
                   showOutlines={!isPreviewMode && showOutlines}
+                  outlineColor={outlineColor}
+                  showComponentTags={showComponentTags}
                   pageBackground={pages.find(p => p.id === currentPageId)}
+                  onZoomChange={(zoom, pan) => {
+                    setCanvasZoom(Math.round(zoom * 100));
+                  }}
+                  onComponentDoubleClick={(componentId) => {
+                    // Switch to layers tab
+                    setActiveTab("layers");
+                    // Expand parent components to make the target visible
+                    if (hierarchyPanelRef.current) {
+                      hierarchyPanelRef.current.expandToComponent(componentId);
+                    }
+                    // Wait a bit for tab to render and expansion to complete, then scroll to component in hierarchy
+                    setTimeout(() => {
+                      const hierarchyItem = document.querySelector(`[data-hierarchy-id="${componentId}"]`);
+                      if (hierarchyItem) {
+                        hierarchyItem.scrollIntoView({ behavior: "smooth", block: "center" });
+                      }
+                    }, 100);
+                  }}
                 />
               </div>
             </div>

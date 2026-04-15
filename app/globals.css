@@ -129,3 +129,241 @@
 .editor-canvas-container [style*="vmax"] {
   /* This is handled by JavaScript conversion in buildStyle.ts */
 }
+
+/* Ctrl+Drag mode cursor */
+body.ctrl-drag-mode [data-component-id] {
+  cursor: grab !important;
+}
+
+body.ctrl-drag-mode [data-component-id]:hover {
+  cursor: grab !important;
+  outline: 2px dashed #3b82f6 !important;
+  outline-offset: 2px;
+}
+
+/* Ensure data-component-id elements are visible for debugging */
+[data-component-id] {
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Smooth reordering animations */
+[data-component-id].component-moving {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.3s ease;
+}
+
+[data-component-id].component-shifting {
+  animation: shift-position 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes shift-position {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Drop zone indicators with 4-sided positioning */
+[data-component-id].drop-target-top::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: -4px;
+  right: -4px;
+  height: 6px;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+  border-radius: 3px;
+  animation: pulse-line 0.8s ease-in-out infinite;
+  z-index: 100;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+}
+
+[data-component-id].drop-target-bottom::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: -4px;
+  right: -4px;
+  height: 6px;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+  border-radius: 3px;
+  animation: pulse-line 0.8s ease-in-out infinite;
+  z-index: 100;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+}
+
+[data-component-id].drop-target-left::before {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: -4px;
+  bottom: -4px;
+  width: 6px;
+  background: linear-gradient(180deg, #3b82f6, #8b5cf6);
+  border-radius: 3px;
+  animation: pulse-line-vertical 0.8s ease-in-out infinite;
+  z-index: 100;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+}
+
+[data-component-id].drop-target-right::after {
+  content: '';
+  position: absolute;
+  right: -8px;
+  top: -4px;
+  bottom: -4px;
+  width: 6px;
+  background: linear-gradient(180deg, #3b82f6, #8b5cf6);
+  border-radius: 3px;
+  animation: pulse-line-vertical 0.8s ease-in-out infinite;
+  z-index: 100;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+}
+
+[data-component-id].drop-target-center {
+  background: rgba(34, 197, 94, 0.1) !important;
+  outline: 3px solid #22c55e !important;
+  outline-offset: 2px !important;
+  animation: pulse-glow-center 0.8s ease-in-out infinite;
+  position: relative;
+  transform: scale(0.98);
+  transition: transform 0.2s ease;
+}
+
+[data-component-id].drop-target-center::before {
+  content: '⇄ Swap Position';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(34, 197, 94, 0.95);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  z-index: 101;
+  pointer-events: none;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
+  animation: fade-in 0.2s ease-out;
+}
+
+[data-component-id].drop-target-inside {
+  background: rgba(139, 92, 246, 0.08) !important;
+  outline: 3px dashed #8b5cf6 !important;
+  outline-offset: 6px !important;
+  animation: pulse-glow-inside 1s ease-in-out infinite;
+  position: relative;
+}
+
+[data-component-id].drop-target-inside::before {
+  content: 'Drop Inside Container';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(139, 92, 246, 0.95);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  z-index: 101;
+  pointer-events: none;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+  animation: fade-in 0.2s ease-out;
+}
+
+@keyframes pulse-line {
+  0%, 100% {
+    opacity: 1;
+    transform: scaleY(1);
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scaleY(1.3);
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.8);
+  }
+}
+
+@keyframes pulse-line-vertical {
+  0%, 100% {
+    opacity: 1;
+    transform: scaleX(1);
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scaleX(1.3);
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.8);
+  }
+}
+
+@keyframes pulse-glow-center {
+  0%, 100% {
+    box-shadow: 0 0 0 rgba(34, 197, 94, 0.4);
+    outline-color: #22c55e;
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(34, 197, 94, 0.6);
+    outline-color: #4ade80;
+  }
+}
+
+@keyframes pulse-glow-inside {
+  0%, 100% {
+    box-shadow: 0 0 0 rgba(139, 92, 246, 0.4);
+    outline-color: #8b5cf6;
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(139, 92, 246, 0.6);
+    outline-color: #a78bfa;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Squeeze animation for grid items */
+.editor-canvas [data-component-id] {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slide-down {
+  from {
+    transform: translateX(-50%) translateY(-100px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in {
+  from {
+    transform: translateY(100px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
