@@ -33,7 +33,7 @@ export function Hero({
   primaryButtonLink = "#",
   secondaryButtonText = "VIEW DOCUMENTATION",
   secondaryButtonLink = "#",
-  backgroundImage = "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=700&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mzh8fHdlYnNpdGUlMjBiYWNrZ3JvdW5kfGVufDB8fDB8fHww",
+  backgroundImage ,
   backgroundColor = "#0d0d0d",
   textColor = "#ffffff",
   alignment = "center",
