@@ -3,6 +3,8 @@
 import { useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { buildComponentStyle } from "@/lib/buildStyle";
+import { ThemeStyleVariant, getThemeCSSVars } from "@/lib/themeStyles";
+import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
 
 interface Tab {
   label: string;
@@ -19,6 +21,7 @@ interface TabsProps {
   activeTabColor?: string;
   width?: string;
   height?: string;
+  themeStyle?: ThemeStyleVariant;
   [key: string]: any;
 }
 
@@ -36,6 +39,7 @@ export function Tabs({
   activeTabColor = "#3b82f6",
   width,
   height,
+  themeStyle,
   ...rest
 }: TabsProps) {
   const [activeTab, setActiveTab] = useState(defaultTab);
@@ -65,13 +69,16 @@ export function Tabs({
     height,
     ...rest,
   });
+  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const cssVars = getThemeCSSVars(effectiveTheme);
+
 
   return (
-    <div style={baseStyle} className="rounded-lg">
+    <div style={{ ...baseStyle, ...cssVars }} className="rounded-lg">
       {/* Tab Headers */}
       <div
         className={cn(
-          "flex gap-1 relative",
+        "flex gap-1 relative",
           variant === "bordered" && "border-b border-border",
         )}
       >

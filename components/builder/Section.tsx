@@ -1,5 +1,8 @@
 import { cn } from "@/lib/utils";
 import { buildComponentStyle } from "@/lib/buildStyle";
+import { ThemeStyleVariant, getThemeCSSVars } from "@/lib/themeStyles";
+
+import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
 
 interface SectionProps {
   children?: React.ReactNode;
@@ -12,6 +15,7 @@ interface SectionProps {
   width?: string;
   height?: string;
   [key: string]: any;
+  themeStyle?: ThemeStyleVariant;
 }
 
 export function Section({
@@ -24,6 +28,7 @@ export function Section({
   id,
   width,
   height,
+  themeStyle,
   ...rest
 }: SectionProps) {
   const paddingClasses = {
@@ -43,13 +48,20 @@ export function Section({
     full: "max-w-full",
   };
 
+  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const cssVars = getThemeCSSVars(effectiveTheme);
+
   const baseStyle = buildComponentStyle({ backgroundColor, textColor, width, height, ...rest });
 
   return (
     <section
       id={id}
-      className={cn("w-full", paddingClasses[padding], className)}
-      style={baseStyle}
+      className={cn(
+        "w-full",
+        paddingClasses[padding],
+        className
+      )}
+      style={{ ...baseStyle, ...cssVars }}
     >
       <div className={cn("mx-auto", maxWidthClasses[maxWidth])}>{children}</div>
     </section>

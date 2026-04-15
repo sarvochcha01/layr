@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { buildComponentStyle } from "@/lib/buildStyle";
+import { ThemeStyleVariant, getThemeCSSVars } from "@/lib/themeStyles";
+import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
 
 interface FeatureProps {
   icon?: string;
@@ -15,6 +17,7 @@ interface FeatureProps {
   iconColor?: string;
   width?: string;
   height?: string;
+  themeStyle?: ThemeStyleVariant;
   [key: string]: any;
 }
 
@@ -29,6 +32,7 @@ export function Feature({
   iconColor = "#3b82f6",
   width,
   height,
+  themeStyle,
   ...rest
 }: FeatureProps) {
   const [hovered, setHovered] = useState(false);
@@ -46,6 +50,9 @@ export function Feature({
     height,
     ...rest,
   });
+  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const cssVars = getThemeCSSVars(effectiveTheme);
+
 
   return (
     <div
@@ -53,13 +60,14 @@ export function Feature({
         "p-6 rounded-2xl min-w-0 overflow-hidden border border-border",
         layout === "vertical" ? "text-center" : "flex gap-5 items-start",
       )}
-      style={{
+      style={{ 
         ...baseStyle,
         transition:
           "transform 300ms cubic-bezier(0.34,1.56,0.64,1), box-shadow 300ms ease, border-color 300ms ease",
         transform: hovered ? "translateY(-4px)" : "translateY(0)",
         boxShadow: hovered ? "0 16px 40px rgba(0,0,0,0.35)" : "none",
         borderColor: hovered ? "rgba(255,255,255,0.12)" : undefined,
+        ...cssVars
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}

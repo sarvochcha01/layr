@@ -1,9 +1,9 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { buildComponentStyle } from "@/lib/buildStyle";
+import { ThemeStyleVariant, getThemeCSSVars } from "@/lib/themeStyles";
+import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
 
 interface CardProps {
   title?: string;
@@ -26,6 +26,7 @@ interface CardProps {
   height?: string;
   backgroundColor?: string;
   textColor?: string;
+  themeStyle?: ThemeStyleVariant;
   children?: React.ReactNode;
   [key: string]: any;
 }
@@ -47,26 +48,44 @@ export function Card({
   className,
   width,
   height,
-  backgroundColor = "#1a1a1a",
-  textColor = "#ffffff",
+  backgroundColor,
+  textColor,
+  themeStyle,
   children,
   iconBg,
   iconColor,
   ...rest
 }: CardProps) {
   const [hovered, setHovered] = useState(false);
+  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const cssVars = getThemeCSSVars(effectiveTheme);
 
-  const baseStyle = buildComponentStyle({
-    backgroundColor,
-    textColor,
-    width,
-    height,
-    ...rest,
-  });
+  const isNeoBrutalist = effectiveTheme === "neobrutalist";
+  const isBrutalist = effectiveTheme === "brutalist";
 
-  // Determine which image to show (priority: topImage > image for backward compatibility)
-  const showTopImage = topImage || image;
-  const showIcon = icon && !showTopImage;
+  const baseStyle: React.CSSProperties = {
+    ...cssVars,
+    backgroundColor: backgroundColor || "var(--theme-surface)",
+    color: textColor || "var(--theme-text)",
+    ...(width ? { width } : {}),
+    ...(height ? { height } : {}),
+    border: `var(--theme-border-width) solid var(--theme-border)`,
+    borderRadius: "var(--theme-radius)",
+    boxShadow: hovered
+      ? isNeoBrutalist || isBrutalist
+        ? "8px 8px 0px var(--theme-border)"
+        : "var(--theme-shadow)"
+      : isNeoBrutalist || isBrutalist
+        ? "var(--theme-hard-shadow, none)"
+        : "0 2px 8px rgba(0,0,0,0.12)",
+    transform: hovered && !isNeoBrutalist && !isBrutalist
+      ? "translateY(-4px)"
+      : hovered && (isNeoBrutalist || isBrutalist)
+        ? "translate(-2px, -2px)"
+        : "none",
+    transition: "all 300ms ease",
+    backdropFilter: "var(--theme-backdrop)",
+  };
 
   // Build bottom background image style
   const bottomBackgroundStyle = bottomBackgroundImageUrl
@@ -78,32 +97,23 @@ export function Card({
       }
     : {};
 
+  const showTopImage = topImage || image;
+  const showIcon = icon && !showTopImage;
+
   return (
     <div
       className={cn(
-        "rounded-2xl p-6 min-w-0 w-full h-full flex flex-col",
-        "border border-border",
-        "overflow-hidden",
-        "relative",
+        "min-w-0 w-full h-full flex flex-col overflow-hidden relative p-6",
         className,
       )}
-      style={{
-        ...baseStyle,
-        transition:
-          "transform 300ms cubic-bezier(0.34,1.56,0.64,1), box-shadow 300ms ease, border-color 300ms ease",
-        transform: hovered ? "translateY(-4px)" : "translateY(0)",
-        boxShadow: hovered
-          ? "0 16px 40px rgba(0,0,0,0.35)"
-          : "0 0 0 rgba(0,0,0,0)",
-        borderColor: hovered ? "rgba(255,255,255,0.15)" : undefined,
-      }}
+      style={baseStyle}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
       {/* Bottom Background Image Layer */}
       {bottomBackgroundImageUrl && (
         <div
-          className="absolute inset-0 rounded-2xl"
+          className="absolute inset-0"
           style={bottomBackgroundStyle}
         />
       )}
@@ -125,18 +135,19 @@ export function Card({
         </div>
       )}
 
-      {/* Icon — show when there's no top image */}
+      {/* Icon */}
       {showIcon && (
         <div className="mb-5 flex-shrink-0 relative z-10">
           <div
-            className="w-12 h-12 rounded-xl flex items-center justify-center text-xl font-bold backdrop-blur-sm"
+            className="w-12 h-12 flex items-center justify-center text-xl font-bold"
             style={{
-              backgroundColor: iconBg,
-              color: iconColor,
+              backgroundColor: iconBg || "var(--theme-accent)",
+              color: iconColor || "var(--theme-accent-fg)",
+              borderRadius: "var(--theme-radius)",
+              border: `var(--theme-border-width) solid var(--theme-border)`,
+              boxShadow: "var(--theme-hard-shadow, none)",
               transition: "transform 300ms cubic-bezier(0.34,1.56,0.64,1)",
-              transform: hovered
-                ? "scale(1.1) rotate(-3deg)"
-                : "scale(1) rotate(0deg)",
+              transform: hovered ? "scale(1.1) rotate(-3deg)" : "scale(1) rotate(0deg)",
             }}
           >
             {icon || "•"}
@@ -148,34 +159,36 @@ export function Card({
       <div className="space-y-3 min-w-0 flex-1 overflow-hidden relative z-10">
         {title && (
           <h3
-            className="text-xl font-semibold break-words leading-tight tracking-tight line-clamp-2"
-            style={{ fontFamily: "'Inter', sans-serif" }}
+            className="text-xl break-words leading-tight line-clamp-2"
+            style={{
+              fontWeight: "var(--theme-heading-weight)" as any,
+              color: "var(--theme-text)",
+              letterSpacing: "var(--theme-letter-spacing)",
+            }}
           >
             {title}
           </h3>
         )}
 
         {description && (
-          <p className="text-sm leading-relaxed break-words text-gray-400 line-clamp-3">
+          <p
+            className="text-sm leading-relaxed break-words line-clamp-3"
+            style={{ color: "var(--theme-text-muted)" }}
+          >
             {description}
           </p>
         )}
 
         {buttonText && (
           <div className="pt-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="px-0 font-medium hover:bg-transparent text-primary hover:text-primary/80 group/btn"
-              asChild
+            <a
+              href={buttonLink}
+              className="inline-flex items-center gap-1.5 text-sm font-semibold transition-all duration-200 hover:opacity-80 group/btn"
+              style={{ color: "var(--theme-accent)" }}
             >
-              <a href={buttonLink} className="inline-flex items-center gap-1.5">
-                {buttonText}
-                <span className="text-xs transition-transform duration-200 group-hover/btn:translate-x-1">
-                  →
-                </span>
-              </a>
-            </Button>
+              {buttonText}
+              <span className="text-xs transition-transform duration-200 group-hover/btn:translate-x-1">→</span>
+            </a>
           </div>
         )}
       </div>

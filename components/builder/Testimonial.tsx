@@ -4,6 +4,8 @@ import { useState } from "react";
 import { Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { buildComponentStyle } from "@/lib/buildStyle";
+import { ThemeStyleVariant, getThemeCSSVars } from "@/lib/themeStyles";
+import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
 
 interface TestimonialProps {
   quote?: string;
@@ -17,6 +19,7 @@ interface TestimonialProps {
   textColor?: string;
   width?: string;
   height?: string;
+  themeStyle?: ThemeStyleVariant;
   [key: string]: any;
 }
 
@@ -32,6 +35,7 @@ export function Testimonial({
   textColor = "#ffffff",
   width,
   height,
+  themeStyle,
   ...rest
 }: TestimonialProps) {
   const [hovered, setHovered] = useState(false);
@@ -43,6 +47,9 @@ export function Testimonial({
     height,
     ...rest,
   });
+  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const cssVars = getThemeCSSVars(effectiveTheme);
+
 
   // Ensure rating is a number, default to 5 if not provided
   const numericRating =
@@ -72,7 +79,7 @@ export function Testimonial({
         isFeatured &&
           "p-10 rounded-3xl border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-transparent",
       )}
-      style={{
+      style={{ 
         ...baseStyle,
         transition:
           "transform 300ms cubic-bezier(0.34,1.56,0.64,1), box-shadow 300ms ease, border-color 300ms ease",
@@ -85,6 +92,7 @@ export function Testimonial({
               : "none"
           : "none",
         borderColor: hovered && isCard ? "rgba(255,255,255,0.12)" : undefined,
+        ...cssVars
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}

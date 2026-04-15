@@ -4,6 +4,8 @@ import { useRef, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { buildComponentStyle } from "@/lib/buildStyle";
+import { ThemeStyleVariant, getThemeCSSVars } from "@/lib/themeStyles";
+import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
 
 interface AccordionItem {
   title: string;
@@ -19,6 +21,7 @@ interface AccordionProps {
   borderColor?: string;
   width?: string;
   height?: string;
+  themeStyle?: ThemeStyleVariant;
   [key: string]: any;
 }
 
@@ -104,6 +107,7 @@ export function Accordion({
   borderColor = "#2a2a2a",
   width,
   height,
+  themeStyle,
   ...rest
 }: AccordionProps) {
   const [openItems, setOpenItems] = useState<number[]>([defaultOpen]);
@@ -120,8 +124,16 @@ export function Accordion({
 
   const outerStyle = buildComponentStyle({ width: width || "100%", height, ...rest });
 
+  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const cssVars = getThemeCSSVars(effectiveTheme);
+
   return (
-    <div className="w-full" style={{ ...outerStyle, display: "block", backgroundColor }}>
+    <div 
+      className={cn(
+        "w-full",
+        )} 
+      style={{ ...outerStyle, display: "block", backgroundColor, ...cssVars }}
+    >
       {items.map((item, index) => (
         <AccordionItemRow
           key={index}

@@ -2,6 +2,8 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { buildComponentStyle } from "@/lib/buildStyle";
+import { ThemeStyleVariant, getThemeCSSVars } from "@/lib/themeStyles";
+import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
 
 interface FormField {
   id: string;
@@ -25,6 +27,7 @@ interface FormProps {
   height?: string;
   backgroundColor?: string;
   textColor?: string;
+  themeStyle?: ThemeStyleVariant;
   [key: string]: any;
 }
 
@@ -43,6 +46,7 @@ export function Form({
   height,
   backgroundColor,
   textColor,
+  themeStyle,
   ...rest
 }: FormProps) {
   const baseStyle = buildComponentStyle({
@@ -52,6 +56,9 @@ export function Form({
     height,
     ...rest,
   });
+  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const cssVars = getThemeCSSVars(effectiveTheme);
+
 
   // If no background color is set, make it transparent (inherit from parent)
   if (!backgroundColor && !rest.backgroundType) {
@@ -73,7 +80,8 @@ export function Form({
               name={field.id}
               placeholder={field.placeholder}
               required={field.required}
-              className={cn(inputClasses, "min-h-[100px]")}
+              className={cn(
+        inputClasses, "min-h-[100px]")}
             />
           </div>
         );
@@ -166,7 +174,7 @@ export function Form({
   };
 
   return (
-    <div className={cn("w-full", className)} style={baseStyle}>
+    <div className={cn("w-full", className)} style={{ ...baseStyle, ...cssVars }}>
       {title && <h2 className="text-2xl font-bold mb-2 text-foreground">{title}</h2>}
 
       {description && <p className="mb-6 text-muted-foreground">{description}</p>}

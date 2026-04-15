@@ -15,6 +15,7 @@ import { PropertiesPanel } from "./PropertiesPanel";
 import { PagesPanel } from "./PagesPanel";
 import { AIChatPanel } from "./AIChatPanel";
 import { CodeEditorDialog } from "./CodeEditorDialog";
+import { ThemeStylePanel } from "./ThemeStylePanel";
 import {
   Download,
   Eye,
@@ -71,7 +72,11 @@ interface EditorLayoutProps {
   onDeleteComponent: (id: string) => void;
   onDuplicateComponent: (id: string) => void;
   onAddComponent?: (componentType: string) => void;
-  onRepositionComponent?: (componentId: string, targetId: string | null, position: "top" | "bottom" | "left" | "right" | "center" | "inside") => void;
+  onRepositionComponent?: (
+    componentId: string,
+    targetId: string | null,
+    position: "top" | "bottom" | "left" | "right" | "center" | "inside",
+  ) => void;
   projectName?: string;
   onProjectNameChange?: (name: string) => void;
   pages: Page[];
@@ -166,7 +171,7 @@ export function EditorLayout({
   const [canvasZoom, setCanvasZoom] = useState(100);
   const [isLeftPanelOpen, setIsLeftPanelOpen] = useState(true);
   const [isRightPanelOpen, setIsRightPanelOpen] = useState(true);
-  
+
   // Editable shortcuts state
   const [customShortcuts, setCustomShortcuts] = useState([
     { id: 1, name: "Canvas Zoom", shortcut: "Ctrl + Scroll" },
@@ -174,8 +179,10 @@ export function EditorLayout({
     { id: 3, name: "Insert Component", shortcut: "Ctrl + Drag" },
     { id: 4, name: "Swap Components", shortcut: "Ctrl + Shift + Drag" },
   ]);
-  const [editingShortcutId, setEditingShortcutId] = useState<number | null>(null);
-  
+  const [editingShortcutId, setEditingShortcutId] = useState<number | null>(
+    null,
+  );
+
   // Controlled tab state so AI panel can be closed programmatically
   const [activeTab, setActiveTab] = useState("components");
 
@@ -193,10 +200,14 @@ export function EditorLayout({
 
       if (isResizingRef.current === "left") {
         const delta = e.clientX - startPosRef.current.x;
-        setLeftPanelWidth(Math.max(200, Math.min(600, startSizeRef.current + delta)));
+        setLeftPanelWidth(
+          Math.max(200, Math.min(600, startSizeRef.current + delta)),
+        );
       } else if (isResizingRef.current === "right") {
         const delta = startPosRef.current.x - e.clientX;
-        setRightPanelWidth(Math.max(300, Math.min(700, startSizeRef.current + delta)));
+        setRightPanelWidth(
+          Math.max(300, Math.min(700, startSizeRef.current + delta)),
+        );
       }
     };
 
@@ -230,9 +241,12 @@ export function EditorLayout({
 
   const getCanvasWidth = () => {
     switch (viewport) {
-      case "mobile": return "375px";
-      case "tablet": return "768px";
-      default: return "100%";
+      case "mobile":
+        return "375px";
+      case "tablet":
+        return "768px";
+      default:
+        return "100%";
     }
   };
 
@@ -257,21 +271,63 @@ export function EditorLayout({
         for (let i = 0; i < pagesToExport.length; i++) {
           const page = pagesToExport[i];
           const pageName = page.name.replace(/\s+/g, "");
-          if (page.slug === "index" || (i === 0 && !pagesToExport.some((p) => p.slug === "index"))) {
-            appFolder?.file("page.tsx", generateAppPage(page.components, pageName, `${pageName} - ${name}`));
+          if (
+            page.slug === "index" ||
+            (i === 0 && !pagesToExport.some((p) => p.slug === "index"))
+          ) {
+            appFolder?.file(
+              "page.tsx",
+              generateAppPage(
+                page.components,
+                pageName,
+                `${pageName} - ${name}`,
+              ),
+            );
           } else {
-            const slugPath = page.slug || page.name.toLowerCase().replace(/\s+/g, "-") || page.id;
-            appFolder?.folder(slugPath)?.file("page.tsx", generateReactComponent(page.components, pageName));
+            const slugPath =
+              page.slug ||
+              page.name.toLowerCase().replace(/\s+/g, "-") ||
+              page.id;
+            appFolder
+              ?.folder(slugPath)
+              ?.file(
+                "page.tsx",
+                generateReactComponent(page.components, pageName),
+              );
           }
         }
 
         const componentNames = [
-          "Header","Footer","Hero","Section","Container","Grid","Card","Button",
-          "Text","Image","Video","Form","Navbar","Accordion","Tabs","Testimonial",
-          "PricingCard","Feature","Stats","CTA","Divider","Spacer","Badge","Alert",
+          "Header",
+          "Footer",
+          "Hero",
+          "Section",
+          "Container",
+          "Grid",
+          "Card",
+          "Button",
+          "Text",
+          "Image",
+          "Video",
+          "Form",
+          "Navbar",
+          "Accordion",
+          "Tabs",
+          "Testimonial",
+          "PricingCard",
+          "Feature",
+          "Stats",
+          "CTA",
+          "Divider",
+          "Spacer",
+          "Badge",
+          "Alert",
         ];
         for (const componentName of componentNames) {
-          componentsFolder?.file(`${componentName}.tsx`, generateComponentImplementation(componentName));
+          componentsFolder?.file(
+            `${componentName}.tsx`,
+            generateComponentImplementation(componentName),
+          );
         }
         componentsFolder?.file("index.ts", generateReactComponentsIndex());
 
@@ -279,27 +335,64 @@ export function EditorLayout({
         zip.file("next.config.js", generateNextConfig());
         zip.file("tailwind.config.js", generateTailwindConfig());
         zip.file("README.md", generateREADME(name));
-        zip.file("postcss.config.js", `/** @type {import('postcss-load-config').Config} */\nconst config = {\n  plugins: {\n    tailwindcss: {},\n    autoprefixer: {},\n  },\n}\n\nmodule.exports = config\n`);
-        zip.file(".gitignore", `# dependencies\n/node_modules\n/.pnp\n.pnp.js\n\n# testing\n/coverage\n\n# next.js\n/.next/\n/out/\n\n# production\n/build\n\n# misc\n.DS_Store\n*.pem\n\n# debug\nnpm-debug.log*\nyarn-debug.log*\nyarn-error.log*\n\n# local env files\n.env*.local\n\n# vercel\n.vercel\n\n# typescript\n*.tsbuildinfo\nnext-env.d.ts\n`);
-        zip.file(".eslintrc.json", JSON.stringify({ extends: "next/core-web-vitals" }, null, 2));
-        zip.file("next-env.d.ts", `/// <reference types="next" />\n/// <reference types="next/image-types/global" />\n\n// NOTE: This file should not be edited\n// see https://nextjs.org/docs/app/building-your-application/configuring/typescript for more information.\n`);
-        zip.file("tsconfig.json", JSON.stringify({
-          compilerOptions: {
-            target: "ES2017", lib: ["dom", "dom.iterable", "esnext"],
-            allowJs: true, skipLibCheck: true, strict: true, noEmit: true,
-            esModuleInterop: true, module: "esnext", moduleResolution: "node",
-            resolveJsonModule: true, isolatedModules: true, jsx: "preserve",
-            incremental: true, plugins: [{ name: "next" }], paths: { "@/*": ["./*"] },
-          },
-          include: ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-          exclude: ["node_modules"],
-        }, null, 2));
+        zip.file(
+          "postcss.config.js",
+          `/** @type {import('postcss-load-config').Config} */\nconst config = {\n  plugins: {\n    tailwindcss: {},\n    autoprefixer: {},\n  },\n}\n\nmodule.exports = config\n`,
+        );
+        zip.file(
+          ".gitignore",
+          `# dependencies\n/node_modules\n/.pnp\n.pnp.js\n\n# testing\n/coverage\n\n# next.js\n/.next/\n/out/\n\n# production\n/build\n\n# misc\n.DS_Store\n*.pem\n\n# debug\nnpm-debug.log*\nyarn-debug.log*\nyarn-error.log*\n\n# local env files\n.env*.local\n\n# vercel\n.vercel\n\n# typescript\n*.tsbuildinfo\nnext-env.d.ts\n`,
+        );
+        zip.file(
+          ".eslintrc.json",
+          JSON.stringify({ extends: "next/core-web-vitals" }, null, 2),
+        );
+        zip.file(
+          "next-env.d.ts",
+          `/// <reference types="next" />\n/// <reference types="next/image-types/global" />\n\n// NOTE: This file should not be edited\n// see https://nextjs.org/docs/app/building-your-application/configuring/typescript for more information.\n`,
+        );
+        zip.file(
+          "tsconfig.json",
+          JSON.stringify(
+            {
+              compilerOptions: {
+                target: "ES2017",
+                lib: ["dom", "dom.iterable", "esnext"],
+                allowJs: true,
+                skipLibCheck: true,
+                strict: true,
+                noEmit: true,
+                esModuleInterop: true,
+                module: "esnext",
+                moduleResolution: "node",
+                resolveJsonModule: true,
+                isolatedModules: true,
+                jsx: "preserve",
+                incremental: true,
+                plugins: [{ name: "next" }],
+                paths: { "@/*": ["./*"] },
+              },
+              include: [
+                "next-env.d.ts",
+                "**/*.ts",
+                "**/*.tsx",
+                ".next/types/**/*.ts",
+              ],
+              exclude: ["node_modules"],
+            },
+            null,
+            2,
+          ),
+        );
         publicFolder?.file(".gitkeep", "");
       } else {
         const css = generateCSS();
         const js = generateJS();
         for (const page of pagesToExport) {
-          zip.file(`${page.slug || page.id}.html`, generateHTML(page.components, pagesToExport));
+          zip.file(
+            `${page.slug || page.id}.html`,
+            generateHTML(page.components, pagesToExport),
+          );
         }
         zip.file("styles.css", css);
         zip.file("script.js", js);
@@ -310,14 +403,18 @@ export function EditorLayout({
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = format === "react" ? `${name}-nextjs.zip` : `${name}-export.zip`;
+      a.download =
+        format === "react" ? `${name}-nextjs.zip` : `${name}-export.zip`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     } catch (error) {
       console.error("Export failed:", error);
-      alert("Export failed: " + (error instanceof Error ? error.message : "Unknown error"));
+      alert(
+        "Export failed: " +
+          (error instanceof Error ? error.message : "Unknown error"),
+      );
     }
   };
 
@@ -345,7 +442,9 @@ export function EditorLayout({
                   key={v}
                   onClick={() => setViewport(v)}
                   className={`px-3 py-1.5 text-xs font-medium transition-colors rounded capitalize ${
-                    viewport === v ? "bg-muted text-foreground" : "text-muted-foreground hover:text-foreground"
+                    viewport === v
+                      ? "bg-muted text-foreground"
+                      : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   {v.charAt(0).toUpperCase() + v.slice(1)}
@@ -361,7 +460,6 @@ export function EditorLayout({
           </div>
 
           <div className="flex items-center space-x-3">
-            
             {/* Conditional Reset Zoom Button - Only shows when zoom is not 100% */}
             {canvasZoom !== 100 && (
               <button
@@ -383,9 +481,19 @@ export function EditorLayout({
               className="p-2 hover:bg-muted rounded-md transition-colors text-muted-foreground hover:text-foreground"
               title={isPreviewMode ? "Stop Preview" : "Preview"}
             >
-              {isPreviewMode ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+              {isPreviewMode ? (
+                <Pause className="w-4 h-4" />
+              ) : (
+                <Play className="w-4 h-4" />
+              )}
             </button>
-            
+
+            {/* Theme Style Panel */}
+            <ThemeStylePanel
+              components={components}
+              onUpdateComponent={onUpdateComponent}
+            />
+
             <div className="relative">
               <button
                 onClick={() => setShowOutlinesMenu(!showOutlinesMenu)}
@@ -397,16 +505,23 @@ export function EditorLayout({
               {showOutlinesMenu && (
                 <>
                   {/* Click-outside overlay */}
-                  <div className="fixed inset-0 z-40" onClick={() => setShowOutlinesMenu(false)} />
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setShowOutlinesMenu(false)}
+                  />
                   <div className="absolute left-0 top-full mt-2 w-64 bg-card rounded-lg shadow-xl border border-border overflow-hidden z-50">
                     <div className="px-4 py-3 border-b border-border">
-                      <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">View Options</div>
+                      <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                        View Options
+                      </div>
                     </div>
-                    
+
                     {/* Component Outlines Toggle */}
                     <div className="px-4 py-3 border-b border-border">
                       <label className="flex items-center justify-between cursor-pointer">
-                        <span className="text-sm text-foreground">Component Outlines</span>
+                        <span className="text-sm text-foreground">
+                          Component Outlines
+                        </span>
                         <button
                           onClick={() => setShowOutlines(!showOutlines)}
                           className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
@@ -420,11 +535,13 @@ export function EditorLayout({
                           />
                         </button>
                       </label>
-                      
+
                       {/* Outline Color Options */}
                       {showOutlines && (
                         <div className="mt-3 space-y-2">
-                          <div className="text-xs text-muted-foreground mb-2">Outline Color</div>
+                          <div className="text-xs text-muted-foreground mb-2">
+                            Outline Color
+                          </div>
                           <div className="flex gap-2">
                             <button
                               onClick={() => setOutlineColor("black")}
@@ -450,31 +567,39 @@ export function EditorLayout({
                         </div>
                       )}
                     </div>
-                    
+
                     {/* Component Tags Toggle */}
                     <div className="px-4 py-3">
                       <label className="flex items-center justify-between cursor-pointer">
-                        <span className="text-sm text-foreground">Component Labels</span>
+                        <span className="text-sm text-foreground">
+                          Component Labels
+                        </span>
                         <button
-                          onClick={() => setShowComponentTags(!showComponentTags)}
+                          onClick={() =>
+                            setShowComponentTags(!showComponentTags)
+                          }
                           className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
                             showComponentTags ? "bg-primary" : "bg-muted"
                           }`}
                         >
                           <span
                             className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                              showComponentTags ? "translate-x-5" : "translate-x-0.5"
+                              showComponentTags
+                                ? "translate-x-5"
+                                : "translate-x-0.5"
                             }`}
                           />
                         </button>
                       </label>
-                      <p className="text-xs text-muted-foreground mt-1">Show component type labels</p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Show component type labels
+                      </p>
                     </div>
                   </div>
                 </>
               )}
             </div>
-            
+
             <button
               onClick={onUndo}
               disabled={!canUndo}
@@ -483,7 +608,7 @@ export function EditorLayout({
             >
               <RotateCcw className="w-4 h-4" />
             </button>
-            
+
             <div className="relative">
               <button
                 onClick={() => setShowSettingsMenu(!showSettingsMenu)}
@@ -495,11 +620,16 @@ export function EditorLayout({
               {showSettingsMenu && (
                 <>
                   {/* Click-outside overlay */}
-                  <div className="fixed inset-0 z-40" onClick={() => setShowSettingsMenu(false)} />
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setShowSettingsMenu(false)}
+                  />
                   <div className="absolute right-0 top-full mt-2 w-80 bg-card rounded-lg shadow-xl border border-border overflow-hidden z-50 max-h-[600px] overflow-y-auto">
                     {/* Canvas Section */}
                     <div className="px-4 py-3 border-b border-border">
-                      <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Canvas</div>
+                      <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                        Canvas
+                      </div>
                     </div>
                     <button
                       onClick={() => {
@@ -514,18 +644,24 @@ export function EditorLayout({
                         <Maximize2 className="w-4 h-4 text-muted-foreground" />
                         <span className="text-foreground">Reset Zoom</span>
                       </div>
-                      <span className="text-xs text-muted-foreground">{canvasZoom}%</span>
+                      <span className="text-xs text-muted-foreground">
+                        {canvasZoom}%
+                      </span>
                     </button>
-                    
+
                     {/* Keyboard Shortcuts Section - Collapsible */}
                     <div className="border-b border-border">
                       <button
-                        onClick={() => setShowShortcutsSection(!showShortcutsSection)}
+                        onClick={() =>
+                          setShowShortcutsSection(!showShortcutsSection)
+                        }
                         className="w-full text-left px-4 py-3 text-sm hover:bg-muted transition-colors flex items-center justify-between"
                       >
                         <div className="flex items-center gap-2">
                           <Keyboard className="w-4 h-4 text-muted-foreground" />
-                          <span className="text-foreground">Keyboard Shortcuts</span>
+                          <span className="text-foreground">
+                            Keyboard Shortcuts
+                          </span>
                         </div>
                         {showShortcutsSection ? (
                           <ChevronDown className="w-4 h-4 text-muted-foreground" />
@@ -533,29 +669,34 @@ export function EditorLayout({
                           <ChevronRight className="w-4 h-4 text-muted-foreground" />
                         )}
                       </button>
-                      
+
                       {showShortcutsSection && (
                         <div className="px-4 pb-3 space-y-2">
                           {customShortcuts.map((shortcut) => (
-                            <div key={shortcut.id} className="flex items-center gap-2 py-1.5">
+                            <div
+                              key={shortcut.id}
+                              className="flex items-center gap-2 py-1.5"
+                            >
                               <div className="flex-1 min-w-0">
-                                <div className="text-xs text-muted-foreground mb-1">{shortcut.name}</div>
+                                <div className="text-xs text-muted-foreground mb-1">
+                                  {shortcut.name}
+                                </div>
                                 {editingShortcutId === shortcut.id ? (
                                   <input
                                     type="text"
                                     value={shortcut.shortcut}
                                     onChange={(e) => {
-                                      setCustomShortcuts(prev =>
-                                        prev.map(s =>
+                                      setCustomShortcuts((prev) =>
+                                        prev.map((s) =>
                                           s.id === shortcut.id
                                             ? { ...s, shortcut: e.target.value }
-                                            : s
-                                        )
+                                            : s,
+                                        ),
                                       );
                                     }}
                                     onBlur={() => setEditingShortcutId(null)}
                                     onKeyDown={(e) => {
-                                      if (e.key === 'Enter') {
+                                      if (e.key === "Enter") {
                                         setEditingShortcutId(null);
                                       }
                                     }}
@@ -564,7 +705,9 @@ export function EditorLayout({
                                   />
                                 ) : (
                                   <button
-                                    onClick={() => setEditingShortcutId(shortcut.id)}
+                                    onClick={() =>
+                                      setEditingShortcutId(shortcut.id)
+                                    }
                                     className="w-full text-left px-2 py-1 text-xs bg-muted hover:bg-muted/80 rounded font-mono transition-colors"
                                   >
                                     {shortcut.shortcut}
@@ -573,7 +716,9 @@ export function EditorLayout({
                               </div>
                               <button
                                 onClick={() => {
-                                  setCustomShortcuts(prev => prev.filter(s => s.id !== shortcut.id));
+                                  setCustomShortcuts((prev) =>
+                                    prev.filter((s) => s.id !== shortcut.id),
+                                  );
                                 }}
                                 className="p-1 hover:bg-destructive/10 rounded transition-colors"
                                 title="Delete shortcut"
@@ -582,14 +727,22 @@ export function EditorLayout({
                               </button>
                             </div>
                           ))}
-                          
+
                           {/* Add New Shortcut */}
                           <button
                             onClick={() => {
-                              const newId = Math.max(...customShortcuts.map(s => s.id), 0) + 1;
-                              setCustomShortcuts(prev => [
+                              const newId =
+                                Math.max(
+                                  ...customShortcuts.map((s) => s.id),
+                                  0,
+                                ) + 1;
+                              setCustomShortcuts((prev) => [
                                 ...prev,
-                                { id: newId, name: "New Shortcut", shortcut: "Ctrl + ?" }
+                                {
+                                  id: newId,
+                                  name: "New Shortcut",
+                                  shortcut: "Ctrl + ?",
+                                },
                               ]);
                               setEditingShortcutId(newId);
                             }}
@@ -612,7 +765,9 @@ export function EditorLayout({
               onClick={onSave}
               disabled={isSaving}
               className={`px-4 py-2 rounded-md text-xs font-medium transition-colors ${
-                isSaving ? "bg-muted text-muted-foreground cursor-not-allowed" : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                isSaving
+                  ? "bg-muted text-muted-foreground cursor-not-allowed"
+                  : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
               }`}
             >
               {isSaving ? "Saving..." : "Save"}
@@ -629,22 +784,33 @@ export function EditorLayout({
               {showExportMenu && (
                 <>
                   {/* Click-outside overlay */}
-                  <div className="fixed inset-0 z-40" onClick={() => setShowExportMenu(false)} />
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setShowExportMenu(false)}
+                  />
                   <div className="absolute right-0 top-full mt-2 w-52 bg-card rounded-lg shadow-xl border border-border overflow-hidden z-50">
                     <button
                       onClick={() => exportToZip("html")}
                       className="w-full text-left px-4 py-3 text-sm hover:bg-muted transition-colors"
                     >
-                      <div className="font-medium text-foreground">Export as HTML</div>
-                      <div className="text-xs text-muted-foreground mt-0.5">Static website</div>
+                      <div className="font-medium text-foreground">
+                        Export as HTML
+                      </div>
+                      <div className="text-xs text-muted-foreground mt-0.5">
+                        Static website
+                      </div>
                     </button>
                     <div className="h-px bg-border" />
                     <button
                       onClick={() => exportToZip("react")}
                       className="w-full text-left px-4 py-3 text-sm hover:bg-muted transition-colors"
                     >
-                      <div className="font-medium text-foreground">Export as React</div>
-                      <div className="text-xs text-muted-foreground mt-0.5">Next.js project</div>
+                      <div className="font-medium text-foreground">
+                        Export as React
+                      </div>
+                      <div className="text-xs text-muted-foreground mt-0.5">
+                        Next.js project
+                      </div>
                     </button>
                   </div>
                 </>
@@ -661,7 +827,11 @@ export function EditorLayout({
               {isLeftPanelOpen && (
                 <div
                   className="bg-card border-r border-border flex flex-col relative"
-                  style={{ width: `${leftPanelWidth}px`, flexShrink: 0, flexGrow: 0 }}
+                  style={{
+                    width: `${leftPanelWidth}px`,
+                    flexShrink: 0,
+                    flexGrow: 0,
+                  }}
                 >
                   {/* Collapse Button */}
                   <button
@@ -671,118 +841,135 @@ export function EditorLayout({
                   >
                     <ChevronLeft className="w-3.5 h-3.5" />
                   </button>
-                  
+
                   {/* Controlled Tabs — activeTab state drives everything */}
-                  <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col h-full w-full">
-                  <div className="flex-shrink-0 px-2 py-2 border-b border-border bg-card">
-                    <TabsList className="w-full grid grid-cols-3 bg-muted gap-0.5 p-1 h-auto rounded-md border border-border">
-                      <TabsTrigger
-                        value="pages"
-                        className="text-[10px] py-2 px-1 data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground text-muted-foreground hover:text-foreground rounded-md transition-all font-semibold tracking-wide flex items-center justify-center h-auto"
-                      >
-                        <LayoutTemplate className="w-3 h-3 mr-1" />
-                        PAGES
-                      </TabsTrigger>
-                      <TabsTrigger
-                        value="layers"
-                        className="text-[10px] py-2 px-1 data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground text-muted-foreground hover:text-foreground rounded-md transition-all font-semibold tracking-wide flex items-center justify-center h-auto"
-                      >
-                        <Layers className="w-3 h-3 mr-1" />
-                        LAYERS
-                      </TabsTrigger>
-                      <TabsTrigger
-                        value="components"
-                        className="text-[10px] py-2 px-1 data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground text-muted-foreground hover:text-foreground rounded-md transition-all font-semibold tracking-wide flex items-center justify-center h-auto"
-                      >
-                        <FileBox className="w-3 h-3 mr-1" />
-                        ASSETS
-                      </TabsTrigger>
-                    </TabsList>
-                  </div>
-
-                  <TabsContent value="pages" className="flex-1 min-h-0 m-0 p-0 border-none data-[state=inactive]:hidden overflow-y-auto">
-                    <PagesPanel
-                      pages={pages}
-                      currentPageId={currentPageId}
-                      onPageSelect={onPageSelect}
-                      onPageAdd={onPageAdd}
-                      onPageDelete={onPageDelete}
-                      onPageDuplicate={onPageDuplicate}
-                      onPageRename={onPageRename || (() => {})}
-                    />
-                  </TabsContent>
-
-                  <TabsContent value="layers" className="flex-1 min-h-0 m-0 p-0 border-none data-[state=inactive]:hidden overflow-y-auto">
-                    <HierarchyPanel
-                      ref={hierarchyPanelRef}
-                      components={components}
-                      selectedComponentIds={selectedComponentIds}
-                      onSelectComponent={onSelectComponent}
-                      onDeleteComponent={onDeleteComponent}
-                      onAddComponent={onAddComponent}
-                    />
-                  </TabsContent>
-
-                  <TabsContent value="components" className="flex-1 min-h-0 m-0 p-0 border-none data-[state=inactive]:hidden overflow-y-auto">
-                    <ComponentPalette
-                      globalComponents={globalComponents}
-                      customComponents={customComponents}
-                      onDeleteCustomComponent={onDeleteCustomComponent}
-                      selectedComponent={selectedComponent}
-                      onSaveCustomComponent={onSaveCustomComponent}
-                      onWriteCode={() => setShowCodeEditor(true)}
-                    />
-                  </TabsContent>
-
-                  <TabsContent
-                    value="ai"
-                    forceMount
-                    className="flex-1 min-h-0 m-0 p-0 border-none data-[state=inactive]:hidden overflow-hidden flex flex-col"
+                  <Tabs
+                    value={activeTab}
+                    onValueChange={setActiveTab}
+                    className="flex flex-col h-full w-full"
                   >
-                    <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-card flex-shrink-0">
-                      <div className="flex items-center space-x-2">
-                        <Sparkles className="w-4 h-4 text-primary" />
-                        <span className="text-sm font-semibold text-foreground">AI Assistant</span>
+                    <div className="flex-shrink-0 px-2 py-2 border-b border-border bg-card">
+                      <TabsList className="w-full grid grid-cols-3 bg-muted gap-0.5 p-1 h-auto rounded-md border border-border">
+                        <TabsTrigger
+                          value="pages"
+                          className="text-[10px] py-2 px-1 data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground text-muted-foreground hover:text-foreground rounded-md transition-all font-semibold tracking-wide flex items-center justify-center h-auto"
+                        >
+                          <LayoutTemplate className="w-3 h-3 mr-1" />
+                          PAGES
+                        </TabsTrigger>
+                        <TabsTrigger
+                          value="layers"
+                          className="text-[10px] py-2 px-1 data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground text-muted-foreground hover:text-foreground rounded-md transition-all font-semibold tracking-wide flex items-center justify-center h-auto"
+                        >
+                          <Layers className="w-3 h-3 mr-1" />
+                          LAYERS
+                        </TabsTrigger>
+                        <TabsTrigger
+                          value="components"
+                          className="text-[10px] py-2 px-1 data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground text-muted-foreground hover:text-foreground rounded-md transition-all font-semibold tracking-wide flex items-center justify-center h-auto"
+                        >
+                          <FileBox className="w-3 h-3 mr-1" />
+                          ASSETS
+                        </TabsTrigger>
+                      </TabsList>
+                    </div>
+
+                    <TabsContent
+                      value="pages"
+                      className="flex-1 min-h-0 m-0 p-0 border-none data-[state=inactive]:hidden overflow-y-auto"
+                    >
+                      <PagesPanel
+                        pages={pages}
+                        currentPageId={currentPageId}
+                        onPageSelect={onPageSelect}
+                        onPageAdd={onPageAdd}
+                        onPageDelete={onPageDelete}
+                        onPageDuplicate={onPageDuplicate}
+                        onPageRename={onPageRename || (() => {})}
+                      />
+                    </TabsContent>
+
+                    <TabsContent
+                      value="layers"
+                      className="flex-1 min-h-0 m-0 p-0 border-none data-[state=inactive]:hidden overflow-y-auto"
+                    >
+                      <HierarchyPanel
+                        ref={hierarchyPanelRef}
+                        components={components}
+                        selectedComponentIds={selectedComponentIds}
+                        onSelectComponent={onSelectComponent}
+                        onDeleteComponent={onDeleteComponent}
+                        onAddComponent={onAddComponent}
+                      />
+                    </TabsContent>
+
+                    <TabsContent
+                      value="components"
+                      className="flex-1 min-h-0 m-0 p-0 border-none data-[state=inactive]:hidden overflow-y-auto"
+                    >
+                      <ComponentPalette
+                        globalComponents={globalComponents}
+                        customComponents={customComponents}
+                        onDeleteCustomComponent={onDeleteCustomComponent}
+                        selectedComponent={selectedComponent}
+                        onSaveCustomComponent={onSaveCustomComponent}
+                        onWriteCode={() => setShowCodeEditor(true)}
+                      />
+                    </TabsContent>
+
+                    <TabsContent
+                      value="ai"
+                      forceMount
+                      className="flex-1 min-h-0 m-0 p-0 border-none data-[state=inactive]:hidden overflow-hidden flex flex-col"
+                    >
+                      <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-card flex-shrink-0">
+                        <div className="flex items-center space-x-2">
+                          <Sparkles className="w-4 h-4 text-primary" />
+                          <span className="text-sm font-semibold text-foreground">
+                            AI Assistant
+                          </span>
+                        </div>
+                        {/* Plain button — no TabsTrigger nesting needed */}
+                        <button
+                          onClick={() => setActiveTab("components")}
+                          className="p-1.5 hover:bg-muted rounded-md transition-colors text-muted-foreground hover:text-foreground"
+                          title="Close AI Assistant"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
                       </div>
-                      {/* Plain button — no TabsTrigger nesting needed */}
+                      <div className="flex-1 min-h-0 overflow-hidden">
+                        <AIChatPanel
+                          onApplyComponents={onApplyAIComponents || (() => {})}
+                          onApplyPages={onApplyAIPages || (() => {})}
+                          existingComponents={components}
+                          customComponents={customComponents}
+                          globalComponents={globalComponents}
+                          messages={chatHistory}
+                          onMessagesChange={onChatHistoryChange}
+                        />
+                      </div>
+                    </TabsContent>
+
+                    {/* Bottom AI trigger */}
+                    <div className="flex-shrink-0 p-2 border-t border-border">
                       <button
-                        onClick={() => setActiveTab("components")}
-                        className="p-1.5 hover:bg-muted rounded-md transition-colors text-muted-foreground hover:text-foreground"
-                        title="Close AI Assistant"
+                        onClick={() => setActiveTab("ai")}
+                        className={`w-full flex items-center justify-center space-x-2 px-4 py-2.5 rounded-md transition-colors text-xs font-semibold ${
+                          activeTab === "ai"
+                            ? "bg-primary/20 text-primary"
+                            : "bg-primary/10 hover:bg-primary/15 text-primary/70"
+                        }`}
                       >
-                        <X className="w-4 h-4" />
+                        <Sparkles className="w-4 h-4" />
+                        <span>AI ASSISTANT</span>
+                        <span className="text-[10px] bg-primary/20 px-1.5 py-0.5 rounded">
+                          ⌘K
+                        </span>
                       </button>
                     </div>
-                    <div className="flex-1 min-h-0 overflow-hidden">
-                      <AIChatPanel
-                        onApplyComponents={onApplyAIComponents || (() => {})}
-                        onApplyPages={onApplyAIPages || (() => {})}
-                        existingComponents={components}
-                        customComponents={customComponents}
-                        globalComponents={globalComponents}
-                        messages={chatHistory}
-                        onMessagesChange={onChatHistoryChange}
-                      />
-                    </div>
-                  </TabsContent>
-
-                  {/* Bottom AI trigger */}
-                  <div className="flex-shrink-0 p-2 border-t border-border">
-                    <button
-                      onClick={() => setActiveTab("ai")}
-                      className={`w-full flex items-center justify-center space-x-2 px-4 py-2.5 rounded-md transition-colors text-xs font-semibold ${
-                        activeTab === "ai"
-                          ? "bg-primary/20 text-primary"
-                          : "bg-primary/10 hover:bg-primary/15 text-primary/70"
-                      }`}
-                    >
-                      <Sparkles className="w-4 h-4" />
-                      <span>AI ASSISTANT</span>
-                      <span className="text-[10px] bg-primary/20 px-1.5 py-0.5 rounded">⌘K</span>
-                    </button>
-                  </div>
-                </Tabs>
-              </div>
+                  </Tabs>
+                </div>
               )}
 
               {/* Left Panel Expand Button (when collapsed) */}
@@ -807,20 +994,34 @@ export function EditorLayout({
           )}
 
           {/* Canvas Area */}
-          <div className="flex-1 min-w-0 bg-background overflow-auto" style={{ flexShrink: 1, flexGrow: 1 }}>
-            <div className={`h-full overflow-auto transition-all duration-300 ${isPreviewMode ? "bg-white p-0" : "bg-background p-8"} light`}>
+          <div
+            className="flex-1 min-w-0 bg-background overflow-auto"
+            style={{ flexShrink: 1, flexGrow: 1 }}
+          >
+            <div
+              className={`h-full overflow-auto transition-all duration-300 ${isPreviewMode ? "bg-white p-0" : "bg-background p-8"} light`}
+            >
               <div
                 className="transition-all duration-300 ease-in-out mx-auto"
                 style={{
                   width: getCanvasWidth(),
-                  maxWidth: viewport === "desktop" ? (isPreviewMode ? "none" : "1200px") : getCanvasWidth(),
+                  maxWidth:
+                    viewport === "desktop"
+                      ? isPreviewMode
+                        ? "none"
+                        : "1200px"
+                      : getCanvasWidth(),
                   minHeight: "100%",
                 }}
               >
                 <Canvas
                   components={components}
-                  selectedComponentIds={isPreviewMode ? [] : selectedComponentIds}
-                  onSelectComponent={isPreviewMode ? () => {} : onSelectComponent}
+                  selectedComponentIds={
+                    isPreviewMode ? [] : selectedComponentIds
+                  }
+                  onSelectComponent={
+                    isPreviewMode ? () => {} : onSelectComponent
+                  }
                   onUpdateComponent={onUpdateComponent}
                   onRepositionComponent={onRepositionComponent}
                   viewport={viewport}
@@ -830,11 +1031,13 @@ export function EditorLayout({
                     if (targetPage) onPageSelect(targetPage.id);
                   }}
                   pages={pages}
-                  currentPageSlug={pages.find(p => p.id === currentPageId)?.slug}
+                  currentPageSlug={
+                    pages.find((p) => p.id === currentPageId)?.slug
+                  }
                   showOutlines={!isPreviewMode && showOutlines}
                   outlineColor={outlineColor}
                   showComponentTags={showComponentTags}
-                  pageBackground={pages.find(p => p.id === currentPageId)}
+                  pageBackground={pages.find((p) => p.id === currentPageId)}
                   onZoomChange={(zoom, pan) => {
                     setCanvasZoom(Math.round(zoom * 100));
                   }}
@@ -847,9 +1050,14 @@ export function EditorLayout({
                     }
                     // Wait a bit for tab to render and expansion to complete, then scroll to component in hierarchy
                     setTimeout(() => {
-                      const hierarchyItem = document.querySelector(`[data-hierarchy-id="${componentId}"]`);
+                      const hierarchyItem = document.querySelector(
+                        `[data-hierarchy-id="${componentId}"]`,
+                      );
                       if (hierarchyItem) {
-                        hierarchyItem.scrollIntoView({ behavior: "smooth", block: "center" });
+                        hierarchyItem.scrollIntoView({
+                          behavior: "smooth",
+                          block: "center",
+                        });
                       }
                     }, 100);
                   }}
@@ -868,11 +1076,15 @@ export function EditorLayout({
                   onMouseDown={(e) => startResize("right", e)}
                 />
               )}
-              
+
               {isRightPanelOpen && (
                 <div
                   className="bg-card border-l border-border flex flex-col overflow-hidden relative"
-                  style={{ width: `${rightPanelWidth}px`, flexShrink: 0, flexGrow: 0 }}
+                  style={{
+                    width: `${rightPanelWidth}px`,
+                    flexShrink: 0,
+                    flexGrow: 0,
+                  }}
                 >
                   {/* Collapse Button */}
                   <button
@@ -882,15 +1094,17 @@ export function EditorLayout({
                   >
                     <ChevronRight className="w-3.5 h-3.5" />
                   </button>
-                  
+
                   <PropertiesPanel
                     selectedComponent={selectedComponent}
                     onUpdateComponent={onUpdateComponent}
                     onDeleteComponent={onDeleteComponent}
                     onDuplicateComponent={onDuplicateComponent}
                     pages={pages}
-                    currentPage={pages.find(p => p.id === currentPageId)}
-                    onUpdatePage={(updates) => onPageUpdate?.(currentPageId, updates)}
+                    currentPage={pages.find((p) => p.id === currentPageId)}
+                    onUpdatePage={(updates) =>
+                      onPageUpdate?.(currentPageId, updates)
+                    }
                     globalComponents={globalComponents}
                     onMarkAsGlobal={onMarkAsGlobal}
                     onUnmarkGlobal={onUnmarkGlobal}
@@ -898,7 +1112,7 @@ export function EditorLayout({
                   />
                 </div>
               )}
-              
+
               {/* Right Panel Expand Button (when collapsed) */}
               {!isRightPanelOpen && (
                 <button

@@ -1,5 +1,7 @@
 import { cn } from "@/lib/utils";
 import { buildComponentStyle } from "@/lib/buildStyle";
+import { ThemeStyleVariant, getThemeCSSVars } from "@/lib/themeStyles";
+import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
 
 interface BadgeProps {
   text?: string;
@@ -8,6 +10,7 @@ interface BadgeProps {
   rounded?: boolean;
   backgroundColor?: string;
   textColor?: string;
+  themeStyle?: ThemeStyleVariant;
   [key: string]: any;
 }
 
@@ -18,6 +21,7 @@ export function Badge({
   rounded = false,
   backgroundColor,
   textColor,
+  themeStyle,
   ...rest
 }: BadgeProps) {
   const variantClasses = {
@@ -39,6 +43,9 @@ export function Badge({
     textColor,
     ...rest,
   });
+  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const cssVars = getThemeCSSVars(effectiveTheme);
+
 
   return (
     <span
@@ -48,7 +55,7 @@ export function Badge({
         sizeClasses[size],
         rounded ? "rounded-full" : "rounded",
       )}
-      style={baseStyle}
+      style={{ ...baseStyle, ...cssVars }}
     >
       {text}
     </span>

@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { buildComponentStyle } from "@/lib/buildStyle";
+import { ThemeStyleVariant, getThemeCSSVars } from "@/lib/themeStyles";
+import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
 
 interface Stat {
   value: string;
@@ -19,6 +21,7 @@ interface StatsProps {
   accentColor?: string;
   width?: string;
   height?: string;
+  themeStyle?: ThemeStyleVariant;
   [key: string]: any;
 }
 
@@ -98,6 +101,7 @@ export function Stats({
   accentColor = "#ffffff",
   width,
   height,
+  themeStyle,
   ...rest
 }: StatsProps) {
   const [visible, setVisible] = useState(false);
@@ -115,6 +119,9 @@ export function Stats({
   const gridCols = { 2: "grid-cols-2", 3: "grid-cols-3", 4: "grid-cols-2 sm:grid-cols-4" };
 
   const baseStyle = buildComponentStyle({ backgroundColor, textColor, width, height, ...rest });
+  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const cssVars = getThemeCSSVars(effectiveTheme);
+
 
   return (
     <div
@@ -125,7 +132,7 @@ export function Stats({
           ? `grid ${gridCols[columns]} gap-12`
           : "flex justify-around items-center flex-wrap gap-12",
       )}
-      style={baseStyle}
+      style={{ ...baseStyle, ...cssVars }}
     >
       {stats.map((stat, index) => (
         <div

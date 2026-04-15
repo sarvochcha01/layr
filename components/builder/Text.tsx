@@ -1,5 +1,7 @@
 import { cn } from "@/lib/utils";
 import { buildComponentStyle } from "@/lib/buildStyle";
+import { ThemeStyleVariant, getThemeCSSVars } from "@/lib/themeStyles";
+import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
 
 interface TextProps {
   children?: React.ReactNode;
@@ -22,6 +24,7 @@ interface TextProps {
   className?: string;
   width?: string;
   height?: string;
+  themeStyle?: ThemeStyleVariant;
   [key: string]: any;
 }
 
@@ -36,6 +39,7 @@ export function Text({
   className,
   width,
   height,
+  themeStyle,
   ...rest
 }: TextProps) {
   const Component = tag;
@@ -70,6 +74,9 @@ export function Text({
   };
 
   const baseStyle = buildComponentStyle({ textColor: color, width, height, ...rest });
+  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const cssVars = getThemeCSSVars(effectiveTheme);
+
 
   return (
     <Component
@@ -79,7 +86,7 @@ export function Text({
         alignClasses[align],
         className
       )}
-      style={baseStyle}
+      style={{ ...baseStyle, ...cssVars }}
     >
       {children || content}
     </Component>

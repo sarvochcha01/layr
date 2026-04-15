@@ -1,9 +1,6 @@
 import { ThemeStyleProvider } from "@/contexts/ThemeStyleContext";
 
-export const dynamic = "force-dynamic";
-export const dynamicParams = true;
-
-export default function EditorLayout({
+export default function PreviewLayout({
   children,
 }: {
   children: React.ReactNode;

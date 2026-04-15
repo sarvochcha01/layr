@@ -1,6 +1,8 @@
 import { AlertCircle, CheckCircle, Info, XCircle, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { buildComponentStyle } from "@/lib/buildStyle";
+import { ThemeStyleVariant, getThemeCSSVars } from "@/lib/themeStyles";
+import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
 
 interface AlertProps {
   title?: string;
@@ -11,6 +13,7 @@ interface AlertProps {
   backgroundColor?: string;
   textColor?: string;
   width?: string;
+  themeStyle?: ThemeStyleVariant;
   [key: string]: any;
 }
 
@@ -23,6 +26,7 @@ export function Alert({
   backgroundColor,
   textColor,
   width,
+  themeStyle,
   ...rest
 }: AlertProps) {
   const variantConfig = {
@@ -61,6 +65,9 @@ export function Alert({
     width,
     ...rest,
   });
+  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const cssVars = getThemeCSSVars(effectiveTheme);
+
 
   return (
     <div
@@ -69,7 +76,7 @@ export function Alert({
         !backgroundColor && config.bgClass,
         !textColor && config.textClass,
       )}
-      style={baseStyle}
+      style={{ ...baseStyle, ...cssVars }}
     >
       <Icon className={cn("w-5 h-5 flex-shrink-0", config.iconClass)} />
 
