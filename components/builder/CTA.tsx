@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { buildComponentStyle } from "@/lib/buildStyle";
@@ -15,9 +18,6 @@ interface CTAProps {
   textColor?: string;
   width?: string;
   height?: string;
-  isPreviewMode?: boolean;
-  onNavigate?: (slug: string) => void;
-  pages?: any[];
   [key: string]: any;
 }
 
@@ -34,51 +34,25 @@ export function CTA({
   textColor,
   width,
   height,
-  isPreviewMode = false,
-  onNavigate,
-  pages,
   ...rest
 }: CTAProps) {
-  const sizeClasses = {
-    sm: "py-12 px-6",
-    md: "py-16 px-8",
-    lg: "py-24 px-12",
-  };
+  const [hovered, setHovered] = useState(false);
 
+  const sizeClasses = { sm: "py-12 px-6", md: "py-16 px-8", lg: "py-24 px-12" };
   const alignmentClasses = {
     left: "text-left items-start",
     center: "text-center items-center",
     right: "text-right items-end",
   };
 
-  const baseStyle = buildComponentStyle({
-    textColor: textColor || "#ffffff",
-    width,
-    height,
-    ...rest,
-  });
+  const baseStyle = buildComponentStyle({ textColor: textColor || "#ffffff", width, height, ...rest });
 
-  // Apply dark gradient background if no custom backgroundColor
   if (!backgroundColor) {
     baseStyle.background = "linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%)";
     baseStyle.border = "1px solid #3a3a3a";
   } else {
     baseStyle.backgroundColor = backgroundColor;
   }
-
-  /** Handle link clicks — prevent navigation in edit mode, use onNavigate for page: links */
-  const handleLinkClick = (e: React.MouseEvent, href: string) => {
-    if (!isPreviewMode) {
-      e.preventDefault();
-      return;
-    }
-    if (href.startsWith("page:") && onNavigate) {
-      e.preventDefault();
-      const pageId = href.substring(5);
-      const page = pages?.find((p: any) => p.id === pageId);
-      if (page) onNavigate(page.slug);
-    }
-  };
 
   return (
     <div
@@ -87,14 +61,31 @@ export function CTA({
         sizeClasses[size],
         alignmentClasses[alignment],
       )}
-      style={baseStyle}
+      style={{
+        ...baseStyle,
+        transition: "border-color 300ms ease, box-shadow 300ms ease",
+        borderColor: hovered ? "rgba(99,102,241,0.4)" : undefined,
+        boxShadow: hovered ? "0 0 60px rgba(99,102,241,0.1)" : "none",
+      }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
     >
       {/* Decorative pattern */}
       <div
-        className="absolute inset-0 opacity-5"
+        className="absolute inset-0 opacity-5 pointer-events-none"
         style={{
           backgroundImage:
             "radial-gradient(circle at 20% 50%, rgba(59,130,246,0.3) 0%, transparent 50%), radial-gradient(circle at 80% 50%, rgba(59,130,246,0.2) 0%, transparent 50%)",
+        }}
+      />
+
+      {/* Animated glow on hover */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: "radial-gradient(ellipse at 50% 50%, rgba(99,102,241,0.08) 0%, transparent 70%)",
+          opacity: hovered ? 1 : 0,
+          transition: "opacity 400ms ease",
         }}
       />
 
@@ -107,32 +98,28 @@ export function CTA({
         </h2>
         <p
           className="text-lg text-gray-400 max-w-xl"
-          style={
-            alignment === "center"
-              ? { marginLeft: "auto", marginRight: "auto" }
-              : undefined
-          }
+          style={alignment === "center" ? { marginLeft: "auto", marginRight: "auto" } : undefined}
         >
           {description}
         </p>
       </div>
 
-      <div className="relative z-10 flex gap-4 flex-wrap" style={isPreviewMode ? undefined : { pointerEvents: "none" }}>
+      <div className="relative z-10 flex gap-4 flex-wrap">
         <Button
           size="lg"
-          className="px-8 py-3 text-base font-medium rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300"
+          className="px-8 py-3 text-base font-medium rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-200 hover:scale-[1.03] active:scale-[0.98]"
           asChild
         >
-          <a href={isPreviewMode ? primaryButtonLink : "#"} onClick={(e) => handleLinkClick(e, primaryButtonLink)}>{primaryButtonText}</a>
+          <a href={primaryButtonLink}>{primaryButtonText}</a>
         </Button>
         {secondaryButtonText && (
           <Button
             size="lg"
             variant="outline"
-            className="px-8 py-3 text-base font-medium rounded-xl border-[#3a3a3a] hover:bg-[#2a2a2a] text-white transition-all duration-300"
+            className="px-8 py-3 text-base font-medium rounded-xl border-[#3a3a3a] hover:bg-[#2a2a2a] text-white transition-all duration-200 hover:scale-[1.03] active:scale-[0.98]"
             asChild
           >
-            <a href={isPreviewMode ? secondaryButtonLink : "#"} onClick={(e) => handleLinkClick(e, secondaryButtonLink)}>{secondaryButtonText}</a>
+            <a href={secondaryButtonLink}>{secondaryButtonText}</a>
           </Button>
         )}
       </div>

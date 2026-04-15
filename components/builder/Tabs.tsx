@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { buildComponentStyle } from "@/lib/buildStyle";
 
@@ -39,27 +39,39 @@ export function Tabs({
   ...rest
 }: TabsProps) {
   const [activeTab, setActiveTab] = useState(defaultTab);
+  const [prevTab, setPrevTab] = useState<number | null>(null);
+  const [animating, setAnimating] = useState(false);
+
+  const handleTabChange = (index: number) => {
+    if (index === activeTab || animating) return;
+    setPrevTab(activeTab);
+    setAnimating(true);
+    setTimeout(() => {
+      setActiveTab(index);
+      setAnimating(false);
+      setPrevTab(null);
+    }, 160);
+  };
 
   const baseStyle = buildComponentStyle({
-    backgroundColor:
-      rest.backgroundType === "gradient" ? undefined : backgroundColor,
+    backgroundColor: rest.backgroundType === "gradient" ? undefined : backgroundColor,
     backgroundType: rest.backgroundType,
     gradientStart: rest.gradientStart,
     gradientEnd: rest.gradientEnd,
     gradientDirection: rest.gradientDirection,
     gradientAngle: rest.gradientAngle,
-    backgroundGradient: rest.backgroundGradient, // Fallback for old format
+    backgroundGradient: rest.backgroundGradient,
     width,
     height,
     ...rest,
   });
 
   return (
-    <div style={baseStyle} className="w-full rounded-lg">
+    <div style={baseStyle} className="rounded-lg">
       {/* Tab Headers */}
       <div
         className={cn(
-          "flex gap-1",
+          "flex gap-1 relative",
           variant === "bordered" && "border-b border-border",
         )}
       >
@@ -69,23 +81,19 @@ export function Tabs({
           return (
             <button
               key={index}
-              onClick={() => setActiveTab(index)}
+              onClick={() => handleTabChange(index)}
               className={cn(
-                "px-4 py-2.5 font-medium transition-all duration-200 text-sm relative",
+                "px-4 py-2.5 font-medium text-sm relative transition-colors duration-200",
                 variant === "underline" && "border-b-2",
                 variant === "pills" && "rounded-lg",
                 variant === "bordered" && "border-b-2 -mb-px",
               )}
               style={{
-                borderColor:
-                  isActive && variant !== "pills"
-                    ? activeTabColor
-                    : "transparent",
+                borderColor: isActive && variant !== "pills" ? activeTabColor : "transparent",
                 color: isActive ? activeTabColor : tabHeadingColor,
                 backgroundColor:
-                  isActive && variant === "pills"
-                    ? `${activeTabColor}20`
-                    : "transparent",
+                  isActive && variant === "pills" ? `${activeTabColor}20` : "transparent",
+                transition: "color 200ms ease, background-color 200ms ease, border-color 200ms ease",
               }}
             >
               {tab.label}
@@ -94,10 +102,15 @@ export function Tabs({
         })}
       </div>
 
-      {/* Tab Content */}
+      {/* Tab Content with fade transition */}
       <div
         className="py-6 px-1 leading-relaxed"
-        style={{ color: contentTextColor }}
+        style={{
+          color: contentTextColor,
+          opacity: animating ? 0 : 1,
+          transform: animating ? "translateY(4px)" : "translateY(0)",
+          transition: "opacity 160ms ease, transform 160ms ease",
+        }}
       >
         {tabs[activeTab]?.content}
       </div>
