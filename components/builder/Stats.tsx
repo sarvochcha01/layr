@@ -14,6 +14,7 @@ interface Stat {
 interface StatsProps {
   stats?: Stat[];
   layout?: "horizontal" | "grid";
+  variant?: "default" | "cards" | "minimal" | "bordered";
   columns?: 2 | 3 | 4;
   backgroundColor?: string;
   textColor?: string;
@@ -49,17 +50,27 @@ function AnimatedStat({
   stat,
   accentColor,
   shouldStart,
+  variant,
 }: {
   stat: Stat;
   accentColor: string;
   shouldStart: boolean;
+  variant: string;
 }) {
   const numericPart = parseFloat(stat.value.replace(/[^0-9.]/g, ""));
   const prefix = stat.value.match(/^[^0-9]*/)?.[0] || "";
   const isNumeric = !isNaN(numericPart);
-
   const counted = useCountUp(isNumeric ? numericPart : 0, 1600, shouldStart && isNumeric);
   const displayValue = isNumeric ? `${prefix}${counted}` : stat.value;
+
+  const cardStyle: React.CSSProperties = variant === "cards" ? {
+    backgroundColor: "var(--theme-surface)",
+    border: `var(--theme-border-width) solid var(--theme-border)`,
+    borderRadius: "var(--theme-radius)",
+    padding: "24px 16px",
+    boxShadow: "var(--theme-hard-shadow, none)",
+    backdropFilter: "var(--theme-backdrop)",
+  } : {};
 
   return (
     <div
@@ -68,6 +79,7 @@ function AnimatedStat({
         opacity: shouldStart ? 1 : 0,
         transform: shouldStart ? "translateY(0)" : "translateY(16px)",
         transition: "opacity 0.5s ease, transform 0.5s ease",
+        ...cardStyle,
       }}
     >
       <div
@@ -95,6 +107,7 @@ export function Stats({
     { value: "15", label: "AVG LATENCY", suffix: "ms" },
   ],
   layout = "horizontal",
+  variant = "default",
   columns = 4,
   backgroundColor,
   textColor,
@@ -124,11 +137,20 @@ export function Stats({
     ...cssVars,
     backgroundColor: backgroundColor || "var(--theme-bg)",
     color: textColor || "var(--theme-text)",
+    borderRadius: variant === "minimal" ? "0" : "var(--theme-radius)",
+    border: variant === "minimal"
+      ? "none"
+      : `var(--theme-border-width) solid var(--theme-border)`,
+    boxShadow: variant === "minimal" ? "none" : "var(--theme-hard-shadow, none)",
+    backdropFilter: "var(--theme-backdrop)",
     ...(width ? { width } : {}),
     ...(height ? { height } : {}),
   };
 
   const resolvedAccent = accentColor || "var(--theme-text)";
+
+  // For "bordered" variant, show dividers between stats
+  const isBordered = variant === "bordered";
 
   return (
     <div
@@ -136,14 +158,23 @@ export function Stats({
       className={cn(
         "py-12 px-8",
         layout === "grid"
-          ? `grid ${gridCols[columns]} gap-12`
-          : "flex justify-around items-center flex-wrap gap-12",
+          ? `grid ${gridCols[columns]} gap-8`
+          : "flex justify-around items-center flex-wrap gap-8",
       )}
       style={rootStyle}
     >
       {stats.map((stat, index) => (
-        <div key={index} style={{ transitionDelay: `${index * 120}ms` }}>
-          <AnimatedStat stat={stat} accentColor={resolvedAccent} shouldStart={visible} />
+        <div
+          key={index}
+          style={{
+            transitionDelay: `${index * 120}ms`,
+            ...(isBordered && index > 0 ? {
+              borderLeft: `1px solid var(--theme-border)`,
+              paddingLeft: "32px",
+            } : {}),
+          }}
+        >
+          <AnimatedStat stat={stat} accentColor={resolvedAccent} shouldStart={visible} variant={variant} />
         </div>
       ))}
     </div>

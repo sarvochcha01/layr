@@ -4,6 +4,70 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { ThemeStyleVariant, getThemeCSSVars } from "@/lib/themeStyles";
 import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
+import {
+  Zap, Shield, Star, Heart, Settings, Globe, Lock, Cpu,
+  Layers, Code, Rocket, Target, Eye, Bell, Award, BarChart3,
+  CheckCircle, Cloud, Database, PenTool, Smartphone, Users,
+  Sparkles, TrendingUp, Lightbulb, Package, LucideIcon,
+  ArrowRight, Box, Compass, Fingerprint, Flame, GitBranch,
+  Hexagon, Infinity, Key, LifeBuoy, Mail, MessageSquare,
+  Monitor, Music, Navigation, PieChart, Play, Search,
+  Send, Server, ShoppingCart, Terminal, Wifi, Wrench,
+} from "lucide-react";
+
+// ─── Icon Map ────────────────────────────────────────────────────────────────
+const ICON_MAP: Record<string, LucideIcon> = {
+  zap: Zap,
+  shield: Shield,
+  star: Star,
+  heart: Heart,
+  settings: Settings,
+  globe: Globe,
+  lock: Lock,
+  cpu: Cpu,
+  layers: Layers,
+  code: Code,
+  rocket: Rocket,
+  target: Target,
+  eye: Eye,
+  bell: Bell,
+  award: Award,
+  chart: BarChart3,
+  check: CheckCircle,
+  cloud: Cloud,
+  database: Database,
+  pen: PenTool,
+  phone: Smartphone,
+  users: Users,
+  sparkles: Sparkles,
+  trending: TrendingUp,
+  lightbulb: Lightbulb,
+  package: Package,
+  arrow: ArrowRight,
+  box: Box,
+  compass: Compass,
+  fingerprint: Fingerprint,
+  flame: Flame,
+  git: GitBranch,
+  hexagon: Hexagon,
+  infinity: Infinity,
+  key: Key,
+  lifebuoy: LifeBuoy,
+  mail: Mail,
+  message: MessageSquare,
+  monitor: Monitor,
+  music: Music,
+  navigation: Navigation,
+  pie: PieChart,
+  play: Play,
+  search: Search,
+  send: Send,
+  server: Server,
+  cart: ShoppingCart,
+  terminal: Terminal,
+  wifi: Wifi,
+  wrench: Wrench,
+};
 
 interface FeatureProps {
   icon?: string;
@@ -21,7 +85,7 @@ interface FeatureProps {
 }
 
 export function Feature({
-  icon = "•",
+  icon = "zap",
   title = "Feature Title",
   description = "Explain the value of this feature in a way that resonates with your audience.",
   layout = "vertical",
@@ -38,10 +102,10 @@ export function Feature({
   const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
   const cssVars = getThemeCSSVars(effectiveTheme);
 
-  const iconSizes = {
-    sm: "text-xl w-10 h-10",
-    md: "text-2xl w-12 h-12",
-    lg: "text-3xl w-14 h-14",
+  const iconSizeMap = {
+    sm: { container: "w-10 h-10", icon: 18 },
+    md: { container: "w-12 h-12", icon: 22 },
+    lg: { container: "w-14 h-14", icon: 26 },
   };
 
   const rootStyle: React.CSSProperties = {
@@ -60,6 +124,8 @@ export function Feature({
   };
 
   const resolvedIconColor = iconColor || "var(--theme-accent)";
+  const IconComponent = ICON_MAP[icon] || Zap;
+  const sizes = iconSizeMap[iconSize];
 
   return (
     <div
@@ -74,7 +140,7 @@ export function Feature({
       <div
         className={cn(
           "rounded-xl flex items-center justify-center flex-shrink-0",
-          iconSizes[iconSize],
+          sizes.container,
           layout === "vertical" && "mx-auto mb-5",
         )}
         style={{
@@ -85,7 +151,7 @@ export function Feature({
           transform: hovered ? "scale(1.15) rotate(-5deg)" : "scale(1) rotate(0deg)",
         }}
       >
-        {icon}
+        <IconComponent size={sizes.icon} strokeWidth={1.75} />
       </div>
 
       <div className={cn("min-w-0", layout === "vertical" ? "text-center" : "flex-1")}>

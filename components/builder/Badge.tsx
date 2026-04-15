@@ -36,9 +36,9 @@ export function Badge({
   };
 
   const sizeStyles: Record<string, React.CSSProperties> = {
-    sm: { padding: "2px 8px", fontSize: "11px" },
-    md: { padding: "4px 12px", fontSize: "13px" },
-    lg: { padding: "6px 16px", fontSize: "14px" },
+    sm: { padding: "4px 10px", fontSize: "11px" },
+    md: { padding: "6px 14px", fontSize: "13px" },
+    lg: { padding: "8px 18px", fontSize: "14px" },
   };
 
   const colors = variantColors[variant] || variantColors.default;
