@@ -8,7 +8,7 @@ import {
   CustomComponents,
   ChatMessage,
 } from "@/types/editor";
-import { HierarchyPanel } from "./HierarchyPanel";
+import { HierarchyPanel, HierarchyPanelRef } from "./HierarchyPanel";
 import { ComponentPalette } from "./ComponentPalette";
 import { Canvas } from "./Canvas";
 import { PropertiesPanel } from "./PropertiesPanel";
@@ -148,6 +148,7 @@ export function EditorLayout({
   onChatHistoryChange,
 }: EditorLayoutProps) {
   const router = useRouter();
+  const hierarchyPanelRef = useRef<HierarchyPanelRef>(null);
   const [viewport, setViewport] = useState<Viewport>("desktop");
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [showCodeEditor, setShowCodeEditor] = useState(false);
@@ -159,7 +160,7 @@ export function EditorLayout({
   const [showOutlinesMenu, setShowOutlinesMenu] = useState(false);
   const [showOutlines, setShowOutlines] = useState(false);
   const [outlineColor, setOutlineColor] = useState<"black" | "white">("black");
-  const [showComponentTags, setShowComponentTags] = useState(true);
+  const [showComponentTags, setShowComponentTags] = useState(false);
   const [canvasZoom, setCanvasZoom] = useState(100);
   
   // Editable shortcuts state
@@ -699,6 +700,7 @@ export function EditorLayout({
 
                   <TabsContent value="layers" className="flex-1 min-h-0 m-0 p-0 border-none data-[state=inactive]:hidden overflow-y-auto">
                     <HierarchyPanel
+                      ref={hierarchyPanelRef}
                       components={components}
                       selectedComponentIds={selectedComponentIds}
                       onSelectComponent={onSelectComponent}
@@ -811,7 +813,11 @@ export function EditorLayout({
                   onComponentDoubleClick={(componentId) => {
                     // Switch to layers tab
                     setActiveTab("layers");
-                    // Wait a bit for tab to render, then scroll to component in hierarchy
+                    // Expand parent components to make the target visible
+                    if (hierarchyPanelRef.current) {
+                      hierarchyPanelRef.current.expandToComponent(componentId);
+                    }
+                    // Wait a bit for tab to render and expansion to complete, then scroll to component in hierarchy
                     setTimeout(() => {
                       const hierarchyItem = document.querySelector(`[data-hierarchy-id="${componentId}"]`);
                       if (hierarchyItem) {

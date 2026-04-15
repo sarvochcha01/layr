@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useImperativeHandle, forwardRef } from "react";
 import { ComponentDefinition } from "@/types/editor";
 import { cn } from "@/lib/utils";
 import {
@@ -38,7 +38,11 @@ interface HierarchyPanelProps {
   onMoveComponentDown?: (id: string) => void;
 }
 
-export function HierarchyPanel({
+export interface HierarchyPanelRef {
+  expandToComponent: (componentId: string) => void;
+}
+
+export const HierarchyPanel = forwardRef<HierarchyPanelRef, HierarchyPanelProps>(({
   components,
   selectedComponentIds,
   selectedComponentId,
@@ -48,7 +52,7 @@ export function HierarchyPanel({
   onAddComponent,
   onMoveComponentUp,
   onMoveComponentDown,
-}: HierarchyPanelProps) {
+}, ref) => {
   const [expandedItems, setExpandedItems] = useState<Set<string>>(
     new Set(["root"])
   );
@@ -56,6 +60,37 @@ export function HierarchyPanel({
 
   // Determine selected ID for backward compatibility
   const currentSelectedId = selectedComponentId || (selectedComponentIds && selectedComponentIds[0]) || null;
+
+  // Helper function to find all parent IDs of a component
+  const findParentIds = (targetId: string, components: ComponentDefinition[], parents: string[] = []): string[] | null => {
+    for (const component of components) {
+      if (component.id === targetId) {
+        return parents;
+      }
+      if (component.children.length > 0) {
+        const result = findParentIds(targetId, component.children, [...parents, component.id]);
+        if (result !== null) {
+          return result;
+        }
+      }
+    }
+    return null;
+  };
+
+  // Expose method to expand to a specific component
+  useImperativeHandle(ref, () => ({
+    expandToComponent: (componentId: string) => {
+      const parentIds = findParentIds(componentId, components);
+      if (parentIds) {
+        setExpandedItems(prev => {
+          const newExpanded = new Set(prev);
+          newExpanded.add("root"); // Always expand root
+          parentIds.forEach(id => newExpanded.add(id));
+          return newExpanded;
+        });
+      }
+    }
+  }));
 
   const handleAddComponent = (componentType: string) => {
     if (onAddComponent) {
@@ -308,4 +343,6 @@ export function HierarchyPanel({
       </Dialog>
     </div>
   );
-}
+});
+
+HierarchyPanel.displayName = "HierarchyPanel";
