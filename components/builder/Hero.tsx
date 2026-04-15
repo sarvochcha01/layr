@@ -35,7 +35,7 @@ export function Hero({
   primaryButtonLink = "#",
   secondaryButtonText = "VIEW DOCUMENTATION",
   secondaryButtonLink = "#",
-  backgroundImage,
+  backgroundImage="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=700&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mzh8fHdlYnNpdGUlMjBiYWNrZ3JvdW5kfGVufDB8fDB8fHww",
   backgroundColor = "#0d0d0d",
   textColor = "#ffffff",
   alignment = "center",
@@ -228,18 +228,20 @@ export function Hero({
                 : "items-start",
           )}
         >
-          <div style={isPreviewMode ? undefined : { pointerEvents: "none" }}>
-            <Button
-              size="lg"
-              className="w-full sm:w-auto px-8 py-3 text-sm font-bold tracking-wider rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground border-0 transition-all duration-300"
-              asChild
-            >
-              <a href={isPreviewMode ? primaryButtonLink : "#"} onClick={(e) => handleLinkClick(e, primaryButtonLink)}>
-                {primaryButtonText}
-                <span className="ml-2">→</span>
-              </a>
-            </Button>
-          </div>
+          {primaryButtonText && (
+            <div style={isPreviewMode ? undefined : { pointerEvents: "none" }}>
+              <Button
+                size="lg"
+                className="w-full sm:w-auto px-8 py-3 text-sm font-bold tracking-wider rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground border-0 transition-all duration-300"
+                asChild
+              >
+                <a href={isPreviewMode ? primaryButtonLink : "#"} onClick={(e) => handleLinkClick(e, primaryButtonLink)}>
+                  {primaryButtonText}
+                  <span className="ml-2">→</span>
+                </a>
+              </Button>
+            </div>
+          )}
 
           {secondaryButtonText && (
             <div style={isPreviewMode ? undefined : { pointerEvents: "none" }}>
@@ -255,35 +257,6 @@ export function Hero({
               </Button>
             </div>
           )}
-        </div>
-
-        {/* Tech Stack Badges */}
-        <div
-          className={cn(
-            "flex flex-wrap gap-6 mt-16 text-xs text-muted-foreground font-semibold uppercase tracking-wider",
-            alignment === "center"
-              ? "justify-center"
-              : alignment === "right"
-                ? "justify-end"
-                : "",
-          )}
-        >
-          <div className="flex items-center gap-2">
-            <span className="w-1 h-1 rounded-full bg-primary"></span>
-            <span>VUE.JS</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="w-1 h-1 rounded-full bg-primary"></span>
-            <span>REACT</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="w-1 h-1 rounded-full bg-primary"></span>
-            <span>SUPABASE</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="w-1 h-1 rounded-full bg-primary"></span>
-            <span>VERCEL</span>
-          </div>
         </div>
       </div>
 

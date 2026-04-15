@@ -49,14 +49,15 @@ export function Grid({
 
   const baseStyle = buildComponentStyle({ backgroundColor, textColor, width, height, ...rest });
 
-  // Apply custom gap as inline style
+  // Apply custom gap as inline style when gap is "custom"
+  const gridStyle = { ...baseStyle };
   if (gap === "custom" && gapCustom) {
-    baseStyle.gap = gapCustom;
+    gridStyle.gap = gapCustom;
   }
 
   // Equal height: make all children stretch to match the tallest
   if (equalHeight) {
-    baseStyle.alignItems = "stretch";
+    gridStyle.alignItems = "stretch";
   }
 
   return (
@@ -67,7 +68,7 @@ export function Grid({
         gap !== "custom" ? gapClasses[gap] || gapClasses.md : undefined,
         className,
       )}
-      style={baseStyle}
+      style={gridStyle}
     >
       {children}
     </div>
