@@ -20,9 +20,6 @@ interface HeroProps {
   className?: string;
   width?: string;
   height?: string;
-  isPreviewMode?: boolean;
-  onNavigate?: (slug: string) => void;
-  pages?: any[];
   [key: string]: any;
 }
 
@@ -44,9 +41,6 @@ export function Hero({
   className,
   width,
   height,
-  isPreviewMode = false,
-  onNavigate,
-  pages,
   ...rest
 }: HeroProps) {
   const sizeClasses = {
@@ -62,13 +56,7 @@ export function Hero({
     right: "text-right",
   };
 
-  const baseStyle = buildComponentStyle({
-    backgroundColor,
-    textColor,
-    width,
-    height,
-    ...rest,
-  });
+  const baseStyle = buildComponentStyle({ backgroundColor, textColor, width, height, ...rest });
 
   if (backgroundImage) {
     baseStyle.backgroundImage = `url(${backgroundImage})`;
@@ -76,24 +64,8 @@ export function Hero({
     baseStyle.backgroundPosition = "center";
   }
 
-  // Split title to highlight "FUTURE" word
   const titleParts = title.split("FUTURE");
   const hasHighlight = titleParts.length > 1;
-
-  /** Handle link clicks — prevent navigation in edit mode, use onNavigate for page: links */
-  const handleLinkClick = (e: React.MouseEvent, href: string) => {
-    if (!isPreviewMode) {
-      e.preventDefault();
-      return;
-    }
-    if (href.startsWith("page:") && onNavigate) {
-      e.preventDefault();
-      const pageId = href.substring(5);
-      const page = pages?.find((p: any) => p.id === pageId);
-      if (page) onNavigate(page.slug);
-    }
-    // For external URLs in preview mode, let the default behavior happen
-  };
 
   return (
     <section
@@ -112,8 +84,8 @@ export function Hero({
             className="absolute inset-0"
             style={{
               backgroundImage: `
-                linear-gradient(rgba(99, 102, 241, 0.1) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(99, 102, 241, 0.1) 1px, transparent 1px)
+                linear-gradient(rgba(99,102,241,0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99,102,241,0.1) 1px, transparent 1px)
               `,
               backgroundSize: "50px 50px",
               animation: "grid-flow 20s linear infinite",
@@ -122,43 +94,64 @@ export function Hero({
         </div>
       )}
 
-      {/* Gradient orbs */}
+      {/* Gradient orbs — now with slow breathing animation */}
       {!backgroundImage && (
         <>
           <div
-            className="absolute top-[-10%] left-[-5%] w-[600px] h-[600px] rounded-full opacity-30 blur-3xl"
+            className="absolute top-[-10%] left-[-5%] w-[600px] h-[600px] rounded-full blur-3xl"
             style={{
-              background:
-                "radial-gradient(circle, #6366f1 0%, transparent 70%)",
+              background: "radial-gradient(circle, #6366f1 0%, transparent 70%)",
+              animation: "orb-breathe 8s ease-in-out infinite",
+              opacity: 0.3,
             }}
           />
           <div
-            className="absolute bottom-[-10%] right-[-5%] w-[500px] h-[500px] rounded-full opacity-20 blur-3xl"
+            className="absolute bottom-[-10%] right-[-5%] w-[500px] h-[500px] rounded-full blur-3xl"
             style={{
-              background:
-                "radial-gradient(circle, #8b5cf6 0%, transparent 70%)",
+              background: "radial-gradient(circle, #8b5cf6 0%, transparent 70%)",
+              animation: "orb-breathe 10s ease-in-out infinite 2s",
+              opacity: 0.2,
             }}
           />
         </>
       )}
+
+      {/* Keyframes injected inline */}
+      <style>{`
+        @keyframes orb-breathe {
+          0%, 100% { transform: scale(1) translate(0, 0); }
+          33% { transform: scale(1.08) translate(12px, -8px); }
+          66% { transform: scale(0.95) translate(-8px, 10px); }
+        }
+        @keyframes fade-up {
+          from { opacity: 0; transform: translateY(20px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes grid-flow {
+          from { background-position: 0 0; }
+          to   { background-position: 50px 50px; }
+        }
+        .hero-badge   { animation: fade-up 0.5s ease both 0.1s; }
+        .hero-title   { animation: fade-up 0.6s ease both 0.25s; }
+        .hero-desc    { animation: fade-up 0.6s ease both 0.4s; }
+        .hero-ctas    { animation: fade-up 0.6s ease both 0.55s; }
+        .hero-tech    { animation: fade-up 0.6s ease both 0.7s; }
+      `}</style>
 
       <div className="relative z-10 max-w-5xl mx-auto px-4">
         {/* Badge */}
         {badge && (
           <div
             className={cn(
-              "mb-8",
-              alignment === "center"
-                ? "flex justify-center"
-                : alignment === "right"
-                  ? "flex justify-end"
-                  : "",
+              "mb-8 hero-badge",
+              alignment === "center" ? "flex justify-center" : alignment === "right" ? "flex justify-end" : "",
             )}
           >
             <span
               className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] px-4 py-2 rounded-full border border-border bg-card"
               style={{ color: "#a5b4fc" }}
             >
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
               {badge}
             </span>
           </div>
@@ -166,7 +159,7 @@ export function Hero({
 
         {/* Title */}
         <h1
-          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 leading-[1.1] tracking-tight"
+          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-8 leading-[1.1] tracking-tight hero-title"
           style={{ fontFamily: "'Inter', sans-serif" }}
         >
           {hasHighlight ? (
@@ -175,8 +168,7 @@ export function Hero({
               <span
                 className="inline-block"
                 style={{
-                  background:
-                    "linear-gradient(135deg, #a5b4fc 0%, #c4b5fd 100%)",
+                  background: "linear-gradient(135deg, #a5b4fc 0%, #c4b5fd 100%)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                   backgroundClip: "text",
@@ -191,28 +183,10 @@ export function Hero({
           )}
         </h1>
 
-        {/* Subtitle */}
-        {subtitle && (
-          <p
-            className="text-lg sm:text-xl md:text-2xl font-medium mb-8 text-foreground/70"
-            style={{
-              ...(alignment === "center"
-                ? { marginLeft: "auto", marginRight: "auto" }
-                : {}),
-            }}
-          >
-            {subtitle}
-          </p>
-        )}
-
         {/* Description */}
         <p
-          className="text-base sm:text-lg mb-12 leading-relaxed max-w-2xl text-muted-foreground"
-          style={{
-            ...(alignment === "center"
-              ? { marginLeft: "auto", marginRight: "auto" }
-              : {}),
-          }}
+          className="text-base sm:text-lg mb-12 leading-relaxed max-w-2xl text-muted-foreground hero-desc"
+          style={alignment === "center" ? { marginLeft: "auto", marginRight: "auto" } : {}}
         >
           {description}
         </p>
@@ -220,70 +194,46 @@ export function Hero({
         {/* CTA Buttons */}
         <div
           className={cn(
-            "flex flex-col sm:flex-row gap-4",
-            alignment === "center"
-              ? "justify-center items-center"
-              : alignment === "right"
-                ? "justify-end items-center"
-                : "items-start",
+            "flex flex-col sm:flex-row gap-4 hero-ctas",
+            alignment === "center" ? "justify-center items-center" : alignment === "right" ? "justify-end items-center" : "items-start",
           )}
         >
-          <div style={isPreviewMode ? undefined : { pointerEvents: "none" }}>
-            <Button
-              size="lg"
-              className="w-full sm:w-auto px-8 py-3 text-sm font-bold tracking-wider rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground border-0 transition-all duration-300"
-              asChild
-            >
-              <a href={isPreviewMode ? primaryButtonLink : "#"} onClick={(e) => handleLinkClick(e, primaryButtonLink)}>
-                {primaryButtonText}
-                <span className="ml-2">→</span>
-              </a>
-            </Button>
-          </div>
+          <Button
+            size="lg"
+            className="w-full sm:w-auto px-8 py-3 text-sm font-bold tracking-wider rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground border-0 transition-all duration-300 hover:scale-[1.03] active:scale-[0.98]"
+            asChild
+          >
+            <a href={primaryButtonLink}>
+              {primaryButtonText}
+              <span className="ml-2 transition-transform duration-200 group-hover:translate-x-1">→</span>
+            </a>
+          </Button>
 
           {secondaryButtonText && (
-            <div style={isPreviewMode ? undefined : { pointerEvents: "none" }}>
-              <Button
-                variant="outline"
-                size="lg"
-                className="w-full sm:w-auto px-8 py-3 text-sm font-bold tracking-wider rounded-xl border-border bg-card hover:bg-muted text-foreground transition-all duration-300"
-                asChild
-              >
-                <a href={isPreviewMode ? secondaryButtonLink : "#"} onClick={(e) => handleLinkClick(e, secondaryButtonLink)}>
-                  {secondaryButtonText}
-                </a>
-              </Button>
-            </div>
+            <Button
+              variant="outline"
+              size="lg"
+              className="w-full sm:w-auto px-8 py-3 text-sm font-bold tracking-wider rounded-xl border-border bg-card hover:bg-muted text-foreground transition-all duration-300 hover:scale-[1.03] active:scale-[0.98]"
+              asChild
+            >
+              <a href={secondaryButtonLink}>{secondaryButtonText}</a>
+            </Button>
           )}
         </div>
 
         {/* Tech Stack Badges */}
         <div
           className={cn(
-            "flex flex-wrap gap-6 mt-16 text-xs text-muted-foreground font-semibold uppercase tracking-wider",
-            alignment === "center"
-              ? "justify-center"
-              : alignment === "right"
-                ? "justify-end"
-                : "",
+            "flex flex-wrap gap-6 mt-16 text-xs text-muted-foreground font-semibold uppercase tracking-wider hero-tech",
+            alignment === "center" ? "justify-center" : alignment === "right" ? "justify-end" : "",
           )}
         >
-          <div className="flex items-center gap-2">
-            <span className="w-1 h-1 rounded-full bg-primary"></span>
-            <span>VUE.JS</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="w-1 h-1 rounded-full bg-primary"></span>
-            <span>REACT</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="w-1 h-1 rounded-full bg-primary"></span>
-            <span>SUPABASE</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="w-1 h-1 rounded-full bg-primary"></span>
-            <span>VERCEL</span>
-          </div>
+          {["VUE.JS", "REACT", "SUPABASE", "VERCEL"].map((tech) => (
+            <div key={tech} className="flex items-center gap-2 hover:text-foreground transition-colors duration-200 cursor-default">
+              <span className="w-1 h-1 rounded-full bg-primary" />
+              <span>{tech}</span>
+            </div>
+          ))}
         </div>
       </div>
 

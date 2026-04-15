@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -23,9 +26,6 @@ interface PricingCardProps {
   textColor?: string;
   width?: string;
   height?: string;
-  isPreviewMode?: boolean;
-  onNavigate?: (slug: string) => void;
-  pages?: any[];
   [key: string]: any;
 }
 
@@ -49,49 +49,34 @@ export function PricingCard({
   textColor = "#ffffff",
   width,
   height,
-  isPreviewMode = false,
-  onNavigate,
-  pages,
   ...rest
 }: PricingCardProps) {
-  const normalizedFeatures = features.map((feature) => {
-    if (typeof feature === "string") {
-      return { text: feature, included: true };
-    }
-    return feature;
-  });
+  const [hovered, setHovered] = useState(false);
 
-  const baseStyle = buildComponentStyle({
-    backgroundColor,
-    textColor,
-    width,
-    height,
-    ...rest,
-  });
+  const normalizedFeatures = features.map((f) =>
+    typeof f === "string" ? { text: f, included: true } : f,
+  );
 
-  /** Handle link clicks */
-  const handleLinkClick = (e: React.MouseEvent, href: string) => {
-    if (!isPreviewMode) {
-      e.preventDefault();
-      return;
-    }
-    if (href.startsWith("page:") && onNavigate) {
-      e.preventDefault();
-      const pageId = href.substring(5);
-      const page = pages?.find((p: any) => p.id === pageId);
-      if (page) onNavigate(page.slug);
-    }
-  };
+  const baseStyle = buildComponentStyle({ backgroundColor, textColor, width, height, ...rest });
 
   return (
     <div
       className={cn(
-        "p-8 rounded-2xl flex flex-col min-w-0 overflow-hidden transition-all duration-300",
-        "border border-border",
-        "hover:border-border/80",
+        "p-8 rounded-2xl flex flex-col min-w-0 overflow-hidden border border-border",
         featured && "ring-1 ring-primary/20",
       )}
-      style={baseStyle}
+      style={{
+        ...baseStyle,
+        transition: "transform 300ms cubic-bezier(0.34,1.56,0.64,1), box-shadow 300ms ease",
+        transform: hovered ? "translateY(-5px)" : "translateY(0)",
+        boxShadow: hovered && featured
+          ? "0 20px 60px rgba(99,102,241,0.25)"
+          : hovered
+          ? "0 16px 40px rgba(0,0,0,0.3)"
+          : "none",
+      }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
     >
       {/* Header */}
       <div className="mb-8">
@@ -103,14 +88,28 @@ export function PricingCard({
             {title}
           </h3>
           {featured && badge && (
-            <span className="text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-primary/20 text-primary">
+            <span
+              className="text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-primary/20 text-primary"
+              style={{
+                animation: "badge-pulse 3s ease-in-out infinite",
+              }}
+            >
               {badge}
             </span>
           )}
         </div>
 
         <div className="flex items-baseline gap-1 mb-2">
-          <span className="text-5xl font-bold tracking-tight">{price}</span>
+          <span
+            className="text-5xl font-bold tracking-tight tabular-nums"
+            style={{
+              transition: "transform 200ms ease",
+              transform: hovered ? "scale(1.04)" : "scale(1)",
+              display: "inline-block",
+            }}
+          >
+            {price}
+          </span>
           <span className="text-sm text-muted-foreground">/{period}</span>
         </div>
 
@@ -121,7 +120,15 @@ export function PricingCard({
       <div className="flex-grow mb-8">
         <ul className="space-y-3">
           {normalizedFeatures.map((feature, index) => (
-            <li key={index} className="flex items-center gap-3 text-sm">
+            <li
+              key={index}
+              className="flex items-center gap-3 text-sm"
+              style={{
+                opacity: hovered ? 1 : 0.9,
+                transform: hovered ? "translateX(2px)" : "translateX(0)",
+                transition: `opacity 200ms ease ${index * 30}ms, transform 200ms ease ${index * 30}ms`,
+              }}
+            >
               {feature.included ? (
                 <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 bg-primary/20">
                   <Check className="w-3 h-3 text-primary" />
@@ -131,12 +138,7 @@ export function PricingCard({
                   <X className="w-3 h-3 text-muted-foreground" />
                 </div>
               )}
-              <span
-                className={cn(
-                  "break-words min-w-0",
-                  feature.included ? "text-foreground/80" : "text-muted-foreground",
-                )}
-              >
+              <span className={cn("break-words min-w-0", feature.included ? "text-foreground/80" : "text-muted-foreground")}>
                 {feature.text}
               </span>
             </li>
@@ -145,24 +147,26 @@ export function PricingCard({
       </div>
 
       {/* CTA Button */}
-      <div className="mt-auto" style={isPreviewMode ? undefined : { pointerEvents: "none" }}>
+      <div className="mt-auto">
         <Button
           className={cn(
-            "w-full py-3 rounded-xl font-semibold text-xs tracking-wider transition-all duration-300",
+            "w-full py-3 rounded-xl font-semibold text-xs tracking-wider transition-all duration-200 active:scale-[0.98]",
             buttonVariant === "primary"
-              ? "bg-primary hover:bg-primary/90 text-primary-foreground border-0"
-              : "bg-secondary hover:bg-secondary/80 text-secondary-foreground border border-border",
+              ? "bg-primary hover:bg-primary/90 text-primary-foreground border-0 hover:scale-[1.02]"
+              : "bg-secondary hover:bg-secondary/80 text-secondary-foreground border border-border hover:scale-[1.02]",
           )}
           asChild
         >
-          <a
-            href={isPreviewMode ? buttonLink : "#"}
-            onClick={(e) => handleLinkClick(e, buttonLink)}
-          >
-            {buttonText}
-          </a>
+          <a href={buttonLink}>{buttonText}</a>
         </Button>
       </div>
+
+      <style>{`
+        @keyframes badge-pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.7; }
+        }
+      `}</style>
     </div>
   );
 }

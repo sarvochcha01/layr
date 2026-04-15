@@ -1,4 +1,7 @@
-import { Star, StarHalf } from "lucide-react";
+"use client";
+
+import { useState } from "react";
+import { Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { buildComponentStyle } from "@/lib/buildStyle";
 
@@ -31,112 +34,83 @@ export function Testimonial({
   height,
   ...rest
 }: TestimonialProps) {
-  const baseStyle = buildComponentStyle({
-    backgroundColor,
-    textColor,
-    width,
-    height,
-    ...rest,
-  });
+  const [hovered, setHovered] = useState(false);
 
-  // Render star rating with half-star support
-  const renderStars = () => {
-    if (rating <= 0) return null;
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 >= 0.25 && rating % 1 <= 0.75;
-    const roundedUp = rating % 1 > 0.75;
-
-    return (
-      <div className="flex gap-1 mb-6">
-        {Array.from({ length: 5 }).map((_, i) => {
-          if (i < fullStars || (roundedUp && i === fullStars)) {
-            return <Star key={i} className="w-5 h-5 fill-primary text-primary" />;
-          }
-          if (i === fullStars && hasHalfStar) {
-            return (
-              <div key={i} className="relative w-5 h-5">
-                <Star className="w-5 h-5 text-muted absolute" />
-                <div className="absolute inset-0 overflow-hidden" style={{ width: "50%" }}>
-                  <Star className="w-5 h-5 fill-primary text-primary" />
-                </div>
-              </div>
-            );
-          }
-          return <Star key={i} className="w-5 h-5 text-muted" />;
-        })}
-      </div>
-    );
-  };
-
-  // Variant-specific styles
-  const variantClasses = {
-    card: cn(
-      "p-8 rounded-2xl",
-      "border border-border",
-      "hover:border-border/80",
-      "hover:-translate-y-0.5",
-    ),
-    minimal: cn(
-      "p-6",
-      "border-l-4 border-primary",
-    ),
-    featured: cn(
-      "p-10 rounded-2xl",
-      "border border-primary/30",
-      "ring-1 ring-primary/10",
-      "shadow-lg shadow-primary/5",
-    ),
-  };
+  const baseStyle = buildComponentStyle({ backgroundColor, textColor, width, height, ...rest });
 
   return (
     <div
       className={cn(
-        "min-w-0 overflow-hidden transition-all duration-300",
-        variantClasses[variant] || variantClasses.card,
+        "p-8 rounded-2xl min-w-0 overflow-hidden border border-border",
       )}
-      style={baseStyle}
+      style={{
+        ...baseStyle,
+        transition: "transform 300ms cubic-bezier(0.34,1.56,0.64,1), box-shadow 300ms ease, border-color 300ms ease",
+        transform: hovered ? "translateY(-4px)" : "translateY(0)",
+        boxShadow: hovered ? "0 16px 40px rgba(0,0,0,0.35)" : "none",
+        borderColor: hovered ? "rgba(255,255,255,0.12)" : undefined,
+      }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
     >
       {/* Rating Stars */}
-      {renderStars()}
+      {rating > 0 && (
+        <div className="flex gap-1 mb-6">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Star
+              key={i}
+              className={cn("w-5 h-5")}
+              style={{
+                fill: i < rating ? "hsl(var(--primary))" : "transparent",
+                color: i < rating ? "hsl(var(--primary))" : "hsl(var(--muted))",
+                transition: `transform 300ms cubic-bezier(0.34,1.56,0.64,1) ${i * 40}ms`,
+                transform: hovered ? "scale(1.2)" : "scale(1)",
+              }}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Quote */}
       <blockquote
-        className={cn(
-          "leading-relaxed mb-8 break-words",
-          variant === "featured" ? "text-xl italic" : "text-lg italic",
-        )}
+        className="text-lg leading-relaxed mb-8 break-words italic text-foreground/80"
         style={{
           fontFamily: "'Inter', sans-serif",
-          opacity: 0.85,
+          transition: "color 200ms ease",
+          color: hovered ? "rgba(255,255,255,0.95)" : undefined,
         }}
       >
-        &ldquo;{quote}&rdquo;
+        "{quote}"
       </blockquote>
 
       {/* Author */}
-      <div className={cn(
-        "flex items-center gap-3",
-        variant === "minimal" ? "" : "pt-6 border-t border-border",
-      )}>
+      <div className="flex items-center gap-3 pt-6 border-t border-border">
         {avatar ? (
           <img
             src={avatar}
             alt={author}
-            className="w-12 h-12 rounded-full object-cover flex-shrink-0"
-            style={{ aspectRatio: "1/1" }}
+            className="w-12 h-12 rounded-full object-cover ring-2 ring-border"
+            style={{
+              transition: "transform 300ms cubic-bezier(0.34,1.56,0.64,1)",
+              transform: hovered ? "scale(1.08)" : "scale(1)",
+            }}
           />
         ) : (
-          <div className="w-12 h-12 rounded-full flex items-center justify-center text-sm font-semibold bg-muted flex-shrink-0">
+          <div
+            className="w-12 h-12 rounded-full flex items-center justify-center text-sm font-semibold bg-muted"
+            style={{
+              transition: "transform 300ms cubic-bezier(0.34,1.56,0.64,1), background-color 200ms ease",
+              transform: hovered ? "scale(1.08)" : "scale(1)",
+              backgroundColor: hovered ? "rgba(99,102,241,0.3)" : undefined,
+            }}
+          >
             {author?.charAt(0) || "?"}
           </div>
         )}
         <div className="min-w-0">
-          <div className="text-sm font-semibold truncate">
-            {author}
-          </div>
+          <div className="text-sm font-semibold truncate text-foreground">{author}</div>
           <div className="text-xs text-muted-foreground truncate uppercase tracking-wider">
-            {role}
-            {company && `, ${company}`}
+            {role}{company && `, ${company}`}
           </div>
         </div>
       </div>
