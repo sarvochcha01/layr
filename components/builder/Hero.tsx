@@ -225,7 +225,7 @@ export function Hero({
             <div style={isPreviewMode ? undefined : { pointerEvents: "none" }}>
               <Button
                 size="lg"
-                className="w-full sm:w-auto px-8 py-3 text-sm font-bold tracking-wider rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground border-0 transition-all duration-300 hover:scale-[1.03] active:scale-[0.98]"
+                className="group w-full sm:w-auto px-8 py-3 text-sm font-bold tracking-wider rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground border-0 transition-all duration-300 hover:scale-[1.03] active:scale-[0.98]"
                 asChild
               >
                 <a
@@ -233,7 +233,7 @@ export function Hero({
                   onClick={(e) => handleLinkClick(e, primaryButtonLink)}
                 >
                   {primaryButtonText}
-                  <span className="ml-2 transition-transform duration-200 group-hover:translate-x-1">
+                  <span className="ml-2 inline-block transition-transform duration-200 group-hover:translate-x-1">
                     →
                   </span>
                 </a>
@@ -258,28 +258,6 @@ export function Hero({
               </Button>
             </div>
           )}
-        </div>
-
-        {/* Tech Stack Badges */}
-        <div
-          className={cn(
-            "flex flex-wrap gap-6 mt-16 text-xs text-muted-foreground font-semibold uppercase tracking-wider hero-tech",
-            alignment === "center"
-              ? "justify-center"
-              : alignment === "right"
-                ? "justify-end"
-                : "",
-          )}
-        >
-          {["VUE.JS", "REACT", "SUPABASE", "VERCEL"].map((tech) => (
-            <div
-              key={tech}
-              className="flex items-center gap-2 hover:text-foreground transition-colors duration-200 cursor-default"
-            >
-              <span className="w-1 h-1 rounded-full bg-primary" />
-              <span>{tech}</span>
-            </div>
-          ))}
         </div>
       </div>
 

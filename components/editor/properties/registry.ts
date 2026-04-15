@@ -318,12 +318,37 @@ export const COMPONENT_SCHEMAS: Record<string, ComponentPropertySchema> = {
         title: "Footer Content",
         icon: "settings",
         fields: [
+          {
+            key: "variant", label: "Layout Style", type: "select",
+            options: [
+              { label: "Standard", value: "standard" },
+              { label: "Centered", value: "centered" },
+              { label: "Minimal", value: "minimal" },
+              { label: "Brand Focus", value: "brand-focus" },
+              { label: "Magazine", value: "magazine" },
+              { label: "Brutalist", value: "brutalist" },
+              { label: "Glassmorphic", value: "glassmorphic" },
+              { label: "Split Dark", value: "split-dark" },
+              { label: "Startup", value: "startup" },
+              { label: "Newsletter", value: "newsletter" },
+            ],
+          },
           { key: "logo", label: "Logo Image URL", type: "text", placeholder: "https://example.com/logo.png" },
           { key: "logoText", label: "Logo Text", type: "text", placeholder: "Brand Name" },
           { key: "description", label: "Description", type: "textarea", placeholder: "Brief description", rows: 3 },
           { key: "copyright", label: "Copyright Text", type: "text", placeholder: "© 2024 All rights reserved" },
+          { key: "accentColor", label: "Accent Color", type: "color" },
           { key: "privacyLink", label: "Privacy Policy Link", type: "link-editor", placeholder: "https://example.com" },
           { key: "termsLink", label: "Terms of Service Link", type: "link-editor", placeholder: "https://example.com" },
+        ],
+      },
+      {
+        id: "newsletter",
+        title: "Newsletter (newsletter variant)",
+        icon: "settings",
+        fields: [
+          { key: "newsletterTitle", label: "Newsletter Heading", type: "text", placeholder: "Stay in the loop" },
+          { key: "newsletterSubtitle", label: "Newsletter Subheading", type: "textarea", placeholder: "Get updates...", rows: 2 },
         ],
       },
       {
