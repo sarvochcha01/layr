@@ -9,6 +9,8 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from "@/components/ui/accordion";
+import { useThemeStyle } from "@/contexts/ThemeStyleContext";
+import { THEME_STYLES } from "@/lib/themeStyles";
 
 const labelClass = "text-xs font-medium text-muted-foreground";
 const selectClass = "w-full h-8 px-2 text-xs bg-transparent appearance-none focus:outline-none";
@@ -26,7 +28,16 @@ function LocalTextInput({ value, onChange, placeholder, className }: { value: st
 
 export function FillSection({ props, updateProp, componentType }: StyleSectionProps) {
   const bgType = props.backgroundType || "solid";
-  
+
+  // Get active theme defaults so color pickers show the *real* values being used
+  const { globalThemeStyle, isGlobalThemeEnabled } = useThemeStyle();
+  const activeThemeKey = props.themeStyle || (isGlobalThemeEnabled ? globalThemeStyle : null);
+  const activeTheme = activeThemeKey ? THEME_STYLES[activeThemeKey as keyof typeof THEME_STYLES] : null;
+
+  // Resolve defaults: show the theme's color if no explicit override is set
+  const defaultBg = activeTheme?.colors.bg || "#ffffff";
+  const defaultText = activeTheme?.colors.text || "#000000";
+
   // For Card components, hide the image option
   const availableTypes = componentType === "Card" 
     ? (["solid", "gradient"] as const)
@@ -41,6 +52,24 @@ export function FillSection({ props, updateProp, componentType }: StyleSectionPr
         </div>
       </AccordionTrigger>
       <AccordionContent className={sectionContentClass}>
+        {/* Theme hint */}
+        {activeTheme && (
+          <div className="flex items-center gap-2 px-2 py-1.5 rounded-md bg-muted/60 border border-border/50 mb-1">
+            <div className="flex gap-1">
+              {activeTheme.previewColors.map((c, i) => (
+                <div
+                  key={i}
+                  className="w-3 h-3 rounded-full border"
+                  style={{ background: c, borderColor: c === "#ffffff" ? "#e5e7eb" : c }}
+                />
+              ))}
+            </div>
+            <span className="text-[10px] text-muted-foreground">
+              Theme: <strong className="text-foreground/80">{activeTheme.name}</strong>
+            </span>
+          </div>
+        )}
+
         {/* Background Type Selector */}
         <div className="space-y-1.5">
           <Label className={labelClass}>Background Type</Label>
@@ -67,10 +96,23 @@ export function FillSection({ props, updateProp, componentType }: StyleSectionPr
         {/* Solid Color */}
         {bgType === "solid" && (
           <div className="space-y-1.5">
-            <Label className={labelClass}>Background Color</Label>
+            <div className="flex items-center justify-between">
+              <Label className={labelClass}>Background Color</Label>
+              {props.backgroundColor && activeTheme && (
+                <button
+                  onClick={() => updateProp("backgroundColor", undefined)}
+                  className="text-[10px] text-primary hover:text-primary/80 font-medium transition-colors"
+                >
+                  Use theme default
+                </button>
+              )}
+            </div>
             <div className="flex gap-2 items-center">
-              <Input type="color" value={props.backgroundColor || "#ffffff"} onChange={(e) => updateProp("backgroundColor", e.target.value)} className="w-8 h-8 p-0.5 min-h-0 cursor-pointer" />
-              <Input type="text" value={props.backgroundColor || "#ffffff"} onChange={(e) => updateProp("backgroundColor", e.target.value)} className="flex-1 h-8 text-xs font-mono" />
+              <Input type="color" value={props.backgroundColor || defaultBg} onChange={(e) => updateProp("backgroundColor", e.target.value)} className="w-8 h-8 p-0.5 min-h-0 cursor-pointer" />
+              <Input type="text" value={props.backgroundColor || defaultBg} onChange={(e) => updateProp("backgroundColor", e.target.value)} className="flex-1 h-8 text-xs font-mono" />
+              {!props.backgroundColor && activeTheme && (
+                <span className="text-[9px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded flex-shrink-0">theme</span>
+              )}
             </div>
           </div>
         )}
@@ -163,10 +205,23 @@ export function FillSection({ props, updateProp, componentType }: StyleSectionPr
 
         {/* Text Color */}
         <div className="space-y-1.5">
-          <Label className={labelClass}>Text Color</Label>
+          <div className="flex items-center justify-between">
+            <Label className={labelClass}>Text Color</Label>
+            {props.textColor && activeTheme && (
+              <button
+                onClick={() => updateProp("textColor", undefined)}
+                className="text-[10px] text-primary hover:text-primary/80 font-medium transition-colors"
+              >
+                Use theme default
+              </button>
+            )}
+          </div>
           <div className="flex gap-2 items-center">
-            <Input type="color" value={props.textColor || "#000000"} onChange={(e) => updateProp("textColor", e.target.value)} className="w-8 h-8 p-0.5 min-h-0 cursor-pointer" />
-            <Input type="text" value={props.textColor || "#000000"} onChange={(e) => updateProp("textColor", e.target.value)} className="flex-1 h-8 text-xs font-mono" />
+            <Input type="color" value={props.textColor || defaultText} onChange={(e) => updateProp("textColor", e.target.value)} className="w-8 h-8 p-0.5 min-h-0 cursor-pointer" />
+            <Input type="text" value={props.textColor || defaultText} onChange={(e) => updateProp("textColor", e.target.value)} className="flex-1 h-8 text-xs font-mono" />
+            {!props.textColor && activeTheme && (
+              <span className="text-[9px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded flex-shrink-0">theme</span>
+            )}
           </div>
         </div>
       </AccordionContent>

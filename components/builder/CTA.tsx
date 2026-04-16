@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { buildComponentStyle } from "@/lib/buildStyle";
+import { ThemeStyleVariant, getThemeCSSVars } from "@/lib/themeStyles";
+import { getUserStyleOverrides } from "@/lib/buildStyle";
+import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
 
 interface CTAProps {
   title?: string;
@@ -18,6 +19,7 @@ interface CTAProps {
   textColor?: string;
   width?: string;
   height?: string;
+  themeStyle?: ThemeStyleVariant;
   [key: string]: any;
 }
 
@@ -34,6 +36,7 @@ export function CTA({
   textColor,
   width,
   height,
+  themeStyle,
   ...rest
 }: CTAProps) {
   const [hovered, setHovered] = useState(false);
@@ -45,45 +48,51 @@ export function CTA({
     right: "text-right items-end",
   };
 
-  const baseStyle = buildComponentStyle({ textColor: textColor || "#ffffff", width, height, ...rest });
+  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const cssVars = getThemeCSSVars(effectiveTheme);
 
-  if (!backgroundColor) {
-    baseStyle.background = "linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%)";
-    baseStyle.border = "1px solid #3a3a3a";
-  } else {
-    baseStyle.backgroundColor = backgroundColor;
-  }
+  const isNeoBrutalist = effectiveTheme === "neobrutalist";
+  const isBrutalist = effectiveTheme === "brutalist";
+
+  const containerStyle: React.CSSProperties = {
+    ...cssVars,
+    backgroundColor: backgroundColor || "var(--theme-surface)",
+    color: textColor || "var(--theme-text)",
+    borderRadius: "var(--theme-radius)",
+    border: `var(--theme-border-width) solid var(--theme-border)`,
+    boxShadow: hovered
+      ? isNeoBrutalist || isBrutalist
+        ? "8px 8px 0px var(--theme-border)"
+        : `0 0 60px rgba(var(--theme-accent), 0.15), var(--theme-shadow)`
+      : isNeoBrutalist || isBrutalist
+        ? "var(--theme-hard-shadow, none)"
+        : "none",
+    transform: hovered && (isNeoBrutalist || isBrutalist)
+      ? "translate(-2px, -2px)"
+      : "none",
+    backdropFilter: "var(--theme-backdrop)",
+    ...(width ? { width } : {}),
+    ...(height ? { minHeight: height } : {}),
+    transition: "all 300ms ease",
+    ...getUserStyleOverrides(rest),
+  };
 
   return (
     <div
       className={cn(
-        "rounded-2xl flex flex-col gap-8 relative overflow-hidden",
+        "flex flex-col gap-8 relative overflow-hidden",
         sizeClasses[size],
         alignmentClasses[alignment],
       )}
-      style={{
-        ...baseStyle,
-        transition: "border-color 300ms ease, box-shadow 300ms ease",
-        borderColor: hovered ? "rgba(99,102,241,0.4)" : undefined,
-        boxShadow: hovered ? "0 0 60px rgba(99,102,241,0.1)" : "none",
-      }}
+      style={containerStyle}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {/* Decorative pattern */}
-      <div
-        className="absolute inset-0 opacity-5 pointer-events-none"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle at 20% 50%, rgba(59,130,246,0.3) 0%, transparent 50%), radial-gradient(circle at 80% 50%, rgba(59,130,246,0.2) 0%, transparent 50%)",
-        }}
-      />
-
-      {/* Animated glow on hover */}
+      {/* Decorative glow on hover */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: "radial-gradient(ellipse at 50% 50%, rgba(99,102,241,0.08) 0%, transparent 70%)",
+          background: `radial-gradient(ellipse at 50% 50%, color-mix(in srgb, var(--theme-accent) 8%, transparent), transparent 70%)`,
           opacity: hovered ? 1 : 0,
           transition: "opacity 400ms ease",
         }}
@@ -91,36 +100,55 @@ export function CTA({
 
       <div className="relative z-10">
         <h2
-          className="text-3xl sm:text-4xl font-bold mb-4 tracking-tight"
-          style={{ fontFamily: "'Inter', sans-serif" }}
+          className="text-3xl sm:text-4xl mb-4 tracking-tight"
+          style={{
+            fontWeight: "var(--theme-heading-weight)" as any,
+            color: "var(--theme-text)",
+            letterSpacing: "var(--theme-letter-spacing)",
+            fontFamily: "var(--theme-heading-font)",
+          }}
         >
           {title}
         </h2>
         <p
-          className="text-lg text-gray-400 max-w-xl"
-          style={alignment === "center" ? { marginLeft: "auto", marginRight: "auto" } : undefined}
+          className="text-lg max-w-xl"
+          style={{
+            color: "var(--theme-text-muted)",
+            ...(alignment === "center" ? { marginLeft: "auto", marginRight: "auto" } : undefined),
+          }}
         >
           {description}
         </p>
       </div>
 
       <div className="relative z-10 flex gap-4 flex-wrap">
-        <Button
-          size="lg"
-          className="px-8 py-3 text-base font-medium rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-200 hover:scale-[1.03] active:scale-[0.98]"
-          asChild
+        <a
+          href={primaryButtonLink}
+          className="inline-flex items-center px-8 py-3 text-base font-semibold transition-all duration-200 hover:opacity-90 hover:scale-[1.03] active:scale-[0.98]"
+          style={{
+            background: "var(--theme-accent)",
+            color: "var(--theme-accent-fg)",
+            borderRadius: "var(--theme-radius)",
+            border: `var(--theme-border-width) solid var(--theme-border)`,
+            boxShadow: "var(--theme-hard-shadow, var(--theme-shadow))",
+          }}
         >
-          <a href={primaryButtonLink}>{primaryButtonText}</a>
-        </Button>
+          {primaryButtonText}
+        </a>
         {secondaryButtonText && (
-          <Button
-            size="lg"
-            variant="outline"
-            className="px-8 py-3 text-base font-medium rounded-xl border-[#3a3a3a] hover:bg-[#2a2a2a] text-white transition-all duration-200 hover:scale-[1.03] active:scale-[0.98]"
-            asChild
+          <a
+            href={secondaryButtonLink}
+            className="inline-flex items-center px-8 py-3 text-base font-semibold transition-all duration-200 hover:opacity-90 hover:scale-[1.03] active:scale-[0.98]"
+            style={{
+              background: "var(--theme-bg)",
+              color: "var(--theme-text)",
+              borderRadius: "var(--theme-radius)",
+              border: `var(--theme-border-width) solid var(--theme-border)`,
+              boxShadow: "var(--theme-hard-shadow, none)",
+            }}
           >
-            <a href={secondaryButtonLink}>{secondaryButtonText}</a>
-          </Button>
+            {secondaryButtonText}
+          </a>
         )}
       </div>
     </div>

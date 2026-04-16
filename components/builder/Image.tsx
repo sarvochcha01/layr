@@ -1,5 +1,7 @@
 import { cn } from "@/lib/utils";
 import { buildComponentStyle } from "@/lib/buildStyle";
+import { ThemeStyleVariant, getThemeCSSVars } from "@/lib/themeStyles";
+import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
 
 interface ImageProps {
   src?: string;
@@ -11,6 +13,7 @@ interface ImageProps {
   objectFit?: "cover" | "contain" | "fill" | "none" | "scale-down";
   loading?: "lazy" | "eager";
   link?: string;
+  themeStyle?: ThemeStyleVariant;
   [key: string]: any;
 }
 
@@ -24,6 +27,7 @@ export function Image({
   objectFit = "cover",
   loading = "lazy",
   link,
+  themeStyle,
   ...rest
 }: ImageProps) {
   const roundedClasses = {
@@ -44,10 +48,13 @@ export function Image({
 
   // Build the container style (width/height handled by ResizableWrapper)
   const baseStyle = buildComponentStyle(rest);
+  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const cssVars = getThemeCSSVars(effectiveTheme);
+
 
   const imageElement = (
     <div 
-      style={baseStyle} 
+      style={{ ...baseStyle, ...cssVars }} 
       className={cn(
         "relative block w-full h-full overflow-hidden",
         roundedClasses[rounded],

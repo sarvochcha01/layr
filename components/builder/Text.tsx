@@ -1,5 +1,8 @@
 import { cn } from "@/lib/utils";
 import { buildComponentStyle } from "@/lib/buildStyle";
+import { ThemeStyleVariant, getThemeCSSVars } from "@/lib/themeStyles";
+import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
+import { loadGoogleFont, getFontFamilyValue } from "@/lib/fonts";
 
 interface TextProps {
   children?: React.ReactNode;
@@ -22,6 +25,7 @@ interface TextProps {
   className?: string;
   width?: string;
   height?: string;
+  themeStyle?: ThemeStyleVariant;
   [key: string]: any;
 }
 
@@ -36,6 +40,7 @@ export function Text({
   className,
   width,
   height,
+  themeStyle,
   ...rest
 }: TextProps) {
   const Component = tag;
@@ -70,6 +75,14 @@ export function Text({
   };
 
   const baseStyle = buildComponentStyle({ textColor: color, width, height, ...rest });
+  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const cssVars = getThemeCSSVars(effectiveTheme);
+
+  // Per-component font override
+  const fontOverride = rest.fontFamily_override;
+  if (fontOverride && typeof window !== "undefined") {
+    loadGoogleFont(fontOverride);
+  }
 
   return (
     <Component
@@ -79,7 +92,13 @@ export function Text({
         alignClasses[align],
         className
       )}
-      style={baseStyle}
+      style={{
+        ...baseStyle,
+        backgroundColor: rest.backgroundColor || "var(--theme-bg)",
+        color: color || "var(--theme-text)",
+        ...cssVars,
+        ...(fontOverride ? { fontFamily: getFontFamilyValue(fontOverride) } : {}),
+      }}
     >
       {children || content}
     </Component>

@@ -1,6 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { buildComponentStyle } from "@/lib/buildStyle";
+import { ThemeStyleVariant, getThemeCSSVars } from "@/lib/themeStyles";
+import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
 
 interface HeroProps {
   title?: string;
@@ -21,6 +23,9 @@ interface HeroProps {
   className?: string;
   width?: string;
   height?: string;
+  themeStyle?: ThemeStyleVariant;
+  onNavigate?: (slug: string) => void;
+  pages?: any[];
   [key: string]: any;
 }
 
@@ -33,9 +38,9 @@ export function Hero({
   primaryButtonLink = "#",
   secondaryButtonText = "VIEW DOCUMENTATION",
   secondaryButtonLink = "#",
-  backgroundImage ,
-  backgroundColor = "#0d0d0d",
-  textColor = "#ffffff",
+  backgroundImage,
+  backgroundColor,
+  textColor,
   alignment = "center",
   size = "xl",
   showScrollIndicator = true,
@@ -43,6 +48,9 @@ export function Hero({
   className,
   width,
   height,
+  themeStyle,
+  onNavigate,
+  pages,
   ...rest
 }: HeroProps) {
   const sizeClasses = {
@@ -58,19 +66,41 @@ export function Hero({
     right: "text-right",
   };
 
-  const baseStyle = buildComponentStyle({
-    backgroundColor,
-    textColor,
-    width,
-    height,
-    ...rest,
-  });
+  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const cssVars = getThemeCSSVars(effectiveTheme);
+
+  // User-set bg/textColor overrides theme
+  const bgColor = backgroundColor || "var(--theme-bg)";
+  const fg = textColor || "var(--theme-text)";
+
+  const baseStyle: React.CSSProperties = {
+    ...cssVars,
+    backgroundColor: bgColor,
+    color: fg,
+    ...(width ? { width } : {}),
+    ...(height ? { minHeight: height } : {}),
+  };
 
   if (backgroundImage) {
     baseStyle.backgroundImage = `url(${backgroundImage})`;
     baseStyle.backgroundSize = "cover";
     baseStyle.backgroundPosition = "center";
+    // Overlay to ensure text readability
+    baseStyle.position = "relative";
   }
+
+  const handleLinkClick = (e: React.MouseEvent, link: string) => {
+    if (isPreviewMode) return;
+    if (link.startsWith("http") || link.startsWith("mailto:")) return;
+    e.preventDefault();
+    if (onNavigate) {
+      let slug = link;
+      if (slug.startsWith("page:")) slug = slug.replace("page:", "");
+      else slug = slug.replace(/^\//, "").replace(/\.html$/, "");
+      if (!slug || slug === "#") slug = "index";
+      onNavigate(slug);
+    }
+  };
 
   const titleParts = title.split("FUTURE");
   const hasHighlight = titleParts.length > 1;
@@ -85,15 +115,23 @@ export function Hero({
       )}
       style={baseStyle}
     >
-      {/* Animated grid background */}
+      {/* Dark overlay when background image is set */}
+      {backgroundImage && (
+        <div
+          className="absolute inset-0 z-0"
+          style={{ background: "rgba(0,0,0,0.55)" }}
+        />
+      )}
+
+      {/* Animated grid background — only without bg image */}
       {!backgroundImage && (
-        <div className="absolute inset-0 opacity-20">
+        <div className="absolute inset-0 opacity-[0.07] pointer-events-none">
           <div
             className="absolute inset-0"
             style={{
               backgroundImage: `
-                linear-gradient(rgba(99,102,241,0.1) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(99,102,241,0.1) 1px, transparent 1px)
+                linear-gradient(var(--theme-text) 1px, transparent 1px),
+                linear-gradient(90deg, var(--theme-text) 1px, transparent 1px)
               `,
               backgroundSize: "50px 50px",
               animation: "grid-flow 20s linear infinite",
@@ -102,31 +140,29 @@ export function Hero({
         </div>
       )}
 
-      {/* Gradient orbs — now with slow breathing animation */}
+      {/* Gradient orbs — themed */}
       {!backgroundImage && (
         <>
           <div
-            className="absolute top-[-10%] left-[-5%] w-[600px] h-[600px] rounded-full blur-3xl"
+            className="absolute top-[-10%] left-[-5%] w-[600px] h-[600px] rounded-full blur-3xl pointer-events-none"
             style={{
-              background:
-                "radial-gradient(circle, #6366f1 0%, transparent 70%)",
+              background: `radial-gradient(circle, var(--theme-accent) 0%, transparent 70%)`,
               animation: "orb-breathe 8s ease-in-out infinite",
-              opacity: 0.3,
+              opacity: 0.25,
             }}
           />
           <div
-            className="absolute bottom-[-10%] right-[-5%] w-[500px] h-[500px] rounded-full blur-3xl"
+            className="absolute bottom-[-10%] right-[-5%] w-[500px] h-[500px] rounded-full blur-3xl pointer-events-none"
             style={{
-              background:
-                "radial-gradient(circle, #8b5cf6 0%, transparent 70%)",
+              background: `radial-gradient(circle, var(--theme-accent) 0%, transparent 70%)`,
               animation: "orb-breathe 10s ease-in-out infinite 2s",
-              opacity: 0.2,
+              opacity: 0.15,
             }}
           />
         </>
       )}
 
-      {/* Keyframes injected inline */}
+      {/* Keyframes */}
       <style>{`
         @keyframes orb-breathe {
           0%, 100% { transform: scale(1) translate(0, 0); }
@@ -145,7 +181,6 @@ export function Hero({
         .hero-title   { animation: fade-up 0.6s ease both 0.25s; }
         .hero-desc    { animation: fade-up 0.6s ease both 0.4s; }
         .hero-ctas    { animation: fade-up 0.6s ease both 0.55s; }
-        .hero-tech    { animation: fade-up 0.6s ease both 0.7s; }
       `}</style>
 
       <div className="relative z-10 max-w-5xl mx-auto px-4">
@@ -162,10 +197,19 @@ export function Hero({
             )}
           >
             <span
-              className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] px-4 py-2 rounded-full border border-border bg-card"
-              style={{ color: "#a5b4fc" }}
+              className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] px-4 py-2"
+              style={{
+                color: "var(--theme-accent)",
+                background: "var(--theme-surface)",
+                border: `1px solid var(--theme-border)`,
+                borderRadius: "var(--theme-radius)",
+                boxShadow: "var(--theme-hard-shadow)",
+              }}
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
+              <span
+                className="w-1.5 h-1.5 rounded-full animate-pulse"
+                style={{ background: "var(--theme-accent)" }}
+              />
               {badge}
             </span>
           </div>
@@ -173,8 +217,13 @@ export function Hero({
 
         {/* Title */}
         <h1
-          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-8 leading-[1.1] tracking-tight hero-title"
-          style={{ fontFamily: "'Inter', sans-serif" }}
+          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl mb-8 leading-[1.1] tracking-tight hero-title"
+          style={{
+            fontFamily: "var(--theme-heading-font)",
+            fontWeight: "var(--theme-heading-weight)" as any,
+            letterSpacing: "var(--theme-letter-spacing)",
+            color: backgroundImage ? "#ffffff" : "var(--theme-text)",
+          }}
         >
           {hasHighlight ? (
             <>
@@ -182,11 +231,7 @@ export function Hero({
               <span
                 className="inline-block"
                 style={{
-                  background:
-                    "linear-gradient(135deg, #a5b4fc 0%, #c4b5fd 100%)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
+                  color: "var(--theme-accent)",
                 }}
               >
                 FUTURE
@@ -200,12 +245,11 @@ export function Hero({
 
         {/* Description */}
         <p
-          className="text-base sm:text-lg mb-12 leading-relaxed max-w-2xl text-muted-foreground hero-desc"
-          style={
-            alignment === "center"
-              ? { marginLeft: "auto", marginRight: "auto" }
-              : {}
-          }
+          className="text-base sm:text-lg mb-12 leading-relaxed max-w-2xl hero-desc"
+          style={{
+            color: backgroundImage ? "rgba(255,255,255,0.75)" : "var(--theme-text-muted)",
+            ...(alignment === "center" ? { marginLeft: "auto", marginRight: "auto" } : {}),
+          }}
         >
           {description}
         </p>
@@ -223,71 +267,58 @@ export function Hero({
         >
           {primaryButtonText && (
             <div style={isPreviewMode ? undefined : { pointerEvents: "none" }}>
-              <Button
-                size="lg"
-                className="w-full sm:w-auto px-8 py-3 text-sm font-bold tracking-wider rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground border-0 transition-all duration-300 hover:scale-[1.03] active:scale-[0.98]"
-                asChild
+              <a
+                href={isPreviewMode ? primaryButtonLink : "#"}
+                onClick={(e) => handleLinkClick(e, primaryButtonLink)}
+                className="inline-flex items-center gap-2 px-8 py-3 text-sm font-bold tracking-wider transition-all duration-300 hover:opacity-90 hover:scale-[1.03] active:scale-[0.98]"
+                style={{
+                  background: "var(--theme-accent)",
+                  color: "var(--theme-accent-fg)",
+                  borderRadius: "var(--theme-radius)",
+                  boxShadow: "var(--theme-hard-shadow, var(--theme-shadow))",
+                  border: `var(--theme-border-width) solid var(--theme-border)`,
+                }}
               >
-                <a
-                  href={isPreviewMode ? primaryButtonLink : "#"}
-                  onClick={(e) => handleLinkClick(e, primaryButtonLink)}
-                >
-                  {primaryButtonText}
-                  <span className="ml-2 transition-transform duration-200 group-hover:translate-x-1">
-                    →
-                  </span>
-                </a>
-              </Button>
+                {primaryButtonText}
+                <span className="inline-block transition-transform duration-200 hover:translate-x-1">→</span>
+              </a>
             </div>
           )}
 
           {secondaryButtonText && (
             <div style={isPreviewMode ? undefined : { pointerEvents: "none" }}>
-              <Button
-                variant="outline"
-                size="lg"
-                className="w-full sm:w-auto px-8 py-3 text-sm font-bold tracking-wider rounded-xl border-border bg-card hover:bg-muted text-foreground transition-all duration-300 hover:scale-[1.03] active:scale-[0.98]"
-                asChild
+              <a
+                href={isPreviewMode ? secondaryButtonLink : "#"}
+                onClick={(e) => handleLinkClick(e, secondaryButtonLink)}
+                className="inline-flex items-center gap-2 px-8 py-3 text-sm font-bold tracking-wider transition-all duration-300 hover:opacity-90 hover:scale-[1.03] active:scale-[0.98]"
+                style={{
+                  background: "var(--theme-surface)",
+                  color: "var(--theme-text)",
+                  borderRadius: "var(--theme-radius)",
+                  border: `var(--theme-border-width) solid var(--theme-border)`,
+                  boxShadow: "var(--theme-hard-shadow, none)",
+                }}
               >
-                <a
-                  href={isPreviewMode ? secondaryButtonLink : "#"}
-                  onClick={(e) => handleLinkClick(e, secondaryButtonLink)}
-                >
-                  {secondaryButtonText}
-                </a>
-              </Button>
+                {secondaryButtonText}
+              </a>
             </div>
           )}
-        </div>
-
-        {/* Tech Stack Badges */}
-        <div
-          className={cn(
-            "flex flex-wrap gap-6 mt-16 text-xs text-muted-foreground font-semibold uppercase tracking-wider hero-tech",
-            alignment === "center"
-              ? "justify-center"
-              : alignment === "right"
-                ? "justify-end"
-                : "",
-          )}
-        >
-          {["VUE.JS", "REACT", "SUPABASE", "VERCEL"].map((tech) => (
-            <div
-              key={tech}
-              className="flex items-center gap-2 hover:text-foreground transition-colors duration-200 cursor-default"
-            >
-              <span className="w-1 h-1 rounded-full bg-primary" />
-              <span>{tech}</span>
-            </div>
-          ))}
         </div>
       </div>
 
       {/* Scroll Indicator */}
       {showScrollIndicator && (
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-xs text-muted-foreground uppercase tracking-wider">
+        <div
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-xs uppercase tracking-wider"
+          style={{ color: backgroundImage ? "rgba(255,255,255,0.5)" : "var(--theme-text-muted)" }}
+        >
           <span>SCROLL TO EXPLORE</span>
-          <div className="w-px h-12 bg-gradient-to-b from-muted-foreground to-transparent animate-pulse" />
+          <div
+            className="w-px h-12 animate-pulse"
+            style={{
+              background: `linear-gradient(to bottom, var(--theme-text-muted), transparent)`,
+            }}
+          />
         </div>
       )}
     </section>

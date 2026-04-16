@@ -1,5 +1,7 @@
 import { cn } from "@/lib/utils";
 import { buildComponentStyle } from "@/lib/buildStyle";
+import { ThemeStyleVariant, getThemeCSSVars } from "@/lib/themeStyles";
+import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
 
 interface HeaderProps {
   children?: React.ReactNode;
@@ -10,6 +12,7 @@ interface HeaderProps {
   shadow?: boolean;
   width?: string;
   height?: string;
+  themeStyle?: ThemeStyleVariant;
   [key: string]: any;
 }
 
@@ -22,6 +25,7 @@ export function Header({
   shadow = true,
   width,
   height,
+  themeStyle,
   ...rest
 }: HeaderProps) {
   const baseStyle = buildComponentStyle({
@@ -30,6 +34,9 @@ export function Header({
     height,
     ...rest,
   });
+  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const cssVars = getThemeCSSVars(effectiveTheme);
+
   // Header uses its own padding prop (string CSS value), not the shared enum
   baseStyle.padding = padding;
 
@@ -41,7 +48,7 @@ export function Header({
         shadow && "shadow-sm shadow-black/20",
         className,
       )}
-      style={baseStyle}
+      style={{ ...baseStyle, ...cssVars }}
     >
       {children}
     </header>

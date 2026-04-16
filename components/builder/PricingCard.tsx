@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { Check, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { buildComponentStyle } from "@/lib/buildStyle";
+import { ThemeStyleVariant, getThemeCSSVars } from "@/lib/themeStyles";
+import { getUserStyleOverrides } from "@/lib/buildStyle";
+import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
 
 interface Feature {
   text: string;
@@ -26,6 +27,7 @@ interface PricingCardProps {
   textColor?: string;
   width?: string;
   height?: string;
+  themeStyle?: ThemeStyleVariant;
   [key: string]: any;
 }
 
@@ -45,10 +47,11 @@ export function PricingCard({
   buttonVariant = "primary",
   featured = false,
   badge = "POPULAR",
-  backgroundColor = "#1a1a1a",
-  textColor = "#ffffff",
+  backgroundColor,
+  textColor,
   width,
   height,
+  themeStyle,
   ...rest
 }: PricingCardProps) {
   const [hovered, setHovered] = useState(false);
@@ -57,23 +60,32 @@ export function PricingCard({
     typeof f === "string" ? { text: f, included: true } : f,
   );
 
-  const baseStyle = buildComponentStyle({ backgroundColor, textColor, width, height, ...rest });
+  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const cssVars = getThemeCSSVars(effectiveTheme);
 
   return (
     <div
       className={cn(
-        "p-8 rounded-2xl flex flex-col min-w-0 overflow-hidden border border-border",
-        featured && "ring-1 ring-primary/20",
+        "p-8 flex flex-col min-w-0 overflow-hidden",
       )}
-      style={{
-        ...baseStyle,
-        transition: "transform 300ms cubic-bezier(0.34,1.56,0.64,1), box-shadow 300ms ease",
+      style={{ 
+        ...cssVars,
+        backgroundColor: backgroundColor || "var(--theme-surface)",
+        color: textColor || "var(--theme-text)",
+        border: `var(--theme-border-width) solid ${featured ? "var(--theme-accent)" : "var(--theme-border)"}`,
+        borderRadius: "var(--theme-radius)",
+        boxShadow: hovered
+          ? featured
+            ? `0 20px 60px color-mix(in srgb, var(--theme-accent) 30%, transparent), var(--theme-hard-shadow, none)`
+            : "var(--theme-shadow)"
+          : featured
+            ? `0 0 0 1px var(--theme-accent), var(--theme-hard-shadow, none)`
+            : "none",
         transform: hovered ? "translateY(-5px)" : "translateY(0)",
-        boxShadow: hovered && featured
-          ? "0 20px 60px rgba(99,102,241,0.25)"
-          : hovered
-          ? "0 16px 40px rgba(0,0,0,0.3)"
-          : "none",
+        transition: "transform 300ms cubic-bezier(0.34,1.56,0.64,1), box-shadow 300ms ease",
+        ...(width ? { width } : {}),
+        ...(height ? { height } : {}),
+        ...getUserStyleOverrides(rest),
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -82,16 +94,19 @@ export function PricingCard({
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
           <h3
-            className="text-xl font-semibold tracking-tight"
-            style={{ fontFamily: "'Inter', sans-serif" }}
+            className="text-xl tracking-tight"
+            style={{ fontWeight: "var(--theme-heading-weight)" as any, color: "var(--theme-text)", fontFamily: "var(--theme-heading-font)" }}
           >
             {title}
           </h3>
           {featured && badge && (
             <span
-              className="text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-primary/20 text-primary"
+              className="text-[10px] font-bold uppercase tracking-wider px-3 py-1"
               style={{
                 animation: "badge-pulse 3s ease-in-out infinite",
+                background: "var(--theme-accent)",
+                color: "var(--theme-accent-fg)",
+                borderRadius: "var(--theme-radius)",
               }}
             >
               {badge}
@@ -110,10 +125,10 @@ export function PricingCard({
           >
             {price}
           </span>
-          <span className="text-sm text-muted-foreground">/{period}</span>
+          <span className="text-sm" style={{ color: "var(--theme-text-muted)" }}>/{period}</span>
         </div>
 
-        {description && <p className="text-sm text-muted-foreground">{description}</p>}
+        {description && <p className="text-sm" style={{ color: "var(--theme-text-muted)" }}>{description}</p>}
       </div>
 
       {/* Features */}
@@ -130,15 +145,21 @@ export function PricingCard({
               }}
             >
               {feature.included ? (
-                <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 bg-primary/20">
-                  <Check className="w-3 h-3 text-primary" />
+                <div
+                  className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
+                  style={{ background: "color-mix(in srgb, var(--theme-accent) 20%, transparent)" }}
+                >
+                  <Check className="w-3 h-3" style={{ color: "var(--theme-accent)" }} />
                 </div>
               ) : (
-                <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 bg-muted">
-                  <X className="w-3 h-3 text-muted-foreground" />
+                <div
+                  className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
+                  style={{ background: "var(--theme-surface)" }}
+                >
+                  <X className="w-3 h-3" style={{ color: "var(--theme-text-muted)" }} />
                 </div>
               )}
-              <span className={cn("break-words min-w-0", feature.included ? "text-foreground/80" : "text-muted-foreground")}>
+              <span className="break-words min-w-0" style={{ color: feature.included ? "var(--theme-text)" : "var(--theme-text-muted)" }}>
                 {feature.text}
               </span>
             </li>
@@ -148,17 +169,19 @@ export function PricingCard({
 
       {/* CTA Button */}
       <div className="mt-auto">
-        <Button
-          className={cn(
-            "w-full py-3 rounded-xl font-semibold text-xs tracking-wider transition-all duration-200 active:scale-[0.98]",
-            buttonVariant === "primary"
-              ? "bg-primary hover:bg-primary/90 text-primary-foreground border-0 hover:scale-[1.02]"
-              : "bg-secondary hover:bg-secondary/80 text-secondary-foreground border border-border hover:scale-[1.02]",
-          )}
-          asChild
+        <a
+          href={buttonLink}
+          className="w-full py-3 text-xs font-bold tracking-wider transition-all duration-200 hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center"
+          style={{
+            background: buttonVariant === "primary" ? "var(--theme-accent)" : "var(--theme-surface)",
+            color: buttonVariant === "primary" ? "var(--theme-accent-fg)" : "var(--theme-text)",
+            borderRadius: "var(--theme-radius)",
+            border: `var(--theme-border-width) solid var(--theme-border)`,
+            boxShadow: "var(--theme-hard-shadow, none)",
+          }}
         >
-          <a href={buttonLink}>{buttonText}</a>
-        </Button>
+          {buttonText}
+        </a>
       </div>
 
       <style>{`

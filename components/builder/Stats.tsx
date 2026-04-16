@@ -2,7 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
-import { buildComponentStyle } from "@/lib/buildStyle";
+import { ThemeStyleVariant, getThemeCSSVars } from "@/lib/themeStyles";
+import { getUserStyleOverrides } from "@/lib/buildStyle";
+import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
 
 interface Stat {
   value: string;
@@ -13,12 +15,14 @@ interface Stat {
 interface StatsProps {
   stats?: Stat[];
   layout?: "horizontal" | "grid";
+  variant?: "default" | "cards" | "minimal" | "bordered";
   columns?: 2 | 3 | 4;
   backgroundColor?: string;
   textColor?: string;
   accentColor?: string;
   width?: string;
   height?: string;
+  themeStyle?: ThemeStyleVariant;
   [key: string]: any;
 }
 
@@ -32,7 +36,6 @@ function useCountUp(target: number, duration = 1800, shouldStart = false) {
     const tick = (now: number) => {
       const elapsed = now - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      // Ease-out cubic
       const eased = 1 - Math.pow(1 - progress, 3);
       setCount(Math.round(eased * target));
       if (progress < 1) requestAnimationFrame(tick);
@@ -48,18 +51,31 @@ function AnimatedStat({
   stat,
   accentColor,
   shouldStart,
+  variant,
+  themeName,
 }: {
   stat: Stat;
   accentColor: string;
   shouldStart: boolean;
+  variant: string;
+  themeName?: string;
 }) {
-  // Try to parse numeric value for counting; keep as-is if not a pure number
   const numericPart = parseFloat(stat.value.replace(/[^0-9.]/g, ""));
   const prefix = stat.value.match(/^[^0-9]*/)?.[0] || "";
   const isNumeric = !isNaN(numericPart);
-
   const counted = useCountUp(isNumeric ? numericPart : 0, 1600, shouldStart && isNumeric);
   const displayValue = isNumeric ? `${prefix}${counted}` : stat.value;
+
+  const isNeoBrutalistCards = variant === "cards" && themeName === "neobrutalist";
+
+  const cardStyle: React.CSSProperties = variant === "cards" ? {
+    backgroundColor: isNeoBrutalistCards ? "var(--theme-accent)" : "var(--theme-surface)",
+    border: `var(--theme-border-width) solid var(--theme-border)`,
+    borderRadius: "var(--theme-radius)",
+    padding: "24px 16px",
+    boxShadow: "var(--theme-hard-shadow, none)",
+    backdropFilter: "var(--theme-backdrop)",
+  } : {};
 
   return (
     <div
@@ -68,16 +84,20 @@ function AnimatedStat({
         opacity: shouldStart ? 1 : 0,
         transform: shouldStart ? "translateY(0)" : "translateY(16px)",
         transition: "opacity 0.5s ease, transform 0.5s ease",
+        ...cardStyle,
       }}
     >
       <div
         className="text-4xl sm:text-5xl font-bold mb-2 tracking-tight tabular-nums"
-        style={{ fontFamily: "'Inter', sans-serif", color: accentColor }}
+        style={{ color: isNeoBrutalistCards ? "var(--theme-accent-fg)" : accentColor }}
       >
         {displayValue}
         {stat.suffix}
       </div>
-      <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-gray-500">
+      <div
+        className="text-[10px] font-semibold uppercase tracking-[0.2em]"
+        style={{ color: isNeoBrutalistCards ? "var(--theme-accent-fg)" : "var(--theme-text-muted)" }}
+      >
         {stat.label}
       </div>
     </div>
@@ -92,16 +112,20 @@ export function Stats({
     { value: "15", label: "AVG LATENCY", suffix: "ms" },
   ],
   layout = "horizontal",
+  variant = "default",
   columns = 4,
-  backgroundColor = "#0d0d0d",
-  textColor = "#ffffff",
-  accentColor = "#ffffff",
+  backgroundColor,
+  textColor,
+  accentColor,
   width,
   height,
+  themeStyle,
   ...rest
 }: StatsProps) {
   const [visible, setVisible] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const cssVars = getThemeCSSVars(effectiveTheme);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -114,7 +138,25 @@ export function Stats({
 
   const gridCols = { 2: "grid-cols-2", 3: "grid-cols-3", 4: "grid-cols-2 sm:grid-cols-4" };
 
-  const baseStyle = buildComponentStyle({ backgroundColor, textColor, width, height, ...rest });
+  const rootStyle: React.CSSProperties = {
+    ...cssVars,
+    backgroundColor: backgroundColor || "var(--theme-bg)",
+    color: textColor || "var(--theme-text)",
+    borderRadius: variant === "minimal" ? "0" : "var(--theme-radius)",
+    border: variant === "minimal"
+      ? "none"
+      : `var(--theme-border-width) solid var(--theme-border)`,
+    boxShadow: variant === "minimal" ? "none" : "var(--theme-hard-shadow, none)",
+    backdropFilter: "var(--theme-backdrop)",
+    ...(width ? { width } : {}),
+    ...(height ? { height } : {}),
+    ...getUserStyleOverrides(rest),
+  };
+
+  const resolvedAccent = accentColor || "var(--theme-text)";
+
+  // For "bordered" variant, show dividers between stats
+  const isBordered = variant === "bordered";
 
   return (
     <div
@@ -122,17 +164,23 @@ export function Stats({
       className={cn(
         "py-12 px-8",
         layout === "grid"
-          ? `grid ${gridCols[columns]} gap-12`
-          : "flex justify-around items-center flex-wrap gap-12",
+          ? `grid ${gridCols[columns]} gap-8`
+          : "flex justify-around items-center flex-wrap gap-8",
       )}
-      style={baseStyle}
+      style={rootStyle}
     >
       {stats.map((stat, index) => (
         <div
           key={index}
-          style={{ transitionDelay: `${index * 120}ms` }}
+          style={{
+            transitionDelay: `${index * 120}ms`,
+            ...(isBordered && index > 0 ? {
+              borderLeft: `1px solid var(--theme-border)`,
+              paddingLeft: "32px",
+            } : {}),
+          }}
         >
-          <AnimatedStat stat={stat} accentColor={accentColor} shouldStart={visible} />
+          <AnimatedStat stat={stat} accentColor={resolvedAccent} shouldStart={visible} variant={variant} themeName={effectiveTheme} />
         </div>
       ))}
     </div>

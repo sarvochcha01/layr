@@ -3,7 +3,9 @@
 import { useState } from "react";
 import { Star } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { buildComponentStyle } from "@/lib/buildStyle";
+import { ThemeStyleVariant, getThemeCSSVars } from "@/lib/themeStyles";
+import { getUserStyleOverrides } from "@/lib/buildStyle";
+import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
 
 interface TestimonialProps {
   quote?: string;
@@ -17,34 +19,29 @@ interface TestimonialProps {
   textColor?: string;
   width?: string;
   height?: string;
+  themeStyle?: ThemeStyleVariant;
   [key: string]: any;
 }
 
 export function Testimonial({
-  quote = "The Obsidian Architect has transformed how our design team ships. It's the precision of an IDE with the speed of a site builder.",
+  quote = "This platform has transformed how our design team ships. It's the precision of an IDE with the speed of a site builder.",
   author = "Marcus Chen",
   role = "CTO",
   company = "NEXUS DIGITAL",
   avatar,
   rating,
   variant = "card",
-  backgroundColor = "#1a1a1a",
-  textColor = "#ffffff",
+  backgroundColor,
+  textColor,
   width,
   height,
+  themeStyle,
   ...rest
 }: TestimonialProps) {
   const [hovered, setHovered] = useState(false);
+  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const cssVars = getThemeCSSVars(effectiveTheme);
 
-  const baseStyle = buildComponentStyle({
-    backgroundColor,
-    textColor,
-    width,
-    height,
-    ...rest,
-  });
-
-  // Ensure rating is a number, default to 5 if not provided
   const numericRating =
     rating === undefined || rating === null
       ? 5
@@ -52,42 +49,51 @@ export function Testimonial({
         ? parseFloat(rating) || 0
         : rating;
 
-  console.log("Testimonial rating:", {
-    rating,
-    numericRating,
-    type: typeof rating,
-  });
+  const isCard = variant === "card";
+  const isMinimal = variant === "minimal";
+  const isFeatured = variant === "featured";
+
+  const rootStyle: React.CSSProperties = {
+    ...cssVars,
+    backgroundColor: backgroundColor || (isMinimal ? "transparent" : "var(--theme-surface)"),
+    color: textColor || "var(--theme-text)",
+    border: isMinimal ? "none" : `var(--theme-border-width) solid ${isFeatured ? "var(--theme-accent)" : "var(--theme-border)"}`,
+    borderRadius: isMinimal ? "0" : "var(--theme-radius)",
+    padding: isMinimal ? "16px" : isFeatured ? "40px" : "32px",
+    backdropFilter: "var(--theme-backdrop)",
+    boxShadow: hovered
+      ? isFeatured
+        ? `0 20px 60px color-mix(in srgb, var(--theme-accent) 25%, transparent)`
+        : isCard
+          ? "var(--theme-shadow)"
+          : "none"
+      : "none",
+    transform: hovered && !isMinimal ? "translateY(-4px)" : "translateY(0)",
+    transition: "transform 300ms cubic-bezier(0.34,1.56,0.64,1), box-shadow 300ms ease",
+    ...(width ? { width } : {}),
+    ...(height ? { height } : {}),
+    ...getUserStyleOverrides(rest),
+  };
 
   return (
     <div
-      className={cn(
-        "p-8 rounded-2xl min-w-0 overflow-hidden border border-border",
-      )}
-      style={{
-        ...baseStyle,
-        transition:
-          "transform 300ms cubic-bezier(0.34,1.56,0.64,1), box-shadow 300ms ease, border-color 300ms ease",
-        transform: hovered ? "translateY(-4px)" : "translateY(0)",
-        boxShadow: hovered ? "0 16px 40px rgba(0,0,0,0.35)" : "none",
-        borderColor: hovered ? "rgba(255,255,255,0.12)" : undefined,
-      }}
+      className="min-w-0 overflow-hidden"
+      style={rootStyle}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
       {/* Rating Stars */}
       {numericRating > 0 && (
-        <div className="flex gap-1 mb-6">
+        <div className={cn("flex gap-1", isMinimal ? "mb-3" : isFeatured ? "mb-8" : "mb-6")}>
           {Array.from({ length: 5 }).map((_, i) => {
             const isFilled = i < numericRating;
             return (
               <Star
                 key={i}
-                className={cn("w-5 h-5")}
+                className={cn(isMinimal ? "w-4 h-4" : isFeatured ? "w-6 h-6" : "w-5 h-5")}
                 fill={isFilled ? "currentColor" : "none"}
                 style={{
-                  color: isFilled
-                    ? "hsl(var(--primary))"
-                    : "hsl(var(--muted-foreground))",
+                  color: isFilled ? "var(--theme-accent)" : "var(--theme-text-muted)",
                   transition: `transform 300ms cubic-bezier(0.34,1.56,0.64,1) ${i * 40}ms`,
                   transform: hovered ? "scale(1.2)" : "scale(1)",
                 }}
@@ -99,46 +105,70 @@ export function Testimonial({
 
       {/* Quote */}
       <blockquote
-        className="text-lg leading-relaxed mb-8 break-words italic text-foreground/80"
-        style={{
-          fontFamily: "'Inter', sans-serif",
-          transition: "color 200ms ease",
-          color: hovered ? "rgba(255,255,255,0.95)" : undefined,
-        }}
+        className={cn(
+          "leading-relaxed break-words",
+          isMinimal ? "text-base mb-4" : isFeatured ? "text-xl mb-10 italic" : "text-lg mb-8 italic",
+        )}
+        style={{ color: "var(--theme-text)" }}
       >
-        "{quote}"
+        {isMinimal ? quote : `"${quote}"`}
       </blockquote>
 
       {/* Author */}
-      <div className="flex items-center gap-3 pt-6 border-t border-border">
+      <div
+        className={cn("flex items-center gap-3")}
+        style={{
+          paddingTop: !isMinimal ? "24px" : undefined,
+          borderTop: !isMinimal ? `1px solid var(--theme-border)` : undefined,
+        }}
+      >
         {avatar ? (
           <img
             src={avatar}
             alt={author}
-            className="w-12 h-12 rounded-full object-cover ring-2 ring-border"
+            className={cn(
+              "rounded-full object-cover",
+              isMinimal ? "w-10 h-10" : isFeatured ? "w-16 h-16" : "w-12 h-12",
+            )}
             style={{
+              border: `2px solid var(--theme-border)`,
               transition: "transform 300ms cubic-bezier(0.34,1.56,0.64,1)",
               transform: hovered ? "scale(1.08)" : "scale(1)",
             }}
           />
         ) : (
           <div
-            className="w-12 h-12 rounded-full flex items-center justify-center text-sm font-semibold bg-muted"
+            className={cn(
+              "rounded-full flex items-center justify-center font-semibold",
+              isMinimal ? "w-10 h-10 text-xs" : isFeatured ? "w-16 h-16 text-lg" : "w-12 h-12 text-sm",
+            )}
             style={{
-              transition:
-                "transform 300ms cubic-bezier(0.34,1.56,0.64,1), background-color 200ms ease",
+              background: "color-mix(in srgb, var(--theme-accent) 20%, transparent)",
+              color: "var(--theme-accent)",
+              transition: "transform 300ms cubic-bezier(0.34,1.56,0.64,1)",
               transform: hovered ? "scale(1.08)" : "scale(1)",
-              backgroundColor: hovered ? "rgba(99,102,241,0.3)" : undefined,
             }}
           >
             {author?.charAt(0) || "?"}
           </div>
         )}
         <div className="min-w-0">
-          <div className="text-sm font-semibold truncate text-foreground">
+          <div
+            className={cn(
+              "font-semibold truncate",
+              isMinimal ? "text-xs" : isFeatured ? "text-base" : "text-sm",
+            )}
+            style={{ color: "var(--theme-text)" }}
+          >
             {author}
           </div>
-          <div className="text-xs text-muted-foreground truncate uppercase tracking-wider">
+          <div
+            className={cn(
+              "truncate uppercase tracking-wider",
+              isMinimal ? "text-[10px]" : isFeatured ? "text-sm" : "text-xs",
+            )}
+            style={{ color: "var(--theme-text-muted)" }}
+          >
             {role}
             {company && `, ${company}`}
           </div>
