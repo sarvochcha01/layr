@@ -47,7 +47,7 @@ export function Form({
   themeStyle,
   ...rest
 }: FormProps) {
-  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const effectiveTheme = useEffectiveThemeStyle(themeStyle, themeStyle !== undefined);
   const cssVars = getThemeCSSVars(effectiveTheme);
 
   const rootStyle: React.CSSProperties = {

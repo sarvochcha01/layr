@@ -16,6 +16,11 @@ interface CTAProps {
   alignment?: "left" | "center" | "right";
   size?: "sm" | "md" | "lg";
   backgroundColor?: string;
+  backgroundType?: "solid" | "gradient" | "image";
+  gradientStart?: string;
+  gradientEnd?: string;
+  gradientDirection?: string;
+  gradientAngle?: string;
   textColor?: string;
   width?: string;
   height?: string;
@@ -33,6 +38,11 @@ export function CTA({
   alignment = "center",
   size = "md",
   backgroundColor,
+  backgroundType,
+  gradientStart,
+  gradientEnd,
+  gradientDirection,
+  gradientAngle,
   textColor,
   width,
   height,
@@ -48,7 +58,7 @@ export function CTA({
     right: "text-right items-end",
   };
 
-  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const effectiveTheme = useEffectiveThemeStyle(themeStyle, themeStyle !== undefined);
   const cssVars = getThemeCSSVars(effectiveTheme);
 
   const isNeoBrutalist = effectiveTheme === "neobrutalist";
@@ -56,8 +66,6 @@ export function CTA({
 
   const containerStyle: React.CSSProperties = {
     ...cssVars,
-    backgroundColor: backgroundColor || "var(--theme-surface)",
-    color: textColor || "var(--theme-text)",
     borderRadius: "var(--theme-radius)",
     border: `var(--theme-border-width) solid var(--theme-border)`,
     boxShadow: hovered
@@ -76,6 +84,25 @@ export function CTA({
     transition: "all 300ms ease",
     ...getUserStyleOverrides(rest),
   };
+
+  // Handle background based on type - user preferences MUST override theme
+  if (backgroundType === "gradient" && gradientStart && gradientEnd) {
+    const direction = gradientDirection === "custom"
+      ? `${gradientAngle || "135"}deg`
+      : gradientDirection || "to bottom right";
+    containerStyle.backgroundImage = `linear-gradient(${direction}, ${gradientStart}, ${gradientEnd})`;
+  } else if (backgroundColor) {
+    containerStyle.background = backgroundColor;
+  } else {
+    containerStyle.background = "var(--theme-surface)";
+  }
+
+  // Text color override
+  if (textColor) {
+    containerStyle.color = textColor;
+  } else {
+    containerStyle.color = "var(--theme-text)";
+  }
 
   return (
     <div

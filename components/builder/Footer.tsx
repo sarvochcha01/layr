@@ -40,6 +40,11 @@ interface FooterProps {
   privacyLink?: string;
   termsLink?: string;
   backgroundColor?: string;
+  backgroundType?: "solid" | "gradient" | "image";
+  gradientStart?: string;
+  gradientEnd?: string;
+  gradientDirection?: string;
+  gradientAngle?: string;
   textColor?: string;
   accentColor?: string;
   newsletterTitle?: string;
@@ -105,6 +110,11 @@ export function Footer({
   privacyLink = "#",
   termsLink = "#",
   backgroundColor,
+  backgroundType,
+  gradientStart,
+  gradientEnd,
+  gradientDirection,
+  gradientAngle,
   textColor,
   accentColor,
   newsletterTitle = "Stay in the loop",
@@ -122,7 +132,7 @@ export function Footer({
   const currentYear = new Date().getFullYear();
   const defaultCopyright = `© ${currentYear} ${logoText}. All rights reserved.`;
 
-  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const effectiveTheme = useEffectiveThemeStyle(themeStyle, themeStyle !== undefined);
   const cssVars = getThemeCSSVars(effectiveTheme);
 
   // Theme-aware accent — user override > theme accent
@@ -131,11 +141,28 @@ export function Footer({
   // Root styles — inject CSS vars + bg/text
   const rootStyle: React.CSSProperties = {
     ...cssVars,
-    backgroundColor: backgroundColor || "var(--theme-bg)",
-    color: textColor || "var(--theme-text)",
     ...(width ? { width } : {}),
     ...(height ? { minHeight: height } : {}),
   };
+
+  // Handle background based on type - user preferences MUST override theme
+  if (backgroundType === "gradient" && gradientStart && gradientEnd) {
+    const direction = gradientDirection === "custom"
+      ? `${gradientAngle || "135"}deg`
+      : gradientDirection || "to bottom right";
+    rootStyle.backgroundImage = `linear-gradient(${direction}, ${gradientStart}, ${gradientEnd})`;
+  } else if (backgroundColor) {
+    rootStyle.background = backgroundColor;
+  } else {
+    rootStyle.background = "var(--theme-bg)";
+  }
+
+  // Text color override
+  if (textColor) {
+    rootStyle.color = textColor;
+  } else {
+    rootStyle.color = "var(--theme-text)";
+  }
 
   const handleLinkClick = (e: React.MouseEvent, href: string) => {
     if (!isPreviewMode) {

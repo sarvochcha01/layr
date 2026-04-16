@@ -200,6 +200,29 @@ export function FillSection({ props, updateProp, componentType }: StyleSectionPr
                 </div>
               </div>
             </div>
+            {/* Hero-specific: Image overlay opacity */}
+            {componentType === "Hero" && (
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <Label className={labelClass}>URL Image Opacity</Label>
+                  <span className="text-xs text-muted-foreground">
+                    {Math.round(((props.backgroundImageOverlay ?? 0.55) * 100))}%
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value={props.backgroundImageOverlay ?? 0.55}
+                  onChange={(e) => updateProp("backgroundImageOverlay", parseFloat(e.target.value))}
+                  className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
+                />
+                <p className="text-[10px] text-muted-foreground/70">
+                  Controls the dark overlay on the background image (higher = darker)
+                </p>
+              </div>
+            )}
           </>
         )}
 

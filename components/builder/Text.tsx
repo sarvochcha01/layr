@@ -9,16 +9,16 @@ interface TextProps {
   content?: string;
   tag?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "p" | "span" | "div";
   size?:
-  | "xs"
-  | "sm"
-  | "base"
-  | "lg"
-  | "xl"
-  | "2xl"
-  | "3xl"
-  | "4xl"
-  | "5xl"
-  | "6xl";
+    | "xs"
+    | "sm"
+    | "base"
+    | "lg"
+    | "xl"
+    | "2xl"
+    | "3xl"
+    | "4xl"
+    | "5xl"
+    | "6xl";
   weight?: "light" | "normal" | "medium" | "semibold" | "bold" | "extrabold";
   color?: string;
   align?: "left" | "center" | "right" | "justify";
@@ -74,8 +74,16 @@ export function Text({
     justify: "text-justify",
   };
 
-  const baseStyle = buildComponentStyle({ textColor: color, width, height, ...rest });
-  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const baseStyle = buildComponentStyle({
+    textColor: color,
+    width,
+    height,
+    ...rest,
+  });
+  const effectiveTheme = useEffectiveThemeStyle(
+    themeStyle,
+    themeStyle !== undefined,
+  );
   const cssVars = getThemeCSSVars(effectiveTheme);
 
   // Per-component font override
@@ -90,14 +98,15 @@ export function Text({
         sizeClasses[size],
         weightClasses[weight],
         alignClasses[align],
-        className
+        className,
       )}
       style={{
-        ...baseStyle,
-        backgroundColor: rest.backgroundColor || "var(--theme-bg)",
-        color: color || rest.textColor || "var(--theme-text)",
         ...cssVars,
-        ...(fontOverride ? { fontFamily: getFontFamilyValue(fontOverride) } : {}),
+        backgroundColor: rest.backgroundColor || "var(--theme-bg)",
+        ...baseStyle, // Apply baseStyle AFTER theme vars so user preferences override
+        ...(fontOverride
+          ? { fontFamily: getFontFamilyValue(fontOverride) }
+          : {}),
       }}
     >
       {children || content}

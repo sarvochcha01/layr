@@ -12,6 +12,11 @@ interface ContainerProps {
   padding?: "none" | "sm" | "md" | "lg" | "xl";
   margin?: "none" | "sm" | "md" | "lg" | "xl" | "auto";
   backgroundColor?: string;
+  backgroundType?: "solid" | "gradient" | "image";
+  gradientStart?: string;
+  gradientEnd?: string;
+  gradientDirection?: string;
+  gradientAngle?: string;
   textColor?: string;
   tag?: "div" | "main" | "section" | "article" | "aside" | "header" | "footer";
   width?: string;
@@ -35,6 +40,11 @@ export function Container({
   padding = "md",
   margin = "auto",
   backgroundColor,
+  backgroundType,
+  gradientStart,
+  gradientEnd,
+  gradientDirection,
+  gradientAngle,
   textColor,
   tag = "div",
   width,
@@ -50,7 +60,7 @@ export function Container({
   themeStyle,
   ...rest
 }: ContainerProps) {
-  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const effectiveTheme = useEffectiveThemeStyle(themeStyle, themeStyle !== undefined);
   const cssVars = getThemeCSSVars(effectiveTheme);
 
   const Component = tag;
@@ -101,13 +111,26 @@ export function Container({
     scroll: "overflow-y-scroll", auto: "overflow-y-auto",
   };
 
-  const baseStyle = buildComponentStyle({
-    backgroundColor,
-    textColor,
-    width: width || (display === "flex" ? "100%" : undefined),
-    height,
-    ...rest,
-  });
+  const baseStyle: React.CSSProperties = {
+    ...cssVars,
+    ...(width || display === "flex" ? { width: width || "100%" } : {}),
+    ...(height ? { height } : {}),
+  };
+
+  // Handle background based on type - user preferences MUST override theme
+  if (backgroundType === "gradient" && gradientStart && gradientEnd) {
+    const direction = gradientDirection === "custom"
+      ? `${gradientAngle || "135"}deg`
+      : gradientDirection || "to bottom right";
+    baseStyle.backgroundImage = `linear-gradient(${direction}, ${gradientStart}, ${gradientEnd})`;
+  } else if (backgroundColor) {
+    baseStyle.background = backgroundColor;
+  }
+
+  // Text color override
+  if (textColor) {
+    baseStyle.color = textColor;
+  }
 
   return (
     <Component

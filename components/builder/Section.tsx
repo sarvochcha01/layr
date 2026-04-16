@@ -8,6 +8,11 @@ interface SectionProps {
   children?: React.ReactNode;
   className?: string;
   backgroundColor?: string;
+  backgroundType?: "solid" | "gradient" | "image";
+  gradientStart?: string;
+  gradientEnd?: string;
+  gradientDirection?: string;
+  gradientAngle?: string;
   textColor?: string;
   padding?: "none" | "sm" | "md" | "lg" | "xl";
   maxWidth?: "sm" | "md" | "lg" | "xl" | "2xl" | "full";
@@ -22,6 +27,11 @@ export function Section({
   children,
   className,
   backgroundColor,
+  backgroundType,
+  gradientStart,
+  gradientEnd,
+  gradientDirection,
+  gradientAngle,
   textColor,
   padding = "lg",
   maxWidth = "xl",
@@ -48,10 +58,29 @@ export function Section({
     full: "max-w-full",
   };
 
-  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const effectiveTheme = useEffectiveThemeStyle(themeStyle, themeStyle !== undefined);
   const cssVars = getThemeCSSVars(effectiveTheme);
 
-  const baseStyle = buildComponentStyle({ backgroundColor, textColor, width, height, ...rest });
+  const baseStyle: React.CSSProperties = {
+    ...cssVars,
+    ...(width ? { width } : {}),
+    ...(height ? { height } : {}),
+  };
+
+  // Handle background based on type - user preferences MUST override theme
+  if (backgroundType === "gradient" && gradientStart && gradientEnd) {
+    const direction = gradientDirection === "custom"
+      ? `${gradientAngle || "135"}deg`
+      : gradientDirection || "to bottom right";
+    baseStyle.backgroundImage = `linear-gradient(${direction}, ${gradientStart}, ${gradientEnd})`;
+  } else if (backgroundColor) {
+    baseStyle.background = backgroundColor;
+  }
+
+  // Text color override
+  if (textColor) {
+    baseStyle.color = textColor;
+  }
 
   return (
     <section

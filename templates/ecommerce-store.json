@@ -1,124 +1,102 @@
 {
-    "name": "E-commerce Store - Premium Minimalist",
-    "description": "An elegant, earthy-toned e-commerce template focusing on large imagery, breathable whitespace, and premium typography.",
+    "name": "Modern E-commerce Store",
+    "description": "Complete e-commerce template with Home, Shop, Product Details, About, and Contact pages. Features modern design, product showcases, and conversion-optimized layouts.",
     "category": "E-commerce",
     "thumbnail": "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400",
     "featured": true,
     "pages": [
         {
-            "id": "home",
+            "id": "home-page",
             "name": "Home",
             "slug": "index",
             "components": [
                 {
-                    "id": "nav-1",
+                    "id": "global-nav",
                     "type": "Navbar",
                     "props": {
-                        "logoText": "AURA · STUDIO",
+                        "logoText": "LUXE STORE",
                         "links": [
-                            {
-                                "text": "New Arrivals",
-                                "href": "#"
-                            },
-                            {
-                                "text": "Collections",
-                                "href": "#"
-                            },
-                            {
-                                "text": "Journal",
-                                "href": "#"
-                            },
-                            {
-                                "text": "About",
-                                "href": "#"
-                            }
+                            { "text": "Home", "href": "/" },
+                            { "text": "Shop", "href": "/shop" },
+                            { "text": "About", "href": "/about" },
+                            { "text": "Contact", "href": "/contact" }
                         ],
                         "ctaText": "Cart (0)",
-                        "backgroundColor": "#FDFBF7",
-                        "textColor": "#292524",
-                        "linkColor": "#78716C",
-                        "linkHoverColor": "#292524"
+                        "backgroundColor": "#FFFFFF",
+                        "textColor": "#1F2937",
+                        "linkColor": "#6B7280",
+                        "linkHoverColor": "#111827"
                     },
                     "children": [],
                     "isGlobal": "GlobalNavbar"
                 },
                 {
-                    "id": "hero-section",
+                    "id": "home-hero",
+                    "type": "Hero",
+                    "props": {
+                        "title": "Discover Your Style",
+                        "subtitle": "Premium fashion and accessories for the modern lifestyle. Shop our curated collection of timeless pieces.",
+                        "buttonText": "Shop Now",
+                        "buttonLink": "/shop",
+                        "backgroundImage": "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1920",
+                        "backgroundSize": "cover",
+                        "backgroundPosition": "center",
+                        "minHeight": "600px",
+                        "textAlign": "center",
+                        "textColor": "#FFFFFF",
+                        "backgroundImageOverlay": 0.4
+                    },
+                    "children": []
+                },
+                {
+                    "id": "features-section",
                     "type": "Container",
                     "props": {
-                        "padding": "none",
-                        "display": "flex",
-                        "minHeight": "80vh",
-                        "backgroundColor": "#FDFBF7",
-                        "alignItems": "center"
+                        "padding": "2xl",
+                        "backgroundColor": "#F9FAFB",
+                        "maxWidth": "xl",
+                        "marginLeft": "auto",
+                        "marginRight": "auto"
                     },
                     "children": [
                         {
-                            "id": "hero-split-grid",
+                            "id": "features-grid",
                             "type": "Grid",
                             "props": {
-                                "columns": 2,
-                                "gap": "none"
+                                "columns": 3,
+                                "gap": "2rem"
                             },
                             "children": [
                                 {
-                                    "id": "hero-content",
-                                    "type": "Container",
+                                    "id": "feature-1",
+                                    "type": "Feature",
                                     "props": {
-                                        "padding": "2xl",
-                                        "display": "flex",
-                                        "flexDirection": "column",
-                                        "justifyContent": "center",
-                                        "height": "100%"
+                                        "title": "Free Shipping",
+                                        "description": "On orders over $100",
+                                        "icon": "🚚",
+                                        "textAlign": "center"
                                     },
-                                    "children": [
-                                        {
-                                            "id": "hero-title",
-                                            "type": "Text",
-                                            "props": {
-                                                "content": "Elevate your everyday.",
-                                                "tag": "h1",
-                                                "size": "5xl",
-                                                "weight": "400",
-                                                "color": "#292524",
-                                                "letterSpacing": "-0.02em",
-                                                "marginBottom": "1.5rem"
-                                            },
-                                            "children": []
-                                        },
-                                        {
-                                            "id": "hero-desc",
-                                            "type": "Text",
-                                            "props": {
-                                                "content": "Discover our new spring collection. Crafted with sustainable materials and timeless design principles for the modern home.",
-                                                "tag": "p",
-                                                "size": "lg",
-                                                "color": "#78716C",
-                                                "marginBottom": "2.5rem",
-                                                "maxWidth": "400px"
-                                            },
-                                            "children": []
-                                        },
-                                        {
-                                            "id": "hero-btn",
-                                            "type": "Button",
-                                            "props": {
-                                                "text": "Shop Collection",
-                                                "variant": "outline",
-                                                "size": "lg"
-                                            },
-                                            "children": []
-                                        }
-                                    ]
+                                    "children": []
                                 },
                                 {
-                                    "id": "hero-image",
-                                    "type": "Image",
+                                    "id": "feature-2",
+                                    "type": "Feature",
                                     "props": {
-                                        "src": "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200",
-                                        "alt": "Store interior",
-                                        "height": "100%",
-                                        "objectFit": "cover"
+                                        "title": "Easy Returns",
+                                        "description": "30-day return policy",
+                                        "icon": "↩️",
+                                        "textAlign": "center"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "feature-3",
+                                    "type": "Feature",
+                                    "props": {
+                                        "title": "Secure Payment",
+                                        "description": "100% secure checkout",
+                                        "icon": "🔒",
+                                        "textAlign": "center"
                                     },
                                     "children": []
                                 }
@@ -127,48 +105,25 @@
                     ]
                 },
                 {
-                    "id": "trusted-bar",
-                    "type": "Container",
-                    "props": {
-                        "padding": "sm",
-                        "backgroundColor": "#292524",
-                        "textColor": "#FFFFFF",
-                        "textAlign": "center"
-                    },
-                    "children": [
-                        {
-                            "id": "trusted-text",
-                            "type": "Text",
-                            "props": {
-                                "content": "Free international shipping on orders over $150 — Carbon neutral delivery",
-                                "tag": "p",
-                                "size": "sm",
-                                "letterSpacing": "0.05em"
-                            },
-                            "children": []
-                        }
-                    ]
-                },
-                {
-                    "id": "products-section",
+                    "id": "featured-products",
                     "type": "Container",
                     "props": {
                         "padding": "2xl",
-                        "backgroundColor": "#FDFBF7",
+                        "backgroundColor": "#FFFFFF",
                         "maxWidth": "xl",
                         "marginLeft": "auto",
                         "marginRight": "auto"
                     },
                     "children": [
                         {
-                            "id": "products-header",
+                            "id": "featured-title",
                             "type": "Text",
                             "props": {
-                                "content": "Curated Essentials",
+                                "content": "Featured Products",
                                 "tag": "h2",
-                                "size": "3xl",
-                                "weight": "400",
-                                "color": "#292524",
+                                "size": "4xl",
+                                "weight": "700",
+                                "color": "#111827",
                                 "marginBottom": "3rem",
                                 "textAlign": "center"
                             },
@@ -178,29 +133,330 @@
                             "id": "products-grid",
                             "type": "Grid",
                             "props": {
+                                "columns": 4,
+                                "gap": "2rem"
+                            },
+                            "children": [
+                                {
+                                    "id": "product-card-1",
+                                    "type": "Card",
+                                    "props": {
+                                        "title": "Classic White Sneakers",
+                                        "description": "$89.99",
+                                        "buttonText": "View Details",
+                                        "backgroundColor": "#FFFFFF",
+                                        "borderWidth": "1px",
+                                        "borderColor": "#E5E7EB",
+                                        "borderRadius": "8px"
+                                    },
+                                    "children": [
+                                        {
+                                            "id": "product-img-1",
+                                            "type": "Image",
+                                            "props": {
+                                                "src": "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=600",
+                                                "alt": "White Sneakers",
+                                                "height": "250px",
+                                                "objectFit": "cover"
+                                            },
+                                            "children": []
+                                        }
+                                    ]
+                                },
+                                {
+                                    "id": "product-card-2",
+                                    "type": "Card",
+                                    "props": {
+                                        "title": "Leather Backpack",
+                                        "description": "$129.99",
+                                        "buttonText": "View Details",
+                                        "backgroundColor": "#FFFFFF",
+                                        "borderWidth": "1px",
+                                        "borderColor": "#E5E7EB",
+                                        "borderRadius": "8px"
+                                    },
+                                    "children": [
+                                        {
+                                            "id": "product-img-2",
+                                            "type": "Image",
+                                            "props": {
+                                                "src": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600",
+                                                "alt": "Leather Backpack",
+                                                "height": "250px",
+                                                "objectFit": "cover"
+                                            },
+                                            "children": []
+                                        }
+                                    ]
+                                },
+                                {
+                                    "id": "product-card-3",
+                                    "type": "Card",
+                                    "props": {
+                                        "title": "Minimalist Watch",
+                                        "description": "$199.99",
+                                        "buttonText": "View Details",
+                                        "backgroundColor": "#FFFFFF",
+                                        "borderWidth": "1px",
+                                        "borderColor": "#E5E7EB",
+                                        "borderRadius": "8px"
+                                    },
+                                    "children": [
+                                        {
+                                            "id": "product-img-3",
+                                            "type": "Image",
+                                            "props": {
+                                                "src": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600",
+                                                "alt": "Minimalist Watch",
+                                                "height": "250px",
+                                                "objectFit": "cover"
+                                            },
+                                            "children": []
+                                        }
+                                    ]
+                                },
+                                {
+                                    "id": "product-card-4",
+                                    "type": "Card",
+                                    "props": {
+                                        "title": "Designer Sunglasses",
+                                        "description": "$149.99",
+                                        "buttonText": "View Details",
+                                        "backgroundColor": "#FFFFFF",
+                                        "borderWidth": "1px",
+                                        "borderColor": "#E5E7EB",
+                                        "borderRadius": "8px"
+                                    },
+                                    "children": [
+                                        {
+                                            "id": "product-img-4",
+                                            "type": "Image",
+                                            "props": {
+                                                "src": "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=600",
+                                                "alt": "Designer Sunglasses",
+                                                "height": "250px",
+                                                "objectFit": "cover"
+                                            },
+                                            "children": []
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "promo-banner",
+                    "type": "CTA",
+                    "props": {
+                        "title": "Summer Sale - Up to 50% Off",
+                        "description": "Limited time offer on selected items. Shop now and save big!",
+                        "buttonText": "Shop Sale",
+                        "backgroundColor": "#1F2937",
+                        "textColor": "#FFFFFF",
+                        "padding": "2xl"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "testimonials-section",
+                    "type": "Container",
+                    "props": {
+                        "padding": "2xl",
+                        "backgroundColor": "#F9FAFB",
+                        "maxWidth": "xl",
+                        "marginLeft": "auto",
+                        "marginRight": "auto"
+                    },
+                    "children": [
+                        {
+                            "id": "testimonials-title",
+                            "type": "Text",
+                            "props": {
+                                "content": "What Our Customers Say",
+                                "tag": "h2",
+                                "size": "4xl",
+                                "weight": "700",
+                                "color": "#111827",
+                                "marginBottom": "3rem",
+                                "textAlign": "center"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "testimonials-grid",
+                            "type": "Grid",
+                            "props": {
                                 "columns": 3,
                                 "gap": "2rem"
                             },
                             "children": [
                                 {
-                                    "id": "product-1",
+                                    "id": "testimonial-1",
+                                    "type": "Testimonial",
+                                    "props": {
+                                        "quote": "Amazing quality and fast shipping! The products exceeded my expectations.",
+                                        "author": "Sarah Johnson",
+                                        "role": "Verified Buyer",
+                                        "rating": 5
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "testimonial-2",
+                                    "type": "Testimonial",
+                                    "props": {
+                                        "quote": "Best online shopping experience. Customer service is top-notch!",
+                                        "author": "Michael Chen",
+                                        "role": "Verified Buyer",
+                                        "rating": 5
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "testimonial-3",
+                                    "type": "Testimonial",
+                                    "props": {
+                                        "quote": "Love the minimalist design and premium quality. Highly recommend!",
+                                        "author": "Emma Davis",
+                                        "role": "Verified Buyer",
+                                        "rating": 5
+                                    },
+                                    "children": []
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "global-footer",
+                    "type": "Footer",
+                    "props": {
+                        "logoText": "LUXE STORE",
+                        "description": "Your destination for premium fashion and lifestyle products.",
+                        "copyright": "© 2024 Luxe Store. All rights reserved.",
+                        "backgroundColor": "#111827",
+                        "textColor": "#9CA3AF",
+                        "sections": [
+                            {
+                                "title": "Shop",
+                                "links": [
+                                    { "text": "New Arrivals", "href": "/shop" },
+                                    { "text": "Best Sellers", "href": "/shop" },
+                                    { "text": "Sale", "href": "/shop" },
+                                    { "text": "Gift Cards", "href": "#" }
+                                ]
+                            },
+                            {
+                                "title": "Customer Service",
+                                "links": [
+                                    { "text": "Contact Us", "href": "/contact" },
+                                    { "text": "Shipping Info", "href": "#" },
+                                    { "text": "Returns", "href": "#" },
+                                    { "text": "FAQ", "href": "#" }
+                                ]
+                            },
+                            {
+                                "title": "Company",
+                                "links": [
+                                    { "text": "About Us", "href": "/about" },
+                                    { "text": "Careers", "href": "#" },
+                                    { "text": "Privacy Policy", "href": "#" },
+                                    { "text": "Terms of Service", "href": "#" }
+                                ]
+                            }
+                        ]
+                    },
+                    "children": [],
+                    "isGlobal": "GlobalFooter"
+                }
+            ]
+        },
+        {
+            "id": "shop-page",
+            "name": "Shop",
+            "slug": "shop",
+            "components": [
+                {
+                    "id": "shop-nav",
+                    "type": "Navbar",
+                    "props": {},
+                    "children": [],
+                    "isGlobal": "GlobalNavbar"
+                },
+                {
+                    "id": "shop-header",
+                    "type": "Container",
+                    "props": {
+                        "padding": "xl",
+                        "backgroundColor": "#F9FAFB",
+                        "textAlign": "center"
+                    },
+                    "children": [
+                        {
+                            "id": "shop-title",
+                            "type": "Text",
+                            "props": {
+                                "content": "Shop All Products",
+                                "tag": "h1",
+                                "size": "5xl",
+                                "weight": "700",
+                                "color": "#111827",
+                                "marginBottom": "1rem"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "shop-subtitle",
+                            "type": "Text",
+                            "props": {
+                                "content": "Discover our complete collection of premium products",
+                                "tag": "p",
+                                "size": "lg",
+                                "color": "#6B7280"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "shop-products",
+                    "type": "Container",
+                    "props": {
+                        "padding": "2xl",
+                        "backgroundColor": "#FFFFFF",
+                        "maxWidth": "xl",
+                        "marginLeft": "auto",
+                        "marginRight": "auto"
+                    },
+                    "children": [
+                        {
+                            "id": "shop-grid",
+                            "type": "Grid",
+                            "props": {
+                                "columns": 4,
+                                "gap": "2rem"
+                            },
+                            "children": [
+                                {
+                                    "id": "shop-product-1",
                                     "type": "Card",
                                     "props": {
-                                        "title": "Ceramic Vase",
-                                        "description": "$45.00 — Handcrafted in Portugal",
+                                        "title": "Premium Denim Jacket",
+                                        "description": "$159.99",
                                         "buttonText": "Add to Cart",
                                         "backgroundColor": "#FFFFFF",
-                                        "textColor": "#292524",
                                         "borderWidth": "1px",
-                                        "borderColor": "#E7E5E4",
-                                        "borderRadius": "0px"
+                                        "borderColor": "#E5E7EB",
+                                        "borderRadius": "8px"
                                     },
                                     "children": [
                                         {
-                                            "id": "p1-img",
+                                            "id": "shop-img-1",
                                             "type": "Image",
                                             "props": {
-                                                "src": "https://images.unsplash.com/photo-1612196808214-b8e1d615c010?w=600",
+                                                "src": "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=600",
+                                                "alt": "Denim Jacket",
                                                 "height": "300px",
                                                 "objectFit": "cover"
                                             },
@@ -209,24 +465,24 @@
                                     ]
                                 },
                                 {
-                                    "id": "product-2",
+                                    "id": "shop-product-2",
                                     "type": "Card",
                                     "props": {
-                                        "title": "Linen Throw",
-                                        "description": "$85.00 — 100% Organic Cotton",
+                                        "title": "Cotton T-Shirt",
+                                        "description": "$39.99",
                                         "buttonText": "Add to Cart",
                                         "backgroundColor": "#FFFFFF",
-                                        "textColor": "#292524",
                                         "borderWidth": "1px",
-                                        "borderColor": "#E7E5E4",
-                                        "borderRadius": "0px"
+                                        "borderColor": "#E5E7EB",
+                                        "borderRadius": "8px"
                                     },
                                     "children": [
                                         {
-                                            "id": "p2-img",
+                                            "id": "shop-img-2",
                                             "type": "Image",
                                             "props": {
-                                                "src": "https://images.unsplash.com/photo-1544207945-8cedb53df426?w=600",
+                                                "src": "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600",
+                                                "alt": "T-Shirt",
                                                 "height": "300px",
                                                 "objectFit": "cover"
                                             },
@@ -235,24 +491,154 @@
                                     ]
                                 },
                                 {
-                                    "id": "product-3",
+                                    "id": "shop-product-3",
                                     "type": "Card",
                                     "props": {
-                                        "title": "Oak Chair",
-                                        "description": "$220.00 — Minimalist Design",
+                                        "title": "Wool Sweater",
+                                        "description": "$119.99",
                                         "buttonText": "Add to Cart",
                                         "backgroundColor": "#FFFFFF",
-                                        "textColor": "#292524",
                                         "borderWidth": "1px",
-                                        "borderColor": "#E7E5E4",
-                                        "borderRadius": "0px"
+                                        "borderColor": "#E5E7EB",
+                                        "borderRadius": "8px"
                                     },
                                     "children": [
                                         {
-                                            "id": "p3-img",
+                                            "id": "shop-img-3",
                                             "type": "Image",
                                             "props": {
-                                                "src": "https://images.unsplash.com/photo-1506898667547-42e22a46e125?w=600",
+                                                "src": "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=600",
+                                                "alt": "Wool Sweater",
+                                                "height": "300px",
+                                                "objectFit": "cover"
+                                            },
+                                            "children": []
+                                        }
+                                    ]
+                                },
+                                {
+                                    "id": "shop-product-4",
+                                    "type": "Card",
+                                    "props": {
+                                        "title": "Canvas Tote Bag",
+                                        "description": "$49.99",
+                                        "buttonText": "Add to Cart",
+                                        "backgroundColor": "#FFFFFF",
+                                        "borderWidth": "1px",
+                                        "borderColor": "#E5E7EB",
+                                        "borderRadius": "8px"
+                                    },
+                                    "children": [
+                                        {
+                                            "id": "shop-img-4",
+                                            "type": "Image",
+                                            "props": {
+                                                "src": "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=600",
+                                                "alt": "Tote Bag",
+                                                "height": "300px",
+                                                "objectFit": "cover"
+                                            },
+                                            "children": []
+                                        }
+                                    ]
+                                },
+                                {
+                                    "id": "shop-product-5",
+                                    "type": "Card",
+                                    "props": {
+                                        "title": "Leather Wallet",
+                                        "description": "$79.99",
+                                        "buttonText": "Add to Cart",
+                                        "backgroundColor": "#FFFFFF",
+                                        "borderWidth": "1px",
+                                        "borderColor": "#E5E7EB",
+                                        "borderRadius": "8px"
+                                    },
+                                    "children": [
+                                        {
+                                            "id": "shop-img-5",
+                                            "type": "Image",
+                                            "props": {
+                                                "src": "https://images.unsplash.com/photo-1627123424574-724758594e93?w=600",
+                                                "alt": "Leather Wallet",
+                                                "height": "300px",
+                                                "objectFit": "cover"
+                                            },
+                                            "children": []
+                                        }
+                                    ]
+                                },
+                                {
+                                    "id": "shop-product-6",
+                                    "type": "Card",
+                                    "props": {
+                                        "title": "Running Shoes",
+                                        "description": "$139.99",
+                                        "buttonText": "Add to Cart",
+                                        "backgroundColor": "#FFFFFF",
+                                        "borderWidth": "1px",
+                                        "borderColor": "#E5E7EB",
+                                        "borderRadius": "8px"
+                                    },
+                                    "children": [
+                                        {
+                                            "id": "shop-img-6",
+                                            "type": "Image",
+                                            "props": {
+                                                "src": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600",
+                                                "alt": "Running Shoes",
+                                                "height": "300px",
+                                                "objectFit": "cover"
+                                            },
+                                            "children": []
+                                        }
+                                    ]
+                                },
+                                {
+                                    "id": "shop-product-7",
+                                    "type": "Card",
+                                    "props": {
+                                        "title": "Baseball Cap",
+                                        "description": "$29.99",
+                                        "buttonText": "Add to Cart",
+                                        "backgroundColor": "#FFFFFF",
+                                        "borderWidth": "1px",
+                                        "borderColor": "#E5E7EB",
+                                        "borderRadius": "8px"
+                                    },
+                                    "children": [
+                                        {
+                                            "id": "shop-img-7",
+                                            "type": "Image",
+                                            "props": {
+                                                "src": "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=600",
+                                                "alt": "Baseball Cap",
+                                                "height": "300px",
+                                                "objectFit": "cover"
+                                            },
+                                            "children": []
+                                        }
+                                    ]
+                                },
+                                {
+                                    "id": "shop-product-8",
+                                    "type": "Card",
+                                    "props": {
+                                        "title": "Wireless Earbuds",
+                                        "description": "$99.99",
+                                        "buttonText": "Add to Cart",
+                                        "backgroundColor": "#FFFFFF",
+                                        "borderWidth": "1px",
+                                        "borderColor": "#E5E7EB",
+                                        "borderRadius": "8px"
+                                    },
+                                    "children": [
+                                        {
+                                            "id": "shop-img-8",
+                                            "type": "Image",
+                                            "props": {
+                                                "src": "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=600",
+                                                "alt": "Wireless Earbuds",
                                                 "height": "300px",
                                                 "objectFit": "cover"
                                             },
@@ -265,107 +651,480 @@
                     ]
                 },
                 {
-                    "id": "newsletter-section",
+                    "id": "shop-footer",
+                    "type": "Footer",
+                    "props": {},
+                    "children": [],
+                    "isGlobal": "GlobalFooter"
+                }
+            ]
+        },
+        {
+            "id": "about-page",
+            "name": "About",
+            "slug": "about",
+            "components": [
+                {
+                    "id": "about-nav",
+                    "type": "Navbar",
+                    "props": {},
+                    "children": [],
+                    "isGlobal": "GlobalNavbar"
+                },
+                {
+                    "id": "about-hero",
+                    "type": "Hero",
+                    "props": {
+                        "title": "Our Story",
+                        "subtitle": "Building a brand that stands for quality, sustainability, and timeless style",
+                        "backgroundImage": "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1920",
+                        "backgroundSize": "cover",
+                        "backgroundPosition": "center",
+                        "minHeight": "400px",
+                        "textAlign": "center",
+                        "textColor": "#FFFFFF",
+                        "backgroundImageOverlay": 0.5
+                    },
+                    "children": []
+                },
+                {
+                    "id": "about-content",
                     "type": "Container",
                     "props": {
                         "padding": "2xl",
-                        "backgroundColor": "#D4A373",
-                        "textColor": "#FFFFFF",
-                        "textAlign": "center"
+                        "backgroundColor": "#FFFFFF",
+                        "maxWidth": "lg",
+                        "marginLeft": "auto",
+                        "marginRight": "auto"
                     },
                     "children": [
                         {
-                            "id": "nl-title",
+                            "id": "about-section-1",
                             "type": "Text",
                             "props": {
-                                "content": "Join our community",
+                                "content": "Who We Are",
                                 "tag": "h2",
                                 "size": "3xl",
-                                "weight": "400",
-                                "color": "#FFFFFF",
-                                "marginBottom": "1rem"
+                                "weight": "700",
+                                "color": "#111827",
+                                "marginBottom": "1.5rem"
                             },
                             "children": []
                         },
                         {
-                            "id": "nl-desc",
+                            "id": "about-text-1",
                             "type": "Text",
                             "props": {
-                                "content": "Sign up for exclusive offers, original stories, and events.",
+                                "content": "Founded in 2020, Luxe Store has been dedicated to bringing you the finest selection of fashion and lifestyle products. We believe in quality over quantity, sustainability over fast fashion, and timeless style over fleeting trends.",
                                 "tag": "p",
-                                "size": "md",
-                                "color": "#FFFFFF",
-                                "opacity": 0.9,
-                                "marginBottom": "2rem"
+                                "size": "lg",
+                                "color": "#4B5563",
+                                "marginBottom": "2rem",
+                                "lineHeight": "1.8"
                             },
                             "children": []
                         },
                         {
-                            "id": "nl-form",
-                            "type": "Form",
+                            "id": "about-section-2",
+                            "type": "Text",
                             "props": {
-                                "title": "",
-                                "submitText": "Subscribe",
-                                "backgroundColor": "transparent"
+                                "content": "Our Mission",
+                                "tag": "h2",
+                                "size": "3xl",
+                                "weight": "700",
+                                "color": "#111827",
+                                "marginBottom": "1.5rem"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "about-text-2",
+                            "type": "Text",
+                            "props": {
+                                "content": "We're on a mission to make premium fashion accessible to everyone. Every product we offer is carefully curated for quality, craftsmanship, and ethical production. We partner with brands that share our values of sustainability and fair labor practices.",
+                                "tag": "p",
+                                "size": "lg",
+                                "color": "#4B5563",
+                                "marginBottom": "2rem",
+                                "lineHeight": "1.8"
                             },
                             "children": []
                         }
                     ]
                 },
                 {
-                    "id": "footer-1",
-                    "type": "Footer",
+                    "id": "about-stats",
+                    "type": "Container",
                     "props": {
-                        "logoText": "AURA · STUDIO",
-                        "description": "Crafting beautiful objects for mindful living.",
-                        "copyright": "© 2024 Aura Studio. All rights reserved.",
-                        "backgroundColor": "#292524",
-                        "textColor": "#A8A29E",
-                        "sections": [
-                            {
-                                "title": "Shop",
-                                "links": [
-                                    {
-                                        "text": "All Products",
-                                        "href": "#"
-                                    },
-                                    {
-                                        "text": "New Arrivals",
-                                        "href": "#"
-                                    },
-                                    {
-                                        "text": "Living",
-                                        "href": "#"
-                                    },
-                                    {
-                                        "text": "Dining",
-                                        "href": "#"
-                                    }
-                                ]
-                            },
-                            {
-                                "title": "Support",
-                                "links": [
-                                    {
-                                        "text": "FAQ",
-                                        "href": "#"
-                                    },
-                                    {
-                                        "text": "Shipping & Returns",
-                                        "href": "#"
-                                    },
-                                    {
-                                        "text": "Care Guide",
-                                        "href": "#"
-                                    },
-                                    {
-                                        "text": "Contact Us",
-                                        "href": "#"
-                                    }
-                                ]
-                            }
-                        ]
+                        "padding": "2xl",
+                        "backgroundColor": "#F9FAFB"
                     },
+                    "children": [
+                        {
+                            "id": "stats-grid",
+                            "type": "Grid",
+                            "props": {
+                                "columns": 4,
+                                "gap": "2rem"
+                            },
+                            "children": [
+                                {
+                                    "id": "stat-1",
+                                    "type": "Stats",
+                                    "props": {
+                                        "value": "50K+",
+                                        "label": "Happy Customers",
+                                        "textAlign": "center"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "stat-2",
+                                    "type": "Stats",
+                                    "props": {
+                                        "value": "1000+",
+                                        "label": "Products",
+                                        "textAlign": "center"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "stat-3",
+                                    "type": "Stats",
+                                    "props": {
+                                        "value": "4.9/5",
+                                        "label": "Average Rating",
+                                        "textAlign": "center"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "stat-4",
+                                    "type": "Stats",
+                                    "props": {
+                                        "value": "100%",
+                                        "label": "Satisfaction",
+                                        "textAlign": "center"
+                                    },
+                                    "children": []
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "about-team",
+                    "type": "Container",
+                    "props": {
+                        "padding": "2xl",
+                        "backgroundColor": "#FFFFFF",
+                        "maxWidth": "xl",
+                        "marginLeft": "auto",
+                        "marginRight": "auto"
+                    },
+                    "children": [
+                        {
+                            "id": "team-title",
+                            "type": "Text",
+                            "props": {
+                                "content": "Meet Our Team",
+                                "tag": "h2",
+                                "size": "4xl",
+                                "weight": "700",
+                                "color": "#111827",
+                                "marginBottom": "3rem",
+                                "textAlign": "center"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "team-grid",
+                            "type": "Grid",
+                            "props": {
+                                "columns": 3,
+                                "gap": "2rem"
+                            },
+                            "children": [
+                                {
+                                    "id": "team-member-1",
+                                    "type": "Card",
+                                    "props": {
+                                        "title": "Sarah Johnson",
+                                        "description": "Founder & CEO",
+                                        "backgroundColor": "#FFFFFF",
+                                        "borderWidth": "0px",
+                                        "textAlign": "center"
+                                    },
+                                    "children": [
+                                        {
+                                            "id": "team-img-1",
+                                            "type": "Image",
+                                            "props": {
+                                                "src": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600",
+                                                "alt": "Sarah Johnson",
+                                                "height": "300px",
+                                                "objectFit": "cover",
+                                                "borderRadius": "8px"
+                                            },
+                                            "children": []
+                                        }
+                                    ]
+                                },
+                                {
+                                    "id": "team-member-2",
+                                    "type": "Card",
+                                    "props": {
+                                        "title": "Michael Chen",
+                                        "description": "Creative Director",
+                                        "backgroundColor": "#FFFFFF",
+                                        "borderWidth": "0px",
+                                        "textAlign": "center"
+                                    },
+                                    "children": [
+                                        {
+                                            "id": "team-img-2",
+                                            "type": "Image",
+                                            "props": {
+                                                "src": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600",
+                                                "alt": "Michael Chen",
+                                                "height": "300px",
+                                                "objectFit": "cover",
+                                                "borderRadius": "8px"
+                                            },
+                                            "children": []
+                                        }
+                                    ]
+                                },
+                                {
+                                    "id": "team-member-3",
+                                    "type": "Card",
+                                    "props": {
+                                        "title": "Emma Davis",
+                                        "description": "Head of Operations",
+                                        "backgroundColor": "#FFFFFF",
+                                        "borderWidth": "0px",
+                                        "textAlign": "center"
+                                    },
+                                    "children": [
+                                        {
+                                            "id": "team-img-3",
+                                            "type": "Image",
+                                            "props": {
+                                                "src": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=600",
+                                                "alt": "Emma Davis",
+                                                "height": "300px",
+                                                "objectFit": "cover",
+                                                "borderRadius": "8px"
+                                            },
+                                            "children": []
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "about-footer",
+                    "type": "Footer",
+                    "props": {},
+                    "children": [],
+                    "isGlobal": "GlobalFooter"
+                }
+            ]
+        },
+        {
+            "id": "contact-page",
+            "name": "Contact",
+            "slug": "contact",
+            "components": [
+                {
+                    "id": "contact-nav",
+                    "type": "Navbar",
+                    "props": {},
+                    "children": [],
+                    "isGlobal": "GlobalNavbar"
+                },
+                {
+                    "id": "contact-header",
+                    "type": "Container",
+                    "props": {
+                        "padding": "xl",
+                        "backgroundColor": "#F9FAFB",
+                        "textAlign": "center"
+                    },
+                    "children": [
+                        {
+                            "id": "contact-title",
+                            "type": "Text",
+                            "props": {
+                                "content": "Get In Touch",
+                                "tag": "h1",
+                                "size": "5xl",
+                                "weight": "700",
+                                "color": "#111827",
+                                "marginBottom": "1rem"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "contact-subtitle",
+                            "type": "Text",
+                            "props": {
+                                "content": "We'd love to hear from you. Send us a message and we'll respond as soon as possible.",
+                                "tag": "p",
+                                "size": "lg",
+                                "color": "#6B7280"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "contact-content",
+                    "type": "Container",
+                    "props": {
+                        "padding": "2xl",
+                        "backgroundColor": "#FFFFFF",
+                        "maxWidth": "xl",
+                        "marginLeft": "auto",
+                        "marginRight": "auto"
+                    },
+                    "children": [
+                        {
+                            "id": "contact-grid",
+                            "type": "Grid",
+                            "props": {
+                                "columns": 2,
+                                "gap": "3rem"
+                            },
+                            "children": [
+                                {
+                                    "id": "contact-info",
+                                    "type": "Container",
+                                    "props": {
+                                        "padding": "lg"
+                                    },
+                                    "children": [
+                                        {
+                                            "id": "info-title",
+                                            "type": "Text",
+                                            "props": {
+                                                "content": "Contact Information",
+                                                "tag": "h3",
+                                                "size": "2xl",
+                                                "weight": "700",
+                                                "color": "#111827",
+                                                "marginBottom": "2rem"
+                                            },
+                                            "children": []
+                                        },
+                                        {
+                                            "id": "info-email",
+                                            "type": "Feature",
+                                            "props": {
+                                                "title": "Email",
+                                                "description": "support@luxestore.com",
+                                                "icon": "📧"
+                                            },
+                                            "children": []
+                                        },
+                                        {
+                                            "id": "info-phone",
+                                            "type": "Feature",
+                                            "props": {
+                                                "title": "Phone",
+                                                "description": "+1 (555) 123-4567",
+                                                "icon": "📞"
+                                            },
+                                            "children": []
+                                        },
+                                        {
+                                            "id": "info-address",
+                                            "type": "Feature",
+                                            "props": {
+                                                "title": "Address",
+                                                "description": "123 Fashion Street, New York, NY 10001",
+                                                "icon": "📍"
+                                            },
+                                            "children": []
+                                        },
+                                        {
+                                            "id": "info-hours",
+                                            "type": "Feature",
+                                            "props": {
+                                                "title": "Business Hours",
+                                                "description": "Mon-Fri: 9AM-6PM EST",
+                                                "icon": "🕐"
+                                            },
+                                            "children": []
+                                        }
+                                    ]
+                                },
+                                {
+                                    "id": "contact-form-container",
+                                    "type": "Container",
+                                    "props": {
+                                        "padding": "lg",
+                                        "backgroundColor": "#F9FAFB",
+                                        "borderRadius": "8px"
+                                    },
+                                    "children": [
+                                        {
+                                            "id": "form-title",
+                                            "type": "Text",
+                                            "props": {
+                                                "content": "Send Us a Message",
+                                                "tag": "h3",
+                                                "size": "2xl",
+                                                "weight": "700",
+                                                "color": "#111827",
+                                                "marginBottom": "1.5rem"
+                                            },
+                                            "children": []
+                                        },
+                                        {
+                                            "id": "contact-form",
+                                            "type": "Form",
+                                            "props": {
+                                                "title": "",
+                                                "submitText": "Send Message",
+                                                "backgroundColor": "transparent"
+                                            },
+                                            "children": []
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "contact-map",
+                    "type": "Container",
+                    "props": {
+                        "padding": "none",
+                        "backgroundColor": "#E5E7EB",
+                        "minHeight": "400px"
+                    },
+                    "children": [
+                        {
+                            "id": "map-placeholder",
+                            "type": "Image",
+                            "props": {
+                                "src": "https://images.unsplash.com/photo-1524661135-423995f22d0b?w=1920",
+                                "alt": "Store Location Map",
+                                "height": "400px",
+                                "objectFit": "cover"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "contact-footer",
+                    "type": "Footer",
+                    "props": {},
                     "children": [],
                     "isGlobal": "GlobalFooter"
                 }
@@ -374,87 +1133,60 @@
     ],
     "globalComponents": {
         "GlobalNavbar": {
-            "id": "nav-1",
+            "id": "global-nav",
             "type": "Navbar",
             "props": {
-                "logoText": "AURA · STUDIO",
+                "logoText": "LUXE STORE",
                 "links": [
-                    {
-                        "text": "New Arrivals",
-                        "href": "#"
-                    },
-                    {
-                        "text": "Collections",
-                        "href": "#"
-                    },
-                    {
-                        "text": "Journal",
-                        "href": "#"
-                    },
-                    {
-                        "text": "About",
-                        "href": "#"
-                    }
+                    { "text": "Home", "href": "/" },
+                    { "text": "Shop", "href": "/shop" },
+                    { "text": "About", "href": "/about" },
+                    { "text": "Contact", "href": "/contact" }
                 ],
                 "ctaText": "Cart (0)",
-                "backgroundColor": "#FDFBF7",
-                "textColor": "#292524",
-                "linkColor": "#78716C",
-                "linkHoverColor": "#292524"
+                "backgroundColor": "#FFFFFF",
+                "textColor": "#1F2937",
+                "linkColor": "#6B7280",
+                "linkHoverColor": "#111827"
             },
             "children": [],
             "isGlobal": "GlobalNavbar"
         },
         "GlobalFooter": {
-            "id": "footer-1",
+            "id": "global-footer",
             "type": "Footer",
             "props": {
-                "logoText": "AURA · STUDIO",
-                "description": "Crafting beautiful objects for mindful living.",
-                "copyright": "© 2024 Aura Studio. All rights reserved.",
-                "backgroundColor": "#292524",
-                "textColor": "#A8A29E",
+                "logoText": "LUXE STORE",
+                "description": "Your destination for premium fashion and lifestyle products.",
+                "copyright": "© 2024 Luxe Store. All rights reserved.",
+                "backgroundColor": "#111827",
+                "textColor": "#9CA3AF",
                 "sections": [
                     {
                         "title": "Shop",
                         "links": [
-                            {
-                                "text": "All Products",
-                                "href": "#"
-                            },
-                            {
-                                "text": "New Arrivals",
-                                "href": "#"
-                            },
-                            {
-                                "text": "Living",
-                                "href": "#"
-                            },
-                            {
-                                "text": "Dining",
-                                "href": "#"
-                            }
+                            { "text": "New Arrivals", "href": "/shop" },
+                            { "text": "Best Sellers", "href": "/shop" },
+                            { "text": "Sale", "href": "/shop" },
+                            { "text": "Gift Cards", "href": "#" }
                         ]
                     },
                     {
-                        "title": "Support",
+                        "title": "Customer Service",
                         "links": [
-                            {
-                                "text": "FAQ",
-                                "href": "#"
-                            },
-                            {
-                                "text": "Shipping & Returns",
-                                "href": "#"
-                            },
-                            {
-                                "text": "Care Guide",
-                                "href": "#"
-                            },
-                            {
-                                "text": "Contact Us",
-                                "href": "#"
-                            }
+                            { "text": "Contact Us", "href": "/contact" },
+                            { "text": "Shipping Info", "href": "#" },
+                            { "text": "Returns", "href": "#" },
+                            { "text": "FAQ", "href": "#" }
+                        ]
+                    },
+                    {
+                        "title": "Company",
+                        "links": [
+                            { "text": "About Us", "href": "/about" },
+                            { "text": "Careers", "href": "#" },
+                            { "text": "Privacy Policy", "href": "#" },
+                            { "text": "Terms of Service", "href": "#" }
                         ]
                     }
                 ]
@@ -464,4 +1196,3 @@
         }
     }
 }
-

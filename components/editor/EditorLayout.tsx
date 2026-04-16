@@ -164,6 +164,7 @@ export function EditorLayout({
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [showSettingsMenu, setShowSettingsMenu] = useState(false);
   const [showShortcutsSection, setShowShortcutsSection] = useState(false);
+  const [showScrollbarSection, setShowScrollbarSection] = useState(false);
   const [showOutlinesMenu, setShowOutlinesMenu] = useState(false);
   const [showOutlines, setShowOutlines] = useState(false);
   const [outlineColor, setOutlineColor] = useState<"black" | "white">("black");
@@ -185,6 +186,12 @@ export function EditorLayout({
 
   // Controlled tab state so AI panel can be closed programmatically
   const [activeTab, setActiveTab] = useState("components");
+
+  // Scrollbar visibility settings
+  const [showAllScrollbars, setShowAllScrollbars] = useState(true);
+  const [showPropertiesScrollbar, setShowPropertiesScrollbar] = useState(true);
+  const [showCanvasScrollbar, setShowCanvasScrollbar] = useState(true);
+  const [showAssetScrollbar, setShowAssetScrollbar] = useState(true);
 
   // Panel widths
   const [leftPanelWidth, setLeftPanelWidth] = useState(280);
@@ -233,6 +240,35 @@ export function EditorLayout({
     document.body.style.cursor = "ew-resize";
     document.body.style.userSelect = "none";
   };
+
+  // Apply scrollbar visibility settings
+  useEffect(() => {
+    const root = document.documentElement;
+    
+    if (!showAllScrollbars) {
+      root.classList.add('hide-all-scrollbars');
+    } else {
+      root.classList.remove('hide-all-scrollbars');
+    }
+
+    if (!showPropertiesScrollbar) {
+      root.classList.add('hide-properties-scrollbar');
+    } else {
+      root.classList.remove('hide-properties-scrollbar');
+    }
+
+    if (!showCanvasScrollbar) {
+      root.classList.add('hide-canvas-scrollbar');
+    } else {
+      root.classList.remove('hide-canvas-scrollbar');
+    }
+
+    if (!showAssetScrollbar) {
+      root.classList.add('hide-asset-scrollbar');
+    } else {
+      root.classList.remove('hide-asset-scrollbar');
+    }
+  }, [showAllScrollbars, showPropertiesScrollbar, showCanvasScrollbar, showAssetScrollbar]);
 
   const selectedComponent =
     selectedComponentIds.length === 1
@@ -754,6 +790,128 @@ export function EditorLayout({
                         </div>
                       )}
                     </div>
+
+                    {/* Scrollbar Visibility Section - Collapsible */}
+                    <div className="border-b border-border">
+                      <button
+                        onClick={() =>
+                          setShowScrollbarSection(!showScrollbarSection)
+                        }
+                        className="w-full text-left px-4 py-3 text-sm hover:bg-muted transition-colors flex items-center justify-between"
+                      >
+                        <div className="flex items-center gap-2">
+                          <Eye className="w-4 h-4 text-muted-foreground" />
+                          <span className="text-foreground">
+                            Scrollbar Visibility
+                          </span>
+                        </div>
+                        {showScrollbarSection ? (
+                          <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                        ) : (
+                          <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                        )}
+                      </button>
+
+                      {showScrollbarSection && (
+                        <div className="px-4 pb-3 space-y-3">
+                          {/* Disable All Scrollbars Toggle */}
+                          <div className="py-2 border-b border-border">
+                            <label className="flex items-center justify-between cursor-pointer">
+                              <span className="text-sm text-foreground">
+                                Show All Scrollbars
+                              </span>
+                              <button
+                                onClick={() => setShowAllScrollbars(!showAllScrollbars)}
+                                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                                  showAllScrollbars ? "bg-primary" : "bg-muted"
+                                }`}
+                              >
+                                <span
+                                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                    showAllScrollbars ? "translate-x-5" : "translate-x-0.5"
+                                  }`}
+                                />
+                              </button>
+                            </label>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Hide all scrollbars globally
+                            </p>
+                          </div>
+
+                          {/* Asset Panel Scrollbar Toggle */}
+                          <div className="py-2 border-b border-border">
+                            <label className="flex items-center justify-between cursor-pointer">
+                              <span className="text-sm text-foreground">
+                                Show Asset Scrollbar
+                              </span>
+                              <button
+                                onClick={() => setShowAssetScrollbar(!showAssetScrollbar)}
+                                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                                  showAssetScrollbar ? "bg-primary" : "bg-muted"
+                                }`}
+                              >
+                                <span
+                                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                    showAssetScrollbar ? "translate-x-5" : "translate-x-0.5"
+                                  }`}
+                                />
+                              </button>
+                            </label>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Hide scrollbar in asset panel
+                            </p>
+                          </div>
+
+                          {/* Canvas Scrollbar Toggle */}
+                          <div className="py-2 border-b border-border">
+                            <label className="flex items-center justify-between cursor-pointer">
+                              <span className="text-sm text-foreground">
+                                Show Canvas Scrollbar
+                              </span>
+                              <button
+                                onClick={() => setShowCanvasScrollbar(!showCanvasScrollbar)}
+                                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                                  showCanvasScrollbar ? "bg-primary" : "bg-muted"
+                                }`}
+                              >
+                                <span
+                                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                    showCanvasScrollbar ? "translate-x-5" : "translate-x-0.5"
+                                  }`}
+                                />
+                              </button>
+                            </label>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Hide scrollbar in canvas area
+                            </p>
+                          </div>
+
+                          {/* Properties Panel Scrollbar Toggle */}
+                          <div className="py-2">
+                            <label className="flex items-center justify-between cursor-pointer">
+                              <span className="text-sm text-foreground">
+                                Show Properties Scrollbar
+                              </span>
+                              <button
+                                onClick={() => setShowPropertiesScrollbar(!showPropertiesScrollbar)}
+                                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                                  showPropertiesScrollbar ? "bg-primary" : "bg-muted"
+                                }`}
+                              >
+                                <span
+                                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                    showPropertiesScrollbar ? "translate-x-5" : "translate-x-0.5"
+                                  }`}
+                                />
+                              </button>
+                            </label>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Hide scrollbar in properties panel
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </>
               )}
@@ -877,6 +1035,7 @@ export function EditorLayout({
                     <TabsContent
                       value="pages"
                       className="flex-1 min-h-0 m-0 p-0 border-none data-[state=inactive]:hidden overflow-y-auto"
+                      data-panel="hierarchy"
                     >
                       <PagesPanel
                         pages={pages}
@@ -892,6 +1051,7 @@ export function EditorLayout({
                     <TabsContent
                       value="layers"
                       className="flex-1 min-h-0 m-0 p-0 border-none data-[state=inactive]:hidden overflow-y-auto"
+                      data-panel="hierarchy"
                     >
                       <HierarchyPanel
                         ref={hierarchyPanelRef}
@@ -906,6 +1066,7 @@ export function EditorLayout({
                     <TabsContent
                       value="components"
                       className="flex-1 min-h-0 m-0 p-0 border-none data-[state=inactive]:hidden overflow-y-auto"
+                      data-panel="asset"
                     >
                       <ComponentPalette
                         globalComponents={globalComponents}
@@ -997,6 +1158,7 @@ export function EditorLayout({
           <div
             className="flex-1 min-w-0 bg-background overflow-auto"
             style={{ flexShrink: 1, flexGrow: 1 }}
+            data-panel="canvas"
           >
             <div
               className={`h-full overflow-auto transition-all duration-300 ${isPreviewMode ? "bg-white p-0" : "bg-background p-8"} light`}

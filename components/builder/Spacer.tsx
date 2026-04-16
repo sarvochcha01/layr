@@ -11,7 +11,7 @@ interface SpacerProps {
 
 export function Spacer({ height = "2rem", width = "100%", themeStyle, ...rest }: SpacerProps) {
   const baseStyle = buildComponentStyle({ height, width, ...rest });
-  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const effectiveTheme = useEffectiveThemeStyle(themeStyle, themeStyle !== undefined);
   const cssVars = getThemeCSSVars(effectiveTheme);
 
   return <div style={{ ...baseStyle, ...cssVars }} />;

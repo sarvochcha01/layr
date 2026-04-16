@@ -1,6 +1,4 @@
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { buildComponentStyle } from "@/lib/buildStyle";
 import { ThemeStyleVariant, getThemeCSSVars } from "@/lib/themeStyles";
 import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
 
@@ -14,7 +12,16 @@ interface HeroProps {
   secondaryButtonText?: string;
   secondaryButtonLink?: string;
   backgroundImage?: string;
+  backgroundImageUrl?: string; // Alternative prop name used by Fill section
+  backgroundSize?: string;
+  backgroundPosition?: string;
+  backgroundImageOverlay?: number; // Overlay opacity for background images (0-1)
   backgroundColor?: string;
+  backgroundType?: "solid" | "gradient" | "image";
+  gradientStart?: string;
+  gradientEnd?: string;
+  gradientDirection?: string;
+  gradientAngle?: string;
   textColor?: string;
   alignment?: "left" | "center" | "right";
   size?: "sm" | "md" | "lg" | "xl";
@@ -23,6 +30,7 @@ interface HeroProps {
   className?: string;
   width?: string;
   height?: string;
+  opacity_css?: number;
   themeStyle?: ThemeStyleVariant;
   onNavigate?: (slug: string) => void;
   pages?: any[];
@@ -39,7 +47,16 @@ export function Hero({
   secondaryButtonText = "VIEW DOCUMENTATION",
   secondaryButtonLink = "#",
   backgroundImage,
+  backgroundImageUrl,
+  backgroundSize,
+  backgroundPosition,
+  backgroundImageOverlay = 0.55,
   backgroundColor,
+  backgroundType,
+  gradientStart,
+  gradientEnd,
+  gradientDirection,
+  gradientAngle,
   textColor,
   alignment = "center",
   size = "xl",
@@ -48,6 +65,7 @@ export function Hero({
   className,
   width,
   height,
+  opacity_css,
   themeStyle,
   onNavigate,
   pages,
@@ -66,27 +84,42 @@ export function Hero({
     right: "text-right",
   };
 
-  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const effectiveTheme = useEffectiveThemeStyle(themeStyle, themeStyle !== undefined);
   const cssVars = getThemeCSSVars(effectiveTheme);
-
-  // User-set bg/textColor overrides theme
-  const bgColor = backgroundColor || "var(--theme-bg)";
-  const fg = textColor || "var(--theme-text)";
 
   const baseStyle: React.CSSProperties = {
     ...cssVars,
-    backgroundColor: bgColor,
-    color: fg,
     ...(width ? { width } : {}),
     ...(height ? { minHeight: height } : {}),
+    ...(opacity_css != null && opacity_css !== "" ? { opacity: Number(opacity_css) } : {}),
   };
 
-  if (backgroundImage) {
-    baseStyle.backgroundImage = `url(${backgroundImage})`;
-    baseStyle.backgroundSize = "cover";
-    baseStyle.backgroundPosition = "center";
-    // Overlay to ensure text readability
+  // Resolve background image URL (support both prop names)
+  const bgImageUrl = backgroundImageUrl || backgroundImage;
+
+  // Handle background based on type - user preferences MUST override theme
+  if (backgroundType === "gradient" && gradientStart && gradientEnd) {
+    const direction = gradientDirection === "custom"
+      ? `${gradientAngle || "135"}deg`
+      : gradientDirection || "to bottom right";
+    baseStyle.backgroundImage = `linear-gradient(${direction}, ${gradientStart}, ${gradientEnd})`;
+  } else if (backgroundType === "image" && bgImageUrl) {
+    baseStyle.backgroundImage = `url(${bgImageUrl})`;
+    baseStyle.backgroundSize = backgroundSize || "cover";
+    baseStyle.backgroundPosition = backgroundPosition || "center";
+    baseStyle.backgroundRepeat = "no-repeat";
     baseStyle.position = "relative";
+  } else if (backgroundColor) {
+    baseStyle.background = backgroundColor;
+  } else {
+    baseStyle.background = "var(--theme-bg)";
+  }
+
+  // Text color override
+  if (textColor) {
+    baseStyle.color = textColor;
+  } else {
+    baseStyle.color = "var(--theme-text)";
   }
 
   const handleLinkClick = (e: React.MouseEvent, link: string) => {
@@ -116,15 +149,15 @@ export function Hero({
       style={baseStyle}
     >
       {/* Dark overlay when background image is set */}
-      {backgroundImage && (
+      {bgImageUrl && (
         <div
           className="absolute inset-0 z-0"
-          style={{ background: "rgba(0,0,0,0.55)" }}
+          style={{ background: `rgba(0,0,0,${backgroundImageOverlay})` }}
         />
       )}
 
       {/* Animated grid background — only without bg image */}
-      {!backgroundImage && (
+      {!bgImageUrl && (
         <div className="absolute inset-0 opacity-[0.07] pointer-events-none">
           <div
             className="absolute inset-0"
@@ -141,7 +174,7 @@ export function Hero({
       )}
 
       {/* Gradient orbs — themed */}
-      {!backgroundImage && (
+      {!bgImageUrl && (
         <>
           <div
             className="absolute top-[-10%] left-[-5%] w-[600px] h-[600px] rounded-full blur-3xl pointer-events-none"
@@ -222,7 +255,7 @@ export function Hero({
             fontFamily: "var(--theme-heading-font)",
             fontWeight: "var(--theme-heading-weight)" as any,
             letterSpacing: "var(--theme-letter-spacing)",
-            color: backgroundImage ? "#ffffff" : "var(--theme-text)",
+            color: textColor || (backgroundImage ? "#ffffff" : "var(--theme-text)"),
           }}
         >
           {hasHighlight ? (
@@ -231,7 +264,7 @@ export function Hero({
               <span
                 className="inline-block"
                 style={{
-                  color: "var(--theme-accent)",
+                  color: textColor || "var(--theme-accent)",
                 }}
               >
                 FUTURE
@@ -247,7 +280,7 @@ export function Hero({
         <p
           className="text-base sm:text-lg mb-12 leading-relaxed max-w-2xl hero-desc"
           style={{
-            color: backgroundImage ? "rgba(255,255,255,0.75)" : "var(--theme-text-muted)",
+            color: textColor ? `${textColor}cc` : (backgroundImage ? "rgba(255,255,255,0.75)" : "var(--theme-text-muted)"),
             ...(alignment === "center" ? { marginLeft: "auto", marginRight: "auto" } : {}),
           }}
         >
@@ -310,13 +343,15 @@ export function Hero({
       {showScrollIndicator && (
         <div
           className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-xs uppercase tracking-wider"
-          style={{ color: backgroundImage ? "rgba(255,255,255,0.5)" : "var(--theme-text-muted)" }}
+          style={{ color: textColor ? `${textColor}80` : (backgroundImage ? "rgba(255,255,255,0.5)" : "var(--theme-text-muted)") }}
         >
           <span>SCROLL TO EXPLORE</span>
           <div
             className="w-px h-12 animate-pulse"
             style={{
-              background: `linear-gradient(to bottom, var(--theme-text-muted), transparent)`,
+              background: textColor 
+                ? `linear-gradient(to bottom, ${textColor}80, transparent)` 
+                : `linear-gradient(to bottom, var(--theme-text-muted), transparent)`,
             }}
           />
         </div>

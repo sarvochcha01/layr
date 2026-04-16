@@ -27,12 +27,18 @@ interface NavbarProps {
   width?: string;
   height?: string;
   backgroundColor?: string;
+  backgroundType?: "solid" | "gradient" | "image";
+  gradientStart?: string;
+  gradientEnd?: string;
+  gradientDirection?: string;
+  gradientAngle?: string;
   textColor?: string;
   linkColor?: string;
   linkHoverColor?: string;
   themeStyle?: ThemeStyleVariant;
   onNavigate?: (slug: string) => void;
   pages?: any[];
+  currentPageSlug?: string;
   [key: string]: any;
 }
 
@@ -54,17 +60,23 @@ export function Navbar({
   width,
   height,
   backgroundColor,
+  backgroundType,
+  gradientStart,
+  gradientEnd,
+  gradientDirection,
+  gradientAngle,
   textColor,
   linkColor,
   linkHoverColor,
   themeStyle,
   onNavigate,
   pages,
+  currentPageSlug,
   ...rest
 }: NavbarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const effectiveTheme = useEffectiveThemeStyle(themeStyle, themeStyle !== undefined);
   const cssVars = getThemeCSSVars(effectiveTheme);
 
   useEffect(() => {
@@ -75,10 +87,6 @@ export function Navbar({
 
   const navStyle: React.CSSProperties = {
     ...cssVars,
-    backgroundColor: backgroundColor
-      ? scrolled ? `${backgroundColor}cc` : backgroundColor
-      : scrolled ? "color-mix(in srgb, var(--theme-bg) 85%, transparent)" : "var(--theme-bg)",
-    color: textColor || "var(--theme-text)",
     backdropFilter: scrolled ? "blur(12px)" : "none",
     position: scrolled ? "sticky" : undefined,
     top: scrolled ? 0 : undefined,
@@ -89,6 +97,28 @@ export function Navbar({
     ...(height ? { height } : {}),
     transition: "all 300ms ease",
   };
+
+  // Handle background based on type - user preferences MUST override theme
+  if (backgroundType === "gradient" && gradientStart && gradientEnd) {
+    const direction = gradientDirection === "custom"
+      ? `${gradientAngle || "135"}deg`
+      : gradientDirection || "to bottom right";
+    navStyle.backgroundImage = `linear-gradient(${direction}, ${gradientStart}, ${gradientEnd})`;
+    if (scrolled) {
+      navStyle.opacity = 0.95;
+    }
+  } else if (backgroundColor) {
+    navStyle.background = scrolled ? `${backgroundColor}cc` : backgroundColor;
+  } else {
+    navStyle.background = scrolled ? "color-mix(in srgb, var(--theme-bg) 85%, transparent)" : "var(--theme-bg)";
+  }
+
+  // Text color override
+  if (textColor) {
+    navStyle.color = textColor;
+  } else {
+    navStyle.color = "var(--theme-text)";
+  }
 
   return (
     <div className="relative">
@@ -121,19 +151,28 @@ export function Navbar({
         {viewport === "desktop" && links.length > 0 && (
           <div className="flex items-center space-x-1 ml-8">
             {links.map((link, index) => {
-              const isActive = index === 0;
+              // Determine if this link is active based on current page slug
+              const getLinkSlug = (href: string, text: string) => {
+                let slug = href;
+                if (slug.startsWith("page:")) slug = slug.replace("page:", "");
+                else slug = slug.replace(/^\//, "").replace(/\.html$/, "");
+                if (!slug || slug === "#") {
+                  slug = text.toLowerCase().replace(/\s+/g, "-");
+                  if (slug === "home") slug = "index";
+                }
+                return slug;
+              };
+
+              const linkSlug = getLinkSlug(link.href, link.text);
+              const isActive = currentPageSlug === linkSlug || 
+                              (currentPageSlug === "index" && linkSlug === "index") ||
+                              (linkSlug === "/" && currentPageSlug === "index");
+
               const handleClick = (e: React.MouseEvent) => {
                 e.preventDefault();
                 e.stopPropagation();
                 if (onNavigate && !link.external) {
-                  let slug = link.href;
-                  if (slug.startsWith("page:")) slug = slug.replace("page:", "");
-                  else slug = slug.replace(/^\//, "").replace(/\.html$/, "");
-                  if (!slug || slug === "#") {
-                    slug = link.text.toLowerCase().replace(/\s+/g, "-");
-                    if (slug === "home") slug = "index";
-                  }
-                  onNavigate(slug);
+                  onNavigate(linkSlug);
                 }
               };
 
@@ -258,44 +297,57 @@ export function Navbar({
       >
         <div style={{ overflow: "hidden" }}>
           <div className="py-2 px-2">
-            {links.map((link, index) => (
-              <a
-                key={index}
-                href={link.external ? link.href : "#"}
-                className="block px-4 py-3 text-sm font-medium rounded-lg transition-colors"
-                style={{
-                  color: "var(--theme-text-muted)",
-                  borderRadius: "var(--theme-radius)",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.color = "var(--theme-text)";
-                  e.currentTarget.style.backgroundColor = "var(--theme-bg)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.color = "var(--theme-text-muted)";
-                  e.currentTarget.style.backgroundColor = "transparent";
-                }}
-                onClick={() => {
-                  setIsMobileMenuOpen(false);
-                  if (onNavigate && !link.external) {
-                    let slug = link.href;
-                    if (slug.startsWith("page:")) slug = slug.replace("page:", "");
-                    else slug = slug.replace(/^\//, "").replace(/\.html$/, "");
-                    if (!slug || slug === "#") {
-                      slug = link.text.toLowerCase().replace(/\s+/g, "-");
-                      if (slug === "home") slug = "index";
+            {links.map((link, index) => {
+              // Determine if this link is active
+              const getLinkSlug = (href: string, text: string) => {
+                let slug = href;
+                if (slug.startsWith("page:")) slug = slug.replace("page:", "");
+                else slug = slug.replace(/^\//, "").replace(/\.html$/, "");
+                if (!slug || slug === "#") {
+                  slug = text.toLowerCase().replace(/\s+/g, "-");
+                  if (slug === "home") slug = "index";
+                }
+                return slug;
+              };
+
+              const linkSlug = getLinkSlug(link.href, link.text);
+              const isActive = currentPageSlug === linkSlug || 
+                              (currentPageSlug === "index" && linkSlug === "index") ||
+                              (linkSlug === "/" && currentPageSlug === "index");
+
+              return (
+                <a
+                  key={index}
+                  href={link.external ? link.href : "#"}
+                  className="block px-4 py-3 text-sm font-medium rounded-lg transition-colors"
+                  style={{
+                    color: isActive ? "var(--theme-text)" : "var(--theme-text-muted)",
+                    backgroundColor: isActive ? "var(--theme-bg)" : "transparent",
+                    borderRadius: "var(--theme-radius)",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = "var(--theme-text)";
+                    e.currentTarget.style.backgroundColor = "var(--theme-bg)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = isActive ? "var(--theme-text)" : "var(--theme-text-muted)";
+                    e.currentTarget.style.backgroundColor = isActive ? "var(--theme-bg)" : "transparent";
+                  }}
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    if (onNavigate && !link.external) {
+                      onNavigate(linkSlug);
                     }
-                    onNavigate(slug);
-                  }
-                }}
-                {...(link.external && isPreviewMode && {
-                  target: "_blank",
-                  rel: "noopener noreferrer",
-                })}
-              >
-                {link.text}
-              </a>
-            ))}
+                  }}
+                  {...(link.external && isPreviewMode && {
+                    target: "_blank",
+                    rel: "noopener noreferrer",
+                  })}
+                >
+                  {link.text}
+                </a>
+              );
+            })}
           </div>
         </div>
       </div>
