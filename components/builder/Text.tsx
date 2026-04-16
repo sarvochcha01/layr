@@ -93,10 +93,9 @@ export function Text({
         className
       )}
       style={{
-        ...baseStyle,
-        backgroundColor: rest.backgroundColor || "var(--theme-bg)",
-        color: color || "var(--theme-text)",
         ...cssVars,
+        backgroundColor: rest.backgroundColor || "var(--theme-bg)",
+        ...baseStyle, // Apply baseStyle AFTER theme vars so user preferences override
         ...(fontOverride ? { fontFamily: getFontFamilyValue(fontOverride) } : {}),
       }}
     >
