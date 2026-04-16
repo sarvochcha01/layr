@@ -301,7 +301,7 @@ export const HierarchyPanel = forwardRef<HierarchyPanelRef, HierarchyPanelProps>
 
       {/* Add Component Dialog */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto" data-panel="dialog">
           <DialogHeader>
             <DialogTitle>Add Component</DialogTitle>
             <DialogDescription>
