@@ -80,7 +80,19 @@ export async function PATCH(
         }
 
         const body = await request.json();
-        const { name, description, components, pages, thumbnail, globalComponents, customComponents, chatHistory } = body;
+        const { 
+            name, 
+            description, 
+            components, 
+            pages, 
+            thumbnail, 
+            globalComponents, 
+            customComponents, 
+            chatHistory,
+            globalThemeStyle,
+            isGlobalThemeEnabled,
+            themeOverrides
+        } = body;
 
         const updateData: any = {
             updatedAt: Timestamp.now(),
@@ -94,6 +106,9 @@ export async function PATCH(
         if (globalComponents !== undefined) updateData.globalComponents = globalComponents;
         if (customComponents !== undefined) updateData.customComponents = customComponents;
         if (chatHistory !== undefined) updateData.chatHistory = chatHistory;
+        if (globalThemeStyle !== undefined) updateData.globalThemeStyle = globalThemeStyle;
+        if (isGlobalThemeEnabled !== undefined) updateData.isGlobalThemeEnabled = isGlobalThemeEnabled;
+        if (themeOverrides !== undefined) updateData.themeOverrides = themeOverrides;
 
         await updateDoc(projectRef, updateData);
 

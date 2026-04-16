@@ -53,7 +53,7 @@ export function Video({
     paddingTop: rest.paddingTop || "15px",
     ...rest 
   });
-  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const effectiveTheme = useEffectiveThemeStyle(themeStyle, themeStyle !== undefined);
   const cssVars = getThemeCSSVars(effectiveTheme);
 
 

@@ -39,7 +39,7 @@ export function Testimonial({
   ...rest
 }: TestimonialProps) {
   const [hovered, setHovered] = useState(false);
-  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const effectiveTheme = useEffectiveThemeStyle(themeStyle, themeStyle !== undefined);
   const cssVars = getThemeCSSVars(effectiveTheme);
 
   const numericRating =

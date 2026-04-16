@@ -27,6 +27,11 @@ interface NavbarProps {
   width?: string;
   height?: string;
   backgroundColor?: string;
+  backgroundType?: "solid" | "gradient" | "image";
+  gradientStart?: string;
+  gradientEnd?: string;
+  gradientDirection?: string;
+  gradientAngle?: string;
   textColor?: string;
   linkColor?: string;
   linkHoverColor?: string;
@@ -54,6 +59,11 @@ export function Navbar({
   width,
   height,
   backgroundColor,
+  backgroundType,
+  gradientStart,
+  gradientEnd,
+  gradientDirection,
+  gradientAngle,
   textColor,
   linkColor,
   linkHoverColor,
@@ -64,7 +74,7 @@ export function Navbar({
 }: NavbarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const effectiveTheme = useEffectiveThemeStyle(themeStyle, themeStyle !== undefined);
   const cssVars = getThemeCSSVars(effectiveTheme);
 
   useEffect(() => {
@@ -75,10 +85,6 @@ export function Navbar({
 
   const navStyle: React.CSSProperties = {
     ...cssVars,
-    backgroundColor: backgroundColor
-      ? scrolled ? `${backgroundColor}cc` : backgroundColor
-      : scrolled ? "color-mix(in srgb, var(--theme-bg) 85%, transparent)" : "var(--theme-bg)",
-    color: textColor || "var(--theme-text)",
     backdropFilter: scrolled ? "blur(12px)" : "none",
     position: scrolled ? "sticky" : undefined,
     top: scrolled ? 0 : undefined,
@@ -89,6 +95,28 @@ export function Navbar({
     ...(height ? { height } : {}),
     transition: "all 300ms ease",
   };
+
+  // Handle background based on type - user preferences MUST override theme
+  if (backgroundType === "gradient" && gradientStart && gradientEnd) {
+    const direction = gradientDirection === "custom"
+      ? `${gradientAngle || "135"}deg`
+      : gradientDirection || "to bottom right";
+    navStyle.backgroundImage = `linear-gradient(${direction}, ${gradientStart}, ${gradientEnd})`;
+    if (scrolled) {
+      navStyle.opacity = 0.95;
+    }
+  } else if (backgroundColor) {
+    navStyle.background = scrolled ? `${backgroundColor}cc` : backgroundColor;
+  } else {
+    navStyle.background = scrolled ? "color-mix(in srgb, var(--theme-bg) 85%, transparent)" : "var(--theme-bg)";
+  }
+
+  // Text color override
+  if (textColor) {
+    navStyle.color = textColor;
+  } else {
+    navStyle.color = "var(--theme-text)";
+  }
 
   return (
     <div className="relative">

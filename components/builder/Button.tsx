@@ -53,7 +53,7 @@ export function Button({
   ...rest
 }: ButtonProps) {
   const buttonContent = children || text || "Button";
-  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const effectiveTheme = useEffectiveThemeStyle(themeStyle, themeStyle !== undefined);
   const cssVars = getThemeCSSVars(effectiveTheme);
 
   const sizeStyles: React.CSSProperties = {

@@ -41,6 +41,15 @@ export interface Project {
     name: string;
     pages: Page[];
     globalComponents?: GlobalComponents;
+    globalThemeStyle?: string; // Global theme for the project
+    isGlobalThemeEnabled?: boolean; // Whether global theme is active
+    themeOverrides?: {
+        accentColor?: string;
+        bgColor?: string;
+        textColor?: string;
+        fontFamily?: string;
+        headingFontFamily?: string;
+    };
     createdAt: any;
     updatedAt: any;
 }

@@ -24,6 +24,11 @@ interface PricingCardProps {
   featured?: boolean;
   badge?: string;
   backgroundColor?: string;
+  backgroundType?: "solid" | "gradient" | "image";
+  gradientStart?: string;
+  gradientEnd?: string;
+  gradientDirection?: string;
+  gradientAngle?: string;
   textColor?: string;
   width?: string;
   height?: string;
@@ -48,6 +53,11 @@ export function PricingCard({
   featured = false,
   badge = "POPULAR",
   backgroundColor,
+  backgroundType,
+  gradientStart,
+  gradientEnd,
+  gradientDirection,
+  gradientAngle,
   textColor,
   width,
   height,
@@ -60,33 +70,52 @@ export function PricingCard({
     typeof f === "string" ? { text: f, included: true } : f,
   );
 
-  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const effectiveTheme = useEffectiveThemeStyle(themeStyle, themeStyle !== undefined);
   const cssVars = getThemeCSSVars(effectiveTheme);
+
+  const cardStyle: React.CSSProperties = {
+    ...cssVars,
+    border: `var(--theme-border-width) solid ${featured ? "var(--theme-accent)" : "var(--theme-border)"}`,
+    borderRadius: "var(--theme-radius)",
+    boxShadow: hovered
+      ? featured
+        ? `0 20px 60px color-mix(in srgb, var(--theme-accent) 30%, transparent), var(--theme-hard-shadow, none)`
+        : "var(--theme-shadow)"
+      : featured
+        ? `0 0 0 1px var(--theme-accent), var(--theme-hard-shadow, none)`
+        : "none",
+    transform: hovered ? "translateY(-5px)" : "translateY(0)",
+    transition: "transform 300ms cubic-bezier(0.34,1.56,0.64,1), box-shadow 300ms ease",
+    ...(width ? { width } : {}),
+    ...(height ? { height } : {}),
+    ...getUserStyleOverrides(rest),
+  };
+
+  // Handle background based on type - user preferences MUST override theme
+  if (backgroundType === "gradient" && gradientStart && gradientEnd) {
+    const direction = gradientDirection === "custom"
+      ? `${gradientAngle || "135"}deg`
+      : gradientDirection || "to bottom right";
+    cardStyle.backgroundImage = `linear-gradient(${direction}, ${gradientStart}, ${gradientEnd})`;
+  } else if (backgroundColor) {
+    cardStyle.background = backgroundColor;
+  } else {
+    cardStyle.background = "var(--theme-surface)";
+  }
+
+  // Text color override
+  if (textColor) {
+    cardStyle.color = textColor;
+  } else {
+    cardStyle.color = "var(--theme-text)";
+  }
 
   return (
     <div
       className={cn(
         "p-8 flex flex-col min-w-0 overflow-hidden",
       )}
-      style={{ 
-        ...cssVars,
-        backgroundColor: backgroundColor || "var(--theme-surface)",
-        color: textColor || "var(--theme-text)",
-        border: `var(--theme-border-width) solid ${featured ? "var(--theme-accent)" : "var(--theme-border)"}`,
-        borderRadius: "var(--theme-radius)",
-        boxShadow: hovered
-          ? featured
-            ? `0 20px 60px color-mix(in srgb, var(--theme-accent) 30%, transparent), var(--theme-hard-shadow, none)`
-            : "var(--theme-shadow)"
-          : featured
-            ? `0 0 0 1px var(--theme-accent), var(--theme-hard-shadow, none)`
-            : "none",
-        transform: hovered ? "translateY(-5px)" : "translateY(0)",
-        transition: "transform 300ms cubic-bezier(0.34,1.56,0.64,1), box-shadow 300ms ease",
-        ...(width ? { width } : {}),
-        ...(height ? { height } : {}),
-        ...getUserStyleOverrides(rest),
-      }}
+      style={cardStyle}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >

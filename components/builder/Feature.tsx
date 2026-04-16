@@ -77,6 +77,11 @@ interface FeatureProps {
   layout?: "vertical" | "horizontal";
   iconSize?: "sm" | "md" | "lg";
   backgroundColor?: string;
+  backgroundType?: "solid" | "gradient" | "image";
+  gradientStart?: string;
+  gradientEnd?: string;
+  gradientDirection?: string;
+  gradientAngle?: string;
   textColor?: string;
   iconColor?: string;
   width?: string;
@@ -92,6 +97,11 @@ export function Feature({
   layout = "vertical",
   iconSize = "md",
   backgroundColor,
+  backgroundType,
+  gradientStart,
+  gradientEnd,
+  gradientDirection,
+  gradientAngle,
   textColor,
   iconColor,
   width,
@@ -100,7 +110,7 @@ export function Feature({
   ...rest
 }: FeatureProps) {
   const [hovered, setHovered] = useState(false);
-  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const effectiveTheme = useEffectiveThemeStyle(themeStyle, themeStyle !== undefined);
   const cssVars = getThemeCSSVars(effectiveTheme);
 
   const iconSizeMap = {
@@ -111,8 +121,6 @@ export function Feature({
 
   const rootStyle: React.CSSProperties = {
     ...cssVars,
-    backgroundColor: backgroundColor || "var(--theme-surface)",
-    color: textColor || "var(--theme-text)",
     borderRadius: "var(--theme-radius)",
     border: `var(--theme-border-width) solid var(--theme-border)`,
     padding: "24px",
@@ -124,6 +132,25 @@ export function Feature({
     ...(height ? { height } : {}),
     ...getUserStyleOverrides(rest),
   };
+
+  // Handle background based on type - user preferences MUST override theme
+  if (backgroundType === "gradient" && gradientStart && gradientEnd) {
+    const direction = gradientDirection === "custom"
+      ? `${gradientAngle || "135"}deg`
+      : gradientDirection || "to bottom right";
+    rootStyle.backgroundImage = `linear-gradient(${direction}, ${gradientStart}, ${gradientEnd})`;
+  } else if (backgroundColor) {
+    rootStyle.background = backgroundColor;
+  } else {
+    rootStyle.background = "var(--theme-surface)";
+  }
+
+  // Text color override
+  if (textColor) {
+    rootStyle.color = textColor;
+  } else {
+    rootStyle.color = "var(--theme-text)";
+  }
 
   const resolvedIconColor = iconColor || "var(--theme-accent)";
   const IconComponent = ICON_MAP[icon] || Zap;

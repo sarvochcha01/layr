@@ -75,7 +75,7 @@ export function Text({
   };
 
   const baseStyle = buildComponentStyle({ textColor: color, width, height, ...rest });
-  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const effectiveTheme = useEffectiveThemeStyle(themeStyle, themeStyle !== undefined);
   const cssVars = getThemeCSSVars(effectiveTheme);
 
   // Per-component font override
