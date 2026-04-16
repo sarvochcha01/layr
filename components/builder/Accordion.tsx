@@ -49,7 +49,7 @@ export function Accordion({
   ...rest
 }: AccordionProps) {
   const [openItems, setOpenItems] = useState<number[]>([defaultOpen]);
-  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const effectiveTheme = useEffectiveThemeStyle(themeStyle, themeStyle !== undefined);
   const cssVars = getThemeCSSVars(effectiveTheme);
 
   const toggleItem = (index: number) => {

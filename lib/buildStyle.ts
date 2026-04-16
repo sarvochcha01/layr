@@ -107,7 +107,7 @@ export function buildComponentStyle(props: Record<string, any>): React.CSSProper
     if (props.borderStyle_css) style.borderStyle = props.borderStyle_css as any;
 
     // --- Effects ---
-    if (props.opacity_css != null && props.opacity_css !== "" && props.opacity_css !== 1) {
+    if (props.opacity_css != null && props.opacity_css !== "") {
         style.opacity = Number(props.opacity_css);
     }
     if (props.boxShadow) style.boxShadow = props.boxShadow;

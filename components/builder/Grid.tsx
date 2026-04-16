@@ -52,7 +52,7 @@ export function Grid({
   };
 
   const baseStyle = buildComponentStyle({ backgroundColor, textColor, width, height, ...rest });
-  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const effectiveTheme = useEffectiveThemeStyle(themeStyle, themeStyle !== undefined);
   const cssVars = getThemeCSSVars(effectiveTheme);
 
 

@@ -24,7 +24,7 @@ export function Badge({
   themeStyle,
   ...rest
 }: BadgeProps) {
-  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const effectiveTheme = useEffectiveThemeStyle(themeStyle, themeStyle !== undefined);
   const cssVars = getThemeCSSVars(effectiveTheme);
 
   // Semantic variant accents (still works across themes)

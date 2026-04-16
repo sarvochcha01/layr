@@ -29,6 +29,8 @@ import { useComponentClipboard } from "@/hooks/useComponentClipboard";
 import { ShortcutsPanel } from "@/components/editor/ShortcutsPanel";
 import { componentCategories } from "@/components/editor/config/components";
 import { Component as ComponentIcon, Globe } from "lucide-react";
+import { useThemeStyle } from "@/contexts/ThemeStyleContext";
+import { ThemeStyleVariant } from "@/lib/themeStyles";
 
 // Utility to recursively remove undefined values so Firebase doesn't complain
 const sanitizeForFirestore = (obj: any): any => {
@@ -91,6 +93,17 @@ export default function EditorPage() {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
   const projectId = searchParams.get("projectId");
+  
+  // Theme context
+  const { 
+    globalThemeStyle,
+    setGlobalThemeStyle, 
+    setThemeOverrides,
+    setIsGlobalThemeEnabled,
+    toggleGlobalTheme,
+    isGlobalThemeEnabled,
+    themeOverrides
+  } = useThemeStyle();
 
   // Use history hook for undo/redo
   const {
@@ -195,6 +208,36 @@ export default function EditorPage() {
         const history = (projectData as any).chatHistory || [];
         setChatHistory(history);
 
+        // Load theme settings with validation
+        const savedTheme = projectData.globalThemeStyle as ThemeStyleVariant;
+        const validThemes: ThemeStyleVariant[] = [
+          "dark-pro", "light-clean", "midnight-glam", "brutalist", "neobrutalist",
+          "glassmorphic", "sunset-gradient", "cyberpunk", "forest-organic", "ocean-depth"
+        ];
+        
+        console.log("[Theme Load] Saved theme:", savedTheme);
+        console.log("[Theme Load] Theme enabled:", projectData.isGlobalThemeEnabled);
+        console.log("[Theme Load] Theme overrides:", projectData.themeOverrides);
+        
+        // Only set theme if it's valid, otherwise use default
+        if (savedTheme && validThemes.includes(savedTheme)) {
+          setGlobalThemeStyle(savedTheme, false); // Don't auto-enable
+          console.log("[Theme Load] Applied theme:", savedTheme);
+        } else if (savedTheme) {
+          console.warn(`Invalid theme "${savedTheme}" found, using default`);
+          setGlobalThemeStyle("dark-pro", false); // Don't auto-enable
+        }
+        
+        if (projectData.themeOverrides) {
+          setThemeOverrides(projectData.themeOverrides);
+        }
+        
+        // Restore the exact toggle state from the project
+        if (projectData.isGlobalThemeEnabled !== undefined) {
+          setIsGlobalThemeEnabled(projectData.isGlobalThemeEnabled);
+          console.log("[Theme Load] Set global theme enabled to:", projectData.isGlobalThemeEnabled);
+        }
+
         // Just load pages as they are
         setPages(projectData.pages, false);
         setCurrentPageId(projectData.pages[0]?.id || "home");
@@ -216,7 +259,7 @@ export default function EditorPage() {
       setIsInitialLoad(false);
       clearHistory(); // Clear any history from initialization
     }
-  }, [projectData, isInitialLoad, setPages, clearHistory]);
+  }, [projectData, isInitialLoad, setPages, clearHistory, setGlobalThemeStyle, setThemeOverrides, setIsGlobalThemeEnabled]);
 
   // Auto-save when pages, global components, or project name change
   useEffect(() => {
@@ -234,7 +277,14 @@ export default function EditorPage() {
         globalComponents,
         customComponents,
         chatHistory,
+        globalThemeStyle: globalThemeStyle,
+        isGlobalThemeEnabled: isGlobalThemeEnabled,
+        themeOverrides: themeOverrides,
       });
+
+      console.log("[Theme Save] Saving theme:", globalThemeStyle);
+      console.log("[Theme Save] Theme enabled:", isGlobalThemeEnabled);
+      console.log("[Theme Save] Theme overrides:", themeOverrides);
 
       updateProjectMutation.mutate({
         projectId,
@@ -253,6 +303,9 @@ export default function EditorPage() {
     projectId,
     user,
     isInitialLoad,
+    globalThemeStyle,
+    isGlobalThemeEnabled,
+    themeOverrides,
   ]);
 
   // Manual save handler
@@ -271,6 +324,9 @@ export default function EditorPage() {
         globalComponents,
         customComponents,
         chatHistory,
+        globalThemeStyle: globalThemeStyle,
+        isGlobalThemeEnabled: isGlobalThemeEnabled,
+        themeOverrides: themeOverrides,
       });
 
       await updateProjectMutation.mutateAsync({

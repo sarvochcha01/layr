@@ -75,7 +75,7 @@ export function Text({
   };
 
   const baseStyle = buildComponentStyle({ textColor: color, width, height, ...rest });
-  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const effectiveTheme = useEffectiveThemeStyle(themeStyle, themeStyle !== undefined);
   const cssVars = getThemeCSSVars(effectiveTheme);
 
   // Per-component font override
@@ -93,10 +93,9 @@ export function Text({
         className
       )}
       style={{
-        ...baseStyle,
-        backgroundColor: rest.backgroundColor || "var(--theme-bg)",
-        color: color || "var(--theme-text)",
         ...cssVars,
+        backgroundColor: rest.backgroundColor || "var(--theme-bg)",
+        ...baseStyle, // Apply baseStyle AFTER theme vars so user preferences override
         ...(fontOverride ? { fontFamily: getFontFamilyValue(fontOverride) } : {}),
       }}
     >

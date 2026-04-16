@@ -121,7 +121,7 @@ export function PropertiesPanel({
   };
 
   return (
-    <div className="h-full flex flex-col overflow-hidden">
+    <div className="h-full flex flex-col overflow-hidden" data-panel="properties">
       {/* Header */}
       <div className="flex-shrink-0 p-4 border-b border-border">
         <div className="flex items-center justify-between">

@@ -1,12 +1,13 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { Settings2, Type, Paintbrush, Link as LinkIcon, ImageIcon, LayoutGrid } from "lucide-react";
+import { Settings2, Type, Paintbrush, Link as LinkIcon, ImageIcon, LayoutGrid, RotateCcw, Palette } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Page } from "@/types/editor";
+import { useThemeStyle } from "@/contexts/ThemeStyleContext";
 import {
   Accordion,
   AccordionItem,
@@ -373,6 +374,7 @@ interface ComponentPropertiesProps {
 
 export function ComponentProperties({ type, props, updateProp, pages }: ComponentPropertiesProps) {
   const schema = COMPONENT_SCHEMAS[type];
+  const { globalThemeStyle } = useThemeStyle();
 
   if (!schema) {
     return (
@@ -388,6 +390,57 @@ export function ComponentProperties({ type, props, updateProp, pages }: Componen
     "fill",
     "dimensions",
   ];
+
+  // Reset component to defaults (remove all custom styling)
+  const handleReset = () => {
+    const keysToReset = [
+      // Background
+      "backgroundColor", "backgroundType", "gradientStart", "gradientEnd", 
+      "gradientDirection", "gradientAngle", "backgroundImage", "backgroundImageUrl",
+      "bottomBackgroundImageUrl", "bottomBackgroundSize", "bottomBackgroundPosition",
+      "topImage", "topImageHeight", "topImageObjectFit",
+      // Text
+      "textColor", "fontSize_css", "fontWeight_css", "lineHeight_css", 
+      "letterSpacing_css", "textAlign_css",
+      // Dimensions
+      "width", "height", "minWidth", "minHeight", "maxWidth_css", "maxHeight",
+      // Spacing
+      "paddingTop", "paddingRight", "paddingBottom", "paddingLeft",
+      "marginTop", "marginRight", "marginBottom", "marginLeft",
+      "padding", "margin",
+      // Borders
+      "borderRadius_css", "borderWidth_css", "borderColor", "borderStyle_css",
+      // Effects
+      "opacity_css", "boxShadow",
+      // Position
+      "position_css", "posTop", "posRight", "posBottom", "posLeft", "zIndex",
+      // Overflow
+      "overflowX_css", "overflowY_css", "overflow_css",
+      // Component-specific colors
+      "linkColor", "linkHoverColor", "iconColor", "iconBg", "accentColor",
+    ];
+
+    const resetUpdates: Record<string, any> = {};
+    keysToReset.forEach(key => {
+      if (props[key] !== undefined) {
+        resetUpdates[key] = undefined;
+      }
+    });
+
+    // Set themeStyle to null to disable theme inheritance completely
+    // This forces the component to use its built-in defaults
+    resetUpdates.themeStyle = null;
+
+    // Apply all resets at once
+    Object.keys(resetUpdates).forEach(key => updateProp(key, resetUpdates[key]));
+  };
+
+  // Apply current global theme to component
+  const handleApplyTheme = () => {
+    if (globalThemeStyle) {
+      updateProp("themeStyle", globalThemeStyle);
+    }
+  };
 
   // Render a single field definition
   const renderField = (field: FieldDefinition) => {
@@ -533,6 +586,58 @@ export function ComponentProperties({ type, props, updateProp, pages }: Componen
         const SectionComponent = STYLE_SECTION_MAP[sectionType];
         return <SectionComponent key={sectionType} props={props} updateProp={updateProp} componentType={type} />;
       })}
+
+      {/* Reset & Theme Actions */}
+      <AccordionItem
+        value="reset-actions"
+        className="border-b-0 border-t border-border/50"
+      >
+        <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
+          <div className="flex items-center gap-2">
+            <RotateCcw className="w-4 h-4 text-muted-foreground" />
+            Reset & Theme
+          </div>
+        </AccordionTrigger>
+        <AccordionContent className="px-4 pb-4 pt-2 space-y-3">
+          <div className="space-y-2">
+            <Label className="text-xs font-medium text-muted-foreground">
+              Reset Component
+            </Label>
+            <p className="text-[10px] text-muted-foreground/70 leading-relaxed">
+              Remove all custom styling and return to default values. This will clear colors, dimensions, spacing, and theme overrides.
+            </p>
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full h-8 text-xs gap-2"
+              onClick={handleReset}
+            >
+              <RotateCcw className="w-3 h-3" />
+              Reset to Default
+            </Button>
+          </div>
+
+          <div className="h-px bg-border" />
+
+          <div className="space-y-2">
+            <Label className="text-xs font-medium text-muted-foreground">
+              Apply Global Theme
+            </Label>
+            <p className="text-[10px] text-muted-foreground/70 leading-relaxed">
+              Apply the current global theme ({globalThemeStyle || "dark-pro"}) to this component. This sets the themeStyle property.
+            </p>
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full h-8 text-xs gap-2"
+              onClick={handleApplyTheme}
+            >
+              <Palette className="w-3 h-3" />
+              Apply Theme: {globalThemeStyle || "dark-pro"}
+            </Button>
+          </div>
+        </AccordionContent>
+      </AccordionItem>
     </Accordion>
   );
 }

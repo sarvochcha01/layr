@@ -43,7 +43,7 @@ export function Divider({
   };
 
   const baseStyle = buildComponentStyle({ width, ...rest });
-  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const effectiveTheme = useEffectiveThemeStyle(themeStyle, themeStyle !== undefined);
   const cssVars = getThemeCSSVars(effectiveTheme);
 
 

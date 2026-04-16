@@ -45,7 +45,7 @@ export function Tabs({
   const [activeTab, setActiveTab] = useState(defaultTab);
   const [animating, setAnimating] = useState(false);
 
-  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const effectiveTheme = useEffectiveThemeStyle(themeStyle, themeStyle !== undefined);
   const cssVars = getThemeCSSVars(effectiveTheme);
 
   const handleTabChange = (index: number) => {

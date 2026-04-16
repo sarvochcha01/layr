@@ -26,6 +26,11 @@ interface CardProps {
   width?: string;
   height?: string;
   backgroundColor?: string;
+  backgroundType?: "solid" | "gradient" | "image";
+  gradientStart?: string;
+  gradientEnd?: string;
+  gradientDirection?: string;
+  gradientAngle?: string;
   textColor?: string;
   themeStyle?: ThemeStyleVariant;
   children?: React.ReactNode;
@@ -50,6 +55,11 @@ export function Card({
   width,
   height,
   backgroundColor,
+  backgroundType,
+  gradientStart,
+  gradientEnd,
+  gradientDirection,
+  gradientAngle,
   textColor,
   themeStyle,
   children,
@@ -58,7 +68,7 @@ export function Card({
   ...rest
 }: CardProps) {
   const [hovered, setHovered] = useState(false);
-  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const effectiveTheme = useEffectiveThemeStyle(themeStyle, themeStyle !== undefined);
   const cssVars = getThemeCSSVars(effectiveTheme);
 
   const isNeoBrutalist = effectiveTheme === "neobrutalist";
@@ -66,8 +76,6 @@ export function Card({
 
   const baseStyle: React.CSSProperties = {
     ...cssVars,
-    backgroundColor: backgroundColor || "var(--theme-surface)",
-    color: textColor || "var(--theme-text)",
     ...(width ? { width } : {}),
     ...(height ? { height } : {}),
     border: `var(--theme-border-width) solid var(--theme-border)`,
@@ -88,6 +96,25 @@ export function Card({
     backdropFilter: "var(--theme-backdrop)",
     ...getUserStyleOverrides(rest),
   };
+
+  // Handle background based on type - user preferences MUST override theme
+  if (backgroundType === "gradient" && gradientStart && gradientEnd) {
+    const direction = gradientDirection === "custom"
+      ? `${gradientAngle || "135"}deg`
+      : gradientDirection || "to bottom right";
+    baseStyle.backgroundImage = `linear-gradient(${direction}, ${gradientStart}, ${gradientEnd})`;
+  } else if (backgroundColor) {
+    baseStyle.background = backgroundColor;
+  } else {
+    baseStyle.background = "var(--theme-surface)";
+  }
+
+  // Text color override
+  if (textColor) {
+    baseStyle.color = textColor;
+  } else {
+    baseStyle.color = "var(--theme-text)";
+  }
 
   // Build bottom background image style
   const bottomBackgroundStyle = bottomBackgroundImageUrl
@@ -164,7 +191,7 @@ export function Card({
             className="text-xl break-words leading-tight line-clamp-2"
             style={{
               fontWeight: "var(--theme-heading-weight)" as any,
-              color: "var(--theme-text)",
+              color: textColor || "var(--theme-text)",
               letterSpacing: "var(--theme-letter-spacing)",
               fontFamily: "var(--theme-heading-font)",
             }}
@@ -176,7 +203,7 @@ export function Card({
         {description && (
           <p
             className="text-sm leading-relaxed break-words line-clamp-3"
-            style={{ color: "var(--theme-text-muted)" }}
+            style={{ color: textColor || "var(--theme-text-muted)", opacity: textColor ? 0.8 : 1 }}
           >
             {description}
           </p>
@@ -187,7 +214,7 @@ export function Card({
             <a
               href={buttonLink}
               className="inline-flex items-center gap-1.5 text-sm font-semibold transition-all duration-200 hover:opacity-80 group/btn"
-              style={{ color: "var(--theme-accent)" }}
+              style={{ color: textColor || "var(--theme-accent)" }}
             >
               {buttonText}
               <span className="text-xs transition-transform duration-200 group-hover/btn:translate-x-1">→</span>
