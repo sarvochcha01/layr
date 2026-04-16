@@ -9,6 +9,8 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from "@/components/ui/accordion";
+import { useThemeStyle } from "@/contexts/ThemeStyleContext";
+import { THEME_STYLES } from "@/lib/themeStyles";
 
 const labelClass = "text-xs font-medium text-muted-foreground";
 const selectClass = "w-full h-8 px-2 text-xs bg-transparent appearance-none focus:outline-none";
@@ -19,7 +21,7 @@ const sectionContentClass = "px-4 pb-4 pt-2 space-y-4";
  * Local-state input for box shadow custom value.
  * Commits on blur/Enter to prevent keystroke lag.
  */
-function BoxShadowInput({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+function BoxShadowInput({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder?: string }) {
   const [localValue, setLocalValue] = useState(value || "");
   const prevValueRef = useRef(value);
 
@@ -48,13 +50,21 @@ function BoxShadowInput({ value, onChange }: { value: string; onChange: (v: stri
           (e.target as HTMLInputElement).blur();
         }
       }}
-      placeholder="Custom: 0 4px 6px rgba(0,0,0,0.1)"
+      placeholder={placeholder || "Custom: 0 4px 6px rgba(0,0,0,0.1)"}
       className="h-8 text-xs font-mono"
     />
   );
 }
 
 export function EffectsSection({ props, updateProp }: StyleSectionProps) {
+  // Get active theme defaults
+  const { globalThemeStyle, isGlobalThemeEnabled } = useThemeStyle();
+  const activeThemeKey = props.themeStyle || (isGlobalThemeEnabled ? globalThemeStyle : null);
+  const activeTheme = activeThemeKey ? THEME_STYLES[activeThemeKey as keyof typeof THEME_STYLES] : null;
+
+  const themeShadow = activeTheme?.style.shadow || "none";
+  const themeName = activeTheme?.name;
+
   return (
     <AccordionItem value="effects" className="border-b-0 border-t border-border/50">
       <AccordionTrigger className={sectionTriggerClass}>
@@ -82,10 +92,20 @@ export function EffectsSection({ props, updateProp }: StyleSectionProps) {
           />
         </div>
         <div className="space-y-1.5">
-          <Label className={labelClass}>Box Shadow</Label>
+          <div className="flex items-center justify-between">
+            <Label className={labelClass}>Box Shadow</Label>
+            {props.boxShadow && themeName && (
+              <button
+                onClick={() => updateProp("boxShadow", undefined)}
+                className="text-[10px] text-primary hover:text-primary/80 font-medium"
+              >
+                Use theme
+              </button>
+            )}
+          </div>
           <div className="relative border rounded-md">
             <select value={props.boxShadow || ""} onChange={(e) => updateProp("boxShadow", e.target.value)} className={selectClass}>
-              <option className="bg-background text-foreground" value="">None</option>
+              <option className="bg-background text-foreground" value="">{themeName ? `Theme (${themeShadow === "none" ? "none" : "custom"})` : "None"}</option>
               <option className="bg-background text-foreground" value="0 1px 2px 0 rgba(0,0,0,0.05)">XS</option>
               <option className="bg-background text-foreground" value="0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1)">SM</option>
               <option className="bg-background text-foreground" value="0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1)">MD</option>
@@ -97,6 +117,7 @@ export function EffectsSection({ props, updateProp }: StyleSectionProps) {
           <BoxShadowInput
             value={props.boxShadow || ""}
             onChange={(v) => updateProp("boxShadow", v)}
+            placeholder={themeShadow !== "none" ? themeShadow : undefined}
           />
         </div>
       </AccordionContent>

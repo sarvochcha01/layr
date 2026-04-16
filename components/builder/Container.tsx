@@ -1,5 +1,8 @@
 import { cn } from "@/lib/utils";
 import { buildComponentStyle } from "@/lib/buildStyle";
+import { ThemeStyleVariant, getThemeCSSVars } from "@/lib/themeStyles";
+
+import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
 
 interface ContainerProps {
   children?: React.ReactNode;
@@ -21,6 +24,7 @@ interface ContainerProps {
   gap?: "none" | "sm" | "md" | "lg" | "xl";
   overflowX?: "visible" | "hidden" | "scroll" | "auto";
   overflowY?: "visible" | "hidden" | "scroll" | "auto";
+  themeStyle?: ThemeStyleVariant;
   [key: string]: any;
 }
 
@@ -43,8 +47,12 @@ export function Container({
   gap = "none",
   overflowX = "visible",
   overflowY = "visible",
+  themeStyle,
   ...rest
 }: ContainerProps) {
+  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const cssVars = getThemeCSSVars(effectiveTheme);
+
   const Component = tag;
 
   const maxWidthClasses: Record<string, string> = {
@@ -117,7 +125,7 @@ export function Container({
         overflowYClasses[overflowY],
         className
       )}
-      style={baseStyle}
+      style={{ ...baseStyle, ...cssVars }}
     >
       {children}
     </Component>

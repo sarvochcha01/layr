@@ -1,5 +1,7 @@
 import { cn } from "@/lib/utils";
 import { buildComponentStyle } from "@/lib/buildStyle";
+import { ThemeStyleVariant, getThemeCSSVars } from "@/lib/themeStyles";
+import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
 
 interface DividerProps {
   text?: string;
@@ -8,6 +10,7 @@ interface DividerProps {
   color?: string;
   width?: string;
   spacing?: "sm" | "md" | "lg";
+  themeStyle?: ThemeStyleVariant;
   [key: string]: any;
 }
 
@@ -18,6 +21,7 @@ export function Divider({
   color = "#2a2a2a",
   width,
   spacing = "md",
+  themeStyle,
   ...rest
 }: DividerProps) {
   const thicknessMap = {
@@ -39,12 +43,16 @@ export function Divider({
   };
 
   const baseStyle = buildComponentStyle({ width, ...rest });
+  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const cssVars = getThemeCSSVars(effectiveTheme);
+
 
   if (text) {
     return (
       <div
-        className={cn("flex items-center gap-4", spacingMap[spacing])}
-        style={baseStyle}
+        className={cn(
+        "flex items-center gap-4", spacingMap[spacing])}
+        style={{ ...baseStyle, ...cssVars }}
       >
         <div
           className="flex-1"

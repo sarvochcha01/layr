@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
-import { buildComponentStyle } from "@/lib/buildStyle";
+import { ThemeStyleVariant, getThemeCSSVars } from "@/lib/themeStyles";
+import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
 
 interface NavLink {
   text: string;
@@ -30,6 +30,7 @@ interface NavbarProps {
   textColor?: string;
   linkColor?: string;
   linkHoverColor?: string;
+  themeStyle?: ThemeStyleVariant;
   onNavigate?: (slug: string) => void;
   pages?: any[];
   [key: string]: any;
@@ -52,16 +53,19 @@ export function Navbar({
   isPreviewMode = false,
   width,
   height,
-  backgroundColor = "#1a1a1a",
-  textColor = "#ffffff",
+  backgroundColor,
+  textColor,
   linkColor,
   linkHoverColor,
+  themeStyle,
   onNavigate,
   pages,
   ...rest
 }: NavbarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const cssVars = getThemeCSSVars(effectiveTheme);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -69,42 +73,44 @@ export function Navbar({
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const baseStyle = buildComponentStyle({ backgroundColor, textColor, width, height, ...rest });
+  const navStyle: React.CSSProperties = {
+    ...cssVars,
+    backgroundColor: backgroundColor
+      ? scrolled ? `${backgroundColor}cc` : backgroundColor
+      : scrolled ? "color-mix(in srgb, var(--theme-bg) 85%, transparent)" : "var(--theme-bg)",
+    color: textColor || "var(--theme-text)",
+    backdropFilter: scrolled ? "blur(12px)" : "none",
+    position: scrolled ? "sticky" : undefined,
+    top: scrolled ? 0 : undefined,
+    zIndex: scrolled ? 50 : undefined,
+    boxShadow: scrolled ? `0 1px 0 var(--theme-divider)` : "none",
+    borderBottom: `var(--theme-border-width) solid var(--theme-border)`,
+    ...(width ? { width } : {}),
+    ...(height ? { height } : {}),
+    transition: "all 300ms ease",
+  };
 
   return (
     <div className="relative">
       <nav
         className={cn(
           "flex items-center w-full px-6 sm:px-8 py-4",
-          "border-b border-border",
-          "transition-all duration-300",
           className,
         )}
-        style={{
-          ...baseStyle,
-          backdropFilter: scrolled ? "blur(12px)" : "none",
-          backgroundColor: scrolled
-            ? `${backgroundColor}cc`
-            : baseStyle.backgroundColor,
-          position: scrolled ? "sticky" : undefined,
-          top: scrolled ? 0 : undefined,
-          zIndex: scrolled ? 50 : undefined,
-          boxShadow: scrolled ? "0 1px 0 rgba(255,255,255,0.05)" : "none",
-        }}
+        style={navStyle}
       >
         {/* Logo */}
-        <div
-          className="flex items-center space-x-2 cursor-default"
-          style={{
-            transition: "opacity 200ms ease",
-          }}
-        >
+        <div className="flex items-center space-x-2 cursor-default">
           {logo ? (
             <img src={logo} alt="Logo" className="h-7 sm:h-8 w-auto" />
           ) : (
             <span
-              className="text-lg font-bold tracking-tight"
-              style={{ fontFamily: "'Inter', sans-serif" }}
+              className="text-lg tracking-tight"
+              style={{
+                fontWeight: "var(--theme-heading-weight)" as any,
+                color: textColor || "var(--theme-text)",
+                fontFamily: "var(--theme-heading-font)",
+              }}
             >
               {logoText}
             </span>
@@ -135,27 +141,37 @@ export function Navbar({
                 <a
                   key={index}
                   href={link.external ? link.href : "#"}
-                  className={cn(
-                    "px-4 py-2 text-sm font-medium relative group overflow-hidden",
-                    isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground",
-                  )}
-                  style={{ transition: "color 200ms ease" }}
+                  className="px-4 py-2 text-sm font-medium relative group overflow-hidden transition-all duration-200"
+                  style={{
+                    color: linkColor || (isActive ? "var(--theme-text)" : "var(--theme-text-muted)"),
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = linkHoverColor || "var(--theme-text)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = linkColor || (isActive ? "var(--theme-text)" : "var(--theme-text-muted)");
+                  }}
                   onClick={handleClick}
-                  {...(link.external && isPreviewMode && { target: "_blank", rel: "noopener noreferrer" })}
+                  {...(link.external && isPreviewMode && {
+                    target: "_blank",
+                    rel: "noopener noreferrer",
+                  })}
                 >
                   {link.text}
                   {/* Animated underline */}
                   <span
-                    className="absolute bottom-0 left-0 h-0.5 bg-primary"
+                    className="absolute bottom-0 left-0 h-0.5"
                     style={{
+                      background: "var(--theme-accent)",
                       width: isActive ? "100%" : "0%",
                       transition: "width 250ms cubic-bezier(0.4,0,0.2,1)",
                     }}
                   />
                   {!isActive && (
                     <span
-                      className="absolute bottom-0 left-0 h-0.5 bg-primary opacity-0 group-hover:opacity-100 group-hover:w-full"
+                      className="absolute bottom-0 left-0 h-0.5 opacity-0 group-hover:opacity-100 group-hover:w-full"
                       style={{
+                        background: "var(--theme-accent)",
                         width: "0%",
                         transition: "width 250ms cubic-bezier(0.4,0,0.2,1), opacity 200ms ease",
                       }}
@@ -167,74 +183,78 @@ export function Navbar({
           </div>
         )}
 
-        {/* Right Side Actions */}
+        {/* Right Side */}
         <div className={cn("flex items-center space-x-3", "ml-auto")}>
-          {viewport === "desktop" && (
-            <>
-              <button className="p-2 text-gray-400 hover:text-white transition-colors duration-200 rounded-lg hover:bg-[#2a2a2a] hover:scale-110 active:scale-95">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                </svg>
-              </button>
-              <button className="p-2 text-muted-foreground hover:text-foreground transition-colors duration-200 rounded-lg hover:bg-muted hover:scale-110 active:scale-95">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                </svg>
-              </button>
-            </>
-          )}
-
-          {viewport === "desktop" && (
-            <Button
-              variant="outline"
-              size="sm"
-              className="px-4 h-9 text-xs font-medium border-border bg-transparent hover:bg-muted text-foreground transition-all duration-200 hover:scale-[1.03] active:scale-[0.97]"
-            >
-              Save
-            </Button>
-          )}
-
           {ctaText && ctaLink && (
             <div style={isPreviewMode ? undefined : { pointerEvents: "none" }}>
-              <Button
-                asChild
-                size="sm"
-                className="px-4 h-9 text-xs font-semibold rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground border-0 transition-all duration-200 hover:scale-[1.03] active:scale-[0.97]"
-              >
-                {ctaExternal && isPreviewMode ? (
-                  <a href={ctaLink} target="_blank" rel="noopener noreferrer">{ctaText}</a>
-                ) : (
-                  <Link href={isPreviewMode ? ctaLink : "#"} onClick={isPreviewMode ? undefined : (e) => e.preventDefault()}>
-                    {ctaText}
-                  </Link>
-                )}
-              </Button>
+              {ctaExternal && isPreviewMode ? (
+                <a
+                  href={ctaLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center px-4 h-9 text-xs font-semibold transition-all duration-200 hover:opacity-90 hover:scale-[1.03] active:scale-[0.97]"
+                  style={{
+                    background: "var(--theme-accent)",
+                    color: "var(--theme-accent-fg)",
+                    borderRadius: "var(--theme-radius)",
+                    border: `var(--theme-border-width) solid var(--theme-border)`,
+                    boxShadow: "var(--theme-hard-shadow, none)",
+                  }}
+                >
+                  {ctaText}
+                </a>
+              ) : (
+                <Link
+                  href={isPreviewMode ? ctaLink : "#"}
+                  onClick={isPreviewMode ? undefined : (e) => e.preventDefault()}
+                  className="inline-flex items-center px-4 h-9 text-xs font-semibold transition-all duration-200 hover:opacity-90 hover:scale-[1.03] active:scale-[0.97]"
+                  style={{
+                    background: "var(--theme-accent)",
+                    color: "var(--theme-accent-fg)",
+                    borderRadius: "var(--theme-radius)",
+                    border: `var(--theme-border-width) solid var(--theme-border)`,
+                    boxShadow: "var(--theme-hard-shadow, none)",
+                  }}
+                >
+                  {ctaText}
+                </Link>
+              )}
             </div>
           )}
 
           {links.length > 0 && viewport !== "desktop" && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="p-2 transition-transform duration-200 hover:scale-110 active:scale-95"
+            <button
+              className="p-2 rounded-lg transition-all duration-200 hover:scale-110 active:scale-95"
+              style={{
+                color: "var(--theme-text-muted)",
+                background: "transparent",
+              }}
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
-              {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </Button>
+              {isMobileMenuOpen ? (
+                <X className="w-5 h-5" />
+              ) : (
+                <Menu className="w-5 h-5" />
+              )}
+            </button>
           )}
         </div>
       </nav>
 
-      {/* Mobile Menu — slides down */}
+      {/* Mobile Menu */}
       <div
         style={{
           display: "grid",
-          gridTemplateRows: isMobileMenuOpen && links.length > 0 && viewport !== "desktop" ? "1fr" : "0fr",
+          gridTemplateRows:
+            isMobileMenuOpen && links.length > 0 && viewport !== "desktop"
+              ? "1fr"
+              : "0fr",
           transition: "grid-template-rows 260ms cubic-bezier(0.4,0,0.2,1)",
+          ...cssVars,
+          backgroundColor: "var(--theme-surface)",
+          borderBottom: `1px solid var(--theme-border)`,
         }}
-        className="absolute top-full left-0 right-0 z-50 bg-card border-b border-border shadow-xl"
+        className="absolute top-full left-0 right-0 z-50 shadow-xl"
       >
         <div style={{ overflow: "hidden" }}>
           <div className="py-2 px-2">
@@ -242,7 +262,19 @@ export function Navbar({
               <a
                 key={index}
                 href={link.external ? link.href : "#"}
-                className="block px-4 py-3 text-sm font-medium rounded-lg transition-colors text-foreground/80 hover:bg-muted hover:text-foreground"
+                className="block px-4 py-3 text-sm font-medium rounded-lg transition-colors"
+                style={{
+                  color: "var(--theme-text-muted)",
+                  borderRadius: "var(--theme-radius)",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = "var(--theme-text)";
+                  e.currentTarget.style.backgroundColor = "var(--theme-bg)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = "var(--theme-text-muted)";
+                  e.currentTarget.style.backgroundColor = "transparent";
+                }}
                 onClick={() => {
                   setIsMobileMenuOpen(false);
                   if (onNavigate && !link.external) {
@@ -256,7 +288,10 @@ export function Navbar({
                     onNavigate(slug);
                   }
                 }}
-                {...(link.external && isPreviewMode && { target: "_blank", rel: "noopener noreferrer" })}
+                {...(link.external && isPreviewMode && {
+                  target: "_blank",
+                  rel: "noopener noreferrer",
+                })}
               >
                 {link.text}
               </a>

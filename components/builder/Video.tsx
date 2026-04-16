@@ -1,5 +1,7 @@
 import { cn } from "@/lib/utils";
 import { buildComponentStyle } from "@/lib/buildStyle";
+import { ThemeStyleVariant, getThemeCSSVars } from "@/lib/themeStyles";
+import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
 
 interface VideoProps {
   src?: string;
@@ -16,6 +18,7 @@ interface VideoProps {
   aspectRatio?: "16:9" | "4:3" | "1:1" | "21:9";
   backgroundColor?: string;
   textColor?: string;
+  themeStyle?: ThemeStyleVariant;
   [key: string]: any;
 }
 
@@ -34,6 +37,7 @@ export function Video({
   aspectRatio = "16:9",
   backgroundColor,
   textColor,
+  themeStyle,
   ...rest
 }: VideoProps) {
   const aspectRatioClasses = {
@@ -49,6 +53,9 @@ export function Video({
     paddingTop: rest.paddingTop || "15px",
     ...rest 
   });
+  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const cssVars = getThemeCSSVars(effectiveTheme);
+
 
   // YouTube / Vimeo URL Parsers
   const extractYoutubeId = (urlOrId?: string) => {
@@ -86,8 +93,9 @@ export function Video({
 
     return (
       <div
-        className={cn("w-full", aspectRatioClasses[aspectRatio], className)}
-        style={baseStyle}
+        className={cn(
+        "w-full", aspectRatioClasses[aspectRatio], className)}
+        style={{ ...baseStyle, ...cssVars }}
       >
         <iframe
           src={`https://www.youtube.com/embed/${activeYoutubeId}?${youtubeParams}`}

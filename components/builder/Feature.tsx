@@ -2,7 +2,73 @@
 
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { buildComponentStyle } from "@/lib/buildStyle";
+import { ThemeStyleVariant, getThemeCSSVars } from "@/lib/themeStyles";
+import { getUserStyleOverrides } from "@/lib/buildStyle";
+import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
+import {
+  Zap, Shield, Star, Heart, Settings, Globe, Lock, Cpu,
+  Layers, Code, Rocket, Target, Eye, Bell, Award, BarChart3,
+  CheckCircle, Cloud, Database, PenTool, Smartphone, Users,
+  Sparkles, TrendingUp, Lightbulb, Package, LucideIcon,
+  ArrowRight, Box, Compass, Fingerprint, Flame, GitBranch,
+  Hexagon, Infinity, Key, LifeBuoy, Mail, MessageSquare,
+  Monitor, Music, Navigation, PieChart, Play, Search,
+  Send, Server, ShoppingCart, Terminal, Wifi, Wrench,
+} from "lucide-react";
+
+// ─── Icon Map ────────────────────────────────────────────────────────────────
+const ICON_MAP: Record<string, LucideIcon> = {
+  zap: Zap,
+  shield: Shield,
+  star: Star,
+  heart: Heart,
+  settings: Settings,
+  globe: Globe,
+  lock: Lock,
+  cpu: Cpu,
+  layers: Layers,
+  code: Code,
+  rocket: Rocket,
+  target: Target,
+  eye: Eye,
+  bell: Bell,
+  award: Award,
+  chart: BarChart3,
+  check: CheckCircle,
+  cloud: Cloud,
+  database: Database,
+  pen: PenTool,
+  phone: Smartphone,
+  users: Users,
+  sparkles: Sparkles,
+  trending: TrendingUp,
+  lightbulb: Lightbulb,
+  package: Package,
+  arrow: ArrowRight,
+  box: Box,
+  compass: Compass,
+  fingerprint: Fingerprint,
+  flame: Flame,
+  git: GitBranch,
+  hexagon: Hexagon,
+  infinity: Infinity,
+  key: Key,
+  lifebuoy: LifeBuoy,
+  mail: Mail,
+  message: MessageSquare,
+  monitor: Monitor,
+  music: Music,
+  navigation: Navigation,
+  pie: PieChart,
+  play: Play,
+  search: Search,
+  send: Send,
+  server: Server,
+  cart: ShoppingCart,
+  terminal: Terminal,
+  wifi: Wifi,
+  wrench: Wrench,
+};
 
 interface FeatureProps {
   icon?: string;
@@ -15,87 +81,97 @@ interface FeatureProps {
   iconColor?: string;
   width?: string;
   height?: string;
+  themeStyle?: ThemeStyleVariant;
   [key: string]: any;
 }
 
 export function Feature({
-  icon = "•",
+  icon = "zap",
   title = "Feature Title",
   description = "Explain the value of this feature in a way that resonates with your audience.",
   layout = "vertical",
   iconSize = "md",
-  backgroundColor = "#1a1a1a",
-  textColor = "#ffffff",
-  iconColor = "#3b82f6",
+  backgroundColor,
+  textColor,
+  iconColor,
   width,
   height,
+  themeStyle,
   ...rest
 }: FeatureProps) {
   const [hovered, setHovered] = useState(false);
+  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const cssVars = getThemeCSSVars(effectiveTheme);
 
-  const iconSizes = {
-    sm: "text-xl w-10 h-10",
-    md: "text-2xl w-12 h-12",
-    lg: "text-3xl w-14 h-14",
+  const iconSizeMap = {
+    sm: { container: "w-10 h-10", icon: 18 },
+    md: { container: "w-12 h-12", icon: 22 },
+    lg: { container: "w-14 h-14", icon: 26 },
   };
 
-  const baseStyle = buildComponentStyle({
-    backgroundColor,
-    textColor,
-    width,
-    height,
-    ...rest,
-  });
+  const rootStyle: React.CSSProperties = {
+    ...cssVars,
+    backgroundColor: backgroundColor || "var(--theme-surface)",
+    color: textColor || "var(--theme-text)",
+    borderRadius: "var(--theme-radius)",
+    border: `var(--theme-border-width) solid var(--theme-border)`,
+    padding: "24px",
+    boxShadow: hovered ? "var(--theme-shadow)" : "none",
+    transform: hovered ? "translateY(-4px)" : "translateY(0)",
+    transition: "transform 300ms cubic-bezier(0.34,1.56,0.64,1), box-shadow 300ms ease",
+    backdropFilter: "var(--theme-backdrop)",
+    ...(width ? { width } : {}),
+    ...(height ? { height } : {}),
+    ...getUserStyleOverrides(rest),
+  };
+
+  const resolvedIconColor = iconColor || "var(--theme-accent)";
+  const IconComponent = ICON_MAP[icon] || Zap;
+  const sizes = iconSizeMap[iconSize];
 
   return (
     <div
       className={cn(
-        "p-6 rounded-2xl min-w-0 overflow-hidden border border-border",
+        "min-w-0 overflow-hidden",
         layout === "vertical" ? "text-center" : "flex gap-5 items-start",
       )}
-      style={{
-        ...baseStyle,
-        transition:
-          "transform 300ms cubic-bezier(0.34,1.56,0.64,1), box-shadow 300ms ease, border-color 300ms ease",
-        transform: hovered ? "translateY(-4px)" : "translateY(0)",
-        boxShadow: hovered ? "0 16px 40px rgba(0,0,0,0.35)" : "none",
-        borderColor: hovered ? "rgba(255,255,255,0.12)" : undefined,
-      }}
+      style={rootStyle}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
       <div
         className={cn(
           "rounded-xl flex items-center justify-center flex-shrink-0",
-          iconSizes[iconSize],
+          sizes.container,
           layout === "vertical" && "mx-auto mb-5",
         )}
         style={{
-          background: `linear-gradient(135deg, ${iconColor}15, ${iconColor}25)`,
-          color: iconColor,
-          transition:
-            "transform 350ms cubic-bezier(0.34,1.56,0.64,1), background 250ms ease",
-          transform: hovered
-            ? "scale(1.15) rotate(-5deg)"
-            : "scale(1) rotate(0deg)",
+          background: `color-mix(in srgb, ${resolvedIconColor} 15%, transparent)`,
+          color: resolvedIconColor,
+          borderRadius: "var(--theme-radius)",
+          transition: "transform 350ms cubic-bezier(0.34,1.56,0.64,1)",
+          transform: hovered ? "scale(1.15) rotate(-5deg)" : "scale(1) rotate(0deg)",
         }}
       >
-        {icon}
+        <IconComponent size={sizes.icon} strokeWidth={1.75} />
       </div>
 
-      <div
-        className={cn(
-          "min-w-0",
-          layout === "vertical" ? "text-center" : "flex-1",
-        )}
-      >
+      <div className={cn("min-w-0", layout === "vertical" ? "text-center" : "flex-1")}>
         <h3
-          className="text-lg font-semibold mb-2 tracking-tight break-words text-foreground"
-          style={{ fontFamily: "'Inter', sans-serif" }}
+          className="text-lg mb-2 tracking-tight break-words"
+          style={{
+            fontWeight: "var(--theme-heading-weight)" as any,
+            color: "var(--theme-text)",
+            letterSpacing: "var(--theme-letter-spacing)",
+            fontFamily: "var(--theme-heading-font)",
+          }}
         >
           {title}
         </h3>
-        <p className="text-sm leading-relaxed text-muted-foreground break-words">
+        <p
+          className="text-sm leading-relaxed break-words"
+          style={{ color: "var(--theme-text-muted)" }}
+        >
           {description}
         </p>
       </div>

@@ -1,5 +1,7 @@
 import { cn } from "@/lib/utils";
 import { buildComponentStyle } from "@/lib/buildStyle";
+import { ThemeStyleVariant, getThemeCSSVars } from "@/lib/themeStyles";
+import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
 
 interface GridProps {
   children?: React.ReactNode;
@@ -13,6 +15,7 @@ interface GridProps {
   height?: string;
   backgroundColor?: string;
   textColor?: string;
+  themeStyle?: ThemeStyleVariant;
   [key: string]: any;
 }
 
@@ -28,6 +31,7 @@ export function Grid({
   height,
   backgroundColor,
   textColor,
+  themeStyle,
   ...rest
 }: GridProps) {
   const gapClasses: Record<string, string> = {
@@ -48,6 +52,9 @@ export function Grid({
   };
 
   const baseStyle = buildComponentStyle({ backgroundColor, textColor, width, height, ...rest });
+  const effectiveTheme = useEffectiveThemeStyle(themeStyle, !!themeStyle);
+  const cssVars = getThemeCSSVars(effectiveTheme);
+
 
   // Apply custom gap as inline style when gap is "custom"
   const gridStyle = { ...baseStyle };
@@ -68,7 +75,7 @@ export function Grid({
         gap !== "custom" ? gapClasses[gap] || gapClasses.md : undefined,
         className,
       )}
-      style={gridStyle}
+      style={{ ...gridStyle, ...cssVars }}
     >
       {children}
     </div>
