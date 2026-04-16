@@ -95,7 +95,7 @@ export function Text({
       style={{
         ...baseStyle,
         backgroundColor: rest.backgroundColor || "var(--theme-bg)",
-        color: color || "var(--theme-text)",
+        color: color || rest.textColor || "var(--theme-text)",
         ...cssVars,
         ...(fontOverride ? { fontFamily: getFontFamilyValue(fontOverride) } : {}),
       }}

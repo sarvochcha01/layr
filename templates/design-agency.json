@@ -1,0 +1,2387 @@
+{
+    "name": "Meridian Design Studio",
+    "description": "A stunning 5-page creative design agency website showcasing Hero, Features, Stats, Cards, Testimonials, Tabs, Accordion, Pricing, Forms, Video, and more. Perfect for demonstrating the full power of every component.",
+    "category": "Portfolio",
+    "thumbnail": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400",
+    "featured": true,
+    "pages": [
+        {
+            "id": "home",
+            "name": "Home",
+            "slug": "index",
+            "components": [
+                {
+                    "id": "global-nav",
+                    "type": "Navbar",
+                    "props": {
+                        "logoText": "Meridian",
+                        "links": [
+                            {
+                                "text": "Home",
+                                "href": "page:home"
+                            },
+                            {
+                                "text": "Services",
+                                "href": "page:services"
+                            },
+                            {
+                                "text": "Portfolio",
+                                "href": "page:portfolio"
+                            },
+                            {
+                                "text": "Pricing",
+                                "href": "page:pricing"
+                            },
+                            {
+                                "text": "Contact",
+                                "href": "page:contact"
+                            }
+                        ],
+                        "ctaText": "Start a Project",
+                        "ctaLink": "page:contact"
+                    },
+                    "children": [],
+                    "isGlobal": "GlobalNavbar"
+                },
+                {
+                    "id": "home-hero",
+                    "type": "Hero",
+                    "props": {
+                        "title": "WE DESIGN THE FUTURE OF BRANDS.",
+                        "badge": "ACCEPTING NEW CLIENTS — Q2 2026",
+                        "description": "Meridian is a full-spectrum design studio crafting brand identities, digital experiences, and creative strategies for companies that refuse to blend in.",
+                        "primaryButtonText": "VIEW OUR WORK",
+                        "primaryButtonLink": "page:portfolio",
+                        "secondaryButtonText": "EXPLORE SERVICES",
+                        "secondaryButtonLink": "page:services",
+                        "alignment": "center",
+                        "size": "xl",
+                        "showScrollIndicator": true
+                    },
+                    "children": []
+                },
+                {
+                    "id": "home-trusted-section",
+                    "type": "Container",
+                    "props": {
+                        "padding": "lg",
+                        "display": "flex",
+                        "flexDirection": "column",
+                        "alignItems": "center",
+                        "gap": "md"
+                    },
+                    "children": [
+                        {
+                            "id": "trusted-label",
+                            "type": "Text",
+                            "props": {
+                                "content": "TRUSTED BY INDUSTRY LEADERS",
+                                "tag": "p",
+                                "size": "xs",
+                                "weight": "700",
+                                "letterSpacing": "0.15em",
+                                "backgroundColor": "#ffffff",
+                                "color": "#000000"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "trusted-logos",
+                            "type": "Grid",
+                            "props": {
+                                "columns": 5,
+                                "gap": "2rem",
+                                "alignItems": "center",
+                                "opacity": 0.4
+                            },
+                            "children": [
+                                {
+                                    "id": "tl-1",
+                                    "type": "Text",
+                                    "props": {
+                                        "content": "DROPBOX",
+                                        "tag": "p",
+                                        "size": "lg",
+                                        "weight": "bold",
+                                        "backgroundColor": "#ffffff",
+                                        "color": "#000000"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "tl-2",
+                                    "type": "Text",
+                                    "props": {
+                                        "content": "NOTION",
+                                        "tag": "p",
+                                        "size": "lg",
+                                        "weight": "bold",
+                                        "backgroundColor": "#ffffff",
+                                        "color": "#000000"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "tl-3",
+                                    "type": "Text",
+                                    "props": {
+                                        "content": "STRIPE",
+                                        "tag": "p",
+                                        "size": "lg",
+                                        "weight": "bold",
+                                        "backgroundColor": "#ffffff",
+                                        "color": "#000000"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "tl-4",
+                                    "type": "Text",
+                                    "props": {
+                                        "content": "FIGMA",
+                                        "tag": "p",
+                                        "size": "lg",
+                                        "weight": "bold",
+                                        "backgroundColor": "#ffffff",
+                                        "color": "#000000"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "tl-5",
+                                    "type": "Text",
+                                    "props": {
+                                        "content": "VERCEL",
+                                        "tag": "p",
+                                        "size": "lg",
+                                        "weight": "bold",
+                                        "backgroundColor": "#ffffff",
+                                        "color": "#000000"
+                                    },
+                                    "children": []
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "home-stats",
+                    "type": "Stats",
+                    "props": {
+                        "stats": [
+                            {
+                                "value": "200",
+                                "label": "PROJECTS DELIVERED",
+                                "suffix": "+"
+                            },
+                            {
+                                "value": "98",
+                                "label": "CLIENT RETENTION",
+                                "suffix": "%"
+                            },
+                            {
+                                "value": "15",
+                                "label": "DESIGN AWARDS",
+                                "suffix": ""
+                            },
+                            {
+                                "value": "12",
+                                "label": "YEARS OF CRAFT",
+                                "suffix": ""
+                            }
+                        ],
+                        "layout": "horizontal",
+                        "variant": "bordered"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "home-spacer-1",
+                    "type": "Spacer",
+                    "props": {
+                        "height": "48px"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "home-services-header",
+                    "type": "Container",
+                    "props": {
+                        "padding": "lg",
+                        "display": "flex",
+                        "flexDirection": "column",
+                        "alignItems": "center",
+                        "gap": "sm"
+                    },
+                    "children": [
+                        {
+                            "id": "svc-badge",
+                            "type": "Badge",
+                            "props": {
+                                "text": "What We Do",
+                                "variant": "info",
+                                "size": "sm",
+                                "rounded": true
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "svc-title",
+                            "type": "Text",
+                            "props": {
+                                "content": "Design That Moves Markets",
+                                "tag": "h2",
+                                "size": "4xl",
+                                "weight": "800",
+                                "backgroundColor": "#ffffff",
+                                "color": "#000000"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "svc-desc",
+                            "type": "Text",
+                            "props": {
+                                "content": "From first spark to final pixel — we handle every dimension of the creative process.",
+                                "tag": "p",
+                                "size": "lg",
+                                "maxWidth": "600px",
+                                "backgroundColor": "#ffffff",
+                                "color": "#000000"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "home-services-grid",
+                    "type": "Grid",
+                    "props": {
+                        "columns": 3,
+                        "gap": "1.5rem"
+                    },
+                    "children": [
+                        {
+                            "id": "hsvc-1",
+                            "type": "Feature",
+                            "props": {
+                                "icon": "pen",
+                                "title": "Brand Identity",
+                                "description": "Logos, color systems, typography, and brand guidelines that create instant recognition and lasting impressions.",
+                                "layout": "vertical",
+                                "iconSize": "lg"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "hsvc-2",
+                            "type": "Feature",
+                            "props": {
+                                "icon": "monitor",
+                                "title": "Web & Product Design",
+                                "description": "Responsive websites, SaaS dashboards, and mobile apps designed for conversion and delight.",
+                                "layout": "vertical",
+                                "iconSize": "lg"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "hsvc-3",
+                            "type": "Feature",
+                            "props": {
+                                "icon": "rocket",
+                                "title": "Creative Strategy",
+                                "description": "Market research, competitive analysis, and creative direction that positions your brand ahead of the curve.",
+                                "layout": "vertical",
+                                "iconSize": "lg"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "home-spacer-2",
+                    "type": "Spacer",
+                    "props": {
+                        "height": "64px"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "home-featured-work-header",
+                    "type": "Container",
+                    "props": {
+                        "padding": "lg",
+                        "display": "flex",
+                        "flexDirection": "column",
+                        "alignItems": "center",
+                        "gap": "sm"
+                    },
+                    "children": [
+                        {
+                            "id": "fw-badge",
+                            "type": "Badge",
+                            "props": {
+                                "text": "Featured Work",
+                                "variant": "info",
+                                "size": "sm",
+                                "rounded": true
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "fw-title",
+                            "type": "Text",
+                            "props": {
+                                "content": "Projects That Speak for Themselves",
+                                "tag": "h2",
+                                "size": "4xl",
+                                "weight": "800",
+                                "backgroundColor": "#ffffff",
+                                "color": "#000000"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "home-work-grid",
+                    "type": "Grid",
+                    "props": {
+                        "columns": 3,
+                        "gap": "1.5rem"
+                    },
+                    "children": [
+                        {
+                            "id": "hw-1",
+                            "type": "Card",
+                            "props": {
+                                "title": "Aurora Finance — Complete Rebrand",
+                                "description": "A modern fintech rebrand transforming a traditional bank into a digital-first financial platform.",
+                                "topImage": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&h=350&fit=crop",
+                                "topImageHeight": "220px",
+                                "buttonText": "View Case Study"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "hw-2",
+                            "type": "Card",
+                            "props": {
+                                "title": "Solstice Health — App Design",
+                                "description": "An award-winning health & wellness app featuring biometric tracking, AI coaching, and a calm visual language.",
+                                "topImage": "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=600&h=350&fit=crop",
+                                "topImageHeight": "220px",
+                                "buttonText": "View Case Study"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "hw-3",
+                            "type": "Card",
+                            "props": {
+                                "title": "Vanta Studios — Brand System",
+                                "description": "A complete identity system for a premium music production studio, from wordmark to spatial design.",
+                                "topImage": "https://images.unsplash.com/photo-1633356122102-3fe601e05bd2?w=600&h=350&fit=crop",
+                                "topImageHeight": "220px",
+                                "buttonText": "View Case Study"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "home-spacer-3",
+                    "type": "Spacer",
+                    "props": {
+                        "height": "64px"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "home-testimonials-header",
+                    "type": "Container",
+                    "props": {
+                        "padding": "md",
+                        "display": "flex",
+                        "flexDirection": "column",
+                        "alignItems": "center",
+                        "gap": "sm"
+                    },
+                    "children": [
+                        {
+                            "id": "test-label",
+                            "type": "Text",
+                            "props": {
+                                "content": "What Our Clients Say",
+                                "tag": "h2",
+                                "size": "3xl",
+                                "weight": "800",
+                                "backgroundColor": "#ffffff",
+                                "color": "#000000"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "home-testimonials-grid",
+                    "type": "Grid",
+                    "props": {
+                        "columns": 3,
+                        "gap": "1.5rem"
+                    },
+                    "children": [
+                        {
+                            "id": "ht-1",
+                            "type": "Testimonial",
+                            "props": {
+                                "quote": "Meridian didn't just redesign our brand — they redefined how our customers perceive us. Revenue up 340% in the first quarter post-launch.",
+                                "author": "Sarah Chen",
+                                "role": "CEO",
+                                "company": "Aurora Finance",
+                                "rating": 5,
+                                "variant": "card"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "ht-2",
+                            "type": "Testimonial",
+                            "props": {
+                                "quote": "The attention to micro-interactions and motion design was extraordinary. Our app store rating jumped from 3.2 to 4.9 within two months.",
+                                "author": "James Rivera",
+                                "role": "Head of Product",
+                                "company": "Solstice Health",
+                                "rating": 5,
+                                "variant": "featured"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "ht-3",
+                            "type": "Testimonial",
+                            "props": {
+                                "quote": "Working with Meridian felt like having an in-house creative team that actually understands business objectives. Absolute perfection.",
+                                "author": "Anika Patel",
+                                "role": "Creative Director",
+                                "company": "Vanta Studios",
+                                "rating": 5,
+                                "variant": "card"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "home-spacer-4",
+                    "type": "Spacer",
+                    "props": {
+                        "height": "48px"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "home-cta",
+                    "type": "CTA",
+                    "props": {
+                        "title": "Ready to transform your brand?",
+                        "description": "Let's discuss your vision. We typically respond within 2 business hours.",
+                        "primaryButtonText": "Start a Conversation",
+                        "primaryButtonLink": "page:contact",
+                        "secondaryButtonText": "View Pricing",
+                        "secondaryButtonLink": "page:pricing",
+                        "alignment": "center",
+                        "size": "lg"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "global-footer",
+                    "type": "Footer",
+                    "props": {
+                        "logoText": "Meridian",
+                        "description": "A full-spectrum design studio crafting brand identities, digital experiences, and creative strategies for ambitious companies.",
+                        "variant": "standard",
+                        "copyright": "© 2026 Meridian Design Studio. All rights reserved.",
+                        "sections": [
+                            {
+                                "title": "STUDIO",
+                                "links": [
+                                    {
+                                        "text": "Services",
+                                        "href": "page:services"
+                                    },
+                                    {
+                                        "text": "Portfolio",
+                                        "href": "page:portfolio"
+                                    },
+                                    {
+                                        "text": "Pricing",
+                                        "href": "page:pricing"
+                                    },
+                                    {
+                                        "text": "Contact",
+                                        "href": "page:contact"
+                                    }
+                                ]
+                            },
+                            {
+                                "title": "COMPANY",
+                                "links": [
+                                    {
+                                        "text": "About Us",
+                                        "href": "#"
+                                    },
+                                    {
+                                        "text": "Careers",
+                                        "href": "#"
+                                    },
+                                    {
+                                        "text": "Blog",
+                                        "href": "#"
+                                    },
+                                    {
+                                        "text": "Press Kit",
+                                        "href": "#"
+                                    }
+                                ]
+                            },
+                            {
+                                "title": "CONNECT",
+                                "links": [
+                                    {
+                                        "text": "Twitter / X",
+                                        "href": "#"
+                                    },
+                                    {
+                                        "text": "Dribbble",
+                                        "href": "#"
+                                    },
+                                    {
+                                        "text": "LinkedIn",
+                                        "href": "#"
+                                    },
+                                    {
+                                        "text": "Instagram",
+                                        "href": "#"
+                                    }
+                                ]
+                            }
+                        ],
+                        "socialLinks": [
+                            {
+                                "platform": "Twitter",
+                                "href": "#",
+                                "icon": "T"
+                            },
+                            {
+                                "platform": "Dribbble",
+                                "href": "#",
+                                "icon": "D"
+                            },
+                            {
+                                "platform": "GitHub",
+                                "href": "#",
+                                "icon": "G"
+                            }
+                        ]
+                    },
+                    "children": [],
+                    "isGlobal": "GlobalFooter"
+                }
+            ]
+        },
+        {
+            "id": "services",
+            "name": "Services",
+            "slug": "services",
+            "components": [
+                {
+                    "id": "svc-nav",
+                    "type": "Navbar",
+                    "props": {
+                        "logoText": "Meridian",
+                        "links": [
+                            {
+                                "text": "Home",
+                                "href": "page:home"
+                            },
+                            {
+                                "text": "Services",
+                                "href": "page:services"
+                            },
+                            {
+                                "text": "Portfolio",
+                                "href": "page:portfolio"
+                            },
+                            {
+                                "text": "Pricing",
+                                "href": "page:pricing"
+                            },
+                            {
+                                "text": "Contact",
+                                "href": "page:contact"
+                            }
+                        ],
+                        "ctaText": "Start a Project",
+                        "ctaLink": "page:contact"
+                    },
+                    "children": [],
+                    "isGlobal": "GlobalNavbar"
+                },
+                {
+                    "id": "svc-hero-section",
+                    "type": "Container",
+                    "props": {
+                        "padding": "xl",
+                        "display": "flex",
+                        "flexDirection": "column",
+                        "alignItems": "center",
+                        "gap": "md"
+                    },
+                    "children": [
+                        {
+                            "id": "svc-page-badge",
+                            "type": "Badge",
+                            "props": {
+                                "text": "Our Services",
+                                "variant": "info",
+                                "size": "md",
+                                "rounded": true
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "svc-page-title",
+                            "type": "Text",
+                            "props": {
+                                "content": "Everything Your Brand Needs to Win",
+                                "tag": "h1",
+                                "size": "5xl",
+                                "weight": "800",
+                                "maxWidth": "800px",
+                                "backgroundColor": "#ffffff",
+                                "color": "#000000"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "svc-page-desc",
+                            "type": "Text",
+                            "props": {
+                                "content": "We offer end-to-end creative services — from initial research and strategy through design, development, and ongoing optimization.",
+                                "tag": "p",
+                                "size": "xl",
+                                "maxWidth": "650px",
+                                "backgroundColor": "#ffffff",
+                                "color": "#000000"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "svc-divider-1",
+                    "type": "Divider",
+                    "props": {},
+                    "children": []
+                },
+                {
+                    "id": "svc-tabs",
+                    "type": "Tabs",
+                    "props": {
+                        "tabs": [
+                            {
+                                "label": "Brand Strategy",
+                                "content": "We dive deep into your market, audience, and competitive landscape to define a brand positioning that creates unfair advantage. Deliverables include brand architecture, messaging frameworks, tone of voice guidelines, and go-to-market creative briefs."
+                            },
+                            {
+                                "label": "Visual Identity",
+                                "content": "From logomarks and color palettes to typography systems and iconography — we craft cohesive visual languages that are instantly memorable. Every identity system comes with comprehensive brand guidelines for consistency at scale."
+                            },
+                            {
+                                "label": "Digital Design",
+                                "content": "Pixel-perfect websites, product interfaces, and mobile applications designed with obsessive attention to user experience. We prototype in Figma, test with real users, and iterate until every interaction feels effortless."
+                            },
+                            {
+                                "label": "Motion & 3D",
+                                "content": "Animated explainers, UI micro-interactions, 3D product visualizations, and spatial design. We bring static brands to life with motion that captures attention and communicates complex ideas in seconds."
+                            }
+                        ],
+                        "defaultTab": 0,
+                        "variant": "underline"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "svc-spacer-1",
+                    "type": "Spacer",
+                    "props": {
+                        "height": "48px"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "svc-detail-header",
+                    "type": "Container",
+                    "props": {
+                        "padding": "md",
+                        "display": "flex",
+                        "flexDirection": "column",
+                        "alignItems": "center",
+                        "gap": "sm"
+                    },
+                    "children": [
+                        {
+                            "id": "svc-detail-title",
+                            "type": "Text",
+                            "props": {
+                                "content": "Our Full Service Offering",
+                                "tag": "h2",
+                                "size": "3xl",
+                                "weight": "800",
+                                "backgroundColor": "#ffffff",
+                                "color": "#000000"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "svc-features-grid-1",
+                    "type": "Grid",
+                    "props": {
+                        "columns": 3,
+                        "gap": "1.5rem"
+                    },
+                    "children": [
+                        {
+                            "id": "sf-1",
+                            "type": "Feature",
+                            "props": {
+                                "icon": "pen",
+                                "title": "Brand Identity Design",
+                                "description": "Logos, wordmarks, brand books, color systems, and comprehensive visual guidelines.",
+                                "layout": "vertical"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "sf-2",
+                            "type": "Feature",
+                            "props": {
+                                "icon": "globe",
+                                "title": "Website Design & Dev",
+                                "description": "Custom responsive websites from landing pages to complex web apps with CMS integration.",
+                                "layout": "vertical"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "sf-3",
+                            "type": "Feature",
+                            "props": {
+                                "icon": "phone",
+                                "title": "Mobile App Design",
+                                "description": "iOS and Android app interfaces with fluid interactions and platform-native design patterns.",
+                                "layout": "vertical"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "sf-4",
+                            "type": "Feature",
+                            "props": {
+                                "icon": "layers",
+                                "title": "Design Systems",
+                                "description": "Scalable component libraries that ensure consistency across products, teams, and platforms.",
+                                "layout": "vertical"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "sf-5",
+                            "type": "Feature",
+                            "props": {
+                                "icon": "play",
+                                "title": "Motion Design",
+                                "description": "UI animations, explainer videos, brand motion graphics, and interactive prototypes.",
+                                "layout": "vertical"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "sf-6",
+                            "type": "Feature",
+                            "props": {
+                                "icon": "target",
+                                "title": "UX Research & Audit",
+                                "description": "User interviews, usability testing, heuristic evaluations, and data-driven design decisions.",
+                                "layout": "vertical"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "svc-spacer-2",
+                    "type": "Spacer",
+                    "props": {
+                        "height": "48px"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "svc-process-header",
+                    "type": "Container",
+                    "props": {
+                        "padding": "md",
+                        "display": "flex",
+                        "flexDirection": "column",
+                        "alignItems": "center",
+                        "gap": "sm"
+                    },
+                    "children": [
+                        {
+                            "id": "process-title",
+                            "type": "Text",
+                            "props": {
+                                "content": "Our Design Process",
+                                "tag": "h2",
+                                "size": "3xl",
+                                "weight": "800",
+                                "backgroundColor": "#ffffff",
+                                "color": "#000000"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "process-desc",
+                            "type": "Text",
+                            "props": {
+                                "content": "A battle-tested methodology refined over 200+ successful projects.",
+                                "tag": "p",
+                                "size": "lg",
+                                "maxWidth": "550px",
+                                "backgroundColor": "#ffffff",
+                                "color": "#000000"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "svc-process-features",
+                    "type": "Grid",
+                    "props": {
+                        "columns": 2,
+                        "gap": "1.5rem"
+                    },
+                    "children": [
+                        {
+                            "id": "sp-1",
+                            "type": "Feature",
+                            "props": {
+                                "icon": "search",
+                                "title": "01 — Discovery & Research",
+                                "description": "We immerse ourselves in your business, market, and audience. Stakeholder interviews, competitive analysis, and user research form the foundation of every project.",
+                                "layout": "horizontal",
+                                "iconSize": "lg"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "sp-2",
+                            "type": "Feature",
+                            "props": {
+                                "icon": "compass",
+                                "title": "02 — Strategy & Direction",
+                                "description": "Insights become a strategic roadmap. We define positioning, creative direction, and measurable objectives before a single pixel is placed.",
+                                "layout": "horizontal",
+                                "iconSize": "lg"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "sp-3",
+                            "type": "Feature",
+                            "props": {
+                                "icon": "sparkles",
+                                "title": "03 — Design & Prototype",
+                                "description": "High-fidelity mockups and interactive prototypes bring the strategy to life. We obsess over every detail — from layout to micro-interactions.",
+                                "layout": "horizontal",
+                                "iconSize": "lg"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "sp-4",
+                            "type": "Feature",
+                            "props": {
+                                "icon": "rocket",
+                                "title": "04 — Launch & Iterate",
+                                "description": "Pixel-perfect handoff to development, QA testing, and post-launch analytics. We stay involved to optimize and evolve the design over time.",
+                                "layout": "horizontal",
+                                "iconSize": "lg"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "svc-spacer-3",
+                    "type": "Spacer",
+                    "props": {
+                        "height": "48px"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "svc-cta",
+                    "type": "CTA",
+                    "props": {
+                        "title": "Have a project in mind?",
+                        "description": "Tell us about your goals as much or as little as you'd like — we'll figure out the best approach together.",
+                        "primaryButtonText": "Get in Touch",
+                        "primaryButtonLink": "page:contact",
+                        "alignment": "center",
+                        "size": "lg"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "svc-footer",
+                    "type": "Footer",
+                    "props": {
+                        "logoText": "Meridian",
+                        "description": "A full-spectrum design studio crafting brand identities, digital experiences, and creative strategies for ambitious companies.",
+                        "variant": "standard",
+                        "copyright": "© 2026 Meridian Design Studio. All rights reserved.",
+                        "sections": [
+                            {
+                                "title": "STUDIO",
+                                "links": [
+                                    {
+                                        "text": "Services",
+                                        "href": "page:services"
+                                    },
+                                    {
+                                        "text": "Portfolio",
+                                        "href": "page:portfolio"
+                                    },
+                                    {
+                                        "text": "Pricing",
+                                        "href": "page:pricing"
+                                    },
+                                    {
+                                        "text": "Contact",
+                                        "href": "page:contact"
+                                    }
+                                ]
+                            },
+                            {
+                                "title": "COMPANY",
+                                "links": [
+                                    {
+                                        "text": "About Us",
+                                        "href": "#"
+                                    },
+                                    {
+                                        "text": "Careers",
+                                        "href": "#"
+                                    },
+                                    {
+                                        "text": "Blog",
+                                        "href": "#"
+                                    },
+                                    {
+                                        "text": "Press Kit",
+                                        "href": "#"
+                                    }
+                                ]
+                            },
+                            {
+                                "title": "CONNECT",
+                                "links": [
+                                    {
+                                        "text": "Twitter / X",
+                                        "href": "#"
+                                    },
+                                    {
+                                        "text": "Dribbble",
+                                        "href": "#"
+                                    },
+                                    {
+                                        "text": "LinkedIn",
+                                        "href": "#"
+                                    },
+                                    {
+                                        "text": "Instagram",
+                                        "href": "#"
+                                    }
+                                ]
+                            }
+                        ],
+                        "socialLinks": [
+                            {
+                                "platform": "Twitter",
+                                "href": "#",
+                                "icon": "T"
+                            },
+                            {
+                                "platform": "Dribbble",
+                                "href": "#",
+                                "icon": "D"
+                            },
+                            {
+                                "platform": "GitHub",
+                                "href": "#",
+                                "icon": "G"
+                            }
+                        ]
+                    },
+                    "children": [],
+                    "isGlobal": "GlobalFooter"
+                }
+            ]
+        },
+        {
+            "id": "portfolio",
+            "name": "Portfolio",
+            "slug": "portfolio",
+            "components": [
+                {
+                    "id": "port-nav",
+                    "type": "Navbar",
+                    "props": {
+                        "logoText": "Meridian",
+                        "links": [
+                            {
+                                "text": "Home",
+                                "href": "page:home"
+                            },
+                            {
+                                "text": "Services",
+                                "href": "page:services"
+                            },
+                            {
+                                "text": "Portfolio",
+                                "href": "page:portfolio"
+                            },
+                            {
+                                "text": "Pricing",
+                                "href": "page:pricing"
+                            },
+                            {
+                                "text": "Contact",
+                                "href": "page:contact"
+                            }
+                        ],
+                        "ctaText": "Start a Project",
+                        "ctaLink": "page:contact"
+                    },
+                    "children": [],
+                    "isGlobal": "GlobalNavbar"
+                },
+                {
+                    "id": "port-hero-section",
+                    "type": "Container",
+                    "props": {
+                        "padding": "xl",
+                        "display": "flex",
+                        "flexDirection": "column",
+                        "alignItems": "center",
+                        "gap": "md"
+                    },
+                    "children": [
+                        {
+                            "id": "port-page-title",
+                            "type": "Text",
+                            "props": {
+                                "content": "Selected Work",
+                                "tag": "h1",
+                                "size": "5xl",
+                                "weight": "800",
+                                "backgroundColor": "#ffffff",
+                                "color": "#000000"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "port-page-desc",
+                            "type": "Text",
+                            "props": {
+                                "content": "A curated collection of our most impactful projects across brand identity, digital product, and creative strategy.",
+                                "tag": "p",
+                                "size": "xl",
+                                "maxWidth": "650px",
+                                "backgroundColor": "#ffffff",
+                                "color": "#000000"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "port-alert",
+                    "type": "Alert",
+                    "props": {
+                        "title": "Currently Booking for Q3 2026",
+                        "message": "We have 2 remaining slots for new brand identity projects starting July 2026. Reach out early to secure your spot.",
+                        "variant": "info",
+                        "dismissible": false
+                    },
+                    "children": []
+                },
+                {
+                    "id": "port-spacer-1",
+                    "type": "Spacer",
+                    "props": {
+                        "height": "32px"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "port-grid-top",
+                    "type": "Grid",
+                    "props": {
+                        "columns": 2,
+                        "gap": "1.5rem"
+                    },
+                    "children": [
+                        {
+                            "id": "pw-1",
+                            "type": "Card",
+                            "props": {
+                                "title": "Aurora Finance — Complete Rebrand",
+                                "description": "Repositioned a traditional bank as a digital-first financial platform. New identity, website, mobile app, and marketing collateral.",
+                                "topImage": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=700&h=400&fit=crop",
+                                "topImageHeight": "260px",
+                                "buttonText": "View Case Study"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "pw-2",
+                            "type": "Card",
+                            "props": {
+                                "title": "Solstice Health — App Design",
+                                "description": "Award-winning health & wellness app featuring biometric tracking, AI coaching, and a calming visual language used by 2M+ users.",
+                                "topImage": "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=700&h=400&fit=crop",
+                                "topImageHeight": "260px",
+                                "buttonText": "View Case Study"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "port-spacer-2",
+                    "type": "Spacer",
+                    "props": {
+                        "height": "24px"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "port-grid-bottom",
+                    "type": "Grid",
+                    "props": {
+                        "columns": 3,
+                        "gap": "1.5rem"
+                    },
+                    "children": [
+                        {
+                            "id": "pw-3",
+                            "type": "Card",
+                            "props": {
+                                "title": "Vanta Studios — Brand System",
+                                "description": "Complete identity system for a premium music production studio — from wordmark to spatial design.",
+                                "topImage": "https://images.unsplash.com/photo-1633356122102-3fe601e05bd2?w=600&h=350&fit=crop",
+                                "topImageHeight": "200px",
+                                "buttonText": "View Details"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "pw-4",
+                            "type": "Card",
+                            "props": {
+                                "title": "Nimbus Cloud — SaaS Dashboard",
+                                "description": "A data-dense cloud infrastructure dashboard designed for clarity, speed, and developer delight.",
+                                "topImage": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=350&fit=crop",
+                                "topImageHeight": "200px",
+                                "buttonText": "View Details"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "pw-5",
+                            "type": "Card",
+                            "props": {
+                                "title": "Terrain Outdoors — E-commerce",
+                                "description": "A rugged, adventure-driven e-commerce experience for a premium outdoor gear brand.",
+                                "topImage": "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=600&h=350&fit=crop",
+                                "topImageHeight": "200px",
+                                "buttonText": "View Details"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "port-spacer-3",
+                    "type": "Spacer",
+                    "props": {
+                        "height": "48px"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "port-video-header",
+                    "type": "Container",
+                    "props": {
+                        "padding": "md",
+                        "display": "flex",
+                        "flexDirection": "column",
+                        "alignItems": "center",
+                        "gap": "sm"
+                    },
+                    "children": [
+                        {
+                            "id": "vid-title",
+                            "type": "Text",
+                            "props": {
+                                "content": "See Our Process in Action",
+                                "tag": "h2",
+                                "size": "3xl",
+                                "weight": "800",
+                                "backgroundColor": "#ffffff",
+                                "color": "#000000"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "vid-desc",
+                            "type": "Text",
+                            "props": {
+                                "content": "A behind-the-scenes look at how we approach a brand transformation from start to launch.",
+                                "tag": "p",
+                                "size": "lg",
+                                "maxWidth": "550px",
+                                "backgroundColor": "#ffffff",
+                                "color": "#000000"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "port-video",
+                    "type": "Video",
+                    "props": {
+                        "youtubeId": "dQw4w9WgXcQ",
+                        "aspectRatio": "16:9"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "port-spacer-4",
+                    "type": "Spacer",
+                    "props": {
+                        "height": "48px"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "port-stats",
+                    "type": "Stats",
+                    "props": {
+                        "stats": [
+                            {
+                                "value": "200",
+                                "label": "PROJECTS COMPLETED",
+                                "suffix": "+"
+                            },
+                            {
+                                "value": "47",
+                                "label": "COUNTRIES SERVED",
+                                "suffix": ""
+                            },
+                            {
+                                "value": "340",
+                                "label": "AVG. REVENUE GROWTH",
+                                "suffix": "%"
+                            },
+                            {
+                                "value": "4.9",
+                                "label": "AVERAGE RATING",
+                                "suffix": "★"
+                            }
+                        ],
+                        "layout": "horizontal",
+                        "variant": "cards"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "port-spacer-5",
+                    "type": "Spacer",
+                    "props": {
+                        "height": "48px"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "port-cta",
+                    "type": "CTA",
+                    "props": {
+                        "title": "Like what you see?",
+                        "description": "Your brand deserves this level of craft. Let's make it happen.",
+                        "primaryButtonText": "Start Your Project",
+                        "primaryButtonLink": "page:contact",
+                        "secondaryButtonText": "See Pricing",
+                        "secondaryButtonLink": "page:pricing",
+                        "alignment": "center",
+                        "size": "lg"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "port-footer",
+                    "type": "Footer",
+                    "props": {
+                        "logoText": "Meridian",
+                        "description": "A full-spectrum design studio crafting brand identities, digital experiences, and creative strategies for ambitious companies.",
+                        "variant": "standard",
+                        "copyright": "© 2026 Meridian Design Studio. All rights reserved.",
+                        "sections": [
+                            {
+                                "title": "STUDIO",
+                                "links": [
+                                    {
+                                        "text": "Services",
+                                        "href": "page:services"
+                                    },
+                                    {
+                                        "text": "Portfolio",
+                                        "href": "page:portfolio"
+                                    },
+                                    {
+                                        "text": "Pricing",
+                                        "href": "page:pricing"
+                                    },
+                                    {
+                                        "text": "Contact",
+                                        "href": "page:contact"
+                                    }
+                                ]
+                            },
+                            {
+                                "title": "COMPANY",
+                                "links": [
+                                    {
+                                        "text": "About Us",
+                                        "href": "#"
+                                    },
+                                    {
+                                        "text": "Careers",
+                                        "href": "#"
+                                    },
+                                    {
+                                        "text": "Blog",
+                                        "href": "#"
+                                    },
+                                    {
+                                        "text": "Press Kit",
+                                        "href": "#"
+                                    }
+                                ]
+                            },
+                            {
+                                "title": "CONNECT",
+                                "links": [
+                                    {
+                                        "text": "Twitter / X",
+                                        "href": "#"
+                                    },
+                                    {
+                                        "text": "Dribbble",
+                                        "href": "#"
+                                    },
+                                    {
+                                        "text": "LinkedIn",
+                                        "href": "#"
+                                    },
+                                    {
+                                        "text": "Instagram",
+                                        "href": "#"
+                                    }
+                                ]
+                            }
+                        ],
+                        "socialLinks": [
+                            {
+                                "platform": "Twitter",
+                                "href": "#",
+                                "icon": "T"
+                            },
+                            {
+                                "platform": "Dribbble",
+                                "href": "#",
+                                "icon": "D"
+                            },
+                            {
+                                "platform": "GitHub",
+                                "href": "#",
+                                "icon": "G"
+                            }
+                        ]
+                    },
+                    "children": [],
+                    "isGlobal": "GlobalFooter"
+                }
+            ]
+        },
+        {
+            "id": "pricing",
+            "name": "Pricing",
+            "slug": "pricing",
+            "components": [
+                {
+                    "id": "price-nav",
+                    "type": "Navbar",
+                    "props": {
+                        "logoText": "Meridian",
+                        "links": [
+                            {
+                                "text": "Home",
+                                "href": "page:home"
+                            },
+                            {
+                                "text": "Services",
+                                "href": "page:services"
+                            },
+                            {
+                                "text": "Portfolio",
+                                "href": "page:portfolio"
+                            },
+                            {
+                                "text": "Pricing",
+                                "href": "page:pricing"
+                            },
+                            {
+                                "text": "Contact",
+                                "href": "page:contact"
+                            }
+                        ],
+                        "ctaText": "Start a Project",
+                        "ctaLink": "page:contact"
+                    },
+                    "children": [],
+                    "isGlobal": "GlobalNavbar"
+                },
+                {
+                    "id": "price-hero-section",
+                    "type": "Container",
+                    "props": {
+                        "padding": "xl",
+                        "display": "flex",
+                        "flexDirection": "column",
+                        "alignItems": "center",
+                        "gap": "md"
+                    },
+                    "children": [
+                        {
+                            "id": "price-badge",
+                            "type": "Badge",
+                            "props": {
+                                "text": "Transparent Pricing",
+                                "variant": "success",
+                                "size": "md",
+                                "rounded": true
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "price-page-title",
+                            "type": "Text",
+                            "props": {
+                                "content": "Investment Plans That Scale With You",
+                                "tag": "h1",
+                                "size": "5xl",
+                                "weight": "800",
+                                "maxWidth": "750px",
+                                "backgroundColor": "#ffffff",
+                                "color": "#000000"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "price-page-desc",
+                            "type": "Text",
+                            "props": {
+                                "content": "Whether you need a single deliverable or a full creative partnership, we have a plan that fits. All plans include unlimited revisions.",
+                                "tag": "p",
+                                "size": "xl",
+                                "maxWidth": "600px",
+                                "backgroundColor": "#ffffff",
+                                "color": "#000000"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "pricing-cards-grid",
+                    "type": "Grid",
+                    "props": {
+                        "columns": 3,
+                        "gap": "1.5rem",
+                        "alignItems": "stretch"
+                    },
+                    "children": [
+                        {
+                            "id": "plan-starter",
+                            "type": "PricingCard",
+                            "props": {
+                                "title": "Starter",
+                                "price": "$2,500",
+                                "period": "project",
+                                "description": "Perfect for startups needing a strong visual foundation.",
+                                "features": [
+                                    {
+                                        "text": "Logo & Brand Mark",
+                                        "included": true
+                                    },
+                                    {
+                                        "text": "Color & Type System",
+                                        "included": true
+                                    },
+                                    {
+                                        "text": "Brand Guidelines (PDF)",
+                                        "included": true
+                                    },
+                                    {
+                                        "text": "Social Media Templates",
+                                        "included": true
+                                    },
+                                    {
+                                        "text": "Website Design",
+                                        "included": false
+                                    },
+                                    {
+                                        "text": "Motion Design",
+                                        "included": false
+                                    },
+                                    {
+                                        "text": "Dedicated Slack Channel",
+                                        "included": false
+                                    }
+                                ],
+                                "buttonText": "Get Started",
+                                "featured": false
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "plan-growth",
+                            "type": "PricingCard",
+                            "props": {
+                                "title": "Growth",
+                                "price": "$8,500",
+                                "period": "project",
+                                "description": "For scaling brands that need a comprehensive identity system.",
+                                "features": [
+                                    {
+                                        "text": "Everything in Starter",
+                                        "included": true
+                                    },
+                                    {
+                                        "text": "Responsive Website Design",
+                                        "included": true
+                                    },
+                                    {
+                                        "text": "UI Component Library",
+                                        "included": true
+                                    },
+                                    {
+                                        "text": "Interactive Prototype",
+                                        "included": true
+                                    },
+                                    {
+                                        "text": "Motion Design Package",
+                                        "included": true
+                                    },
+                                    {
+                                        "text": "3 Rounds of Revisions",
+                                        "included": true
+                                    },
+                                    {
+                                        "text": "Dedicated Slack Channel",
+                                        "included": false
+                                    }
+                                ],
+                                "buttonText": "Most Popular",
+                                "featured": true,
+                                "badge": "BEST VALUE"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "plan-enterprise",
+                            "type": "PricingCard",
+                            "props": {
+                                "title": "Enterprise",
+                                "price": "$18,000",
+                                "period": "project",
+                                "description": "Full creative partnership with ongoing design support.",
+                                "features": [
+                                    {
+                                        "text": "Everything in Growth",
+                                        "included": true
+                                    },
+                                    {
+                                        "text": "Full Design System (Figma)",
+                                        "included": true
+                                    },
+                                    {
+                                        "text": "Product / App Design",
+                                        "included": true
+                                    },
+                                    {
+                                        "text": "Brand Strategy Workshop",
+                                        "included": true
+                                    },
+                                    {
+                                        "text": "Unlimited Revisions",
+                                        "included": true
+                                    },
+                                    {
+                                        "text": "Dedicated Slack Channel",
+                                        "included": true
+                                    },
+                                    {
+                                        "text": "Priority 24h Support",
+                                        "included": true
+                                    }
+                                ],
+                                "buttonText": "Contact Sales",
+                                "featured": false
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "price-spacer-1",
+                    "type": "Spacer",
+                    "props": {
+                        "height": "64px"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "price-faq-header",
+                    "type": "Container",
+                    "props": {
+                        "padding": "md",
+                        "display": "flex",
+                        "flexDirection": "column",
+                        "alignItems": "center",
+                        "gap": "sm"
+                    },
+                    "children": [
+                        {
+                            "id": "faq-title",
+                            "type": "Text",
+                            "props": {
+                                "content": "Frequently Asked Questions",
+                                "tag": "h2",
+                                "size": "3xl",
+                                "weight": "800",
+                                "backgroundColor": "#ffffff",
+                                "color": "#000000"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "faq-desc",
+                            "type": "Text",
+                            "props": {
+                                "content": "Everything you need to know before getting started.",
+                                "tag": "p",
+                                "size": "lg",
+                                "maxWidth": "500px",
+                                "backgroundColor": "#ffffff",
+                                "color": "#000000"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "price-faq",
+                    "type": "Accordion",
+                    "props": {
+                        "items": [
+                            {
+                                "title": "What is your typical project timeline?",
+                                "content": "Most brand identity projects take 4–6 weeks. Website design ranges from 6–10 weeks depending on complexity. Enterprise engagements are scoped individually. We always provide a detailed timeline in our proposal."
+                            },
+                            {
+                                "title": "Do you offer payment plans?",
+                                "content": "Yes! We typically structure payments as 50% upfront and 50% on delivery. For Enterprise engagements, we offer monthly billing options. We accept wire transfer, credit cards, and cryptocurrency."
+                            },
+                            {
+                                "title": "What if I need changes after the project is delivered?",
+                                "content": "Minor adjustments within 30 days of delivery are included free of charge. For ongoing design support, we recommend our retainer plans starting at $2,500/month for guaranteed availability and priority turnaround."
+                            },
+                            {
+                                "title": "Can I upgrade my plan later?",
+                                "content": "Absolutely. Many clients start with a Starter engagement and upgrade to Growth or Enterprise as their needs evolve. Any previous investment is credited toward the upgraded plan."
+                            },
+                            {
+                                "title": "Do you work with international clients?",
+                                "content": "Yes, roughly 40% of our clients are outside the US. We work across all time zones and maintain async-friendly workflows with Slack, Loom, and Figma for seamless collaboration."
+                            },
+                            {
+                                "title": "What do I own after the project?",
+                                "content": "You own everything. All deliverables — source files, brand guides, code, assets — are transferred to you with full commercial rights upon final payment. No licensing fees, no restrictions."
+                            }
+                        ],
+                        "allowMultiple": false,
+                        "defaultOpen": 0
+                    },
+                    "children": []
+                },
+                {
+                    "id": "price-spacer-2",
+                    "type": "Spacer",
+                    "props": {
+                        "height": "48px"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "price-guarantee",
+                    "type": "Alert",
+                    "props": {
+                        "title": "100% Satisfaction Guarantee",
+                        "message": "If you're not completely thrilled with our work after the first milestone review, we'll refund your deposit in full. No questions asked. We've never had to use this policy.",
+                        "variant": "success",
+                        "dismissible": false
+                    },
+                    "children": []
+                },
+                {
+                    "id": "price-spacer-3",
+                    "type": "Spacer",
+                    "props": {
+                        "height": "48px"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "price-cta",
+                    "type": "CTA",
+                    "props": {
+                        "title": "Not sure which plan fits?",
+                        "description": "Book a free 30-minute discovery call. We'll learn about your project and recommend the perfect engagement.",
+                        "primaryButtonText": "Schedule a Call",
+                        "primaryButtonLink": "page:contact",
+                        "alignment": "center",
+                        "size": "md"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "price-footer",
+                    "type": "Footer",
+                    "props": {
+                        "logoText": "Meridian",
+                        "description": "A full-spectrum design studio crafting brand identities, digital experiences, and creative strategies for ambitious companies.",
+                        "variant": "standard",
+                        "copyright": "© 2026 Meridian Design Studio. All rights reserved.",
+                        "sections": [
+                            {
+                                "title": "STUDIO",
+                                "links": [
+                                    {
+                                        "text": "Services",
+                                        "href": "page:services"
+                                    },
+                                    {
+                                        "text": "Portfolio",
+                                        "href": "page:portfolio"
+                                    },
+                                    {
+                                        "text": "Pricing",
+                                        "href": "page:pricing"
+                                    },
+                                    {
+                                        "text": "Contact",
+                                        "href": "page:contact"
+                                    }
+                                ]
+                            },
+                            {
+                                "title": "COMPANY",
+                                "links": [
+                                    {
+                                        "text": "About Us",
+                                        "href": "#"
+                                    },
+                                    {
+                                        "text": "Careers",
+                                        "href": "#"
+                                    },
+                                    {
+                                        "text": "Blog",
+                                        "href": "#"
+                                    },
+                                    {
+                                        "text": "Press Kit",
+                                        "href": "#"
+                                    }
+                                ]
+                            },
+                            {
+                                "title": "CONNECT",
+                                "links": [
+                                    {
+                                        "text": "Twitter / X",
+                                        "href": "#"
+                                    },
+                                    {
+                                        "text": "Dribbble",
+                                        "href": "#"
+                                    },
+                                    {
+                                        "text": "LinkedIn",
+                                        "href": "#"
+                                    },
+                                    {
+                                        "text": "Instagram",
+                                        "href": "#"
+                                    }
+                                ]
+                            }
+                        ],
+                        "socialLinks": [
+                            {
+                                "platform": "Twitter",
+                                "href": "#",
+                                "icon": "T"
+                            },
+                            {
+                                "platform": "Dribbble",
+                                "href": "#",
+                                "icon": "D"
+                            },
+                            {
+                                "platform": "GitHub",
+                                "href": "#",
+                                "icon": "G"
+                            }
+                        ]
+                    },
+                    "children": [],
+                    "isGlobal": "GlobalFooter"
+                }
+            ]
+        },
+        {
+            "id": "contact",
+            "name": "Contact",
+            "slug": "contact",
+            "components": [
+                {
+                    "id": "contact-nav",
+                    "type": "Navbar",
+                    "props": {
+                        "logoText": "Meridian",
+                        "links": [
+                            {
+                                "text": "Home",
+                                "href": "page:home"
+                            },
+                            {
+                                "text": "Services",
+                                "href": "page:services"
+                            },
+                            {
+                                "text": "Portfolio",
+                                "href": "page:portfolio"
+                            },
+                            {
+                                "text": "Pricing",
+                                "href": "page:pricing"
+                            },
+                            {
+                                "text": "Contact",
+                                "href": "page:contact"
+                            }
+                        ],
+                        "ctaText": "Start a Project",
+                        "ctaLink": "page:contact"
+                    },
+                    "children": [],
+                    "isGlobal": "GlobalNavbar"
+                },
+                {
+                    "id": "contact-hero-section",
+                    "type": "Container",
+                    "props": {
+                        "padding": "xl",
+                        "display": "flex",
+                        "flexDirection": "column",
+                        "alignItems": "center",
+                        "gap": "md"
+                    },
+                    "children": [
+                        {
+                            "id": "contact-page-title",
+                            "type": "Text",
+                            "props": {
+                                "content": "Let's Build Something Extraordinary",
+                                "tag": "h1",
+                                "size": "5xl",
+                                "weight": "800",
+                                "maxWidth": "750px",
+                                "backgroundColor": "#ffffff",
+                                "color": "#000000"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "contact-page-desc",
+                            "type": "Text",
+                            "props": {
+                                "content": "Tell us about your project, timeline, and budget. We'll get back to you within 2 business hours with next steps.",
+                                "tag": "p",
+                                "size": "xl",
+                                "maxWidth": "600px",
+                                "backgroundColor": "#ffffff",
+                                "color": "#000000"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "contact-grid",
+                    "type": "Grid",
+                    "props": {
+                        "columns": 2,
+                        "gap": "2rem",
+                        "alignItems": "start"
+                    },
+                    "children": [
+                        {
+                            "id": "contact-form",
+                            "type": "Form",
+                            "props": {
+                                "title": "Start Your Project",
+                                "description": "Fill in the details below and we'll be in touch shortly.",
+                                "fields": [
+                                    {
+                                        "id": "name",
+                                        "type": "text",
+                                        "label": "Full Name",
+                                        "placeholder": "Jane Smith",
+                                        "required": true
+                                    },
+                                    {
+                                        "id": "email",
+                                        "type": "email",
+                                        "label": "Work Email",
+                                        "placeholder": "jane@company.com",
+                                        "required": true
+                                    },
+                                    {
+                                        "id": "company",
+                                        "type": "text",
+                                        "label": "Company Name",
+                                        "placeholder": "Acme Inc.",
+                                        "required": false
+                                    },
+                                    {
+                                        "id": "service",
+                                        "type": "select",
+                                        "label": "Service Needed",
+                                        "required": true,
+                                        "options": [
+                                            "Brand Identity",
+                                            "Website Design",
+                                            "Mobile App Design",
+                                            "Design System",
+                                            "Motion Design",
+                                            "Full Creative Package",
+                                            "Other"
+                                        ]
+                                    },
+                                    {
+                                        "id": "budget",
+                                        "type": "radio",
+                                        "label": "Estimated Budget Range",
+                                        "required": true,
+                                        "options": [
+                                            "$2,500 — $5,000",
+                                            "$5,000 — $10,000",
+                                            "$10,000 — $25,000",
+                                            "$25,000+"
+                                        ]
+                                    },
+                                    {
+                                        "id": "message",
+                                        "type": "textarea",
+                                        "label": "Tell Us About Your Project",
+                                        "placeholder": "Describe your vision, goals, timeline, and any inspiration you have in mind...",
+                                        "required": true
+                                    },
+                                    {
+                                        "id": "nda",
+                                        "type": "checkbox",
+                                        "label": "I'd like to sign an NDA before sharing project details",
+                                        "required": false
+                                    }
+                                ],
+                                "submitText": "Send Inquiry →"
+                            },
+                            "children": []
+                        },
+                        {
+                            "id": "contact-info-col",
+                            "type": "Container",
+                            "props": {
+                                "padding": "md",
+                                "display": "flex",
+                                "flexDirection": "column",
+                                "gap": "lg"
+                            },
+                            "children": [
+                                {
+                                    "id": "info-card-1",
+                                    "type": "Feature",
+                                    "props": {
+                                        "icon": "mail",
+                                        "title": "Email Us",
+                                        "description": "hello@meridianstudio.design — We respond within 2 hours during business days.",
+                                        "layout": "horizontal",
+                                        "iconSize": "md"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "info-card-2",
+                                    "type": "Feature",
+                                    "props": {
+                                        "icon": "message",
+                                        "title": "Live Chat",
+                                        "description": "Available Mon–Fri, 9am–6pm EST. Average response time: 3 minutes.",
+                                        "layout": "horizontal",
+                                        "iconSize": "md"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "info-card-3",
+                                    "type": "Feature",
+                                    "props": {
+                                        "icon": "globe",
+                                        "title": "Studio Location",
+                                        "description": "45 Design Quarter, Brooklyn, NY 11201. Open for studio visits by appointment.",
+                                        "layout": "horizontal",
+                                        "iconSize": "md"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "contact-divider",
+                                    "type": "Divider",
+                                    "props": {},
+                                    "children": []
+                                },
+                                {
+                                    "id": "contact-testimonial",
+                                    "type": "Testimonial",
+                                    "props": {
+                                        "quote": "From the first call to final delivery, Meridian was exceptional. They truly understood our vision and elevated it beyond what we imagined possible.",
+                                        "author": "Marcus Chen",
+                                        "role": "Founder & CEO",
+                                        "company": "Aurora Finance",
+                                        "rating": 5,
+                                        "variant": "featured"
+                                    },
+                                    "children": []
+                                },
+                                {
+                                    "id": "contact-alert-response",
+                                    "type": "Alert",
+                                    "props": {
+                                        "title": "Fast Response Guarantee",
+                                        "message": "We reply to every inquiry within 2 business hours. If we don't, your first strategy session is on us.",
+                                        "variant": "warning",
+                                        "dismissible": false
+                                    },
+                                    "children": []
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "contact-spacer-1",
+                    "type": "Spacer",
+                    "props": {
+                        "height": "64px"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "contact-image",
+                    "type": "Image",
+                    "props": {
+                        "src": "https://images.unsplash.com/photo-1497366216548-37526070297c?w=1400&h=500&fit=crop",
+                        "alt": "Meridian Design Studio office space",
+                        "borderRadius": "16px"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "contact-spacer-2",
+                    "type": "Spacer",
+                    "props": {
+                        "height": "48px"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "contact-footer",
+                    "type": "Footer",
+                    "props": {
+                        "logoText": "Meridian",
+                        "description": "A full-spectrum design studio crafting brand identities, digital experiences, and creative strategies for ambitious companies.",
+                        "variant": "centered",
+                        "copyright": "© 2026 Meridian Design Studio. All rights reserved.",
+                        "sections": [
+                            {
+                                "title": "STUDIO",
+                                "links": [
+                                    {
+                                        "text": "Services",
+                                        "href": "page:services"
+                                    },
+                                    {
+                                        "text": "Portfolio",
+                                        "href": "page:portfolio"
+                                    },
+                                    {
+                                        "text": "Pricing",
+                                        "href": "page:pricing"
+                                    },
+                                    {
+                                        "text": "Contact",
+                                        "href": "page:contact"
+                                    }
+                                ]
+                            },
+                            {
+                                "title": "COMPANY",
+                                "links": [
+                                    {
+                                        "text": "About Us",
+                                        "href": "#"
+                                    },
+                                    {
+                                        "text": "Careers",
+                                        "href": "#"
+                                    },
+                                    {
+                                        "text": "Blog",
+                                        "href": "#"
+                                    },
+                                    {
+                                        "text": "Press Kit",
+                                        "href": "#"
+                                    }
+                                ]
+                            },
+                            {
+                                "title": "CONNECT",
+                                "links": [
+                                    {
+                                        "text": "Twitter / X",
+                                        "href": "#"
+                                    },
+                                    {
+                                        "text": "Dribbble",
+                                        "href": "#"
+                                    },
+                                    {
+                                        "text": "LinkedIn",
+                                        "href": "#"
+                                    },
+                                    {
+                                        "text": "Instagram",
+                                        "href": "#"
+                                    }
+                                ]
+                            }
+                        ],
+                        "socialLinks": [
+                            {
+                                "platform": "Twitter",
+                                "href": "#",
+                                "icon": "T"
+                            },
+                            {
+                                "platform": "Dribbble",
+                                "href": "#",
+                                "icon": "D"
+                            },
+                            {
+                                "platform": "GitHub",
+                                "href": "#",
+                                "icon": "G"
+                            }
+                        ]
+                    },
+                    "children": [],
+                    "isGlobal": "GlobalFooter"
+                }
+            ]
+        }
+    ],
+    "globalComponents": {
+        "GlobalNavbar": {
+            "id": "global-nav",
+            "type": "Navbar",
+            "props": {
+                "logoText": "Meridian",
+                "links": [
+                    {
+                        "text": "Home",
+                        "href": "page:home"
+                    },
+                    {
+                        "text": "Services",
+                        "href": "page:services"
+                    },
+                    {
+                        "text": "Portfolio",
+                        "href": "page:portfolio"
+                    },
+                    {
+                        "text": "Pricing",
+                        "href": "page:pricing"
+                    },
+                    {
+                        "text": "Contact",
+                        "href": "page:contact"
+                    }
+                ],
+                "ctaText": "Start a Project",
+                "ctaLink": "page:contact"
+            },
+            "children": [],
+            "isGlobal": "GlobalNavbar"
+        },
+        "GlobalFooter": {
+            "id": "global-footer",
+            "type": "Footer",
+            "props": {
+                "logoText": "Meridian",
+                "description": "A full-spectrum design studio crafting brand identities, digital experiences, and creative strategies for ambitious companies.",
+                "variant": "standard",
+                "copyright": "© 2026 Meridian Design Studio. All rights reserved.",
+                "sections": [
+                    {
+                        "title": "STUDIO",
+                        "links": [
+                            {
+                                "text": "Services",
+                                "href": "page:services"
+                            },
+                            {
+                                "text": "Portfolio",
+                                "href": "page:portfolio"
+                            },
+                            {
+                                "text": "Pricing",
+                                "href": "page:pricing"
+                            },
+                            {
+                                "text": "Contact",
+                                "href": "page:contact"
+                            }
+                        ]
+                    },
+                    {
+                        "title": "COMPANY",
+                        "links": [
+                            {
+                                "text": "About Us",
+                                "href": "#"
+                            },
+                            {
+                                "text": "Careers",
+                                "href": "#"
+                            },
+                            {
+                                "text": "Blog",
+                                "href": "#"
+                            },
+                            {
+                                "text": "Press Kit",
+                                "href": "#"
+                            }
+                        ]
+                    },
+                    {
+                        "title": "CONNECT",
+                        "links": [
+                            {
+                                "text": "Twitter / X",
+                                "href": "#"
+                            },
+                            {
+                                "text": "Dribbble",
+                                "href": "#"
+                            },
+                            {
+                                "text": "LinkedIn",
+                                "href": "#"
+                            },
+                            {
+                                "text": "Instagram",
+                                "href": "#"
+                            }
+                        ]
+                    }
+                ],
+                "socialLinks": [
+                    {
+                        "platform": "Twitter",
+                        "href": "#",
+                        "icon": "T"
+                    },
+                    {
+                        "platform": "Dribbble",
+                        "href": "#",
+                        "icon": "D"
+                    },
+                    {
+                        "platform": "GitHub",
+                        "href": "#",
+                        "icon": "G"
+                    }
+                ]
+            },
+            "children": [],
+            "isGlobal": "GlobalFooter"
+        }
+    }
+}
