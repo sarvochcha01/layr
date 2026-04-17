@@ -32,6 +32,7 @@ export interface Page {
     backgroundSize?: string;
     backgroundPosition?: string;
     backgroundRepeat?: string;
+    componentSpacing?: "none" | "compact" | "normal" | "relaxed" | "loose"; // Spacing between components
 }
 
 // Flexible: keyed by global name → template component

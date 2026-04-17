@@ -33,9 +33,8 @@ interface CanvasProps {
     gradientDirection?: string;
     gradientAngle?: string;
     backgroundImageUrl?: string;
-    backgroundSize?: string;
-    backgroundPosition?: string;
   };
+  componentSpacing?: "none" | "compact" | "normal" | "relaxed" | "loose";
   onZoomChange?: (zoom: number, pan: { x: number; y: number }) => void;
   onComponentDoubleClick?: (componentId: string) => void;
 }
@@ -67,7 +66,7 @@ function DropZone({
         "transition-all duration-200",
         isOver
           ? "bg-primary/10 border-2 border-dashed border-primary min-h-[40px]"
-          : "min-h-[8px] border-2 border-transparent",
+          : "min-h-0 border-2 border-transparent",
         className,
       )}
     >
@@ -450,6 +449,7 @@ export function Canvas({
   outlineColor = "black",
   showComponentTags = true,
   pageBackground,
+  componentSpacing = "normal",
   onZoomChange,
   onComponentDoubleClick,
 }: CanvasProps) {
@@ -535,14 +535,24 @@ export function Canvas({
       }
     } else if (bgType === "image" && pageBackground.backgroundImageUrl) {
       pageStyle.backgroundImage = `url(${pageBackground.backgroundImageUrl})`;
-      pageStyle.backgroundSize = pageBackground.backgroundSize || "cover";
-      pageStyle.backgroundPosition = pageBackground.backgroundPosition || "center";
+      pageStyle.backgroundSize = "cover";
+      pageStyle.backgroundPosition = "center";
       pageStyle.backgroundRepeat = "no-repeat";
     }
   } else {
     // Default to white background when no pageBackground is provided
     pageStyle.backgroundColor = "#ffffff";
   }
+
+  // Map spacing to Tailwind classes
+  const spacingClassMap = {
+    none: "space-y-0",
+    compact: "space-y-2",
+    normal: "space-y-4",
+    relaxed: "space-y-6",
+    loose: "space-y-8",
+  };
+  const spacingClass = spacingClassMap[componentSpacing];
 
   return (
     <div
@@ -579,7 +589,7 @@ export function Canvas({
           />
         ) : (
           <>
-            <div className="space-y-4">
+            <div className={cn("space-y-4", spacingClass)}>
               {/* Initial drop zone at the top */}
               {!isPreviewMode && (
                 <DropZone targetId={undefined} position="before" />

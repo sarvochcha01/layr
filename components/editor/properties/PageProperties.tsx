@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { Paintbrush } from "lucide-react";
+import { Paintbrush, Space } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Page } from "@/types/editor";
@@ -27,7 +27,49 @@ export function PageProperties({ currentPage, onUpdatePage }: PagePropertiesProp
         <h3 className="text-sm font-semibold text-foreground">Page Settings</h3>
       </div>
       <div className="flex-1 overflow-auto">
-        <Accordion type="multiple" defaultValue={["background"]} className="w-full">
+        <Accordion type="multiple" defaultValue={["background", "spacing"]} className="w-full">
+          {/* Component Spacing Section */}
+          <AccordionItem value="spacing" className="border-b-0 border-t border-border/50">
+            <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
+              <div className="flex items-center gap-2">
+                <Space className="w-4 h-4 text-muted-foreground" />
+                Component Spacing
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
+              <div className="space-y-1.5">
+                <Label className={labelClass}>Spacing Between Components</Label>
+                <div className="flex flex-col gap-1 border rounded-md p-1">
+                  {(["none", "compact", "normal", "relaxed", "loose"] as const).map((spacing) => (
+                    <button
+                      key={spacing}
+                      onClick={() => onUpdatePage({ componentSpacing: spacing })}
+                      className={`px-3 py-2 text-xs rounded capitalize transition-colors text-left ${
+                        (currentPage.componentSpacing || "normal") === spacing
+                          ? "bg-secondary text-foreground font-medium"
+                          : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span>{spacing}</span>
+                        <span className="text-[10px] opacity-60">
+                          {spacing === "none" && "0px"}
+                          {spacing === "compact" && "8px"}
+                          {spacing === "normal" && "16px"}
+                          {spacing === "relaxed" && "24px"}
+                          {spacing === "loose" && "32px"}
+                        </span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+                <p className="text-[10px] text-muted-foreground mt-2">
+                  Controls the vertical spacing between components on this page
+                </p>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+
           <AccordionItem value="background" className="border-b-0 border-t border-border/50">
             <AccordionTrigger className="hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50">
               <div className="flex items-center gap-2">

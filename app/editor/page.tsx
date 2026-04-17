@@ -121,6 +121,7 @@ export default function EditorPage() {
       name: "Home",
       slug: "index",
       components: placeholderComponents,
+      componentSpacing: "normal",
     },
   ]);
 
@@ -245,7 +246,10 @@ export default function EditorPage() {
         }
 
         // Just load pages as they are
-        setPages(projectData.pages, false);
+        setPages(projectData.pages.map(page => ({
+          ...page,
+          componentSpacing: page.componentSpacing || "normal"
+        })), false);
         setCurrentPageId(projectData.pages[0]?.id || "home");
       } else {
         // Legacy support: convert old components array to pages
@@ -256,6 +260,7 @@ export default function EditorPage() {
               name: "Home",
               slug: "index",
               components: projectData.components || placeholderComponents,
+              componentSpacing: "normal",
             },
           ],
           false, // Don't record initial load in history
@@ -369,6 +374,7 @@ export default function EditorPage() {
       name,
       slug,
       components: [],
+      componentSpacing: "normal",
     };
     setPages((prev) => [...prev, newPage]);
     setCurrentPageId(newPage.id);
@@ -409,6 +415,7 @@ export default function EditorPage() {
       name: `${pageToDuplicate.name} (Copy)`,
       slug: `${pageToDuplicate.slug}-copy-${Date.now()}`,
       components: cloneComponentsWithNewIds(pageToDuplicate.components),
+      componentSpacing: pageToDuplicate.componentSpacing || "normal",
     };
 
     setPages((prev) => [...prev, newPage]);
@@ -889,6 +896,7 @@ export default function EditorPage() {
             slug,
             path: aiPage.path || `/${slug}`,
             components: aiPage.components || [],
+            componentSpacing: "normal",
           };
           updatedPages.push(newPage);
           if (!firstNewOrUpdatedPageId) firstNewOrUpdatedPageId = newPage.id;

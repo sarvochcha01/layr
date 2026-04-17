@@ -1237,10 +1237,11 @@ export function EditorLayout({
                       gradientDirection: page.gradientDirection,
                       gradientAngle: page.gradientAngle,
                       backgroundImageUrl: page.backgroundImageUrl,
-                      backgroundSize: page.backgroundSize,
-                      backgroundPosition: page.backgroundPosition,
                     };
                   })()}
+                  componentSpacing={
+                    pages.find((p) => p.id === currentPageId)?.componentSpacing || "normal"
+                  }
                   onZoomChange={(zoom, pan) => {
                     setCanvasZoom(Math.round(zoom * 100));
                   }}
