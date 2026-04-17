@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import {
   Page,
   GlobalComponents,
@@ -175,6 +175,10 @@ export function EditorLayout({
   const [isLeftPanelOpen, setIsLeftPanelOpen] = useState(true);
   const [isRightPanelOpen, setIsRightPanelOpen] = useState(true);
 
+  // Canvas container measurement for desktop scaling
+  const canvasContainerRef = useRef<HTMLDivElement>(null);
+  const [canvasContainerWidth, setCanvasContainerWidth] = useState(0);
+
   // Editable shortcuts state
   const [customShortcuts, setCustomShortcuts] = useState([
     { id: 1, name: "Canvas Zoom", shortcut: "Ctrl + Scroll" },
@@ -235,6 +239,21 @@ export function EditorLayout({
     };
   }, []);
 
+  // Measure canvas container width for desktop scaling
+  useEffect(() => {
+    const container = canvasContainerRef.current;
+    if (!container) return;
+
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        setCanvasContainerWidth(entry.contentRect.width);
+      }
+    });
+
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, []);
+
   const startResize = (type: string, e: React.MouseEvent) => {
     e.preventDefault();
     isResizingRef.current = type;
@@ -293,6 +312,20 @@ export function EditorLayout({
         return "100%";
     }
   };
+
+  // Calculate the zoom factor for desktop edit mode
+  // Renders at full viewport width then scales down to fit available space
+  const getDesktopEditZoom = useCallback(() => {
+    if (viewport !== "desktop" || isPreviewMode || canvasContainerWidth <= 0) return 1;
+    // Available width = container width minus p-8 padding (32px * 2)
+    const availableWidth = canvasContainerWidth - 64;
+    // Reference = full window width (what preview mode renders at)
+    const referenceWidth = typeof window !== 'undefined' ? window.innerWidth : 1440;
+    if (referenceWidth <= 0) return 1;
+    return Math.min(1, availableWidth / referenceWidth);
+  }, [viewport, isPreviewMode, canvasContainerWidth]);
+
+  const desktopEditZoom = getDesktopEditZoom();
 
   const exportToZip = async (format: "html" | "react" = "html") => {
     try {
@@ -1144,6 +1177,7 @@ export function EditorLayout({
 
           {/* Canvas Area */}
           <div
+            ref={canvasContainerRef}
             className="flex-1 min-w-0 bg-background overflow-auto"
             style={{ flexShrink: 1, flexGrow: 1 }}
             data-panel="canvas"
@@ -1152,16 +1186,17 @@ export function EditorLayout({
               className={`h-full overflow-auto transition-all duration-300 ${isPreviewMode ? "bg-white p-0" : "bg-background p-8"} light`}
             >
               <div
-                className="transition-all duration-300 ease-in-out mx-auto"
+                className="transition-all duration-300 ease-in-out"
                 style={{
-                  width: getCanvasWidth(),
-                  maxWidth:
-                    viewport === "desktop"
-                      ? isPreviewMode
-                        ? "none"
-                        : "1200px"
-                      : getCanvasWidth(),
+                  width: viewport === "desktop" && !isPreviewMode
+                    ? `${typeof window !== 'undefined' ? window.innerWidth : 1440}px`
+                    : getCanvasWidth(),
+                  maxWidth: viewport !== "desktop" ? getCanvasWidth() : "none",
                   minHeight: "100%",
+                  ...(viewport === "desktop" && !isPreviewMode && desktopEditZoom < 1 ? {
+                    zoom: desktopEditZoom,
+                    transformOrigin: "top left",
+                  } : {}),
                 }}
               >
                 <Canvas

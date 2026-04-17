@@ -539,6 +539,8 @@ export function Canvas({
       onClick={isPreviewMode ? undefined : () => onSelectComponent(null)}
       tabIndex={isPreviewMode ? undefined : 0}
     >
+      {/* Canvas wrapper */}
+      <div>
       {/* Canvas content with zoom and pan - only apply transform in edit mode */}
       <div
         style={
@@ -601,6 +603,7 @@ export function Canvas({
             )}
           </>
         )}
+      </div>
       </div>
     </div>
   );
