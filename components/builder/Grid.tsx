@@ -70,7 +70,7 @@ export function Grid({
   return (
     <div
       className={cn(
-        "grid",
+        "w-full grid",
         columnClasses[columns],
         gap !== "custom" ? gapClasses[gap] || gapClasses.md : undefined,
         className,

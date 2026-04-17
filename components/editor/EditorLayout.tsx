@@ -182,7 +182,7 @@ export function EditorLayout({
   // Editable shortcuts state
   const [customShortcuts, setCustomShortcuts] = useState([
     { id: 1, name: "Canvas Zoom", shortcut: "Ctrl + Scroll" },
-    { id: 2, name: "Canvas Pan", shortcut: "Ctrl + Middle Click" },
+    { id: 2, name: "Canvas Pan", shortcut: "Middle M-Button/space + left M-click" },
     { id: 3, name: "Insert Component", shortcut: "Ctrl + Drag" },
     { id: 4, name: "Swap Components", shortcut: "Ctrl + Shift + Drag" },
     {id:5, name: "select multi-components", shortcut: "Ctrl + leftclick(on canvas)"},
@@ -1183,7 +1183,7 @@ export function EditorLayout({
             data-panel="canvas"
           >
             <div
-              className={`h-full overflow-auto transition-all duration-300 ${isPreviewMode ? "bg-white p-0" : "bg-background p-8"} light`}
+              className={`min-h-full transition-all duration-300 ${isPreviewMode ? "bg-white p-0" : "bg-background p-8"} light`}
             >
               <div
                 className="transition-all duration-300 ease-in-out"
@@ -1225,7 +1225,22 @@ export function EditorLayout({
                   showOutlines={!isPreviewMode && showOutlines}
                   outlineColor={outlineColor}
                   showComponentTags={showComponentTags}
-                  pageBackground={pages.find((p) => p.id === currentPageId)}
+                  pageBackground={(() => {
+                    const page = pages.find((p) => p.id === currentPageId);
+                    if (!page) return undefined;
+                    return {
+                      backgroundColor: page.backgroundColor,
+                      backgroundType: page.backgroundType,
+                      backgroundGradient: page.backgroundGradient, // Legacy
+                      gradientStart: page.gradientStart,
+                      gradientEnd: page.gradientEnd,
+                      gradientDirection: page.gradientDirection,
+                      gradientAngle: page.gradientAngle,
+                      backgroundImageUrl: page.backgroundImageUrl,
+                      backgroundSize: page.backgroundSize,
+                      backgroundPosition: page.backgroundPosition,
+                    };
+                  })()}
                   onZoomChange={(zoom, pan) => {
                     setCanvasZoom(Math.round(zoom * 100));
                   }}

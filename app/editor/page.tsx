@@ -423,6 +423,12 @@ export default function EditorPage() {
     toast.success(`Page renamed to "${name}"`);
   };
 
+  const handlePageUpdate = (pageId: string, updates: Partial<Page>) => {
+    setPages((prev) =>
+      prev.map((p) => (p.id === pageId ? { ...p, ...updates } : p)),
+    );
+  };
+
   const handlePageSelect = (pageId: string) => {
     setCurrentPageId(pageId);
     multiSelect.clearSelection();
@@ -1169,6 +1175,7 @@ export default function EditorPage() {
           onPageDelete={handlePageDelete}
           onPageDuplicate={handlePageDuplicate}
           onPageRename={handlePageRename}
+          onPageUpdate={handlePageUpdate}
           onUndo={undo}
           onRedo={redo}
           canUndo={canUndo}

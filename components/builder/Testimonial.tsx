@@ -70,14 +70,13 @@ export function Testimonial({
       : "none",
     transform: hovered && !isMinimal ? "translateY(-4px)" : "translateY(0)",
     transition: "transform 300ms cubic-bezier(0.34,1.56,0.64,1), box-shadow 300ms ease",
-    ...(width ? { width } : {}),
-    ...(height ? { height } : {}),
+    boxSizing: "border-box",
     ...getUserStyleOverrides(rest),
   };
 
   return (
     <div
-      className="min-w-0 overflow-hidden"
+      className="w-full h-full overflow-hidden"
       style={rootStyle}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}

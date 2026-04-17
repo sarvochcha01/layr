@@ -43,7 +43,16 @@ export function PageProperties({ currentPage, onUpdatePage }: PagePropertiesProp
                   {(["solid", "gradient", "image"] as const).map((t) => (
                     <button
                       key={t}
-                      onClick={() => onUpdatePage({ backgroundType: t })}
+                      onClick={() => {
+                        const updates: Partial<Page> = { backgroundType: t };
+                        // Initialize gradient defaults when switching to gradient
+                        if (t === "gradient" && !currentPage.gradientStart) {
+                          updates.gradientStart = "#667eea";
+                          updates.gradientEnd = "#764ba2";
+                          updates.gradientDirection = "to bottom right";
+                        }
+                        onUpdatePage(updates);
+                      }}
                       className={`flex-1 px-2 py-1 text-xs rounded capitalize transition-colors ${bgType === t ? "bg-secondary text-foreground font-medium" : "text-muted-foreground hover:text-foreground"}`}
                     >
                       {t}
@@ -65,15 +74,83 @@ export function PageProperties({ currentPage, onUpdatePage }: PagePropertiesProp
 
               {/* Gradient */}
               {bgType === "gradient" && (
-                <div className="space-y-1.5">
-                  <Label className={labelClass}>CSS Gradient</Label>
-                  <Input
-                    value={currentPage.backgroundGradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"}
-                    onChange={(e) => onUpdatePage({ backgroundGradient: e.target.value })}
-                    placeholder="linear-gradient(135deg, #667eea, #764ba2)"
-                    className="h-8 text-xs font-mono"
-                  />
-                  <div className="h-8 rounded border" style={{ backgroundImage: currentPage.backgroundGradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" }} />
+                <div className="space-y-3">
+                  <div className="space-y-1.5">
+                    <Label className={labelClass}>Start Color</Label>
+                    <div className="flex gap-2 items-center">
+                      <Input
+                        type="color"
+                        value={currentPage.gradientStart || "#667eea"}
+                        onChange={(e) => onUpdatePage({ gradientStart: e.target.value })}
+                        className="w-8 h-8 p-0.5 min-h-0 cursor-pointer"
+                      />
+                      <Input
+                        type="text"
+                        value={currentPage.gradientStart || "#667eea"}
+                        onChange={(e) => onUpdatePage({ gradientStart: e.target.value })}
+                        className="flex-1 h-8 text-xs font-mono"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className={labelClass}>End Color</Label>
+                    <div className="flex gap-2 items-center">
+                      <Input
+                        type="color"
+                        value={currentPage.gradientEnd || "#764ba2"}
+                        onChange={(e) => onUpdatePage({ gradientEnd: e.target.value })}
+                        className="w-8 h-8 p-0.5 min-h-0 cursor-pointer"
+                      />
+                      <Input
+                        type="text"
+                        value={currentPage.gradientEnd || "#764ba2"}
+                        onChange={(e) => onUpdatePage({ gradientEnd: e.target.value })}
+                        className="flex-1 h-8 text-xs font-mono"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className={labelClass}>Direction</Label>
+                    <div className="relative border rounded-md">
+                      <select
+                        value={currentPage.gradientDirection || "to bottom right"}
+                        onChange={(e) => onUpdatePage({ gradientDirection: e.target.value })}
+                        className="w-full h-8 px-2 text-xs bg-transparent appearance-none focus:outline-none"
+                      >
+                        <option className="bg-background text-foreground" value="to right">To Right</option>
+                        <option className="bg-background text-foreground" value="to left">To Left</option>
+                        <option className="bg-background text-foreground" value="to bottom">To Bottom</option>
+                        <option className="bg-background text-foreground" value="to top">To Top</option>
+                        <option className="bg-background text-foreground" value="to bottom right">To Bottom Right</option>
+                        <option className="bg-background text-foreground" value="to bottom left">To Bottom Left</option>
+                        <option className="bg-background text-foreground" value="to top right">To Top Right</option>
+                        <option className="bg-background text-foreground" value="to top left">To Top Left</option>
+                        <option className="bg-background text-foreground" value="custom">Custom Angle</option>
+                      </select>
+                    </div>
+                  </div>
+                  {currentPage.gradientDirection === "custom" && (
+                    <div className="space-y-1.5">
+                      <Label className={labelClass}>Angle (degrees)</Label>
+                      <Input
+                        type="number"
+                        value={currentPage.gradientAngle || "135"}
+                        onChange={(e) => onUpdatePage({ gradientAngle: e.target.value })}
+                        min="0"
+                        max="360"
+                        className="h-8 text-xs"
+                      />
+                    </div>
+                  )}
+                  <div className="space-y-1.5">
+                    <Label className={labelClass}>Preview</Label>
+                    <div
+                      className="h-12 rounded border"
+                      style={{
+                        backgroundImage: `linear-gradient(${currentPage.gradientDirection === "custom" ? `${currentPage.gradientAngle || "135"}deg` : currentPage.gradientDirection || "to bottom right"}, ${currentPage.gradientStart || "#667eea"}, ${currentPage.gradientEnd || "#764ba2"})`,
+                      }}
+                    />
+                  </div>
                 </div>
               )}
 

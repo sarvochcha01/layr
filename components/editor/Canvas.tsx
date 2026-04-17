@@ -27,7 +27,11 @@ interface CanvasProps {
   pageBackground?: {
     backgroundColor?: string;
     backgroundType?: "solid" | "gradient" | "image";
-    backgroundGradient?: string;
+    backgroundGradient?: string; // Legacy
+    gradientStart?: string;
+    gradientEnd?: string;
+    gradientDirection?: string;
+    gradientAngle?: string;
     backgroundImageUrl?: string;
     backgroundSize?: string;
     backgroundPosition?: string;
@@ -202,8 +206,7 @@ function ComponentWrapper({
       data-component-id={component.id}
       data-component-type={component.type}
       className={cn(
-        "relative group min-w-0",
-        shouldTakeFullHeight && "flex self-stretch",
+        "relative group",
         shouldTakeFullWidth && "w-full",
         isDragging && "opacity-40",
       )}
@@ -215,10 +218,11 @@ function ComponentWrapper({
         isPreviewMode={!!isPreviewMode}
         currentWidth={component.props.width}
         currentHeight={component.props.height}
+        currentTransform={component.props.transform}
         onResize={handleResize}
+        componentType={component.type}
         className={cn(
           "relative transition-all duration-200",
-          shouldTakeFullHeight && "flex flex-1",
           shouldTakeFullWidth && "w-full",
           !isPreviewMode && isSelected && "ring-2 ring-blue-500 ring-offset-2",
           !isPreviewMode &&
@@ -515,8 +519,20 @@ export function Canvas({
     
     if (bgType === "solid") {
       pageStyle.backgroundColor = pageBackground.backgroundColor || "#ffffff";
-    } else if (bgType === "gradient" && pageBackground.backgroundGradient) {
-      pageStyle.backgroundImage = pageBackground.backgroundGradient;
+    } else if (bgType === "gradient") {
+      // Use new gradient properties if available
+      if (pageBackground.gradientStart && pageBackground.gradientEnd) {
+        const direction = pageBackground.gradientDirection === "custom"
+          ? `${pageBackground.gradientAngle || "135"}deg`
+          : pageBackground.gradientDirection || "to bottom right";
+        pageStyle.backgroundImage = `linear-gradient(${direction}, ${pageBackground.gradientStart}, ${pageBackground.gradientEnd})`;
+      } else if (pageBackground.backgroundGradient) {
+        // Fallback to legacy CSS gradient string
+        pageStyle.backgroundImage = pageBackground.backgroundGradient;
+      } else {
+        // Default gradient
+        pageStyle.backgroundImage = "linear-gradient(to bottom right, #667eea, #764ba2)";
+      }
     } else if (bgType === "image" && pageBackground.backgroundImageUrl) {
       pageStyle.backgroundImage = `url(${pageBackground.backgroundImageUrl})`;
       pageStyle.backgroundSize = pageBackground.backgroundSize || "cover";
@@ -533,14 +549,14 @@ export function Canvas({
       className={`w-full editor-canvas ${
         isPreviewMode
           ? "min-h-screen"
-          : "editor-canvas-container rounded-lg shadow-sm min-h-[800px] p-4"
+          : "editor-canvas-container rounded-lg shadow-sm p-4"
       }`}
       style={pageStyle}
       onClick={isPreviewMode ? undefined : () => onSelectComponent(null)}
       tabIndex={isPreviewMode ? undefined : 0}
     >
       {/* Canvas wrapper */}
-      <div>
+      <div className="min-h-[800px]">
       {/* Canvas content with zoom and pan - only apply transform in edit mode */}
       <div
         style={
@@ -599,12 +615,14 @@ export function Canvas({
 
             {/* Final drop zone at the bottom */}
             {!isPreviewMode && (
-              <DropZone targetId={undefined} position="inside" className="mt-4" />
+              <DropZone targetId={undefined} position="inside" className="mt-4 mb-32" />
             )}
           </>
         )}
       </div>
       </div>
+      {/* Extra padding at bottom to ensure last component is fully visible */}
+      {!isPreviewMode && <div className="h-32" />}
     </div>
   );
 }

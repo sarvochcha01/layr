@@ -76,8 +76,6 @@ export function Card({
 
   const baseStyle: React.CSSProperties = {
     ...cssVars,
-    ...(width ? { width } : {}),
-    ...(height ? { height } : {}),
     border: `var(--theme-border-width) solid var(--theme-border)`,
     borderRadius: "var(--theme-radius)",
     boxShadow: hovered
@@ -94,6 +92,9 @@ export function Card({
         : "none",
     transition: "all 300ms ease",
     backdropFilter: "var(--theme-backdrop)",
+    boxSizing: "border-box",
+    // Default padding (can be overridden by user)
+    padding: "24px",
     ...getUserStyleOverrides(rest),
   };
 
@@ -132,7 +133,7 @@ export function Card({
   return (
     <div
       className={cn(
-        "min-w-0 w-full h-full flex flex-col overflow-hidden relative p-6",
+        "w-full h-full flex flex-col overflow-hidden relative",
         className,
       )}
       style={baseStyle}

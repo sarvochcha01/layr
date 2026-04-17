@@ -51,7 +51,13 @@ export function CTA({
 }: CTAProps) {
   const [hovered, setHovered] = useState(false);
 
-  const sizeClasses = { sm: "py-12 px-6", md: "py-16 px-8", lg: "py-24 px-12" };
+  // Size padding values (will be overridden by user's custom padding if set)
+  const sizePadding = { 
+    sm: { paddingTop: "48px", paddingBottom: "48px", paddingLeft: "24px", paddingRight: "24px" },
+    md: { paddingTop: "64px", paddingBottom: "64px", paddingLeft: "32px", paddingRight: "32px" },
+    lg: { paddingTop: "96px", paddingBottom: "96px", paddingLeft: "48px", paddingRight: "48px" },
+  };
+  
   const alignmentClasses = {
     left: "text-left items-start",
     center: "text-center items-center",
@@ -79,9 +85,10 @@ export function CTA({
       ? "translate(-2px, -2px)"
       : "none",
     backdropFilter: "var(--theme-backdrop)",
-    ...(width ? { width } : {}),
-    ...(height ? { minHeight: height } : {}),
     transition: "all 300ms ease",
+    boxSizing: "border-box",
+    // Apply size-based padding as defaults
+    ...sizePadding[size],
     ...getUserStyleOverrides(rest),
   };
 
@@ -107,8 +114,7 @@ export function CTA({
   return (
     <div
       className={cn(
-        "flex flex-col gap-8 relative overflow-hidden",
-        sizeClasses[size],
+        "w-full h-full flex flex-col gap-8 relative overflow-hidden",
         alignmentClasses[alignment],
       )}
       style={containerStyle}

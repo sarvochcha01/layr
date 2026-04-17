@@ -86,8 +86,9 @@ export function PricingCard({
         : "none",
     transform: hovered ? "translateY(-5px)" : "translateY(0)",
     transition: "transform 300ms cubic-bezier(0.34,1.56,0.64,1), box-shadow 300ms ease",
-    ...(width ? { width } : {}),
-    ...(height ? { height } : {}),
+    boxSizing: "border-box",
+    // Default padding (can be overridden by user)
+    padding: "32px",
     ...getUserStyleOverrides(rest),
   };
 
@@ -113,7 +114,7 @@ export function PricingCard({
   return (
     <div
       className={cn(
-        "p-8 flex flex-col min-w-0 overflow-hidden",
+        "w-full h-full flex flex-col overflow-hidden",
       )}
       style={cardStyle}
       onMouseEnter={() => setHovered(true)}
