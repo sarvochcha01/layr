@@ -74,6 +74,7 @@ Each template file should be a JSON file with the following structure:
 
 ## Current Templates
 
+- `design-agency.json` - **Meridian Design Studio** — Full 5-page creative agency website showcasing 21 component types (Home, Services, Portfolio, Pricing, Contact)
 - `design-system-demo.json` - Comprehensive design system showcase with all components and layout variations (4 pages)
 - `ecommerce-store.json` - Complete e-commerce website (4 pages)
 - `saas-landing.json` - SaaS product landing page (4 pages)
