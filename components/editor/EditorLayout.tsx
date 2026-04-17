@@ -68,6 +68,7 @@ interface EditorLayoutProps {
   components: ComponentDefinition[];
   selectedComponentIds: string[];
   onSelectComponent: (id: string | null) => void;
+  onSelectMultiple?: (ids: string[]) => void;
   onUpdateComponent: (id: string, updates: Record<string, any>) => void;
   onDeleteComponent: (id: string) => void;
   onDuplicateComponent: (id: string) => void;
@@ -118,6 +119,7 @@ export function EditorLayout({
   components,
   selectedComponentIds,
   onSelectComponent,
+  onSelectMultiple,
   onUpdateComponent,
   onDeleteComponent,
   onDuplicateComponent,
@@ -274,6 +276,11 @@ export function EditorLayout({
     selectedComponentIds.length === 1
       ? findComponentById(components, selectedComponentIds[0])
       : null;
+
+  // Get all selected components for multi-edit
+  const selectedComponents = selectedComponentIds
+    .map(id => findComponentById(components, id))
+    .filter((c): c is ComponentDefinition => c !== null);
 
   const getCanvasWidth = () => {
     switch (viewport) {
@@ -1058,8 +1065,12 @@ export function EditorLayout({
                         components={components}
                         selectedComponentIds={selectedComponentIds}
                         onSelectComponent={onSelectComponent}
+                        onSelectMultiple={onSelectMultiple}
                         onDeleteComponent={onDeleteComponent}
                         onAddComponent={onAddComponent}
+                        onRepositionComponent={onRepositionComponent}
+                        onMoveComponentUp={onMoveComponentUp}
+                        onMoveComponentDown={onMoveComponentDown}
                       />
                     </TabsContent>
 
@@ -1184,6 +1195,9 @@ export function EditorLayout({
                   onSelectComponent={
                     isPreviewMode ? () => {} : onSelectComponent
                   }
+                  onSelectMultiple={
+                    isPreviewMode ? undefined : onSelectMultiple
+                  }
                   onUpdateComponent={onUpdateComponent}
                   onRepositionComponent={onRepositionComponent}
                   viewport={viewport}
@@ -1259,6 +1273,7 @@ export function EditorLayout({
 
                   <PropertiesPanel
                     selectedComponent={selectedComponent}
+                    selectedComponents={selectedComponents}
                     onUpdateComponent={onUpdateComponent}
                     onDeleteComponent={onDeleteComponent}
                     onDuplicateComponent={onDuplicateComponent}

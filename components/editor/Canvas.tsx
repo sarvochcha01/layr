@@ -13,6 +13,7 @@ interface CanvasProps {
   components: ComponentDefinition[];
   selectedComponentIds: string[];
   onSelectComponent: (id: string | null) => void;
+  onSelectMultiple?: (ids: string[]) => void;
   onUpdateComponent?: (id: string, updates: Record<string, any>) => void;
   onRepositionComponent?: (componentId: string, targetId: string | null, position: "top" | "bottom" | "left" | "right" | "center" | "inside") => void;
   viewport?: "desktop" | "tablet" | "mobile";
@@ -87,6 +88,7 @@ function ComponentWrapper({
   onSelect,
   selectedComponentIds,
   onSelectComponent,
+  onSelectMultiple,
   onUpdateComponent,
   viewport,
   isPreviewMode,
@@ -103,6 +105,7 @@ function ComponentWrapper({
   onSelect: () => void;
   selectedComponentIds: string[];
   onSelectComponent: (id: string) => void;
+  onSelectMultiple?: (ids: string[]) => void;
   onUpdateComponent?: (id: string, updates: Record<string, any>) => void;
   viewport?: "desktop" | "tablet" | "mobile";
   isPreviewMode?: boolean;
@@ -163,6 +166,36 @@ function ComponentWrapper({
     }
   };
 
+  // Simple click handler - delegates to parent for multi-select logic
+  const handleClick = (e: React.MouseEvent) => {
+    if (isPreviewMode) return;
+    
+    e.stopPropagation();
+    
+    // Check if Ctrl/Cmd is held for multi-select
+    if (e.ctrlKey || e.metaKey) {
+      if (onSelectMultiple) {
+        // Toggle this component in selection
+        const currentlySelected = selectedComponentIds.includes(component.id);
+        if (currentlySelected) {
+          // Remove from selection
+          const newSelection = selectedComponentIds.filter(id => id !== component.id);
+          if (newSelection.length > 0) {
+            onSelectMultiple(newSelection);
+          } else {
+            onSelectComponent(component.id); // Keep at least one selected
+          }
+        } else {
+          // Add to selection
+          onSelectMultiple([...selectedComponentIds, component.id]);
+        }
+      }
+    } else {
+      // Normal click: select only this component
+      onSelect();
+    }
+  };
+
   return (
     <div
       ref={setNodeRef}
@@ -202,10 +235,7 @@ function ComponentWrapper({
           onClick={
             isPreviewMode
               ? undefined
-              : (e) => {
-                  e.stopPropagation();
-                  onSelect();
-                }
+              : handleClick
           }
           onDoubleClick={
             isPreviewMode
@@ -265,6 +295,7 @@ function ComponentWrapper({
                         component={child}
                         selectedComponentIds={selectedComponentIds}
                         onSelectComponent={onSelectComponent}
+                        onSelectMultiple={onSelectMultiple}
                         onUpdateComponent={onUpdateComponent}
                         viewport={viewport}
                         isPreviewMode={isPreviewMode}
@@ -296,6 +327,7 @@ function ComponentWrapper({
                         component={child}
                         selectedComponentIds={selectedComponentIds}
                         onSelectComponent={onSelectComponent}
+                        onSelectMultiple={onSelectMultiple}
                         onUpdateComponent={onUpdateComponent}
                         viewport={viewport}
                         isPreviewMode={isPreviewMode}
@@ -349,6 +381,7 @@ function ComponentRenderer({
   component,
   selectedComponentIds,
   onSelectComponent,
+  onSelectMultiple,
   onUpdateComponent,
   viewport,
   isPreviewMode,
@@ -363,6 +396,7 @@ function ComponentRenderer({
   component: ComponentDefinition;
   selectedComponentIds: string[];
   onSelectComponent: (id: string) => void;
+  onSelectMultiple?: (ids: string[]) => void;
   onUpdateComponent?: (id: string, updates: Record<string, any>) => void;
   viewport?: "desktop" | "tablet" | "mobile";
   isPreviewMode?: boolean;
@@ -381,6 +415,7 @@ function ComponentRenderer({
       onSelect={() => onSelectComponent(component.id)}
       selectedComponentIds={selectedComponentIds}
       onSelectComponent={onSelectComponent}
+      onSelectMultiple={onSelectMultiple}
       onUpdateComponent={onUpdateComponent}
       viewport={viewport}
       isPreviewMode={isPreviewMode}
@@ -399,6 +434,7 @@ export function Canvas({
   components,
   selectedComponentIds,
   onSelectComponent,
+  onSelectMultiple,
   onUpdateComponent,
   onRepositionComponent,
   viewport = "desktop",
@@ -538,6 +574,7 @@ export function Canvas({
                     component={component}
                     selectedComponentIds={selectedComponentIds}
                     onSelectComponent={onSelectComponent}
+                    onSelectMultiple={onSelectMultiple}
                     onUpdateComponent={onUpdateComponent}
                     viewport={viewport}
                     isPreviewMode={isPreviewMode}
