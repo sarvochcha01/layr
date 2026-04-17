@@ -181,6 +181,7 @@ export function EditorLayout({
     { id: 2, name: "Canvas Pan", shortcut: "Ctrl + Middle Click" },
     { id: 3, name: "Insert Component", shortcut: "Ctrl + Drag" },
     { id: 4, name: "Swap Components", shortcut: "Ctrl + Shift + Drag" },
+    {id:5, name: "select multi-components", shortcut: "Ctrl + leftclick(on canvas)"},
   ]);
   const [editingShortcutId, setEditingShortcutId] = useState<number | null>(
     null,
@@ -770,30 +771,6 @@ export function EditorLayout({
                               </button>
                             </div>
                           ))}
-
-                          {/* Add New Shortcut */}
-                          <button
-                            onClick={() => {
-                              const newId =
-                                Math.max(
-                                  ...customShortcuts.map((s) => s.id),
-                                  0,
-                                ) + 1;
-                              setCustomShortcuts((prev) => [
-                                ...prev,
-                                {
-                                  id: newId,
-                                  name: "New Shortcut",
-                                  shortcut: "Ctrl + ?",
-                                },
-                              ]);
-                              setEditingShortcutId(newId);
-                            }}
-                            className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs text-muted-foreground hover:text-foreground border border-dashed border-border hover:border-primary/50 rounded transition-colors mt-2"
-                          >
-                            <Plus className="w-3 h-3" />
-                            <span>Add Shortcut</span>
-                          </button>
                         </div>
                       )}
                     </div>
