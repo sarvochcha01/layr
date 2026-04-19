@@ -48,6 +48,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useShortcuts } from "@/hooks/useShortcuts";
 import JSZip from "jszip";
 import { generateCSS, generateHTML, generateJS } from "@/lib/codeGenerator";
 import {
@@ -186,6 +187,7 @@ export function EditorLayout({
     { id: 3, name: "Insert Component", shortcut: "Ctrl + Drag" },
     { id: 4, name: "Swap Components", shortcut: "Ctrl + Shift + Drag" },
     {id:5, name: "select multi-components", shortcut: "Ctrl + leftclick(on canvas)"},
+    {id:6, name: "Toggle Preview Mode", shortcut: "Space (while hovering canvas)"},
   ]);
   const [editingShortcutId, setEditingShortcutId] = useState<number | null>(
     null,
@@ -203,6 +205,13 @@ export function EditorLayout({
   // Panel widths
   const [leftPanelWidth, setLeftPanelWidth] = useState(280);
   const [rightPanelWidth, setRightPanelWidth] = useState(280);
+
+  // Shortcuts hook for space bar toggle
+  useShortcuts({
+    isPreviewMode,
+    onTogglePreview: () => setIsPreviewMode(!isPreviewMode),
+    isEnabled: true,
+  });
 
   const isResizingRef = useRef<string | null>(null);
   const startPosRef = useRef({ x: 0, y: 0 });
@@ -1007,6 +1016,7 @@ export function EditorLayout({
                     flexShrink: 0,
                     flexGrow: 0,
                   }}
+                  data-panel="left-sidebar"
                 >
                   {/* Collapse Button */}
                   <button
@@ -1289,6 +1299,7 @@ export function EditorLayout({
                     flexShrink: 0,
                     flexGrow: 0,
                   }}
+                  data-panel="properties"
                 >
                   {/* Collapse Button */}
                   <button
