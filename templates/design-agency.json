@@ -38,7 +38,8 @@
                             }
                         ],
                         "ctaText": "Start a Project",
-                        "ctaLink": "page:contact"
+                        "ctaLink": "page:contact",
+                        "animations": []
                     },
                     "children": [],
                     "isGlobal": "GlobalNavbar"
@@ -56,7 +57,18 @@
                         "secondaryButtonLink": "page:services",
                         "alignment": "center",
                         "size": "xl",
-                        "showScrollIndicator": true
+                        "showScrollIndicator": true,
+                        "animations": [
+                            {
+                                "id": "anim_1777136674516_11ysx",
+                                "trigger": "onLoad",
+                                "preset": "fadeInUp",
+                                "duration": 0.8,
+                                "delay": 0.1,
+                                "ease": "power2.out",
+                                "enabled": true
+                            }
+                        ]
                     },
                     "children": []
                 },
@@ -68,7 +80,8 @@
                         "display": "flex",
                         "flexDirection": "column",
                         "alignItems": "center",
-                        "gap": "md"
+                        "gap": "md",
+                        "animations": []
                     },
                     "children": [
                         {
@@ -81,7 +94,8 @@
                                 "weight": "700",
                                 "letterSpacing": "0.15em",
                                 "backgroundColor": "#ffffff",
-                                "color": "#000000"
+                                "color": "#000000",
+                                "animations": []
                             },
                             "children": []
                         },
@@ -92,7 +106,23 @@
                                 "columns": 5,
                                 "gap": "2rem",
                                 "alignItems": "center",
-                                "opacity": 0.4
+                                "opacity": 0.4,
+                                "animations": [
+                                    {
+                                        "id": "anim_1777136674516_63e5m",
+                                        "trigger": "onScroll",
+                                        "preset": "fadeInUp",
+                                        "duration": 0.6,
+                                        "delay": 0,
+                                        "ease": "power2.out",
+                                        "enabled": true,
+                                        "stagger": 0.15,
+                                        "staggerFrom": "start",
+                                        "scrollStart": "top 80%",
+                                        "scrollEnd": "top 20%",
+                                        "scrub": false
+                                    }
+                                ]
                             },
                             "children": [
                                 {
@@ -104,7 +134,8 @@
                                         "size": "lg",
                                         "weight": "bold",
                                         "backgroundColor": "#ffffff",
-                                        "color": "#000000"
+                                        "color": "#000000",
+                                        "animations": []
                                     },
                                     "children": []
                                 },
@@ -117,7 +148,8 @@
                                         "size": "lg",
                                         "weight": "bold",
                                         "backgroundColor": "#ffffff",
-                                        "color": "#000000"
+                                        "color": "#000000",
+                                        "animations": []
                                     },
                                     "children": []
                                 },
@@ -130,7 +162,8 @@
                                         "size": "lg",
                                         "weight": "bold",
                                         "backgroundColor": "#ffffff",
-                                        "color": "#000000"
+                                        "color": "#000000",
+                                        "animations": []
                                     },
                                     "children": []
                                 },
@@ -143,7 +176,8 @@
                                         "size": "lg",
                                         "weight": "bold",
                                         "backgroundColor": "#ffffff",
-                                        "color": "#000000"
+                                        "color": "#000000",
+                                        "animations": []
                                     },
                                     "children": []
                                 },
@@ -156,7 +190,8 @@
                                         "size": "lg",
                                         "weight": "bold",
                                         "backgroundColor": "#ffffff",
-                                        "color": "#000000"
+                                        "color": "#000000",
+                                        "animations": []
                                     },
                                     "children": []
                                 }
@@ -191,7 +226,21 @@
                             }
                         ],
                         "layout": "horizontal",
-                        "variant": "bordered"
+                        "variant": "bordered",
+                        "animations": [
+                            {
+                                "id": "anim_1777136674516_gaz52",
+                                "trigger": "onScroll",
+                                "preset": "zoomIn",
+                                "duration": 0.6,
+                                "delay": 0.2,
+                                "ease": "power2.out",
+                                "enabled": true,
+                                "scrollStart": "top 80%",
+                                "scrollEnd": "top 20%",
+                                "scrub": false
+                            }
+                        ]
                     },
                     "children": []
                 },
@@ -199,7 +248,8 @@
                     "id": "home-spacer-1",
                     "type": "Spacer",
                     "props": {
-                        "height": "48px"
+                        "height": "48px",
+                        "animations": []
                     },
                     "children": []
                 },
@@ -211,7 +261,8 @@
                         "display": "flex",
                         "flexDirection": "column",
                         "alignItems": "center",
-                        "gap": "sm"
+                        "gap": "sm",
+                        "animations": []
                     },
                     "children": [
                         {
@@ -221,7 +272,21 @@
                                 "text": "What We Do",
                                 "variant": "info",
                                 "size": "sm",
-                                "rounded": true
+                                "rounded": true,
+                                "animations": [
+                                    {
+                                        "id": "anim_1777136674516_foz9a",
+                                        "trigger": "onScroll",
+                                        "preset": "fadeIn",
+                                        "duration": 0.6,
+                                        "delay": 0,
+                                        "ease": "power2.out",
+                                        "enabled": true,
+                                        "scrollStart": "top 80%",
+                                        "scrollEnd": "top 20%",
+                                        "scrub": false
+                                    }
+                                ]
                             },
                             "children": []
                         },
@@ -234,7 +299,21 @@
                                 "size": "4xl",
                                 "weight": "800",
                                 "backgroundColor": "#ffffff",
-                                "color": "#000000"
+                                "color": "#000000",
+                                "animations": [
+                                    {
+                                        "id": "anim_1777136674516_q9ump",
+                                        "trigger": "onScroll",
+                                        "preset": "slideUp",
+                                        "duration": 0.6,
+                                        "delay": 0,
+                                        "ease": "power2.out",
+                                        "enabled": true,
+                                        "scrollStart": "top 80%",
+                                        "scrollEnd": "top 20%",
+                                        "scrub": false
+                                    }
+                                ]
                             },
                             "children": []
                         },
@@ -247,7 +326,8 @@
                                 "size": "lg",
                                 "maxWidth": "600px",
                                 "backgroundColor": "#ffffff",
-                                "color": "#000000"
+                                "color": "#000000",
+                                "animations": []
                             },
                             "children": []
                         }
@@ -258,7 +338,23 @@
                     "type": "Grid",
                     "props": {
                         "columns": 3,
-                        "gap": "1.5rem"
+                        "gap": "1.5rem",
+                        "animations": [
+                            {
+                                "id": "anim_1777136674516_ffbzo",
+                                "trigger": "onScroll",
+                                "preset": "fadeInUp",
+                                "duration": 0.6,
+                                "delay": 0,
+                                "ease": "power2.out",
+                                "enabled": true,
+                                "stagger": 0.15,
+                                "staggerFrom": "start",
+                                "scrollStart": "top 80%",
+                                "scrollEnd": "top 20%",
+                                "scrub": false
+                            }
+                        ]
                     },
                     "children": [
                         {
@@ -269,7 +365,19 @@
                                 "title": "Brand Identity",
                                 "description": "Logos, color systems, typography, and brand guidelines that create instant recognition and lasting impressions.",
                                 "layout": "vertical",
-                                "iconSize": "lg"
+                                "iconSize": "lg",
+                                "animations": [
+                                    {
+                                        "id": "anim_1777136674516_d9hov",
+                                        "trigger": "onHover",
+                                        "preset": "pulse",
+                                        "duration": 0.3,
+                                        "delay": 0,
+                                        "ease": "power2.out",
+                                        "enabled": true,
+                                        "reverse": true
+                                    }
+                                ]
                             },
                             "children": []
                         },
@@ -281,7 +389,19 @@
                                 "title": "Web & Product Design",
                                 "description": "Responsive websites, SaaS dashboards, and mobile apps designed for conversion and delight.",
                                 "layout": "vertical",
-                                "iconSize": "lg"
+                                "iconSize": "lg",
+                                "animations": [
+                                    {
+                                        "id": "anim_1777136674516_pe69d",
+                                        "trigger": "onHover",
+                                        "preset": "pulse",
+                                        "duration": 0.3,
+                                        "delay": 0,
+                                        "ease": "power2.out",
+                                        "enabled": true,
+                                        "reverse": true
+                                    }
+                                ]
                             },
                             "children": []
                         },
@@ -293,7 +413,19 @@
                                 "title": "Creative Strategy",
                                 "description": "Market research, competitive analysis, and creative direction that positions your brand ahead of the curve.",
                                 "layout": "vertical",
-                                "iconSize": "lg"
+                                "iconSize": "lg",
+                                "animations": [
+                                    {
+                                        "id": "anim_1777136674516_vmzuw",
+                                        "trigger": "onHover",
+                                        "preset": "pulse",
+                                        "duration": 0.3,
+                                        "delay": 0,
+                                        "ease": "power2.out",
+                                        "enabled": true,
+                                        "reverse": true
+                                    }
+                                ]
                             },
                             "children": []
                         }
@@ -303,7 +435,8 @@
                     "id": "home-spacer-2",
                     "type": "Spacer",
                     "props": {
-                        "height": "64px"
+                        "height": "64px",
+                        "animations": []
                     },
                     "children": []
                 },
@@ -315,7 +448,8 @@
                         "display": "flex",
                         "flexDirection": "column",
                         "alignItems": "center",
-                        "gap": "sm"
+                        "gap": "sm",
+                        "animations": []
                     },
                     "children": [
                         {
@@ -325,7 +459,21 @@
                                 "text": "Featured Work",
                                 "variant": "info",
                                 "size": "sm",
-                                "rounded": true
+                                "rounded": true,
+                                "animations": [
+                                    {
+                                        "id": "anim_1777136674516_ukgg2",
+                                        "trigger": "onScroll",
+                                        "preset": "fadeIn",
+                                        "duration": 0.6,
+                                        "delay": 0,
+                                        "ease": "power2.out",
+                                        "enabled": true,
+                                        "scrollStart": "top 80%",
+                                        "scrollEnd": "top 20%",
+                                        "scrub": false
+                                    }
+                                ]
                             },
                             "children": []
                         },
@@ -338,7 +486,21 @@
                                 "size": "4xl",
                                 "weight": "800",
                                 "backgroundColor": "#ffffff",
-                                "color": "#000000"
+                                "color": "#000000",
+                                "animations": [
+                                    {
+                                        "id": "anim_1777136674516_wjkvw",
+                                        "trigger": "onScroll",
+                                        "preset": "slideUp",
+                                        "duration": 0.6,
+                                        "delay": 0,
+                                        "ease": "power2.out",
+                                        "enabled": true,
+                                        "scrollStart": "top 80%",
+                                        "scrollEnd": "top 20%",
+                                        "scrub": false
+                                    }
+                                ]
                             },
                             "children": []
                         }
@@ -349,7 +511,23 @@
                     "type": "Grid",
                     "props": {
                         "columns": 3,
-                        "gap": "1.5rem"
+                        "gap": "1.5rem",
+                        "animations": [
+                            {
+                                "id": "anim_1777136674516_puigg",
+                                "trigger": "onScroll",
+                                "preset": "fadeInUp",
+                                "duration": 0.6,
+                                "delay": 0,
+                                "ease": "power2.out",
+                                "enabled": true,
+                                "stagger": 0.15,
+                                "staggerFrom": "start",
+                                "scrollStart": "top 80%",
+                                "scrollEnd": "top 20%",
+                                "scrub": false
+                            }
+                        ]
                     },
                     "children": [
                         {
@@ -360,7 +538,19 @@
                                 "description": "A modern fintech rebrand transforming a traditional bank into a digital-first financial platform.",
                                 "topImage": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&h=350&fit=crop",
                                 "topImageHeight": "220px",
-                                "buttonText": "View Case Study"
+                                "buttonText": "View Case Study",
+                                "animations": [
+                                    {
+                                        "id": "anim_1777136674516_8fu47",
+                                        "trigger": "onHover",
+                                        "preset": "pulse",
+                                        "duration": 0.3,
+                                        "delay": 0,
+                                        "ease": "power2.out",
+                                        "enabled": true,
+                                        "reverse": true
+                                    }
+                                ]
                             },
                             "children": []
                         },
@@ -372,7 +562,19 @@
                                 "description": "An award-winning health & wellness app featuring biometric tracking, AI coaching, and a calm visual language.",
                                 "topImage": "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=600&h=350&fit=crop",
                                 "topImageHeight": "220px",
-                                "buttonText": "View Case Study"
+                                "buttonText": "View Case Study",
+                                "animations": [
+                                    {
+                                        "id": "anim_1777136674516_sqh8s",
+                                        "trigger": "onHover",
+                                        "preset": "pulse",
+                                        "duration": 0.3,
+                                        "delay": 0,
+                                        "ease": "power2.out",
+                                        "enabled": true,
+                                        "reverse": true
+                                    }
+                                ]
                             },
                             "children": []
                         },
@@ -384,7 +586,19 @@
                                 "description": "A complete identity system for a premium music production studio, from wordmark to spatial design.",
                                 "topImage": "https://images.unsplash.com/photo-1633356122102-3fe601e05bd2?w=600&h=350&fit=crop",
                                 "topImageHeight": "220px",
-                                "buttonText": "View Case Study"
+                                "buttonText": "View Case Study",
+                                "animations": [
+                                    {
+                                        "id": "anim_1777136674516_yvf0v",
+                                        "trigger": "onHover",
+                                        "preset": "pulse",
+                                        "duration": 0.3,
+                                        "delay": 0,
+                                        "ease": "power2.out",
+                                        "enabled": true,
+                                        "reverse": true
+                                    }
+                                ]
                             },
                             "children": []
                         }
@@ -394,7 +608,8 @@
                     "id": "home-spacer-3",
                     "type": "Spacer",
                     "props": {
-                        "height": "64px"
+                        "height": "64px",
+                        "animations": []
                     },
                     "children": []
                 },
@@ -406,7 +621,8 @@
                         "display": "flex",
                         "flexDirection": "column",
                         "alignItems": "center",
-                        "gap": "sm"
+                        "gap": "sm",
+                        "animations": []
                     },
                     "children": [
                         {
@@ -418,7 +634,21 @@
                                 "size": "3xl",
                                 "weight": "800",
                                 "backgroundColor": "#ffffff",
-                                "color": "#000000"
+                                "color": "#000000",
+                                "animations": [
+                                    {
+                                        "id": "anim_1777136674517_mi2b0",
+                                        "trigger": "onScroll",
+                                        "preset": "slideUp",
+                                        "duration": 0.6,
+                                        "delay": 0,
+                                        "ease": "power2.out",
+                                        "enabled": true,
+                                        "scrollStart": "top 80%",
+                                        "scrollEnd": "top 20%",
+                                        "scrub": false
+                                    }
+                                ]
                             },
                             "children": []
                         }
@@ -429,7 +659,23 @@
                     "type": "Grid",
                     "props": {
                         "columns": 3,
-                        "gap": "1.5rem"
+                        "gap": "1.5rem",
+                        "animations": [
+                            {
+                                "id": "anim_1777136674517_fue6l",
+                                "trigger": "onScroll",
+                                "preset": "fadeInUp",
+                                "duration": 0.6,
+                                "delay": 0,
+                                "ease": "power2.out",
+                                "enabled": true,
+                                "stagger": 0.15,
+                                "staggerFrom": "start",
+                                "scrollStart": "top 80%",
+                                "scrollEnd": "top 20%",
+                                "scrub": false
+                            }
+                        ]
                     },
                     "children": [
                         {
@@ -441,7 +687,19 @@
                                 "role": "CEO",
                                 "company": "Aurora Finance",
                                 "rating": 5,
-                                "variant": "card"
+                                "variant": "card",
+                                "animations": [
+                                    {
+                                        "id": "anim_1777136674517_0x6qo",
+                                        "trigger": "onHover",
+                                        "preset": "pulse",
+                                        "duration": 0.3,
+                                        "delay": 0,
+                                        "ease": "power2.out",
+                                        "enabled": true,
+                                        "reverse": true
+                                    }
+                                ]
                             },
                             "children": []
                         },
@@ -454,7 +712,19 @@
                                 "role": "Head of Product",
                                 "company": "Solstice Health",
                                 "rating": 5,
-                                "variant": "featured"
+                                "variant": "featured",
+                                "animations": [
+                                    {
+                                        "id": "anim_1777136674517_gx1nv",
+                                        "trigger": "onHover",
+                                        "preset": "pulse",
+                                        "duration": 0.3,
+                                        "delay": 0,
+                                        "ease": "power2.out",
+                                        "enabled": true,
+                                        "reverse": true
+                                    }
+                                ]
                             },
                             "children": []
                         },
@@ -467,7 +737,19 @@
                                 "role": "Creative Director",
                                 "company": "Vanta Studios",
                                 "rating": 5,
-                                "variant": "card"
+                                "variant": "card",
+                                "animations": [
+                                    {
+                                        "id": "anim_1777136674517_y47fe",
+                                        "trigger": "onHover",
+                                        "preset": "pulse",
+                                        "duration": 0.3,
+                                        "delay": 0,
+                                        "ease": "power2.out",
+                                        "enabled": true,
+                                        "reverse": true
+                                    }
+                                ]
                             },
                             "children": []
                         }
@@ -477,7 +759,8 @@
                     "id": "home-spacer-4",
                     "type": "Spacer",
                     "props": {
-                        "height": "48px"
+                        "height": "48px",
+                        "animations": []
                     },
                     "children": []
                 },
@@ -492,7 +775,8 @@
                         "secondaryButtonText": "View Pricing",
                         "secondaryButtonLink": "page:pricing",
                         "alignment": "center",
-                        "size": "lg"
+                        "size": "lg",
+                        "animations": []
                     },
                     "children": []
                 },
@@ -585,7 +869,8 @@
                                 "href": "#",
                                 "icon": "G"
                             }
-                        ]
+                        ],
+                        "animations": []
                     },
                     "children": [],
                     "isGlobal": "GlobalFooter"
@@ -625,7 +910,8 @@
                             }
                         ],
                         "ctaText": "Start a Project",
-                        "ctaLink": "page:contact"
+                        "ctaLink": "page:contact",
+                        "animations": []
                     },
                     "children": [],
                     "isGlobal": "GlobalNavbar"
@@ -638,7 +924,8 @@
                         "display": "flex",
                         "flexDirection": "column",
                         "alignItems": "center",
-                        "gap": "md"
+                        "gap": "md",
+                        "animations": []
                     },
                     "children": [
                         {
@@ -648,7 +935,21 @@
                                 "text": "Our Services",
                                 "variant": "info",
                                 "size": "md",
-                                "rounded": true
+                                "rounded": true,
+                                "animations": [
+                                    {
+                                        "id": "anim_1777136674517_fdv3z",
+                                        "trigger": "onScroll",
+                                        "preset": "fadeIn",
+                                        "duration": 0.6,
+                                        "delay": 0,
+                                        "ease": "power2.out",
+                                        "enabled": true,
+                                        "scrollStart": "top 80%",
+                                        "scrollEnd": "top 20%",
+                                        "scrub": false
+                                    }
+                                ]
                             },
                             "children": []
                         },
@@ -662,7 +963,21 @@
                                 "weight": "800",
                                 "maxWidth": "800px",
                                 "backgroundColor": "#ffffff",
-                                "color": "#000000"
+                                "color": "#000000",
+                                "animations": [
+                                    {
+                                        "id": "anim_1777136674517_jsgyg",
+                                        "trigger": "onScroll",
+                                        "preset": "slideUp",
+                                        "duration": 0.6,
+                                        "delay": 0,
+                                        "ease": "power2.out",
+                                        "enabled": true,
+                                        "scrollStart": "top 80%",
+                                        "scrollEnd": "top 20%",
+                                        "scrub": false
+                                    }
+                                ]
                             },
                             "children": []
                         },
@@ -675,7 +990,8 @@
                                 "size": "xl",
                                 "maxWidth": "650px",
                                 "backgroundColor": "#ffffff",
-                                "color": "#000000"
+                                "color": "#000000",
+                                "animations": []
                             },
                             "children": []
                         }
@@ -684,7 +1000,9 @@
                 {
                     "id": "svc-divider-1",
                     "type": "Divider",
-                    "props": {},
+                    "props": {
+                        "animations": []
+                    },
                     "children": []
                 },
                 {
@@ -710,7 +1028,8 @@
                             }
                         ],
                         "defaultTab": 0,
-                        "variant": "underline"
+                        "variant": "underline",
+                        "animations": []
                     },
                     "children": []
                 },
@@ -718,7 +1037,8 @@
                     "id": "svc-spacer-1",
                     "type": "Spacer",
                     "props": {
-                        "height": "48px"
+                        "height": "48px",
+                        "animations": []
                     },
                     "children": []
                 },
@@ -730,7 +1050,8 @@
                         "display": "flex",
                         "flexDirection": "column",
                         "alignItems": "center",
-                        "gap": "sm"
+                        "gap": "sm",
+                        "animations": []
                     },
                     "children": [
                         {
@@ -742,7 +1063,21 @@
                                 "size": "3xl",
                                 "weight": "800",
                                 "backgroundColor": "#ffffff",
-                                "color": "#000000"
+                                "color": "#000000",
+                                "animations": [
+                                    {
+                                        "id": "anim_1777136674517_g9m8x",
+                                        "trigger": "onScroll",
+                                        "preset": "slideUp",
+                                        "duration": 0.6,
+                                        "delay": 0,
+                                        "ease": "power2.out",
+                                        "enabled": true,
+                                        "scrollStart": "top 80%",
+                                        "scrollEnd": "top 20%",
+                                        "scrub": false
+                                    }
+                                ]
                             },
                             "children": []
                         }
@@ -753,7 +1088,23 @@
                     "type": "Grid",
                     "props": {
                         "columns": 3,
-                        "gap": "1.5rem"
+                        "gap": "1.5rem",
+                        "animations": [
+                            {
+                                "id": "anim_1777136674517_fpkit",
+                                "trigger": "onScroll",
+                                "preset": "fadeInUp",
+                                "duration": 0.6,
+                                "delay": 0,
+                                "ease": "power2.out",
+                                "enabled": true,
+                                "stagger": 0.15,
+                                "staggerFrom": "start",
+                                "scrollStart": "top 80%",
+                                "scrollEnd": "top 20%",
+                                "scrub": false
+                            }
+                        ]
                     },
                     "children": [
                         {
@@ -763,7 +1114,19 @@
                                 "icon": "pen",
                                 "title": "Brand Identity Design",
                                 "description": "Logos, wordmarks, brand books, color systems, and comprehensive visual guidelines.",
-                                "layout": "vertical"
+                                "layout": "vertical",
+                                "animations": [
+                                    {
+                                        "id": "anim_1777136674517_pvj1d",
+                                        "trigger": "onHover",
+                                        "preset": "pulse",
+                                        "duration": 0.3,
+                                        "delay": 0,
+                                        "ease": "power2.out",
+                                        "enabled": true,
+                                        "reverse": true
+                                    }
+                                ]
                             },
                             "children": []
                         },
@@ -774,7 +1137,19 @@
                                 "icon": "globe",
                                 "title": "Website Design & Dev",
                                 "description": "Custom responsive websites from landing pages to complex web apps with CMS integration.",
-                                "layout": "vertical"
+                                "layout": "vertical",
+                                "animations": [
+                                    {
+                                        "id": "anim_1777136674517_qtive",
+                                        "trigger": "onHover",
+                                        "preset": "pulse",
+                                        "duration": 0.3,
+                                        "delay": 0,
+                                        "ease": "power2.out",
+                                        "enabled": true,
+                                        "reverse": true
+                                    }
+                                ]
                             },
                             "children": []
                         },
@@ -785,7 +1160,19 @@
                                 "icon": "phone",
                                 "title": "Mobile App Design",
                                 "description": "iOS and Android app interfaces with fluid interactions and platform-native design patterns.",
-                                "layout": "vertical"
+                                "layout": "vertical",
+                                "animations": [
+                                    {
+                                        "id": "anim_1777136674517_usnv4",
+                                        "trigger": "onHover",
+                                        "preset": "pulse",
+                                        "duration": 0.3,
+                                        "delay": 0,
+                                        "ease": "power2.out",
+                                        "enabled": true,
+                                        "reverse": true
+                                    }
+                                ]
                             },
                             "children": []
                         },
@@ -796,7 +1183,19 @@
                                 "icon": "layers",
                                 "title": "Design Systems",
                                 "description": "Scalable component libraries that ensure consistency across products, teams, and platforms.",
-                                "layout": "vertical"
+                                "layout": "vertical",
+                                "animations": [
+                                    {
+                                        "id": "anim_1777136674517_6f1qz",
+                                        "trigger": "onHover",
+                                        "preset": "pulse",
+                                        "duration": 0.3,
+                                        "delay": 0,
+                                        "ease": "power2.out",
+                                        "enabled": true,
+                                        "reverse": true
+                                    }
+                                ]
                             },
                             "children": []
                         },
@@ -807,7 +1206,19 @@
                                 "icon": "play",
                                 "title": "Motion Design",
                                 "description": "UI animations, explainer videos, brand motion graphics, and interactive prototypes.",
-                                "layout": "vertical"
+                                "layout": "vertical",
+                                "animations": [
+                                    {
+                                        "id": "anim_1777136674517_gatt3",
+                                        "trigger": "onHover",
+                                        "preset": "pulse",
+                                        "duration": 0.3,
+                                        "delay": 0,
+                                        "ease": "power2.out",
+                                        "enabled": true,
+                                        "reverse": true
+                                    }
+                                ]
                             },
                             "children": []
                         },
@@ -818,7 +1229,19 @@
                                 "icon": "target",
                                 "title": "UX Research & Audit",
                                 "description": "User interviews, usability testing, heuristic evaluations, and data-driven design decisions.",
-                                "layout": "vertical"
+                                "layout": "vertical",
+                                "animations": [
+                                    {
+                                        "id": "anim_1777136674517_yaffj",
+                                        "trigger": "onHover",
+                                        "preset": "pulse",
+                                        "duration": 0.3,
+                                        "delay": 0,
+                                        "ease": "power2.out",
+                                        "enabled": true,
+                                        "reverse": true
+                                    }
+                                ]
                             },
                             "children": []
                         }
@@ -828,7 +1251,8 @@
                     "id": "svc-spacer-2",
                     "type": "Spacer",
                     "props": {
-                        "height": "48px"
+                        "height": "48px",
+                        "animations": []
                     },
                     "children": []
                 },
@@ -840,7 +1264,8 @@
                         "display": "flex",
                         "flexDirection": "column",
                         "alignItems": "center",
-                        "gap": "sm"
+                        "gap": "sm",
+                        "animations": []
                     },
                     "children": [
                         {
@@ -852,7 +1277,21 @@
                                 "size": "3xl",
                                 "weight": "800",
                                 "backgroundColor": "#ffffff",
-                                "color": "#000000"
+                                "color": "#000000",
+                                "animations": [
+                                    {
+                                        "id": "anim_1777136674517_xon21",
+                                        "trigger": "onScroll",
+                                        "preset": "slideUp",
+                                        "duration": 0.6,
+                                        "delay": 0,
+                                        "ease": "power2.out",
+                                        "enabled": true,
+                                        "scrollStart": "top 80%",
+                                        "scrollEnd": "top 20%",
+                                        "scrub": false
+                                    }
+                                ]
                             },
                             "children": []
                         },
@@ -865,7 +1304,8 @@
                                 "size": "lg",
                                 "maxWidth": "550px",
                                 "backgroundColor": "#ffffff",
-                                "color": "#000000"
+                                "color": "#000000",
+                                "animations": []
                             },
                             "children": []
                         }
@@ -876,7 +1316,23 @@
                     "type": "Grid",
                     "props": {
                         "columns": 2,
-                        "gap": "1.5rem"
+                        "gap": "1.5rem",
+                        "animations": [
+                            {
+                                "id": "anim_1777136674517_ja3u4",
+                                "trigger": "onScroll",
+                                "preset": "fadeInUp",
+                                "duration": 0.6,
+                                "delay": 0,
+                                "ease": "power2.out",
+                                "enabled": true,
+                                "stagger": 0.15,
+                                "staggerFrom": "start",
+                                "scrollStart": "top 80%",
+                                "scrollEnd": "top 20%",
+                                "scrub": false
+                            }
+                        ]
                     },
                     "children": [
                         {
@@ -887,7 +1343,19 @@
                                 "title": "01 — Discovery & Research",
                                 "description": "We immerse ourselves in your business, market, and audience. Stakeholder interviews, competitive analysis, and user research form the foundation of every project.",
                                 "layout": "horizontal",
-                                "iconSize": "lg"
+                                "iconSize": "lg",
+                                "animations": [
+                                    {
+                                        "id": "anim_1777136674517_twlsn",
+                                        "trigger": "onHover",
+                                        "preset": "pulse",
+                                        "duration": 0.3,
+                                        "delay": 0,
+                                        "ease": "power2.out",
+                                        "enabled": true,
+                                        "reverse": true
+                                    }
+                                ]
                             },
                             "children": []
                         },
@@ -899,7 +1367,19 @@
                                 "title": "02 — Strategy & Direction",
                                 "description": "Insights become a strategic roadmap. We define positioning, creative direction, and measurable objectives before a single pixel is placed.",
                                 "layout": "horizontal",
-                                "iconSize": "lg"
+                                "iconSize": "lg",
+                                "animations": [
+                                    {
+                                        "id": "anim_1777136674517_4iqbr",
+                                        "trigger": "onHover",
+                                        "preset": "pulse",
+                                        "duration": 0.3,
+                                        "delay": 0,
+                                        "ease": "power2.out",
+                                        "enabled": true,
+                                        "reverse": true
+                                    }
+                                ]
                             },
                             "children": []
                         },
@@ -911,7 +1391,19 @@
                                 "title": "03 — Design & Prototype",
                                 "description": "High-fidelity mockups and interactive prototypes bring the strategy to life. We obsess over every detail — from layout to micro-interactions.",
                                 "layout": "horizontal",
-                                "iconSize": "lg"
+                                "iconSize": "lg",
+                                "animations": [
+                                    {
+                                        "id": "anim_1777136674517_cs7j1",
+                                        "trigger": "onHover",
+                                        "preset": "pulse",
+                                        "duration": 0.3,
+                                        "delay": 0,
+                                        "ease": "power2.out",
+                                        "enabled": true,
+                                        "reverse": true
+                                    }
+                                ]
                             },
                             "children": []
                         },
@@ -923,7 +1415,19 @@
                                 "title": "04 — Launch & Iterate",
                                 "description": "Pixel-perfect handoff to development, QA testing, and post-launch analytics. We stay involved to optimize and evolve the design over time.",
                                 "layout": "horizontal",
-                                "iconSize": "lg"
+                                "iconSize": "lg",
+                                "animations": [
+                                    {
+                                        "id": "anim_1777136674517_l1q4z",
+                                        "trigger": "onHover",
+                                        "preset": "pulse",
+                                        "duration": 0.3,
+                                        "delay": 0,
+                                        "ease": "power2.out",
+                                        "enabled": true,
+                                        "reverse": true
+                                    }
+                                ]
                             },
                             "children": []
                         }
@@ -933,7 +1437,8 @@
                     "id": "svc-spacer-3",
                     "type": "Spacer",
                     "props": {
-                        "height": "48px"
+                        "height": "48px",
+                        "animations": []
                     },
                     "children": []
                 },
@@ -946,7 +1451,8 @@
                         "primaryButtonText": "Get in Touch",
                         "primaryButtonLink": "page:contact",
                         "alignment": "center",
-                        "size": "lg"
+                        "size": "lg",
+                        "animations": []
                     },
                     "children": []
                 },
@@ -1039,7 +1545,8 @@
                                 "href": "#",
                                 "icon": "G"
                             }
-                        ]
+                        ],
+                        "animations": []
                     },
                     "children": [],
                     "isGlobal": "GlobalFooter"
@@ -1079,7 +1586,8 @@
                             }
                         ],
                         "ctaText": "Start a Project",
-                        "ctaLink": "page:contact"
+                        "ctaLink": "page:contact",
+                        "animations": []
                     },
                     "children": [],
                     "isGlobal": "GlobalNavbar"
@@ -1092,7 +1600,8 @@
                         "display": "flex",
                         "flexDirection": "column",
                         "alignItems": "center",
-                        "gap": "md"
+                        "gap": "md",
+                        "animations": []
                     },
                     "children": [
                         {
@@ -1104,7 +1613,21 @@
                                 "size": "5xl",
                                 "weight": "800",
                                 "backgroundColor": "#ffffff",
-                                "color": "#000000"
+                                "color": "#000000",
+                                "animations": [
+                                    {
+                                        "id": "anim_1777136674517_1uvx4",
+                                        "trigger": "onScroll",
+                                        "preset": "slideUp",
+                                        "duration": 0.6,
+                                        "delay": 0,
+                                        "ease": "power2.out",
+                                        "enabled": true,
+                                        "scrollStart": "top 80%",
+                                        "scrollEnd": "top 20%",
+                                        "scrub": false
+                                    }
+                                ]
                             },
                             "children": []
                         },
@@ -1117,7 +1640,8 @@
                                 "size": "xl",
                                 "maxWidth": "650px",
                                 "backgroundColor": "#ffffff",
-                                "color": "#000000"
+                                "color": "#000000",
+                                "animations": []
                             },
                             "children": []
                         }
@@ -1130,7 +1654,8 @@
                         "title": "Currently Booking for Q3 2026",
                         "message": "We have 2 remaining slots for new brand identity projects starting July 2026. Reach out early to secure your spot.",
                         "variant": "info",
-                        "dismissible": false
+                        "dismissible": false,
+                        "animations": []
                     },
                     "children": []
                 },
@@ -1138,7 +1663,8 @@
                     "id": "port-spacer-1",
                     "type": "Spacer",
                     "props": {
-                        "height": "32px"
+                        "height": "32px",
+                        "animations": []
                     },
                     "children": []
                 },
@@ -1147,7 +1673,23 @@
                     "type": "Grid",
                     "props": {
                         "columns": 2,
-                        "gap": "1.5rem"
+                        "gap": "1.5rem",
+                        "animations": [
+                            {
+                                "id": "anim_1777136674517_snjqw",
+                                "trigger": "onScroll",
+                                "preset": "fadeInUp",
+                                "duration": 0.6,
+                                "delay": 0,
+                                "ease": "power2.out",
+                                "enabled": true,
+                                "stagger": 0.15,
+                                "staggerFrom": "start",
+                                "scrollStart": "top 80%",
+                                "scrollEnd": "top 20%",
+                                "scrub": false
+                            }
+                        ]
                     },
                     "children": [
                         {
@@ -1158,7 +1700,19 @@
                                 "description": "Repositioned a traditional bank as a digital-first financial platform. New identity, website, mobile app, and marketing collateral.",
                                 "topImage": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=700&h=400&fit=crop",
                                 "topImageHeight": "260px",
-                                "buttonText": "View Case Study"
+                                "buttonText": "View Case Study",
+                                "animations": [
+                                    {
+                                        "id": "anim_1777136674517_9kzgk",
+                                        "trigger": "onHover",
+                                        "preset": "pulse",
+                                        "duration": 0.3,
+                                        "delay": 0,
+                                        "ease": "power2.out",
+                                        "enabled": true,
+                                        "reverse": true
+                                    }
+                                ]
                             },
                             "children": []
                         },
@@ -1170,7 +1724,19 @@
                                 "description": "Award-winning health & wellness app featuring biometric tracking, AI coaching, and a calming visual language used by 2M+ users.",
                                 "topImage": "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=700&h=400&fit=crop",
                                 "topImageHeight": "260px",
-                                "buttonText": "View Case Study"
+                                "buttonText": "View Case Study",
+                                "animations": [
+                                    {
+                                        "id": "anim_1777136674517_uchos",
+                                        "trigger": "onHover",
+                                        "preset": "pulse",
+                                        "duration": 0.3,
+                                        "delay": 0,
+                                        "ease": "power2.out",
+                                        "enabled": true,
+                                        "reverse": true
+                                    }
+                                ]
                             },
                             "children": []
                         }
@@ -1180,7 +1746,8 @@
                     "id": "port-spacer-2",
                     "type": "Spacer",
                     "props": {
-                        "height": "24px"
+                        "height": "24px",
+                        "animations": []
                     },
                     "children": []
                 },
@@ -1189,7 +1756,23 @@
                     "type": "Grid",
                     "props": {
                         "columns": 3,
-                        "gap": "1.5rem"
+                        "gap": "1.5rem",
+                        "animations": [
+                            {
+                                "id": "anim_1777136674517_2y46t",
+                                "trigger": "onScroll",
+                                "preset": "fadeInUp",
+                                "duration": 0.6,
+                                "delay": 0,
+                                "ease": "power2.out",
+                                "enabled": true,
+                                "stagger": 0.15,
+                                "staggerFrom": "start",
+                                "scrollStart": "top 80%",
+                                "scrollEnd": "top 20%",
+                                "scrub": false
+                            }
+                        ]
                     },
                     "children": [
                         {
@@ -1200,7 +1783,19 @@
                                 "description": "Complete identity system for a premium music production studio — from wordmark to spatial design.",
                                 "topImage": "https://images.unsplash.com/photo-1633356122102-3fe601e05bd2?w=600&h=350&fit=crop",
                                 "topImageHeight": "200px",
-                                "buttonText": "View Details"
+                                "buttonText": "View Details",
+                                "animations": [
+                                    {
+                                        "id": "anim_1777136674517_j0rjs",
+                                        "trigger": "onHover",
+                                        "preset": "pulse",
+                                        "duration": 0.3,
+                                        "delay": 0,
+                                        "ease": "power2.out",
+                                        "enabled": true,
+                                        "reverse": true
+                                    }
+                                ]
                             },
                             "children": []
                         },
@@ -1212,7 +1807,19 @@
                                 "description": "A data-dense cloud infrastructure dashboard designed for clarity, speed, and developer delight.",
                                 "topImage": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=350&fit=crop",
                                 "topImageHeight": "200px",
-                                "buttonText": "View Details"
+                                "buttonText": "View Details",
+                                "animations": [
+                                    {
+                                        "id": "anim_1777136674517_qfk5r",
+                                        "trigger": "onHover",
+                                        "preset": "pulse",
+                                        "duration": 0.3,
+                                        "delay": 0,
+                                        "ease": "power2.out",
+                                        "enabled": true,
+                                        "reverse": true
+                                    }
+                                ]
                             },
                             "children": []
                         },
@@ -1224,7 +1831,19 @@
                                 "description": "A rugged, adventure-driven e-commerce experience for a premium outdoor gear brand.",
                                 "topImage": "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=600&h=350&fit=crop",
                                 "topImageHeight": "200px",
-                                "buttonText": "View Details"
+                                "buttonText": "View Details",
+                                "animations": [
+                                    {
+                                        "id": "anim_1777136674517_x09iv",
+                                        "trigger": "onHover",
+                                        "preset": "pulse",
+                                        "duration": 0.3,
+                                        "delay": 0,
+                                        "ease": "power2.out",
+                                        "enabled": true,
+                                        "reverse": true
+                                    }
+                                ]
                             },
                             "children": []
                         }
@@ -1234,7 +1853,8 @@
                     "id": "port-spacer-3",
                     "type": "Spacer",
                     "props": {
-                        "height": "48px"
+                        "height": "48px",
+                        "animations": []
                     },
                     "children": []
                 },
@@ -1246,7 +1866,8 @@
                         "display": "flex",
                         "flexDirection": "column",
                         "alignItems": "center",
-                        "gap": "sm"
+                        "gap": "sm",
+                        "animations": []
                     },
                     "children": [
                         {
@@ -1258,7 +1879,21 @@
                                 "size": "3xl",
                                 "weight": "800",
                                 "backgroundColor": "#ffffff",
-                                "color": "#000000"
+                                "color": "#000000",
+                                "animations": [
+                                    {
+                                        "id": "anim_1777136674517_xpe1l",
+                                        "trigger": "onScroll",
+                                        "preset": "slideUp",
+                                        "duration": 0.6,
+                                        "delay": 0,
+                                        "ease": "power2.out",
+                                        "enabled": true,
+                                        "scrollStart": "top 80%",
+                                        "scrollEnd": "top 20%",
+                                        "scrub": false
+                                    }
+                                ]
                             },
                             "children": []
                         },
@@ -1271,7 +1906,8 @@
                                 "size": "lg",
                                 "maxWidth": "550px",
                                 "backgroundColor": "#ffffff",
-                                "color": "#000000"
+                                "color": "#000000",
+                                "animations": []
                             },
                             "children": []
                         }
@@ -1282,7 +1918,8 @@
                     "type": "Video",
                     "props": {
                         "youtubeId": "dQw4w9WgXcQ",
-                        "aspectRatio": "16:9"
+                        "aspectRatio": "16:9",
+                        "animations": []
                     },
                     "children": []
                 },
@@ -1290,7 +1927,8 @@
                     "id": "port-spacer-4",
                     "type": "Spacer",
                     "props": {
-                        "height": "48px"
+                        "height": "48px",
+                        "animations": []
                     },
                     "children": []
                 },
@@ -1321,7 +1959,21 @@
                             }
                         ],
                         "layout": "horizontal",
-                        "variant": "cards"
+                        "variant": "cards",
+                        "animations": [
+                            {
+                                "id": "anim_1777136674517_w1xu4",
+                                "trigger": "onScroll",
+                                "preset": "zoomIn",
+                                "duration": 0.6,
+                                "delay": 0.2,
+                                "ease": "power2.out",
+                                "enabled": true,
+                                "scrollStart": "top 80%",
+                                "scrollEnd": "top 20%",
+                                "scrub": false
+                            }
+                        ]
                     },
                     "children": []
                 },
@@ -1329,7 +1981,8 @@
                     "id": "port-spacer-5",
                     "type": "Spacer",
                     "props": {
-                        "height": "48px"
+                        "height": "48px",
+                        "animations": []
                     },
                     "children": []
                 },
@@ -1344,7 +1997,8 @@
                         "secondaryButtonText": "See Pricing",
                         "secondaryButtonLink": "page:pricing",
                         "alignment": "center",
-                        "size": "lg"
+                        "size": "lg",
+                        "animations": []
                     },
                     "children": []
                 },
@@ -1437,7 +2091,8 @@
                                 "href": "#",
                                 "icon": "G"
                             }
-                        ]
+                        ],
+                        "animations": []
                     },
                     "children": [],
                     "isGlobal": "GlobalFooter"
@@ -1477,7 +2132,8 @@
                             }
                         ],
                         "ctaText": "Start a Project",
-                        "ctaLink": "page:contact"
+                        "ctaLink": "page:contact",
+                        "animations": []
                     },
                     "children": [],
                     "isGlobal": "GlobalNavbar"
@@ -1490,7 +2146,8 @@
                         "display": "flex",
                         "flexDirection": "column",
                         "alignItems": "center",
-                        "gap": "md"
+                        "gap": "md",
+                        "animations": []
                     },
                     "children": [
                         {
@@ -1500,7 +2157,21 @@
                                 "text": "Transparent Pricing",
                                 "variant": "success",
                                 "size": "md",
-                                "rounded": true
+                                "rounded": true,
+                                "animations": [
+                                    {
+                                        "id": "anim_1777136674517_etv6g",
+                                        "trigger": "onScroll",
+                                        "preset": "fadeIn",
+                                        "duration": 0.6,
+                                        "delay": 0,
+                                        "ease": "power2.out",
+                                        "enabled": true,
+                                        "scrollStart": "top 80%",
+                                        "scrollEnd": "top 20%",
+                                        "scrub": false
+                                    }
+                                ]
                             },
                             "children": []
                         },
@@ -1514,7 +2185,21 @@
                                 "weight": "800",
                                 "maxWidth": "750px",
                                 "backgroundColor": "#ffffff",
-                                "color": "#000000"
+                                "color": "#000000",
+                                "animations": [
+                                    {
+                                        "id": "anim_1777136674517_gs6rk",
+                                        "trigger": "onScroll",
+                                        "preset": "slideUp",
+                                        "duration": 0.6,
+                                        "delay": 0,
+                                        "ease": "power2.out",
+                                        "enabled": true,
+                                        "scrollStart": "top 80%",
+                                        "scrollEnd": "top 20%",
+                                        "scrub": false
+                                    }
+                                ]
                             },
                             "children": []
                         },
@@ -1527,7 +2212,8 @@
                                 "size": "xl",
                                 "maxWidth": "600px",
                                 "backgroundColor": "#ffffff",
-                                "color": "#000000"
+                                "color": "#000000",
+                                "animations": []
                             },
                             "children": []
                         }
@@ -1539,7 +2225,23 @@
                     "props": {
                         "columns": 3,
                         "gap": "1.5rem",
-                        "alignItems": "stretch"
+                        "alignItems": "stretch",
+                        "animations": [
+                            {
+                                "id": "anim_1777136674517_k9owb",
+                                "trigger": "onScroll",
+                                "preset": "fadeInUp",
+                                "duration": 0.6,
+                                "delay": 0,
+                                "ease": "power2.out",
+                                "enabled": true,
+                                "stagger": 0.15,
+                                "staggerFrom": "start",
+                                "scrollStart": "top 80%",
+                                "scrollEnd": "top 20%",
+                                "scrub": false
+                            }
+                        ]
                     },
                     "children": [
                         {
@@ -1581,7 +2283,8 @@
                                     }
                                 ],
                                 "buttonText": "Get Started",
-                                "featured": false
+                                "featured": false,
+                                "animations": []
                             },
                             "children": []
                         },
@@ -1625,7 +2328,8 @@
                                 ],
                                 "buttonText": "Most Popular",
                                 "featured": true,
-                                "badge": "BEST VALUE"
+                                "badge": "BEST VALUE",
+                                "animations": []
                             },
                             "children": []
                         },
@@ -1668,7 +2372,8 @@
                                     }
                                 ],
                                 "buttonText": "Contact Sales",
-                                "featured": false
+                                "featured": false,
+                                "animations": []
                             },
                             "children": []
                         }
@@ -1678,7 +2383,8 @@
                     "id": "price-spacer-1",
                     "type": "Spacer",
                     "props": {
-                        "height": "64px"
+                        "height": "64px",
+                        "animations": []
                     },
                     "children": []
                 },
@@ -1690,7 +2396,8 @@
                         "display": "flex",
                         "flexDirection": "column",
                         "alignItems": "center",
-                        "gap": "sm"
+                        "gap": "sm",
+                        "animations": []
                     },
                     "children": [
                         {
@@ -1702,7 +2409,21 @@
                                 "size": "3xl",
                                 "weight": "800",
                                 "backgroundColor": "#ffffff",
-                                "color": "#000000"
+                                "color": "#000000",
+                                "animations": [
+                                    {
+                                        "id": "anim_1777136674517_d76ix",
+                                        "trigger": "onScroll",
+                                        "preset": "slideUp",
+                                        "duration": 0.6,
+                                        "delay": 0,
+                                        "ease": "power2.out",
+                                        "enabled": true,
+                                        "scrollStart": "top 80%",
+                                        "scrollEnd": "top 20%",
+                                        "scrub": false
+                                    }
+                                ]
                             },
                             "children": []
                         },
@@ -1715,7 +2436,8 @@
                                 "size": "lg",
                                 "maxWidth": "500px",
                                 "backgroundColor": "#ffffff",
-                                "color": "#000000"
+                                "color": "#000000",
+                                "animations": []
                             },
                             "children": []
                         }
@@ -1752,7 +2474,8 @@
                             }
                         ],
                         "allowMultiple": false,
-                        "defaultOpen": 0
+                        "defaultOpen": 0,
+                        "animations": []
                     },
                     "children": []
                 },
@@ -1760,7 +2483,8 @@
                     "id": "price-spacer-2",
                     "type": "Spacer",
                     "props": {
-                        "height": "48px"
+                        "height": "48px",
+                        "animations": []
                     },
                     "children": []
                 },
@@ -1771,7 +2495,8 @@
                         "title": "100% Satisfaction Guarantee",
                         "message": "If you're not completely thrilled with our work after the first milestone review, we'll refund your deposit in full. No questions asked. We've never had to use this policy.",
                         "variant": "success",
-                        "dismissible": false
+                        "dismissible": false,
+                        "animations": []
                     },
                     "children": []
                 },
@@ -1779,7 +2504,8 @@
                     "id": "price-spacer-3",
                     "type": "Spacer",
                     "props": {
-                        "height": "48px"
+                        "height": "48px",
+                        "animations": []
                     },
                     "children": []
                 },
@@ -1792,7 +2518,8 @@
                         "primaryButtonText": "Schedule a Call",
                         "primaryButtonLink": "page:contact",
                         "alignment": "center",
-                        "size": "md"
+                        "size": "md",
+                        "animations": []
                     },
                     "children": []
                 },
@@ -1885,7 +2612,8 @@
                                 "href": "#",
                                 "icon": "G"
                             }
-                        ]
+                        ],
+                        "animations": []
                     },
                     "children": [],
                     "isGlobal": "GlobalFooter"
@@ -1925,7 +2653,8 @@
                             }
                         ],
                         "ctaText": "Start a Project",
-                        "ctaLink": "page:contact"
+                        "ctaLink": "page:contact",
+                        "animations": []
                     },
                     "children": [],
                     "isGlobal": "GlobalNavbar"
@@ -1938,7 +2667,8 @@
                         "display": "flex",
                         "flexDirection": "column",
                         "alignItems": "center",
-                        "gap": "md"
+                        "gap": "md",
+                        "animations": []
                     },
                     "children": [
                         {
@@ -1951,7 +2681,21 @@
                                 "weight": "800",
                                 "maxWidth": "750px",
                                 "backgroundColor": "#ffffff",
-                                "color": "#000000"
+                                "color": "#000000",
+                                "animations": [
+                                    {
+                                        "id": "anim_1777136674517_k62qd",
+                                        "trigger": "onScroll",
+                                        "preset": "slideUp",
+                                        "duration": 0.6,
+                                        "delay": 0,
+                                        "ease": "power2.out",
+                                        "enabled": true,
+                                        "scrollStart": "top 80%",
+                                        "scrollEnd": "top 20%",
+                                        "scrub": false
+                                    }
+                                ]
                             },
                             "children": []
                         },
@@ -1964,7 +2708,8 @@
                                 "size": "xl",
                                 "maxWidth": "600px",
                                 "backgroundColor": "#ffffff",
-                                "color": "#000000"
+                                "color": "#000000",
+                                "animations": []
                             },
                             "children": []
                         }
@@ -1976,7 +2721,23 @@
                     "props": {
                         "columns": 2,
                         "gap": "2rem",
-                        "alignItems": "start"
+                        "alignItems": "start",
+                        "animations": [
+                            {
+                                "id": "anim_1777136674517_rnx0r",
+                                "trigger": "onScroll",
+                                "preset": "fadeInUp",
+                                "duration": 0.6,
+                                "delay": 0,
+                                "ease": "power2.out",
+                                "enabled": true,
+                                "stagger": 0.15,
+                                "staggerFrom": "start",
+                                "scrollStart": "top 80%",
+                                "scrollEnd": "top 20%",
+                                "scrub": false
+                            }
+                        ]
                     },
                     "children": [
                         {
@@ -2048,7 +2809,8 @@
                                         "required": false
                                     }
                                 ],
-                                "submitText": "Send Inquiry →"
+                                "submitText": "Send Inquiry →",
+                                "animations": []
                             },
                             "children": []
                         },
@@ -2059,7 +2821,8 @@
                                 "padding": "md",
                                 "display": "flex",
                                 "flexDirection": "column",
-                                "gap": "lg"
+                                "gap": "lg",
+                                "animations": []
                             },
                             "children": [
                                 {
@@ -2136,7 +2899,8 @@
                     "id": "contact-spacer-1",
                     "type": "Spacer",
                     "props": {
-                        "height": "64px"
+                        "height": "64px",
+                        "animations": []
                     },
                     "children": []
                 },
@@ -2146,7 +2910,8 @@
                     "props": {
                         "src": "https://images.unsplash.com/photo-1497366216548-37526070297c?w=1400&h=500&fit=crop",
                         "alt": "Meridian Design Studio office space",
-                        "borderRadius": "16px"
+                        "borderRadius": "16px",
+                        "animations": []
                     },
                     "children": []
                 },
@@ -2154,7 +2919,8 @@
                     "id": "contact-spacer-2",
                     "type": "Spacer",
                     "props": {
-                        "height": "48px"
+                        "height": "48px",
+                        "animations": []
                     },
                     "children": []
                 },
@@ -2247,7 +3013,8 @@
                                 "href": "#",
                                 "icon": "G"
                             }
-                        ]
+                        ],
+                        "animations": []
                     },
                     "children": [],
                     "isGlobal": "GlobalFooter"

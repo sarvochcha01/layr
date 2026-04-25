@@ -91,7 +91,7 @@ export function Hero({
     ...cssVars,
     ...(width ? { width } : {}),
     ...(height ? { minHeight: height } : {}),
-    ...(opacity_css != null && opacity_css !== "" ? { opacity: Number(opacity_css) } : {}),
+    ...(opacity_css != null ? { opacity: Number(opacity_css) } : {}),
   };
 
   // Resolve background image URL (support both prop names)

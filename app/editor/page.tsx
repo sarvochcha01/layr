@@ -246,7 +246,7 @@ export default function EditorPage() {
         }
 
         // Just load pages as they are
-        setPages(projectData.pages.map(page => ({
+        setPages(projectData.pages.map((page: any) => ({
           ...page,
           componentSpacing: page.componentSpacing || "normal"
         })), false);
