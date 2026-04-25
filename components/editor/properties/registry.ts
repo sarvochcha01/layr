@@ -23,7 +23,6 @@ export const COMPONENT_SCHEMAS: Record<string, ComponentPropertySchema> = {
         icon: "type",
         fields: [
           { key: "title", label: "Title", type: "text", placeholder: "Enter hero title" },
-          { key: "subtitle", label: "Subtitle", type: "text", placeholder: "Enter subtitle" },
           { key: "badge", label: "Badge Text", type: "text", placeholder: "Badge text" },
           { key: "description", label: "Description", type: "textarea", placeholder: "Enter description", rows: 3 },
           { key: "primaryButtonText", label: "Primary Button Text", type: "text", placeholder: "Button text" },

@@ -212,7 +212,13 @@ function ComponentWrapper({
         "relative group",
         shouldTakeFullWidth && "w-full",
         isDragging && "opacity-40",
+        // Ensure selected components are above unselected ones
+        isSelected && "z-10",
       )}
+      style={{
+        // Use inline style for higher z-index to ensure it works
+        zIndex: isSelected ? 10 : undefined,
+      }}
     >
       {/* Component wrapper — receives inline styles from properties panel */}
       <ResizableWrapper
