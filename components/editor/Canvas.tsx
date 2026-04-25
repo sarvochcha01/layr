@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useRef } from "react";
 import { useDroppable, useDraggable } from "@dnd-kit/core";
 import { ComponentDefinition } from "@/types/editor";
 import { COMPONENT_REGISTRY } from "@/components/builder";
@@ -8,6 +8,7 @@ import { buildComponentStyle } from "@/lib/buildStyle";
 import { ResizableWrapper } from "./ResizableWrapper";
 import { useCtrlDrag } from "@/hooks/useCtrlDrag";
 import { useCanvasZoom } from "@/hooks/useCanvasZoom";
+import { useComponentAnimation } from "@/hooks/useComponentAnimation";
 
 interface CanvasProps {
   components: ComponentDefinition[];
@@ -133,6 +134,10 @@ function ComponentWrapper({
     disabled: isPreviewMode,
   });
 
+  // Animation hook — only active in preview mode
+  const animRef = useRef<HTMLDivElement>(null);
+  useComponentAnimation(animRef, component.props.animations, !!isPreviewMode);
+
   if (!Component) {
     return (
       <div className="p-4 border-2 border-red-300 bg-red-50 rounded">
@@ -251,6 +256,7 @@ function ComponentWrapper({
                 }
           }
         >
+        <div ref={animRef}>
         {/* Selection overlay and DRAG HANDLE */}
         {!isPreviewMode && showComponentTags && (
           <div
@@ -374,6 +380,7 @@ function ComponentWrapper({
             currentPageSlug={currentPageSlug}
           />
         )}
+        </div>
         </div>
       </ResizableWrapper>
     </div>

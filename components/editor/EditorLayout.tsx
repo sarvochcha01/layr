@@ -12,6 +12,7 @@ import { HierarchyPanel, HierarchyPanelRef } from "./HierarchyPanel";
 import { ComponentPalette } from "./ComponentPalette";
 import { Canvas } from "./Canvas";
 import { PropertiesPanel } from "./PropertiesPanel";
+import { AnimationPanel } from "./AnimationPanel";
 import { PagesPanel } from "./PagesPanel";
 import { AIChatPanel } from "./AIChatPanel";
 import { CodeEditorDialog } from "./CodeEditorDialog";
@@ -33,6 +34,7 @@ import {
   Sparkles,
   BoxSelect,
   Play,
+  Zap,
   Pause,
   RotateCcw,
   Settings,
@@ -195,6 +197,7 @@ export function EditorLayout({
 
   // Controlled tab state so AI panel can be closed programmatically
   const [activeTab, setActiveTab] = useState("components");
+  const [rightPanelTab, setRightPanelTab] = useState<"properties" | "animate">("properties");
 
   // Scrollbar visibility settings
   const [showAllScrollbars, setShowAllScrollbars] = useState(true);
@@ -1310,22 +1313,59 @@ export function EditorLayout({
                     <ChevronRight className="w-3.5 h-3.5" />
                   </button>
 
-                  <PropertiesPanel
-                    selectedComponent={selectedComponent}
-                    selectedComponents={selectedComponents}
-                    onUpdateComponent={onUpdateComponent}
-                    onDeleteComponent={onDeleteComponent}
-                    onDuplicateComponent={onDuplicateComponent}
-                    pages={pages}
-                    currentPage={pages.find((p) => p.id === currentPageId)}
-                    onUpdatePage={(updates) =>
-                      onPageUpdate?.(currentPageId, updates)
-                    }
-                    globalComponents={globalComponents}
-                    onMarkAsGlobal={onMarkAsGlobal}
-                    onUnmarkGlobal={onUnmarkGlobal}
-                    onApplyGlobalTemplate={onApplyGlobalTemplate}
-                  />
+                  {/* Right Panel Tabs */}
+                  <div className="flex-shrink-0 px-2 pt-2 pb-0 border-b border-border bg-card">
+                    <div className="flex gap-0.5 p-1 bg-muted rounded-md border border-border ml-6">
+                      <button
+                        onClick={() => setRightPanelTab("properties")}
+                        className={`flex-1 flex items-center justify-center gap-1.5 text-[10px] py-2 px-1 rounded-md transition-all font-semibold tracking-wide ${
+                          rightPanelTab === "properties"
+                            ? "bg-secondary text-secondary-foreground"
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        <Settings className="w-3 h-3" />
+                        PROPERTIES
+                      </button>
+                      <button
+                        onClick={() => setRightPanelTab("animate")}
+                        className={`flex-1 flex items-center justify-center gap-1.5 text-[10px] py-2 px-1 rounded-md transition-all font-semibold tracking-wide ${
+                          rightPanelTab === "animate"
+                            ? "bg-secondary text-secondary-foreground"
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        <Zap className="w-3 h-3" />
+                        ANIMATE
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Tab Content */}
+                  {rightPanelTab === "properties" ? (
+                    <PropertiesPanel
+                      selectedComponent={selectedComponent}
+                      selectedComponents={selectedComponents}
+                      onUpdateComponent={onUpdateComponent}
+                      onDeleteComponent={onDeleteComponent}
+                      onDuplicateComponent={onDuplicateComponent}
+                      pages={pages}
+                      currentPage={pages.find((p) => p.id === currentPageId)}
+                      onUpdatePage={(updates) =>
+                        onPageUpdate?.(currentPageId, updates)
+                      }
+                      globalComponents={globalComponents}
+                      onMarkAsGlobal={onMarkAsGlobal}
+                      onUnmarkGlobal={onUnmarkGlobal}
+                      onApplyGlobalTemplate={onApplyGlobalTemplate}
+                    />
+                  ) : (
+                    <AnimationPanel
+                      selectedComponent={selectedComponent}
+                      selectedComponents={selectedComponents}
+                      onUpdateComponent={onUpdateComponent}
+                    />
+                  )}
                 </div>
               )}
 
