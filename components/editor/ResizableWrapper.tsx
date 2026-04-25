@@ -79,7 +79,7 @@ export function ResizableWrapper({
         <>
           {/* Corner Handles */}
           <div
-            className="absolute w-4 h-4 bg-primary border-2 border-white rounded-full z-50 hover:scale-125 transition-transform shadow-lg pointer-events-auto"
+            className="absolute w-4 h-4 bg-primary border-2 border-white rounded-full z-[100] hover:scale-125 transition-transform shadow-lg pointer-events-auto"
             style={{
               top: "-8px",
               left: "-8px",
@@ -88,7 +88,7 @@ export function ResizableWrapper({
             onMouseDown={(e) => handleMouseDown(e, "top-left")}
           />
           <div
-            className="absolute w-4 h-4 bg-primary border-2 border-white rounded-full z-50 hover:scale-125 transition-transform shadow-lg pointer-events-auto"
+            className="absolute w-4 h-4 bg-primary border-2 border-white rounded-full z-[100] hover:scale-125 transition-transform shadow-lg pointer-events-auto"
             style={{
               top: "-8px",
               right: "-8px",
@@ -97,7 +97,7 @@ export function ResizableWrapper({
             onMouseDown={(e) => handleMouseDown(e, "top-right")}
           />
           <div
-            className="absolute w-4 h-4 bg-primary border-2 border-white rounded-full z-50 hover:scale-125 transition-transform shadow-lg pointer-events-auto"
+            className="absolute w-4 h-4 bg-primary border-2 border-white rounded-full z-[100] hover:scale-125 transition-transform shadow-lg pointer-events-auto"
             style={{
               bottom: "-8px",
               left: "-8px",
@@ -106,7 +106,7 @@ export function ResizableWrapper({
             onMouseDown={(e) => handleMouseDown(e, "bottom-left")}
           />
           <div
-            className="absolute w-4 h-4 bg-primary border-2 border-white rounded-full z-50 hover:scale-125 transition-transform shadow-lg pointer-events-auto"
+            className="absolute w-4 h-4 bg-primary border-2 border-white rounded-full z-[100] hover:scale-125 transition-transform shadow-lg pointer-events-auto"
             style={{
               bottom: "-8px",
               right: "-8px",
@@ -117,7 +117,7 @@ export function ResizableWrapper({
 
           {/* Edge Handles */}
           <div
-            className="absolute w-8 h-3 bg-primary border-2 border-white rounded-full z-50 hover:scale-110 transition-transform shadow-lg pointer-events-auto"
+            className="absolute w-8 h-3 bg-primary border-2 border-white rounded-full z-[100] hover:scale-110 transition-transform shadow-lg pointer-events-auto"
             style={{
               top: "-6px",
               left: "50%",
@@ -127,7 +127,7 @@ export function ResizableWrapper({
             onMouseDown={(e) => handleMouseDown(e, "top")}
           />
           <div
-            className="absolute w-8 h-3 bg-primary border-2 border-white rounded-full z-50 hover:scale-110 transition-transform shadow-lg pointer-events-auto"
+            className="absolute w-8 h-3 bg-primary border-2 border-white rounded-full z-[100] hover:scale-110 transition-transform shadow-lg pointer-events-auto"
             style={{
               bottom: "-6px",
               left: "50%",
@@ -137,7 +137,7 @@ export function ResizableWrapper({
             onMouseDown={(e) => handleMouseDown(e, "bottom")}
           />
           <div
-            className="absolute w-3 h-8 bg-primary border-2 border-white rounded-full z-50 hover:scale-110 transition-transform shadow-lg pointer-events-auto"
+            className="absolute w-3 h-8 bg-primary border-2 border-white rounded-full z-[100] hover:scale-110 transition-transform shadow-lg pointer-events-auto"
             style={{
               top: "50%",
               left: "-6px",
@@ -147,7 +147,7 @@ export function ResizableWrapper({
             onMouseDown={(e) => handleMouseDown(e, "left")}
           />
           <div
-            className="absolute w-3 h-8 bg-primary border-2 border-white rounded-full z-50 hover:scale-110 transition-transform shadow-lg pointer-events-auto"
+            className="absolute w-3 h-8 bg-primary border-2 border-white rounded-full z-[100] hover:scale-110 transition-transform shadow-lg pointer-events-auto"
             style={{
               top: "50%",
               right: "-6px",

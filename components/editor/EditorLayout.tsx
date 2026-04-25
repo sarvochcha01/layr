@@ -1206,6 +1206,8 @@ export function EditorLayout({
                     : getCanvasWidth(),
                   maxWidth: viewport !== "desktop" ? getCanvasWidth() : "none",
                   minHeight: "100%",
+                  // Center the canvas for mobile and tablet viewports
+                  margin: viewport !== "desktop" ? "0 auto" : undefined,
                   ...(viewport === "desktop" && !isPreviewMode && desktopEditZoom < 1 ? {
                     zoom: desktopEditZoom,
                     transformOrigin: "top left",

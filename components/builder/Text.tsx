@@ -26,6 +26,7 @@ interface TextProps {
   width?: string;
   height?: string;
   themeStyle?: ThemeStyleVariant;
+  isPreviewMode?: boolean;
   [key: string]: any;
 }
 
@@ -41,6 +42,7 @@ export function Text({
   width,
   height,
   themeStyle,
+  isPreviewMode,
   ...rest
 }: TextProps) {
   const Component = tag;
@@ -107,6 +109,10 @@ export function Text({
         ...(fontOverride
           ? { fontFamily: getFontFamilyValue(fontOverride) }
           : {}),
+        // Ensure full width in edit mode for better clickability
+        width: !isPreviewMode && !width ? "100%" : baseStyle.width,
+        display: !isPreviewMode ? "block" : baseStyle.display,
+        minHeight: !isPreviewMode ? "1.5em" : undefined,
       }}
     >
       {children || content}
