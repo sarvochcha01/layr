@@ -163,6 +163,10 @@ function ComponentWrapper({
   ];
   const shouldTakeFullHeight = fullHeightComponents.includes(component.type);
 
+  // Components that need minimum click area in edit mode
+  const minClickAreaComponents = ["Divider", "Spacer", "Text"];
+  const needsMinClickArea = minClickAreaComponents.includes(component.type);
+
   const handleResize = (id: string, updates: { width?: string; height?: string }) => {
     if (onUpdateComponent) {
       onUpdateComponent(id, updates);
@@ -250,6 +254,15 @@ function ComponentWrapper({
                   }
                 }
           }
+          className={cn(
+            // Add minimum click area for hard-to-click components in edit mode
+            !isPreviewMode && needsMinClickArea && "min-h-[20px] relative w-full h-full"
+          )}
+          style={{
+            // Ensure full width and height for clickability
+            width: needsMinClickArea && !isPreviewMode ? "100%" : undefined,
+            height: needsMinClickArea && !isPreviewMode ? "100%" : undefined,
+          }}
         >
         {/* Selection overlay and DRAG HANDLE */}
         {!isPreviewMode && showComponentTags && (
