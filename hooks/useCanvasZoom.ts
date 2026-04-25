@@ -16,6 +16,7 @@ export function useCanvasZoom({
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [isPanning, setIsPanning] = useState(false);
+  const [isSpacePressed, setIsSpacePressed] = useState(false);
   const panStartRef = useRef({ x: 0, y: 0 });
   const panOffsetRef = useRef({ x: 0, y: 0 });
 
@@ -50,10 +51,37 @@ export function useCanvasZoom({
       });
     };
 
-    // Ctrl + Middle Mouse Button = Pan
+    // Track Space key press
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.code === 'Space' && !e.repeat) {
+        setIsSpacePressed(true);
+        // Prevent default space behavior (scrolling)
+        if (document.activeElement?.tagName !== 'INPUT' && 
+            document.activeElement?.tagName !== 'TEXTAREA') {
+          e.preventDefault();
+        }
+      }
+    };
+
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.code === 'Space') {
+        setIsSpacePressed(false);
+        if (isPanning) {
+          setIsPanning(false);
+          document.body.style.cursor = '';
+          document.body.style.userSelect = '';
+        }
+      }
+    };
+
+    // Middle Mouse Button (without Ctrl) OR Space + Left Mouse Button = Pan
     const handleMouseDown = (e: MouseEvent) => {
-      // Middle mouse button (button 1) + Ctrl
-      if (e.button !== 1 || (!e.ctrlKey && !e.metaKey)) return;
+      // Middle mouse button (button 1) without Ctrl
+      const isMiddleMousePan = e.button === 1;
+      // Left mouse button (button 0) with Space key
+      const isSpacePan = e.button === 0 && isSpacePressed;
+
+      if (!isMiddleMousePan && !isSpacePan) return;
 
       e.preventDefault();
       e.stopPropagation();
@@ -66,7 +94,13 @@ export function useCanvasZoom({
     };
 
     const handleMouseMove = (e: MouseEvent) => {
-      if (!isPanning) return;
+      if (!isPanning) {
+        // Update cursor when space is held but not panning yet
+        if (isSpacePressed) {
+          document.body.style.cursor = 'grab';
+        }
+        return;
+      }
 
       e.preventDefault();
 
@@ -83,25 +117,30 @@ export function useCanvasZoom({
       if (!isPanning) return;
 
       setIsPanning(false);
-      document.body.style.cursor = '';
+      // Restore cursor based on space key state
+      document.body.style.cursor = isSpacePressed ? 'grab' : '';
       document.body.style.userSelect = '';
     };
 
     // Add event listeners
     document.addEventListener('wheel', handleWheel, { passive: false });
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('keyup', handleKeyUp);
     document.addEventListener('mousedown', handleMouseDown);
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
 
     return () => {
       document.removeEventListener('wheel', handleWheel);
+      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('keyup', handleKeyUp);
       document.removeEventListener('mousedown', handleMouseDown);
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
       document.body.style.cursor = '';
       document.body.style.userSelect = '';
     };
-  }, [isEnabled, isPanning, pan, minZoom, maxZoom, zoomSpeed]);
+  }, [isEnabled, isPanning, isSpacePressed, pan, minZoom, maxZoom, zoomSpeed]);
 
   return {
     zoom,

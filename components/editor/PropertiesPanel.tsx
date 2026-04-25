@@ -20,6 +20,7 @@ import { PageProperties } from "./properties/PageProperties";
 
 interface PropertiesPanelProps {
   selectedComponent: ComponentDefinition | null;
+  selectedComponents?: ComponentDefinition[];
   onUpdateComponent: (id: string, updates: Record<string, any>) => void;
   onDeleteComponent: (id: string) => void;
   onDuplicateComponent: (id: string) => void;
@@ -34,6 +35,7 @@ interface PropertiesPanelProps {
 
 export function PropertiesPanel({
   selectedComponent,
+  selectedComponents = [],
   onUpdateComponent,
   onDeleteComponent,
   onDuplicateComponent,
@@ -62,7 +64,9 @@ export function PropertiesPanel({
   }, []);
 
   const updateProp = (key: string, value: any) => {
-    if (!selectedComponent) return;
+    // Get the primary component (first selected or single selected)
+    const primary = selectedComponent || selectedComponents[0];
+    if (!primary) return;
 
     // Accumulate updates
     pendingUpdatesRef.current[key] = value;
@@ -74,14 +78,30 @@ export function PropertiesPanel({
 
     // Set new timeout
     debouncedUpdateRef.current = setTimeout(() => {
-      onUpdateComponent(selectedComponent.id, pendingUpdatesRef.current);
+      // If multiple components are selected and they're all the same type, update all of them
+      if (selectedComponents.length > 1) {
+        const sameType = selectedComponents.every(c => c.type === primary.type);
+        if (sameType) {
+          // Apply updates to all selected components of the same type
+          selectedComponents.forEach(component => {
+            onUpdateComponent(component.id, pendingUpdatesRef.current);
+          });
+        } else {
+          // Different types selected, only update the primary one
+          onUpdateComponent(primary.id, pendingUpdatesRef.current);
+        }
+      } else {
+        // Single component selected
+        onUpdateComponent(primary.id, pendingUpdatesRef.current);
+      }
+      
       pendingUpdatesRef.current = {};
       debouncedUpdateRef.current = null;
     }, 150); // Reduced from 300ms to 150ms for snappier feedback
   };
 
   // ── No component selected ──────────────────────────────
-  if (!selectedComponent) {
+  if (!selectedComponent && selectedComponents.length === 0) {
     if (currentPage && onUpdatePage) {
       return <PageProperties currentPage={currentPage} onUpdatePage={onUpdatePage} />;
     }
@@ -103,20 +123,62 @@ export function PropertiesPanel({
     );
   }
 
-  // ── Component selected ─────────────────────────────────
-  const isGlobal = !!selectedComponent.isGlobal;
+  // Get the primary component (first selected or the single selected one)
+  const primaryComponent = selectedComponent || selectedComponents[0];
+  
+  if (!primaryComponent) {
+    // Fallback to page properties
+    if (currentPage && onUpdatePage) {
+      return <PageProperties currentPage={currentPage} onUpdatePage={onUpdatePage} />;
+    }
+    return null;
+  }
+
+  // ── Multiple components selected with different types ──────────────────────────────
+  // Show page properties instead when different component types are selected
+  if (selectedComponents.length > 1) {
+    const allSameType = selectedComponents.every(c => c.type === primaryComponent.type);
+    if (!allSameType) {
+      // Different types selected - show page properties
+      if (currentPage && onUpdatePage) {
+        return <PageProperties currentPage={currentPage} onUpdatePage={onUpdatePage} />;
+      }
+      
+      return (
+        <div className="h-full flex flex-col">
+          <div className="p-4 border-b border-border">
+            <h3 className="text-sm font-semibold text-foreground">Properties</h3>
+          </div>
+          <div className="flex-1 flex items-center justify-center text-muted-foreground">
+            <div className="text-center">
+              <div className="text-4xl mb-2">⚠️</div>
+              <div className="text-sm">
+                {selectedComponents.length} different component types selected
+              </div>
+              <div className="text-xs mt-2">
+                Select components of the same type to edit together
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+  }
+
+  // ── Component(s) selected (same type) ─────────────────────────────────
+  const isGlobal = !!primaryComponent.isGlobal;
   const existingGlobalNames = Object.keys(globalComponents);
 
   const handleMarkAsGlobal = () => {
     if (!globalName.trim() || !onMarkAsGlobal) return;
-    onMarkAsGlobal(selectedComponent.id, globalName.trim());
+    onMarkAsGlobal(primaryComponent.id, globalName.trim());
     setShowGlobalDialog(false);
     setGlobalName("");
   };
 
   const handleApplyExistingGlobal = (name: string) => {
     if (!onApplyGlobalTemplate) return;
-    onApplyGlobalTemplate(selectedComponent.id, name);
+    onApplyGlobalTemplate(primaryComponent.id, name);
     setShowGlobalDialog(false);
   };
 
@@ -129,30 +191,41 @@ export function PropertiesPanel({
             <h3 className="text-xs font-semibold text-muted-foreground tracking-wide uppercase">
               Properties
             </h3>
-            <p className="text-[10px] text-muted-foreground/70 mt-1">
-              {selectedComponent.type} Component
-            </p>
+            {selectedComponents.length > 1 ? (
+              <p className="text-[10px] text-muted-foreground/70 mt-1">
+                {selectedComponents.length} Components Selected
+                {selectedComponents.every(c => c.type === primaryComponent.type) && (
+                  <span className="text-primary"> • All {primaryComponent.type}</span>
+                )}
+              </p>
+            ) : (
+              <p className="text-[10px] text-muted-foreground/70 mt-1">
+                {primaryComponent.type} Component
+              </p>
+            )}
           </div>
-          {/* Global toggle button */}
-          {isGlobal ? (
-            <button
-              onClick={() => onUnmarkGlobal?.(selectedComponent.id)}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/15 text-primary text-xs font-medium hover:bg-primary/25 transition-colors"
-              title={`Global: ${selectedComponent.isGlobal} — Click to unmark`}
-            >
-              <Globe className="w-3 h-3" />
-              {selectedComponent.isGlobal}
-              <X className="w-3 h-3 opacity-60" />
-            </button>
-          ) : (
-            <button
-              onClick={() => setShowGlobalDialog(true)}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-border text-xs text-muted-foreground hover:text-foreground hover:border-border/80 transition-colors"
-              title="Mark as Global Component"
-            >
-              <Globe className="w-3 h-3" />
-              Make Global
-            </button>
+          {/* Global toggle button - only show for single selection */}
+          {selectedComponents.length === 1 && (
+            isGlobal ? (
+              <button
+                onClick={() => onUnmarkGlobal?.(primaryComponent.id)}
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/15 text-primary text-xs font-medium hover:bg-primary/25 transition-colors"
+                title={`Global: ${primaryComponent.isGlobal} — Click to unmark`}
+              >
+                <Globe className="w-3 h-3" />
+                {primaryComponent.isGlobal}
+                <X className="w-3 h-3 opacity-60" />
+              </button>
+            ) : (
+              <button
+                onClick={() => setShowGlobalDialog(true)}
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-border text-xs text-muted-foreground hover:text-foreground hover:border-border/80 transition-colors"
+                title="Mark as Global Component"
+              >
+                <Globe className="w-3 h-3" />
+                Make Global
+              </button>
+            )
           )}
         </div>
       </div>
@@ -161,8 +234,8 @@ export function PropertiesPanel({
       <div className="flex-1 overflow-y-auto min-h-0">
         <div className="p-4">
           <ComponentProperties
-            type={selectedComponent.type}
-            props={selectedComponent.props}
+            type={primaryComponent.type}
+            props={primaryComponent.props}
             updateProp={updateProp}
             pages={pages}
           />
@@ -175,7 +248,7 @@ export function PropertiesPanel({
           variant="outline"
           size="sm"
           className="w-full h-8 text-xs"
-          onClick={() => selectedComponent && onDuplicateComponent(selectedComponent.id)}
+          onClick={() => primaryComponent && onDuplicateComponent(primaryComponent.id)}
         >
           Duplicate Component
         </Button>
@@ -183,7 +256,7 @@ export function PropertiesPanel({
           variant="destructive"
           size="sm"
           className="w-full h-8 text-xs"
-          onClick={() => selectedComponent && onDeleteComponent(selectedComponent.id)}
+          onClick={() => primaryComponent && onDeleteComponent(primaryComponent.id)}
         >
           Delete Component
         </Button>

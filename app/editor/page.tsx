@@ -26,6 +26,7 @@ import { Loading } from "@/components/ui/loading";
 import { useHistory } from "@/hooks/useHistory";
 import { useComponentFavorites } from "@/hooks/useComponentFavorites";
 import { useComponentClipboard } from "@/hooks/useComponentClipboard";
+import { useMultiSelect } from "@/hooks/useMultiSelect";
 import { ShortcutsPanel } from "@/components/editor/ShortcutsPanel";
 import { componentCategories } from "@/components/editor/config/components";
 import { Component as ComponentIcon, Globe } from "lucide-react";
@@ -120,19 +121,25 @@ export default function EditorPage() {
       name: "Home",
       slug: "index",
       components: placeholderComponents,
+      componentSpacing: "normal",
     },
   ]);
 
   const [currentPageId, setCurrentPageId] = useState<string>("home");
-  const [selectedComponentIds, setSelectedComponentIds] = useState<string[]>(
-    [],
-  );
   const [draggedComponent, setDraggedComponent] = useState<any>(null);
   const [redirecting, setRedirecting] = useState(false);
   const [projectName, setProjectName] = useState<string>("");
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [isSavingManual, setIsSavingManual] = useState(false);
+
+  // Use multi-select hook for component selection
+  const multiSelect = useMultiSelect({
+    onSelectionChange: (ids) => {
+      // Hook handles the state internally
+    },
+    allowEmpty: true,
+  });
 
   // Global components state
   const [globalComponents, setGlobalComponents] = useState<GlobalComponents>(
@@ -239,7 +246,10 @@ export default function EditorPage() {
         }
 
         // Just load pages as they are
-        setPages(projectData.pages, false);
+        setPages(projectData.pages.map(page => ({
+          ...page,
+          componentSpacing: page.componentSpacing || "normal"
+        })), false);
         setCurrentPageId(projectData.pages[0]?.id || "home");
       } else {
         // Legacy support: convert old components array to pages
@@ -250,6 +260,7 @@ export default function EditorPage() {
               name: "Home",
               slug: "index",
               components: projectData.components || placeholderComponents,
+              componentSpacing: "normal",
             },
           ],
           false, // Don't record initial load in history
@@ -363,6 +374,7 @@ export default function EditorPage() {
       name,
       slug,
       components: [],
+      componentSpacing: "normal",
     };
     setPages((prev) => [...prev, newPage]);
     setCurrentPageId(newPage.id);
@@ -403,6 +415,7 @@ export default function EditorPage() {
       name: `${pageToDuplicate.name} (Copy)`,
       slug: `${pageToDuplicate.slug}-copy-${Date.now()}`,
       components: cloneComponentsWithNewIds(pageToDuplicate.components),
+      componentSpacing: pageToDuplicate.componentSpacing || "normal",
     };
 
     setPages((prev) => [...prev, newPage]);
@@ -417,9 +430,15 @@ export default function EditorPage() {
     toast.success(`Page renamed to "${name}"`);
   };
 
+  const handlePageUpdate = (pageId: string, updates: Partial<Page>) => {
+    setPages((prev) =>
+      prev.map((p) => (p.id === pageId ? { ...p, ...updates } : p)),
+    );
+  };
+
   const handlePageSelect = (pageId: string) => {
     setCurrentPageId(pageId);
-    setSelectedComponentIds([]);
+    multiSelect.clearSelection();
   };
 
   const handleProjectNameChange = (newName: string) => {
@@ -730,11 +749,11 @@ export default function EditorPage() {
       );
     }
 
-    setSelectedComponentIds((prev) => prev.filter((id) => id !== componentId));
+    multiSelect.removeFromSelection(componentId);
   };
 
   const deleteSelectedComponents = () => {
-    selectedComponentIds.forEach((id) => {
+    multiSelect.selectedIds.forEach((id) => {
       // Check if it's a global component template
       const globalName = Object.entries(globalComponents).find(
         ([_, comp]) => comp.id === id,
@@ -752,7 +771,7 @@ export default function EditorPage() {
         removeComponentFromTree(prev, id),
       );
     });
-    setSelectedComponentIds([]);
+    multiSelect.clearSelection();
   };
 
   const getAllComponentIds = (components: ComponentDefinition[]): string[] => {
@@ -803,7 +822,7 @@ export default function EditorPage() {
         `${aiComponents.length} AI-generated component${aiComponents.length !== 1 ? "s" : ""} added to page`,
       );
     }
-    setSelectedComponentIds([]);
+    multiSelect.clearSelection();
   };
 
   // AI pages handler
@@ -877,6 +896,7 @@ export default function EditorPage() {
             slug,
             path: aiPage.path || `/${slug}`,
             components: aiPage.components || [],
+            componentSpacing: "normal",
           };
           updatedPages.push(newPage);
           if (!firstNewOrUpdatedPageId) firstNewOrUpdatedPageId = newPage.id;
@@ -1051,12 +1071,12 @@ export default function EditorPage() {
         if (
           event.ctrlKey &&
           event.key === "c" &&
-          selectedComponentIds.length === 1
+          multiSelect.selectedIds.length === 1
         ) {
           event.preventDefault();
           const component = findComponentInTree(
             components,
-            selectedComponentIds[0],
+            multiSelect.selectedIds[0],
           );
           if (component) {
             copyComponent(component);
@@ -1088,11 +1108,11 @@ export default function EditorPage() {
         if (event.ctrlKey && event.key === "a") {
           event.preventDefault();
           const allIds = getAllComponentIds(components);
-          setSelectedComponentIds(allIds);
+          multiSelect.selectAll(allIds);
           return;
         }
 
-        if (event.key === "Delete" && selectedComponentIds.length > 0) {
+        if (event.key === "Delete" && multiSelect.selectedIds.length > 0) {
           event.preventDefault();
           deleteSelectedComponents();
           return;
@@ -1100,17 +1120,17 @@ export default function EditorPage() {
 
         if (event.key === "Escape") {
           event.preventDefault();
-          setSelectedComponentIds([]);
+          multiSelect.clearSelection();
           return;
         }
 
         if (
           event.ctrlKey &&
           event.key === "d" &&
-          selectedComponentIds.length > 0
+          multiSelect.selectedIds.length > 0
         ) {
           event.preventDefault();
-          selectedComponentIds.forEach((id) => duplicateComponent(id));
+          multiSelect.selectedIds.forEach((id) => duplicateComponent(id));
           return;
         }
       }
@@ -1122,7 +1142,7 @@ export default function EditorPage() {
     };
   }, [
     components,
-    selectedComponentIds,
+    multiSelect.selectedIds,
     undo,
     redo,
     hasClipboard,
@@ -1146,8 +1166,9 @@ export default function EditorPage() {
       <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
         <EditorLayout
           components={components}
-          selectedComponentIds={selectedComponentIds}
-          onSelectComponent={(id) => setSelectedComponentIds(id ? [id] : [])}
+          selectedComponentIds={multiSelect.selectedIds}
+          onSelectComponent={(id) => multiSelect.selectSingle(id)}
+          onSelectMultiple={(ids) => multiSelect.selectMultiple(ids)}
           onUpdateComponent={updateComponent}
           onDeleteComponent={deleteComponent}
           onDuplicateComponent={duplicateComponent}
@@ -1162,6 +1183,7 @@ export default function EditorPage() {
           onPageDelete={handlePageDelete}
           onPageDuplicate={handlePageDuplicate}
           onPageRename={handlePageRename}
+          onPageUpdate={handlePageUpdate}
           onUndo={undo}
           onRedo={redo}
           canUndo={canUndo}

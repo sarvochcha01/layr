@@ -128,8 +128,7 @@ export function Feature({
     transform: hovered ? "translateY(-4px)" : "translateY(0)",
     transition: "transform 300ms cubic-bezier(0.34,1.56,0.64,1), box-shadow 300ms ease",
     backdropFilter: "var(--theme-backdrop)",
-    ...(width ? { width } : {}),
-    ...(height ? { height } : {}),
+    boxSizing: "border-box",
     ...getUserStyleOverrides(rest),
   };
 
@@ -159,7 +158,7 @@ export function Feature({
   return (
     <div
       className={cn(
-        "min-w-0 overflow-hidden",
+        "w-full h-full overflow-hidden",
         layout === "vertical" ? "text-center" : "flex gap-5 items-start",
       )}
       style={rootStyle}

@@ -147,6 +147,16 @@ export function buildComponentStyle(props: Record<string, any>): React.CSSProper
 export function getUserStyleOverrides(props: Record<string, any>): React.CSSProperties {
     const style: React.CSSProperties = {};
 
+    // Spacing - padding and margin
+    if (props.paddingTop) style.paddingTop = ensureUnit(props.paddingTop);
+    if (props.paddingRight) style.paddingRight = ensureUnit(props.paddingRight);
+    if (props.paddingBottom) style.paddingBottom = ensureUnit(props.paddingBottom);
+    if (props.paddingLeft) style.paddingLeft = ensureUnit(props.paddingLeft);
+    if (props.marginTop) style.marginTop = ensureUnit(props.marginTop);
+    if (props.marginRight) style.marginRight = ensureUnit(props.marginRight);
+    if (props.marginBottom) style.marginBottom = ensureUnit(props.marginBottom);
+    if (props.marginLeft) style.marginLeft = ensureUnit(props.marginLeft);
+
     // Border overrides — individual properties override theme shorthand
     if (props.borderRadius_css) style.borderRadius = ensureUnit(props.borderRadius_css);
 

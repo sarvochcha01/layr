@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import {
   Page,
   GlobalComponents,
@@ -48,6 +48,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useShortcuts } from "@/hooks/useShortcuts";
 import JSZip from "jszip";
 import { generateCSS, generateHTML, generateJS } from "@/lib/codeGenerator";
 import {
@@ -68,6 +69,7 @@ interface EditorLayoutProps {
   components: ComponentDefinition[];
   selectedComponentIds: string[];
   onSelectComponent: (id: string | null) => void;
+  onSelectMultiple?: (ids: string[]) => void;
   onUpdateComponent: (id: string, updates: Record<string, any>) => void;
   onDeleteComponent: (id: string) => void;
   onDuplicateComponent: (id: string) => void;
@@ -118,6 +120,7 @@ export function EditorLayout({
   components,
   selectedComponentIds,
   onSelectComponent,
+  onSelectMultiple,
   onUpdateComponent,
   onDeleteComponent,
   onDuplicateComponent,
@@ -173,12 +176,18 @@ export function EditorLayout({
   const [isLeftPanelOpen, setIsLeftPanelOpen] = useState(true);
   const [isRightPanelOpen, setIsRightPanelOpen] = useState(true);
 
+  // Canvas container measurement for desktop scaling
+  const canvasContainerRef = useRef<HTMLDivElement>(null);
+  const [canvasContainerWidth, setCanvasContainerWidth] = useState(0);
+
   // Editable shortcuts state
   const [customShortcuts, setCustomShortcuts] = useState([
     { id: 1, name: "Canvas Zoom", shortcut: "Ctrl + Scroll" },
-    { id: 2, name: "Canvas Pan", shortcut: "Ctrl + Middle Click" },
+    { id: 2, name: "Canvas Pan", shortcut: "Middle M-Button/space + left M-click" },
     { id: 3, name: "Insert Component", shortcut: "Ctrl + Drag" },
     { id: 4, name: "Swap Components", shortcut: "Ctrl + Shift + Drag" },
+    {id:5, name: "select multi-components", shortcut: "Ctrl + leftclick(on canvas)"},
+    {id:6, name: "Toggle Preview Mode", shortcut: "Space (while hovering canvas)"},
   ]);
   const [editingShortcutId, setEditingShortcutId] = useState<number | null>(
     null,
@@ -196,6 +205,13 @@ export function EditorLayout({
   // Panel widths
   const [leftPanelWidth, setLeftPanelWidth] = useState(280);
   const [rightPanelWidth, setRightPanelWidth] = useState(280);
+
+  // Shortcuts hook for space bar toggle
+  useShortcuts({
+    isPreviewMode,
+    onTogglePreview: () => setIsPreviewMode(!isPreviewMode),
+    isEnabled: true,
+  });
 
   const isResizingRef = useRef<string | null>(null);
   const startPosRef = useRef({ x: 0, y: 0 });
@@ -230,6 +246,21 @@ export function EditorLayout({
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", handleMouseUp);
     };
+  }, []);
+
+  // Measure canvas container width for desktop scaling
+  useEffect(() => {
+    const container = canvasContainerRef.current;
+    if (!container) return;
+
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        setCanvasContainerWidth(entry.contentRect.width);
+      }
+    });
+
+    observer.observe(container);
+    return () => observer.disconnect();
   }, []);
 
   const startResize = (type: string, e: React.MouseEvent) => {
@@ -275,6 +306,11 @@ export function EditorLayout({
       ? findComponentById(components, selectedComponentIds[0])
       : null;
 
+  // Get all selected components for multi-edit
+  const selectedComponents = selectedComponentIds
+    .map(id => findComponentById(components, id))
+    .filter((c): c is ComponentDefinition => c !== null);
+
   const getCanvasWidth = () => {
     switch (viewport) {
       case "mobile":
@@ -285,6 +321,20 @@ export function EditorLayout({
         return "100%";
     }
   };
+
+  // Calculate the zoom factor for desktop edit mode
+  // Renders at full viewport width then scales down to fit available space
+  const getDesktopEditZoom = useCallback(() => {
+    if (viewport !== "desktop" || isPreviewMode || canvasContainerWidth <= 0) return 1;
+    // Available width = container width minus p-8 padding (32px * 2)
+    const availableWidth = canvasContainerWidth - 64;
+    // Reference = full window width (what preview mode renders at)
+    const referenceWidth = typeof window !== 'undefined' ? window.innerWidth : 1440;
+    if (referenceWidth <= 0) return 1;
+    return Math.min(1, availableWidth / referenceWidth);
+  }, [viewport, isPreviewMode, canvasContainerWidth]);
+
+  const desktopEditZoom = getDesktopEditZoom();
 
   const exportToZip = async (format: "html" | "react" = "html") => {
     try {
@@ -763,30 +813,6 @@ export function EditorLayout({
                               </button>
                             </div>
                           ))}
-
-                          {/* Add New Shortcut */}
-                          <button
-                            onClick={() => {
-                              const newId =
-                                Math.max(
-                                  ...customShortcuts.map((s) => s.id),
-                                  0,
-                                ) + 1;
-                              setCustomShortcuts((prev) => [
-                                ...prev,
-                                {
-                                  id: newId,
-                                  name: "New Shortcut",
-                                  shortcut: "Ctrl + ?",
-                                },
-                              ]);
-                              setEditingShortcutId(newId);
-                            }}
-                            className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs text-muted-foreground hover:text-foreground border border-dashed border-border hover:border-primary/50 rounded transition-colors mt-2"
-                          >
-                            <Plus className="w-3 h-3" />
-                            <span>Add Shortcut</span>
-                          </button>
                         </div>
                       )}
                     </div>
@@ -990,6 +1016,7 @@ export function EditorLayout({
                     flexShrink: 0,
                     flexGrow: 0,
                   }}
+                  data-panel="left-sidebar"
                 >
                   {/* Collapse Button */}
                   <button
@@ -1058,8 +1085,12 @@ export function EditorLayout({
                         components={components}
                         selectedComponentIds={selectedComponentIds}
                         onSelectComponent={onSelectComponent}
+                        onSelectMultiple={onSelectMultiple}
                         onDeleteComponent={onDeleteComponent}
                         onAddComponent={onAddComponent}
+                        onRepositionComponent={onRepositionComponent}
+                        onMoveComponentUp={onMoveComponentUp}
+                        onMoveComponentDown={onMoveComponentDown}
                       />
                     </TabsContent>
 
@@ -1156,24 +1187,26 @@ export function EditorLayout({
 
           {/* Canvas Area */}
           <div
+            ref={canvasContainerRef}
             className="flex-1 min-w-0 bg-background overflow-auto"
             style={{ flexShrink: 1, flexGrow: 1 }}
             data-panel="canvas"
           >
             <div
-              className={`h-full overflow-auto transition-all duration-300 ${isPreviewMode ? "bg-white p-0" : "bg-background p-8"} light`}
+              className={`min-h-full transition-all duration-300 ${isPreviewMode ? "bg-white p-0" : "bg-background p-8"} light`}
             >
               <div
-                className="transition-all duration-300 ease-in-out mx-auto"
+                className="transition-all duration-300 ease-in-out"
                 style={{
-                  width: getCanvasWidth(),
-                  maxWidth:
-                    viewport === "desktop"
-                      ? isPreviewMode
-                        ? "none"
-                        : "1200px"
-                      : getCanvasWidth(),
+                  width: viewport === "desktop" && !isPreviewMode
+                    ? `${typeof window !== 'undefined' ? window.innerWidth : 1440}px`
+                    : getCanvasWidth(),
+                  maxWidth: viewport !== "desktop" ? getCanvasWidth() : "none",
                   minHeight: "100%",
+                  ...(viewport === "desktop" && !isPreviewMode && desktopEditZoom < 1 ? {
+                    zoom: desktopEditZoom,
+                    transformOrigin: "top left",
+                  } : {}),
                 }}
               >
                 <Canvas
@@ -1183,6 +1216,9 @@ export function EditorLayout({
                   }
                   onSelectComponent={
                     isPreviewMode ? () => {} : onSelectComponent
+                  }
+                  onSelectMultiple={
+                    isPreviewMode ? undefined : onSelectMultiple
                   }
                   onUpdateComponent={onUpdateComponent}
                   onRepositionComponent={onRepositionComponent}
@@ -1199,7 +1235,23 @@ export function EditorLayout({
                   showOutlines={!isPreviewMode && showOutlines}
                   outlineColor={outlineColor}
                   showComponentTags={showComponentTags}
-                  pageBackground={pages.find((p) => p.id === currentPageId)}
+                  pageBackground={(() => {
+                    const page = pages.find((p) => p.id === currentPageId);
+                    if (!page) return undefined;
+                    return {
+                      backgroundColor: page.backgroundColor,
+                      backgroundType: page.backgroundType,
+                      backgroundGradient: page.backgroundGradient, // Legacy
+                      gradientStart: page.gradientStart,
+                      gradientEnd: page.gradientEnd,
+                      gradientDirection: page.gradientDirection,
+                      gradientAngle: page.gradientAngle,
+                      backgroundImageUrl: page.backgroundImageUrl,
+                    };
+                  })()}
+                  componentSpacing={
+                    pages.find((p) => p.id === currentPageId)?.componentSpacing || "normal"
+                  }
                   onZoomChange={(zoom, pan) => {
                     setCanvasZoom(Math.round(zoom * 100));
                   }}
@@ -1247,6 +1299,7 @@ export function EditorLayout({
                     flexShrink: 0,
                     flexGrow: 0,
                   }}
+                  data-panel="properties"
                 >
                   {/* Collapse Button */}
                   <button
@@ -1259,6 +1312,7 @@ export function EditorLayout({
 
                   <PropertiesPanel
                     selectedComponent={selectedComponent}
+                    selectedComponents={selectedComponents}
                     onUpdateComponent={onUpdateComponent}
                     onDeleteComponent={onDeleteComponent}
                     onDuplicateComponent={onDuplicateComponent}

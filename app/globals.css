@@ -434,3 +434,41 @@ body.ctrl-drag-mode [data-component-id]:hover {
 .hide-asset-scrollbar [data-panel="asset"] *::-webkit-scrollbar {
   display: none;
 }
+
+/* Hierarchy panel drag styles */
+[data-hierarchy-id] {
+  cursor: grab;
+  user-select: none;
+}
+
+[data-hierarchy-id]:active {
+  cursor: grabbing;
+}
+
+[data-hierarchy-id].dragging {
+  opacity: 0.4;
+  cursor: grabbing;
+}
+
+/* Hierarchy multi-select drag styles */
+.hierarchy-selecting [data-hierarchy-id] {
+  cursor: crosshair !important;
+}
+
+.hierarchy-selecting [data-hierarchy-id]:hover {
+  background: rgba(59, 130, 246, 0.1) !important;
+}
+
+/* Empty space selection cursor */
+.hierarchy-selecting .flex-1.overflow-auto {
+  cursor: crosshair !important;
+}
+
+/* Hierarchy drop indicators */
+.hierarchy-drop-indicator {
+  height: 2px;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+  border-radius: 1px;
+  animation: pulse-line 0.8s ease-in-out infinite;
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+}

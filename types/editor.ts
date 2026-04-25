@@ -23,11 +23,16 @@ export interface Page {
     components: ComponentDefinition[];
     backgroundColor?: string;
     backgroundType?: "solid" | "gradient" | "image";
-    backgroundGradient?: string;
+    backgroundGradient?: string; // Legacy CSS gradient string
+    gradientStart?: string; // New: gradient start color
+    gradientEnd?: string; // New: gradient end color
+    gradientDirection?: string; // New: gradient direction
+    gradientAngle?: string; // New: custom angle
     backgroundImageUrl?: string;
     backgroundSize?: string;
     backgroundPosition?: string;
     backgroundRepeat?: string;
+    componentSpacing?: "none" | "compact" | "normal" | "relaxed" | "loose"; // Spacing between components
 }
 
 // Flexible: keyed by global name → template component
