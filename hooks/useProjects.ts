@@ -7,6 +7,7 @@ interface Project {
     components?: any[]; // Legacy support
     pages?: any[]; // New multi-page support
     globalComponents?: Record<string, any>; // Global component templates
+    apiEndpoints?: any[]; // Backend API endpoint definitions
     createdAt: any;
     updatedAt: any;
 }

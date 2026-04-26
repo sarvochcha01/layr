@@ -4,6 +4,8 @@ import { cn } from "@/lib/utils";
 import { ThemeStyleVariant, getThemeCSSVars } from "@/lib/themeStyles";
 import { getUserStyleOverrides } from "@/lib/buildStyle";
 import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
+import { useState, useRef } from "react";
+import { BackendAction } from "@/types/backend";
 
 interface FormField {
   id: string;
@@ -28,6 +30,10 @@ interface FormProps {
   backgroundColor?: string;
   textColor?: string;
   themeStyle?: ThemeStyleVariant;
+  /** Backend action config — when set, form submits to the endpoint */
+  backendAction?: BackendAction;
+  /** Project ID for backend calls */
+  projectId?: string;
   [key: string]: any;
 }
 
@@ -36,7 +42,7 @@ export function Form({
   description,
   fields = [],
   submitText = "Submit",
-  action = "#",
+  action,
   method = "POST",
   className,
   layout = "vertical",
@@ -45,10 +51,16 @@ export function Form({
   backgroundColor,
   textColor,
   themeStyle,
+  backendAction,
+  projectId,
   ...rest
 }: FormProps) {
   const effectiveTheme = useEffectiveThemeStyle(themeStyle, themeStyle !== undefined);
   const cssVars = getThemeCSSVars(effectiveTheme);
+  const formRef = useRef<HTMLFormElement>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
+  const [statusMessage, setStatusMessage] = useState("");
 
   const rootStyle: React.CSSProperties = {
     ...cssVars,
@@ -81,6 +93,88 @@ export function Form({
     color: "var(--theme-text)",
     marginBottom: "6px",
     letterSpacing: "var(--theme-letter-spacing)",
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!formRef.current) return;
+
+    const formData = new FormData(formRef.current);
+    const payload: Record<string, any> = {};
+
+    // Collect all form values
+    formData.forEach((value, key) => {
+      payload[key] = value;
+    });
+
+    // If backendAction is configured, send to endpoint
+    if (backendAction?.endpointId && projectId) {
+      setIsSubmitting(true);
+      setSubmitStatus("idle");
+
+      try {
+        // Build mapped body
+        let body: Record<string, any> = {};
+        if (
+          backendAction.payloadMapping &&
+          Object.keys(backendAction.payloadMapping).length > 0
+        ) {
+          for (const [sourceKey, targetKey] of Object.entries(
+            backendAction.payloadMapping
+          )) {
+            if (sourceKey in payload) {
+              body[targetKey] = payload[sourceKey];
+            }
+          }
+        } else {
+          // No mapping — send payload as-is
+          body = payload;
+        }
+
+        // POST to the actual endpoint path (e.g. /api/backend/login)
+        const path = backendAction.endpointPath?.startsWith("/")
+          ? backendAction.endpointPath
+          : `/${backendAction.endpointPath || ""}`;
+        const response = await fetch(`/api/backend${path}`, {
+          method: backendAction.endpointMethod || "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-project-id": projectId,
+          },
+          body: JSON.stringify(body),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Request failed (${response.status})`);
+        }
+
+        // Handle success behavior
+        setSubmitStatus("success");
+        setStatusMessage(backendAction.successMessage || "Submitted successfully!");
+
+        if (backendAction.onSuccess === "reset") {
+          formRef.current.reset();
+        } else if (backendAction.onSuccess === "redirect" && backendAction.redirectUrl) {
+          window.location.href = backendAction.redirectUrl;
+        }
+
+        // Auto-clear success message
+        setTimeout(() => {
+          setSubmitStatus("idle");
+          setStatusMessage("");
+        }, 3000);
+      } catch (err) {
+        setSubmitStatus("error");
+        setStatusMessage((err as Error).message);
+        setTimeout(() => {
+          setSubmitStatus("idle");
+          setStatusMessage("");
+        }, 5000);
+      } finally {
+        setIsSubmitting(false);
+      }
+    }
   };
 
   const renderField = (field: FormField) => {
@@ -223,24 +317,51 @@ export function Form({
         </p>
       )}
 
-      <form action={action} method={method} className="space-y-5">
+      <form ref={formRef} onSubmit={handleSubmit} className="space-y-5">
         {fields.map((field) => renderField(field))}
+
+        {/* Status message */}
+        {submitStatus !== "idle" && statusMessage && (
+          <div
+            style={{
+              padding: "10px 14px",
+              borderRadius: "var(--theme-radius)",
+              fontSize: "13px",
+              fontWeight: 500,
+              ...(submitStatus === "success"
+                ? {
+                    background: "rgba(34, 197, 94, 0.1)",
+                    color: "#22c55e",
+                    border: "1px solid rgba(34, 197, 94, 0.2)",
+                  }
+                : {
+                    background: "rgba(239, 68, 68, 0.1)",
+                    color: "#ef4444",
+                    border: "1px solid rgba(239, 68, 68, 0.2)",
+                  }),
+            }}
+          >
+            {statusMessage}
+          </div>
+        )}
 
         <button
           type="submit"
-          className="w-full py-3 text-sm font-bold tracking-wider transition-all duration-200 hover:opacity-90 hover:scale-[1.02] active:scale-[0.98]"
+          disabled={isSubmitting}
+          className="w-full py-3 text-sm font-bold tracking-wider transition-all duration-200 hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
           style={{
             background: "var(--theme-accent)",
             color: "var(--theme-accent-fg)",
             borderRadius: "var(--theme-radius)",
             border: `var(--theme-border-width) solid var(--theme-border)`,
             boxShadow: "var(--theme-hard-shadow, none)",
-            cursor: "pointer",
+            cursor: isSubmitting ? "not-allowed" : "pointer",
           }}
         >
-          {submitText}
+          {isSubmitting ? "Submitting..." : submitText}
         </button>
       </form>
     </div>
   );
 }
+

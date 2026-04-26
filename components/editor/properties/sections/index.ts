@@ -5,3 +5,5 @@ export { TypographySection } from "./TypographySection";
 export { BordersSection } from "./BordersSection";
 export { EffectsSection } from "./EffectsSection";
 export { PositionSection } from "./PositionSection";
+export { DataSourceSection } from "./DataSourceSection";
+export { BackendActionSection } from "./BackendActionSection";
