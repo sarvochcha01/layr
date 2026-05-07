@@ -7,6 +7,7 @@ import {
   PipelineStep,
   PipelineStepType,
   STEP_TYPE_META,
+  DbCollection,
 } from "@/types/backend";
 import {
   ShieldCheck,
@@ -24,6 +25,7 @@ import {
   Hash,
   ToggleLeft,
   Braces,
+  TableProperties,
 } from "lucide-react";
 
 // ── Icons ─────────────────────────────────────────────────────────────
@@ -37,6 +39,7 @@ const STEP_ICONS: Record<string, React.ReactNode> = {
   "db-insert": <DatabaseZap className="w-3.5 h-3.5" />,
   "db-update": <RefreshCw className="w-3.5 h-3.5" />,
   "db-delete": <Trash2 className="w-3.5 h-3.5" />,
+  collection: <TableProperties className="w-3.5 h-3.5" />,
   hash: <Lock className="w-3.5 h-3.5" />,
   "hash-compare": <ShieldOff className="w-3.5 h-3.5" />,
   "string-literal": <Type className="w-3.5 h-3.5" />,
@@ -56,6 +59,7 @@ const STEP_COLORS: Record<string, { bg: string; text: string; handle: string }> 
   "db-insert":       { bg: "rgba(34,197,94,0.15)",    text: "#4ade80", handle: "#4ade80" },
   "db-update":       { bg: "rgba(249,115,22,0.15)",   text: "#fb923c", handle: "#fb923c" },
   "db-delete":       { bg: "rgba(239,68,68,0.15)",    text: "#f87171", handle: "#f87171" },
+  collection:        { bg: "rgba(139,92,246,0.15)",   text: "#a78bfa", handle: "#a78bfa" },
   hash:              { bg: "rgba(236,72,153,0.15)",   text: "#f472b6", handle: "#f472b6" },
   "hash-compare":    { bg: "rgba(236,72,153,0.15)",   text: "#f472b6", handle: "#f472b6" },
   "string-literal":  { bg: "rgba(148,163,184,0.12)",  text: "#94a3b8", handle: "#94a3b8" },
@@ -75,16 +79,29 @@ export interface HandleDef {
 /**
  * Build handle definitions for a pipeline step.
  * Each configurable property gets its own data pin — no exec pins.
+ *
+ * @param step - The pipeline step to build handles for
+ * @param dbSchema - All DB collections (used to derive field pins on DB nodes)
+ * @param connectedCollectionName - Name of the collection wired into this node's collection input
  */
-export function getStepHandles(step: PipelineStep): { inputs: HandleDef[]; outputs: HandleDef[] } {
+export function getStepHandles(
+  step: PipelineStep,
+  dbSchema?: DbCollection[],
+  connectedCollectionName?: string,
+): { inputs: HandleDef[]; outputs: HandleDef[] } {
   const inputs: HandleDef[] = [];
   const outputs: HandleDef[] = [];
 
+  // Helper: get fields for a connected collection from schema
+  const getSchemaFields = (): string[] => {
+    if (!connectedCollectionName || !dbSchema) return [];
+    const col = dbSchema.find((c) => c.name === connectedCollectionName);
+    return col ? col.fields.map((f) => f.name) : [];
+  };
+
   switch (step.type) {
     case "validate":
-      // Single input — the data to validate
       inputs.push({ id: "validate-data", label: "data", type: "target", kind: "data" });
-      // Two outputs — pass (data flows through) and fail (connect to respond)
       outputs.push({ id: "validate-pass", label: "✓ pass", type: "source", kind: "data" });
       outputs.push({ id: "validate-fail", label: "✗ fail", type: "source", kind: "data" });
       break;
@@ -123,19 +140,24 @@ export function getStepHandles(step: PipelineStep): { inputs: HandleDef[]; outpu
           inputs.push({ id: `resp-${key}`, label: key, type: "target", kind: "data" });
         });
       } else {
-        // Static mode — accept a json body pin
         inputs.push({ id: "resp-body", label: "body", type: "target", kind: "data" });
       }
       break;
 
-    case "db-query":
+    case "db-query": {
       inputs.push({ id: "q-collection", label: "collection", type: "target", kind: "data" });
-      step.dbQueryConfig?.filters?.forEach((f, i) => {
-        if (!f.isLiteral) {
-          const label = f.field || `filter${i}`;
-          inputs.push({ id: `filter-${i}`, label, type: "target", kind: "data" });
-        }
-      });
+      const qFields = getSchemaFields();
+      if (qFields.length > 0) {
+        qFields.forEach((fn) => {
+          inputs.push({ id: `filter-${fn}`, label: fn, type: "target", kind: "data" });
+        });
+      } else {
+        step.dbQueryConfig?.filters?.forEach((f, i) => {
+          if (!f.isLiteral) {
+            inputs.push({ id: `filter-${i}`, label: f.field || `filter${i}`, type: "target", kind: "data" });
+          }
+        });
+      }
       inputs.push({ id: "q-orderBy", label: "orderBy", type: "target", kind: "data" });
       inputs.push({ id: "q-limit", label: "limit", type: "target", kind: "data" });
       outputs.push({
@@ -145,10 +167,16 @@ export function getStepHandles(step: PipelineStep): { inputs: HandleDef[]; outpu
         kind: "data",
       });
       break;
+    }
 
-    case "db-insert":
+    case "db-insert": {
       inputs.push({ id: "i-collection", label: "collection", type: "target", kind: "data" });
-      if (step.dbInsertConfig?.fieldMapping) {
+      const iFields = getSchemaFields();
+      if (iFields.length > 0) {
+        iFields.forEach((fn) => {
+          inputs.push({ id: `field-${fn}`, label: fn, type: "target", kind: "data" });
+        });
+      } else if (step.dbInsertConfig?.fieldMapping) {
         Object.keys(step.dbInsertConfig.fieldMapping).forEach((fn) => {
           inputs.push({ id: `field-${fn}`, label: fn, type: "target", kind: "data" });
         });
@@ -160,20 +188,36 @@ export function getStepHandles(step: PipelineStep): { inputs: HandleDef[]; outpu
         kind: "data",
       });
       break;
+    }
 
-    case "db-update":
+    case "db-update": {
       inputs.push({ id: "u-collection", label: "collection", type: "target", kind: "data" });
       inputs.push({ id: "doc-id", label: "docId", type: "target", kind: "data" });
-      if (step.dbUpdateConfig?.fieldMapping) {
+      const uFields = getSchemaFields();
+      if (uFields.length > 0) {
+        uFields.forEach((fn) => {
+          inputs.push({ id: `field-${fn}`, label: fn, type: "target", kind: "data" });
+        });
+      } else if (step.dbUpdateConfig?.fieldMapping) {
         Object.keys(step.dbUpdateConfig.fieldMapping).forEach((fn) => {
           inputs.push({ id: `field-${fn}`, label: fn, type: "target", kind: "data" });
         });
       }
       break;
+    }
 
     case "db-delete":
       inputs.push({ id: "d-collection", label: "collection", type: "target", kind: "data" });
       inputs.push({ id: "doc-id", label: "docId", type: "target", kind: "data" });
+      break;
+
+    case "collection":
+      outputs.push({
+        id: "collection-out",
+        label: step.collectionConfig?.collectionName || "collection",
+        type: "source",
+        kind: "data",
+      });
       break;
 
     case "hash":
@@ -225,6 +269,10 @@ export interface StepNodeData {
   isSelected: boolean;
   onSelect: (stepId: string) => void;
   onStepChange: (stepId: string, updates: Partial<PipelineStep>) => void;
+  /** All user-defined collections from the DB schema */
+  dbSchema?: DbCollection[];
+  /** Name of collection wired into this node's collection input (if any) */
+  connectedCollectionName?: string;
   [key: string]: unknown;
 }
 
@@ -270,21 +318,29 @@ const RULE_TYPE_OPTIONS = [
 // Extra height for inline edit areas
 const VALIDATE_INLINE_HEIGHT = 52;
 const LITERAL_INLINE_HEIGHT = 32;
+const COLLECTION_INLINE_HEIGHT = 36;
 
 // ── StepNode ──────────────────────────────────────────────────────────
 
 function StepNodeComponent({ data, selected }: NodeProps) {
-  const { step, onSelect, onStepChange } = data as unknown as StepNodeData;
+  const { step, onSelect, onStepChange, dbSchema, connectedCollectionName } = data as unknown as StepNodeData;
   const colors = STEP_COLORS[step.type] || STEP_COLORS.validate;
   const icon = STEP_ICONS[step.type];
   const meta = STEP_TYPE_META[step.type as PipelineStepType];
-  const { inputs, outputs } = getStepHandles(step);
+  const { inputs, outputs } = getStepHandles(step, dbSchema, connectedCollectionName);
 
   const bodyRows = Math.max(inputs.length, outputs.length);
   const isValidate = step.type === "validate";
   const isLiteral = step.type.endsWith("-literal");
-  const hasInlineArea = isValidate || isLiteral;
-  const inlineHeight = isValidate ? VALIDATE_INLINE_HEIGHT : isLiteral ? LITERAL_INLINE_HEIGHT : 0;
+  const isCollection = step.type === "collection";
+  const hasInlineArea = isValidate || isLiteral || isCollection;
+  const inlineHeight = isValidate
+    ? VALIDATE_INLINE_HEIGHT
+    : isLiteral
+    ? LITERAL_INLINE_HEIGHT
+    : isCollection
+    ? COLLECTION_INLINE_HEIGHT
+    : 0;
 
   // ── Validate inline helpers ──
   const rule = step.validateConfig?.rules?.[0];
@@ -329,7 +385,7 @@ function StepNodeComponent({ data, selected }: NodeProps) {
     <div
       style={{
         position: "relative",
-        minWidth: isLiteral ? 140 : 200,
+        minWidth: isLiteral ? 140 : isCollection ? 180 : 200,
         maxWidth: 300,
         borderRadius: 10,
         border: `1px solid ${selected ? colors.handle : "hsl(var(--border))"}`,
@@ -363,6 +419,31 @@ function StepNodeComponent({ data, selected }: NodeProps) {
         </span>
         {!step.isEnabled && <span style={{ fontSize: 9, opacity: 0.5 }}>OFF</span>}
       </div>
+
+      {/* ── Collection: inline collection picker ── */}
+      {isCollection && (
+        <div style={{ padding: "6px 10px", minHeight: COLLECTION_INLINE_HEIGHT, display: "flex", alignItems: "center" }}>
+          <select
+            value={step.collectionConfig?.collectionName || ""}
+            onChange={(e) =>
+              onStepChange(step.id, { collectionConfig: { collectionName: e.target.value } })
+            }
+            style={{
+              ...inlineInputStyle,
+              width: "100%",
+              cursor: "pointer",
+              color: step.collectionConfig?.collectionName ? colors.text : "rgba(255,255,255,0.25)",
+              borderColor: step.collectionConfig?.collectionName ? `${colors.handle}66` : "hsl(var(--border)/0.4)",
+            }}
+            className="nodrag"
+          >
+            <option value="" disabled>select collection...</option>
+            {(dbSchema || []).map((col) => (
+              <option key={col.id} value={col.name}>{col.name}</option>
+            ))}
+          </select>
+        </div>
+      )}
 
       {/* ── Validate: inline single-rule editor ── */}
       {isValidate && (

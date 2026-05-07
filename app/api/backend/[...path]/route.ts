@@ -91,7 +91,7 @@ async function handleRequest(
         body,
         query,
         headers,
-      }, delegate);
+      }, delegate, endpoint.nodeEdges || []);
 
       return NextResponse.json(result.body, {
         status: result.status,

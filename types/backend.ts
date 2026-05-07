@@ -94,6 +94,7 @@ export type PipelineStepType =
   | "db-insert"
   | "db-update"
   | "db-delete"
+  | "collection"
   | "hash"
   | "hash-compare"
   | "string-literal"
@@ -220,6 +221,11 @@ export interface HashCompareStepConfig {
   failBody?: Record<string, any>;
 }
 
+/** Config for "collection" node — outputs a collection name to DB nodes */
+export interface CollectionStepConfig {
+  collectionName: string;    // e.g. "users"
+}
+
 /** Config for "string-literal" node */
 export interface StringLiteralConfig {
   value: string;
@@ -252,6 +258,9 @@ export interface PipelineStep {
   isEnabled: boolean;
   position?: { x: number; y: number }; // Node graph position
 
+  // Runtime-only: resolved wire paths keyed by targetHandle (set by resolvePipelineFromGraph)
+  inputWires?: Record<string, string>;
+
   // Type-specific config — only one will be populated
   validateConfig?: ValidateStepConfig;
   conditionConfig?: ConditionStepConfig;
@@ -261,6 +270,7 @@ export interface PipelineStep {
   dbInsertConfig?: DbInsertStepConfig;
   dbUpdateConfig?: DbUpdateStepConfig;
   dbDeleteConfig?: DbDeleteStepConfig;
+  collectionConfig?: CollectionStepConfig;
   hashConfig?: HashStepConfig;
   hashCompareConfig?: HashCompareStepConfig;
   stringLiteralConfig?: StringLiteralConfig;
@@ -332,6 +342,12 @@ export const STEP_TYPE_META: Record<PipelineStepType, {
     description: "Delete a document",
     icon: "Trash2",
     color: "red",
+  },
+  "collection": {
+    label: "Collection",
+    description: "Select a database collection",
+    icon: "TableProperties",
+    color: "violet",
   },
   "hash": {
     label: "Hash",

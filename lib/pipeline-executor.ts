@@ -8,6 +8,7 @@
 
 import {
   PipelineStep,
+  PipelineEdge,
   ValidationRule,
   ValidateStepConfig,
   ConditionStepConfig,
@@ -133,6 +134,138 @@ function generateUUID(): string {
     const v = c === "x" ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
+}
+
+// ── Graph-aware pre-processing ────────────────────────────────────────
+
+/**
+ * Before execution, walk the node graph edges to:
+ * 1. Copy collection names from Collection nodes into dbXxxConfig.collection
+ * 2. Build fieldMapping entries from field-input edges (source handle label → field name)
+ *
+ * This bridges the visual node graph to the runtime executor.
+ */
+function resolvePipelineFromGraph(
+  steps: PipelineStep[],
+  edges: PipelineEdge[]
+): PipelineStep[] {
+  // Map stepId → step for fast lookups
+  const stepMap = new Map(steps.map((s) => [s.id, s]));
+
+  // Collection input handle IDs for each DB node type
+  const COLLECTION_HANDLES: Record<string, string> = {
+    "i-collection": "db-insert",
+    "q-collection": "db-query",
+    "u-collection": "db-update",
+    "d-collection": "db-delete",
+  };
+
+  // Clone steps so we don't mutate originals
+  const resolved = steps.map((s) => ({
+    ...s,
+    dbInsertConfig: s.dbInsertConfig ? { ...s.dbInsertConfig, fieldMapping: { ...s.dbInsertConfig.fieldMapping } } : undefined,
+    dbQueryConfig:  s.dbQueryConfig  ? { ...s.dbQueryConfig  } : undefined,
+    dbUpdateConfig: s.dbUpdateConfig ? { ...s.dbUpdateConfig, fieldMapping: { ...s.dbUpdateConfig.fieldMapping } } : undefined,
+    dbDeleteConfig: s.dbDeleteConfig ? { ...s.dbDeleteConfig } : undefined,
+  }));
+  const resolvedMap = new Map(resolved.map((s) => [s.id, s]));
+
+  for (const edge of edges) {
+    const sourceStep = stepMap.get(edge.source);
+    const targetStep = resolvedMap.get(edge.target);
+    if (!sourceStep || !targetStep) continue;
+
+    const targetHandle = edge.targetHandle || "";
+    const sourceHandle = edge.sourceHandle || "";
+
+    // ── 1. Collection node wired to a DB node's collection input ──────
+    if (COLLECTION_HANDLES[targetHandle] && sourceStep.type === "collection") {
+      const collectionName = sourceStep.collectionConfig?.collectionName || "";
+      if (collectionName) {
+        switch (targetStep.type) {
+          case "db-insert":
+            if (targetStep.dbInsertConfig) targetStep.dbInsertConfig.collection = collectionName;
+            break;
+          case "db-query":
+            if (targetStep.dbQueryConfig) targetStep.dbQueryConfig.collection = collectionName;
+            break;
+          case "db-update":
+            if (targetStep.dbUpdateConfig) targetStep.dbUpdateConfig.collection = collectionName;
+            break;
+          case "db-delete":
+            if (targetStep.dbDeleteConfig) targetStep.dbDeleteConfig.collection = collectionName;
+            break;
+        }
+      }
+      continue;
+    }
+
+    // ── 2. Any wire going into a field-input pin of a DB node ─────────
+    // Target handle format: "field-<fieldName>" (db-insert, db-update)
+    if (targetHandle.startsWith("field-")) {
+      const fieldName = targetHandle.slice(6); // strip "field-"
+
+      // The source produces a context-resolvable path based on the source handle:
+      //   body-<name>   → "body.<name>"
+      //   query-<name>  → "query.<name>"
+      //   var-out       → "variables.<step.label or name>"
+      //   hash-result   → "variables.<resultVariable>"
+      //   insert-result → "variables.<resultVariable>"
+      //   literal-value → "variables.<step.label>"
+      let sourcePath = "";
+
+      if (sourceHandle.startsWith("body-")) {
+        sourcePath = "body." + sourceHandle.slice(5);
+      } else if (sourceHandle.startsWith("query-")) {
+        sourcePath = "query." + sourceHandle.slice(6);
+      } else if (sourceHandle === "var-out") {
+        sourcePath = "variables." + (sourceStep.setVariableConfig?.name || sourceStep.label);
+      } else if (sourceHandle === "hash-result") {
+        sourcePath = "variables." + (sourceStep.hashConfig?.resultVariable || "hashed");
+      } else if (sourceHandle === "insert-result") {
+        sourcePath = "variables." + (sourceStep.dbInsertConfig?.resultVariable || "newId");
+      } else if (sourceHandle === "query-result") {
+        sourcePath = "variables." + (sourceStep.dbQueryConfig?.resultVariable || "result");
+      } else if (sourceHandle === "literal-value") {
+        sourcePath = "variables." + (sourceStep.label || sourceStep.id);
+      } else if (sourceHandle === "validate-pass") {
+        // Validate pass doesn't carry a value — skip
+        continue;
+      }
+
+      if (sourcePath) {
+        if (targetStep.type === "db-insert" && targetStep.dbInsertConfig) {
+          targetStep.dbInsertConfig.fieldMapping[fieldName] = sourcePath;
+        } else if (targetStep.type === "db-update" && targetStep.dbUpdateConfig) {
+          targetStep.dbUpdateConfig.fieldMapping[fieldName] = sourcePath;
+        }
+      }
+      continue;
+    }
+
+    // ── 3. Wire into respond body ─────────────────────────────────────
+    if (targetHandle === "resp-body" && targetStep.type === "respond" && targetStep.respondConfig) {
+      // Switch respond to mapping mode and map "body" → source path
+      let sourcePath = "";
+      if (sourceHandle === "insert-result") {
+        sourcePath = "variables." + (sourceStep.dbInsertConfig?.resultVariable || "newId");
+      } else if (sourceHandle === "query-result") {
+        sourcePath = "variables." + (sourceStep.dbQueryConfig?.resultVariable || "result");
+      } else if (sourceHandle === "var-out") {
+        sourcePath = "variables." + (sourceStep.setVariableConfig?.name || sourceStep.label);
+      }
+      if (sourcePath) {
+        targetStep.respondConfig = {
+          ...targetStep.respondConfig,
+          bodyMode: "mapping",
+          bodyMapping: { ...targetStep.respondConfig.bodyMapping, body: sourcePath },
+        };
+      }
+      continue;
+    }
+  }
+
+  return resolved;
 }
 
 // ── Step executors ────────────────────────────────────────────────────
@@ -324,8 +457,13 @@ export async function executePipeline(
     query: Record<string, any>;
     headers: Record<string, string>;
   },
-  delegate?: PipelineDelegate
+  delegate?: PipelineDelegate,
+  nodeEdges?: PipelineEdge[]
 ): Promise<PipelineResult> {
+  // Pre-process: resolve collection names and field mappings from graph wiring
+  const resolvedSteps = nodeEdges && nodeEdges.length > 0
+    ? resolvePipelineFromGraph(steps, nodeEdges)
+    : steps;
   const ctx: PipelineContext = {
     request,
     variables: {},
@@ -338,7 +476,7 @@ export async function executePipeline(
 
   const trace: PipelineTraceEntry[] = [];
 
-  for (const step of steps) {
+  for (const step of resolvedSteps) {
     // Skip disabled steps
     if (!step.isEnabled) {
       trace.push({
@@ -565,6 +703,10 @@ export async function executePipeline(
           }
           break;
         }
+
+        // ── collection node — UI-only, skip at runtime ───────────────
+        case "collection":
+          break;
 
         // ── Literal nodes ── store their value as a variable
         case "string-literal": {
