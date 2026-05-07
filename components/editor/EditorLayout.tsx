@@ -8,6 +8,8 @@ import {
   CustomComponents,
   ChatMessage,
 } from "@/types/editor";
+import { BackendProvider } from "@/contexts/BackendContext";
+import { ApiEndpoint } from "@/types/backend";
 import { HierarchyPanel, HierarchyPanelRef } from "./HierarchyPanel";
 import { ComponentPalette } from "./ComponentPalette";
 import { Canvas } from "./Canvas";
@@ -47,8 +49,9 @@ import {
   Plus,
   Trash2,
   Check,
+  Database,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useShortcuts } from "@/hooks/useShortcuts";
 import JSZip from "jszip";
@@ -116,6 +119,8 @@ interface EditorLayoutProps {
   onSaveCodeComponent?: (name: string, html: string, css: string) => void;
   chatHistory?: ChatMessage[];
   onChatHistoryChange?: (messages: ChatMessage[]) => void;
+  apiEndpoints?: ApiEndpoint[];
+  projectId?: string | null;
 }
 
 export function EditorLayout({
@@ -158,11 +163,14 @@ export function EditorLayout({
   onSaveCodeComponent,
   chatHistory,
   onChatHistoryChange,
+  apiEndpoints = [],
+  projectId,
 }: EditorLayoutProps) {
   const router = useRouter();
   const hierarchyPanelRef = useRef<HierarchyPanelRef>(null);
   const [viewport, setViewport] = useState<Viewport>("desktop");
   const [isPreviewMode, setIsPreviewMode] = useState(false);
+  const [isDataSourceFetching, setIsDataSourceFetching] = useState(false);
   const [showCodeEditor, setShowCodeEditor] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedName, setEditedName] = useState(projectName || "");
@@ -188,8 +196,8 @@ export function EditorLayout({
     { id: 2, name: "Canvas Pan", shortcut: "Middle M-Button/space + left M-click" },
     { id: 3, name: "Insert Component", shortcut: "Ctrl + Drag" },
     { id: 4, name: "Swap Components", shortcut: "Ctrl + Shift + Drag" },
-    {id:5, name: "select multi-components", shortcut: "Ctrl + leftclick(on canvas)"},
-    {id:6, name: "Toggle Preview Mode", shortcut: "Space (while hovering canvas)"},
+    { id: 5, name: "select multi-components", shortcut: "Ctrl + leftclick(on canvas)" },
+    { id: 6, name: "Toggle Preview Mode", shortcut: "Space (while hovering canvas)" },
   ]);
   const [editingShortcutId, setEditingShortcutId] = useState<number | null>(
     null,
@@ -215,6 +223,98 @@ export function EditorLayout({
     onTogglePreview: () => setIsPreviewMode(!isPreviewMode),
     isEnabled: true,
   });
+
+  // Auto-fetch data source bindings when entering preview mode
+  useEffect(() => {
+    if (!isPreviewMode || !projectId || apiEndpoints.length === 0) return;
+
+    // Collect all components with data source bindings
+    const currentPage = pages.find((p) => p.id === currentPageId);
+    if (!currentPage) return;
+
+    const collectBound = (
+      comps: ComponentDefinition[],
+    ): ComponentDefinition[] => {
+      const result: ComponentDefinition[] = [];
+      for (const c of comps) {
+        if (c.props?.dataSource?.endpointId && c.props.dataSource.fieldMappings) {
+          result.push(c);
+        }
+        if (c.children?.length) {
+          result.push(...collectBound(c.children));
+        }
+      }
+      return result;
+    };
+
+    const boundComponents = collectBound(currentPage.components);
+    if (boundComponents.length === 0) return;
+
+    setIsDataSourceFetching(true);
+
+    // Fetch data for each unique endpoint and apply mappings
+    const endpointCache: Record<string, Promise<any>> = {};
+
+    const fetchEndpoint = (endpoint: ApiEndpoint): Promise<any> => {
+      if (endpoint.id in endpointCache) return endpointCache[endpoint.id];
+
+      const url = `/api/backend${endpoint.path.startsWith("/") ? endpoint.path : `/${endpoint.path}`}`;
+      const promise = fetch(url, {
+        method: endpoint.method,
+        headers: {
+          "Content-Type": "application/json",
+          "x-project-id": projectId,
+        },
+      })
+        .then((res) => (res.ok ? res.json() : null))
+        .catch(() => null);
+
+      endpointCache[endpoint.id] = promise;
+      return promise;
+    };
+
+    const getNestedValue = (obj: any, path: string): any => {
+      if (!obj || !path) return undefined;
+      const parts = path.replace(/\[(\d+)\]/g, ".$1").split(".");
+      let current = obj;
+      for (const part of parts) {
+        if (current === null || current === undefined) return undefined;
+        current = current[part];
+      }
+      return current;
+    };
+
+    // Fetch and apply for each bound component, then clear loading
+    const fetchPromises: Promise<void>[] = [];
+
+    for (const comp of boundComponents) {
+      const ds = comp.props.dataSource;
+      const endpoint = apiEndpoints.find((ep) => ep.id === ds.endpointId);
+      if (!endpoint || !endpoint.isEnabled) continue;
+
+      const p = fetchEndpoint(endpoint).then((data) => {
+        if (!data) return;
+        const updates: Record<string, any> = {};
+        for (const [propKey, responsePath] of Object.entries(
+          ds.fieldMappings as Record<string, string>,
+        )) {
+          const value = getNestedValue(data, responsePath);
+          if (value !== undefined) {
+            updates[propKey] =
+              typeof value === "object" ? JSON.stringify(value) : String(value);
+          }
+        }
+        if (Object.keys(updates).length > 0) {
+          onUpdateComponent(comp.id, updates);
+        }
+      });
+      fetchPromises.push(p);
+    }
+
+    Promise.all(fetchPromises).finally(() => {
+      setIsDataSourceFetching(false);
+    });
+  }, [isPreviewMode]); // Only trigger on preview mode change
 
   const isResizingRef = useRef<string | null>(null);
   const startPosRef = useRef({ x: 0, y: 0 });
@@ -278,7 +378,7 @@ export function EditorLayout({
   // Apply scrollbar visibility settings
   useEffect(() => {
     const root = document.documentElement;
-    
+
     if (!showAllScrollbars) {
       root.classList.add('hide-all-scrollbars');
     } else {
@@ -502,7 +602,7 @@ export function EditorLayout({
       console.error("Export failed:", error);
       alert(
         "Export failed: " +
-          (error instanceof Error ? error.message : "Unknown error"),
+        (error instanceof Error ? error.message : "Unknown error"),
       );
     }
   };
@@ -515,7 +615,7 @@ export function EditorLayout({
           <div className="flex items-center space-x-6">
             <div className="flex items-center space-x-3">
               <button
-                onClick={() => router.back()}
+                onClick={() => router.push("/projects")}
                 className="p-2 hover:bg-muted rounded-md transition-colors text-muted-foreground hover:text-foreground"
                 title="Close Editor"
               >
@@ -530,11 +630,10 @@ export function EditorLayout({
                 <button
                   key={v}
                   onClick={() => setViewport(v)}
-                  className={`px-3 py-1.5 text-xs font-medium transition-colors rounded capitalize ${
-                    viewport === v
+                  className={`px-3 py-1.5 text-xs font-medium transition-colors rounded capitalize ${viewport === v
                       ? "bg-muted text-foreground"
                       : "text-muted-foreground hover:text-foreground"
-                  }`}
+                    }`}
                 >
                   {v.charAt(0).toUpperCase() + v.slice(1)}
                 </button>
@@ -613,14 +712,12 @@ export function EditorLayout({
                         </span>
                         <button
                           onClick={() => setShowOutlines(!showOutlines)}
-                          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                            showOutlines ? "bg-primary" : "bg-muted"
-                          }`}
+                          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${showOutlines ? "bg-primary" : "bg-muted"
+                            }`}
                         >
                           <span
-                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                              showOutlines ? "translate-x-5" : "translate-x-0.5"
-                            }`}
+                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${showOutlines ? "translate-x-5" : "translate-x-0.5"
+                              }`}
                           />
                         </button>
                       </label>
@@ -634,21 +731,19 @@ export function EditorLayout({
                           <div className="flex gap-2">
                             <button
                               onClick={() => setOutlineColor("black")}
-                              className={`flex-1 px-3 py-2 text-xs rounded-md border transition-colors ${
-                                outlineColor === "black"
+                              className={`flex-1 px-3 py-2 text-xs rounded-md border transition-colors ${outlineColor === "black"
                                   ? "border-primary bg-primary/10 text-primary"
                                   : "border-border hover:bg-muted text-foreground"
-                              }`}
+                                }`}
                             >
                               Black
                             </button>
                             <button
                               onClick={() => setOutlineColor("white")}
-                              className={`flex-1 px-3 py-2 text-xs rounded-md border transition-colors ${
-                                outlineColor === "white"
+                              className={`flex-1 px-3 py-2 text-xs rounded-md border transition-colors ${outlineColor === "white"
                                   ? "border-primary bg-primary/10 text-primary"
                                   : "border-border hover:bg-muted text-foreground"
-                              }`}
+                                }`}
                             >
                               White
                             </button>
@@ -667,16 +762,14 @@ export function EditorLayout({
                           onClick={() =>
                             setShowComponentTags(!showComponentTags)
                           }
-                          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                            showComponentTags ? "bg-primary" : "bg-muted"
-                          }`}
+                          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${showComponentTags ? "bg-primary" : "bg-muted"
+                            }`}
                         >
                           <span
-                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                              showComponentTags
+                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${showComponentTags
                                 ? "translate-x-5"
                                 : "translate-x-0.5"
-                            }`}
+                              }`}
                           />
                         </button>
                       </label>
@@ -851,14 +944,12 @@ export function EditorLayout({
                               </span>
                               <button
                                 onClick={() => setShowAllScrollbars(!showAllScrollbars)}
-                                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                                  showAllScrollbars ? "bg-primary" : "bg-muted"
-                                }`}
+                                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${showAllScrollbars ? "bg-primary" : "bg-muted"
+                                  }`}
                               >
                                 <span
-                                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                                    showAllScrollbars ? "translate-x-5" : "translate-x-0.5"
-                                  }`}
+                                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${showAllScrollbars ? "translate-x-5" : "translate-x-0.5"
+                                    }`}
                                 />
                               </button>
                             </label>
@@ -875,14 +966,12 @@ export function EditorLayout({
                               </span>
                               <button
                                 onClick={() => setShowAssetScrollbar(!showAssetScrollbar)}
-                                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                                  showAssetScrollbar ? "bg-primary" : "bg-muted"
-                                }`}
+                                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${showAssetScrollbar ? "bg-primary" : "bg-muted"
+                                  }`}
                               >
                                 <span
-                                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                                    showAssetScrollbar ? "translate-x-5" : "translate-x-0.5"
-                                  }`}
+                                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${showAssetScrollbar ? "translate-x-5" : "translate-x-0.5"
+                                    }`}
                                 />
                               </button>
                             </label>
@@ -899,14 +988,12 @@ export function EditorLayout({
                               </span>
                               <button
                                 onClick={() => setShowCanvasScrollbar(!showCanvasScrollbar)}
-                                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                                  showCanvasScrollbar ? "bg-primary" : "bg-muted"
-                                }`}
+                                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${showCanvasScrollbar ? "bg-primary" : "bg-muted"
+                                  }`}
                               >
                                 <span
-                                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                                    showCanvasScrollbar ? "translate-x-5" : "translate-x-0.5"
-                                  }`}
+                                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${showCanvasScrollbar ? "translate-x-5" : "translate-x-0.5"
+                                    }`}
                                 />
                               </button>
                             </label>
@@ -923,14 +1010,12 @@ export function EditorLayout({
                               </span>
                               <button
                                 onClick={() => setShowPropertiesScrollbar(!showPropertiesScrollbar)}
-                                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                                  showPropertiesScrollbar ? "bg-primary" : "bg-muted"
-                                }`}
+                                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${showPropertiesScrollbar ? "bg-primary" : "bg-muted"
+                                  }`}
                               >
                                 <span
-                                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                                    showPropertiesScrollbar ? "translate-x-5" : "translate-x-0.5"
-                                  }`}
+                                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${showPropertiesScrollbar ? "translate-x-5" : "translate-x-0.5"
+                                    }`}
                                 />
                               </button>
                             </label>
@@ -948,14 +1033,27 @@ export function EditorLayout({
 
             <div className="w-px h-6 bg-border" />
 
+            {/* Backend Editor Button */}
+            <button
+              onClick={() => {
+                const params = new URLSearchParams(window.location.search);
+                const pid = params.get("projectId");
+                if (pid) router.push(`/editor/backend?projectId=${pid}`);
+              }}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-violet-500/10 hover:bg-violet-500/20 text-violet-400 rounded-md text-xs font-medium transition-colors border border-violet-500/20"
+              title="Backend Editor"
+            >
+              <Database className="w-3.5 h-3.5" />
+              <span>Backend</span>
+            </button>
+
             <button
               onClick={onSave}
               disabled={isSaving}
-              className={`px-4 py-2 rounded-md text-xs font-medium transition-colors ${
-                isSaving
+              className={`px-4 py-2 rounded-md text-xs font-medium transition-colors ${isSaving
                   ? "bg-muted text-muted-foreground cursor-not-allowed"
                   : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
-              }`}
+                }`}
             >
               {isSaving ? "Saving..." : "Save"}
             </button>
@@ -1074,7 +1172,7 @@ export function EditorLayout({
                         onPageAdd={onPageAdd}
                         onPageDelete={onPageDelete}
                         onPageDuplicate={onPageDuplicate}
-                        onPageRename={onPageRename || (() => {})}
+                        onPageRename={onPageRename || (() => { })}
                       />
                     </TabsContent>
 
@@ -1135,8 +1233,8 @@ export function EditorLayout({
                       </div>
                       <div className="flex-1 min-h-0 overflow-hidden">
                         <AIChatPanel
-                          onApplyComponents={onApplyAIComponents || (() => {})}
-                          onApplyPages={onApplyAIPages || (() => {})}
+                          onApplyComponents={onApplyAIComponents || (() => { })}
+                          onApplyPages={onApplyAIPages || (() => { })}
                           existingComponents={components}
                           customComponents={customComponents}
                           globalComponents={globalComponents}
@@ -1150,11 +1248,10 @@ export function EditorLayout({
                     <div className="flex-shrink-0 p-2 border-t border-border">
                       <button
                         onClick={() => setActiveTab("ai")}
-                        className={`w-full flex items-center justify-center space-x-2 px-4 py-2.5 rounded-md transition-colors text-xs font-semibold ${
-                          activeTab === "ai"
+                        className={`w-full flex items-center justify-center space-x-2 px-4 py-2.5 rounded-md transition-colors text-xs font-semibold ${activeTab === "ai"
                             ? "bg-primary/20 text-primary"
                             : "bg-primary/10 hover:bg-primary/15 text-primary/70"
-                        }`}
+                          }`}
                       >
                         <Sparkles className="w-4 h-4" />
                         <span>AI ASSISTANT</span>
@@ -1191,10 +1288,22 @@ export function EditorLayout({
           {/* Canvas Area */}
           <div
             ref={canvasContainerRef}
-            className="flex-1 min-w-0 bg-background overflow-auto"
+            className="flex-1 min-w-0 bg-background overflow-auto relative"
             style={{ flexShrink: 1, flexGrow: 1 }}
             data-panel="canvas"
           >
+            {/* Data source loading overlay */}
+            {isDataSourceFetching && (
+              <div className="absolute inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
+                <div className="flex flex-col items-center gap-3">
+                  <div className="relative w-10 h-10">
+                    <div className="absolute inset-0 rounded-full border-2 border-violet-500/20" />
+                    <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-violet-500 animate-spin" />
+                  </div>
+                  <span className="text-xs text-violet-400 font-medium animate-pulse">Fetching data...</span>
+                </div>
+              </div>
+            )}
             <div
               className={`min-h-full transition-all duration-300 ${isPreviewMode ? "bg-white p-0" : "bg-background p-8"} light`}
             >
@@ -1214,13 +1323,14 @@ export function EditorLayout({
                   } : {}),
                 }}
               >
+              <BackendProvider projectId={projectId || null}>
                 <Canvas
                   components={components}
                   selectedComponentIds={
                     isPreviewMode ? [] : selectedComponentIds
                   }
                   onSelectComponent={
-                    isPreviewMode ? () => {} : onSelectComponent
+                    isPreviewMode ? () => { } : onSelectComponent
                   }
                   onSelectMultiple={
                     isPreviewMode ? undefined : onSelectMultiple
@@ -1281,6 +1391,7 @@ export function EditorLayout({
                     }, 100);
                   }}
                 />
+              </BackendProvider>
               </div>
             </div>
           </div>
@@ -1320,22 +1431,20 @@ export function EditorLayout({
                     <div className="flex gap-0.5 p-1 bg-muted rounded-md border border-border ml-6">
                       <button
                         onClick={() => setRightPanelTab("properties")}
-                        className={`flex-1 flex items-center justify-center gap-1.5 text-[10px] py-2 px-1 rounded-md transition-all font-semibold tracking-wide ${
-                          rightPanelTab === "properties"
+                        className={`flex-1 flex items-center justify-center gap-1.5 text-[10px] py-2 px-1 rounded-md transition-all font-semibold tracking-wide ${rightPanelTab === "properties"
                             ? "bg-secondary text-secondary-foreground"
                             : "text-muted-foreground hover:text-foreground"
-                        }`}
+                          }`}
                       >
                         <Settings className="w-3 h-3" />
                         PROPERTIES
                       </button>
                       <button
                         onClick={() => setRightPanelTab("animate")}
-                        className={`flex-1 flex items-center justify-center gap-1.5 text-[10px] py-2 px-1 rounded-md transition-all font-semibold tracking-wide ${
-                          rightPanelTab === "animate"
+                        className={`flex-1 flex items-center justify-center gap-1.5 text-[10px] py-2 px-1 rounded-md transition-all font-semibold tracking-wide ${rightPanelTab === "animate"
                             ? "bg-secondary text-secondary-foreground"
                             : "text-muted-foreground hover:text-foreground"
-                        }`}
+                          }`}
                       >
                         <Zap className="w-3 h-3" />
                         ANIMATE
@@ -1360,6 +1469,8 @@ export function EditorLayout({
                       onMarkAsGlobal={onMarkAsGlobal}
                       onUnmarkGlobal={onUnmarkGlobal}
                       onApplyGlobalTemplate={onApplyGlobalTemplate}
+                      apiEndpoints={apiEndpoints}
+                      projectId={projectId}
                     />
                   ) : (
                     <AnimationPanel

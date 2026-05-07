@@ -89,6 +89,8 @@ export async function PATCH(
             globalComponents, 
             customComponents, 
             chatHistory,
+            apiEndpoints,
+            dbSchema,
             globalThemeStyle,
             isGlobalThemeEnabled,
             themeOverrides
@@ -106,6 +108,8 @@ export async function PATCH(
         if (globalComponents !== undefined) updateData.globalComponents = globalComponents;
         if (customComponents !== undefined) updateData.customComponents = customComponents;
         if (chatHistory !== undefined) updateData.chatHistory = chatHistory;
+        if (apiEndpoints !== undefined) updateData.apiEndpoints = apiEndpoints;
+        if (dbSchema !== undefined) updateData.dbSchema = dbSchema;
         if (globalThemeStyle !== undefined) updateData.globalThemeStyle = globalThemeStyle;
         if (isGlobalThemeEnabled !== undefined) updateData.isGlobalThemeEnabled = isGlobalThemeEnabled;
         if (themeOverrides !== undefined) updateData.themeOverrides = themeOverrides;

@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Page } from "@/types/editor";
+import { ApiEndpoint } from "@/types/backend";
 import { useThemeStyle } from "@/contexts/ThemeStyleContext";
 import {
   Accordion,
@@ -26,6 +27,8 @@ import {
   BordersSection,
   EffectsSection,
   PositionSection,
+  DataSourceSection,
+  BackendActionSection,
 } from "./sections";
 
 // ── Icon mapping ──────────────────────────────────────────
@@ -370,9 +373,11 @@ interface ComponentPropertiesProps {
   props: Record<string, any>;
   updateProp: (key: string, value: any) => void;
   pages?: Page[];
+  apiEndpoints?: ApiEndpoint[];
+  projectId?: string | null;
 }
 
-export function ComponentProperties({ type, props, updateProp, pages }: ComponentPropertiesProps) {
+export function ComponentProperties({ type, props, updateProp, pages, apiEndpoints, projectId }: ComponentPropertiesProps) {
   const schema = COMPONENT_SCHEMAS[type];
   const { globalThemeStyle } = useThemeStyle();
 
@@ -586,6 +591,29 @@ export function ComponentProperties({ type, props, updateProp, pages }: Componen
         const SectionComponent = STYLE_SECTION_MAP[sectionType];
         return <SectionComponent key={sectionType} props={props} updateProp={updateProp} componentType={type} />;
       })}
+
+      {/* Data Source Section */}
+      {apiEndpoints && (
+        <DataSourceSection
+          props={props}
+          updateProp={updateProp}
+          apiEndpoints={apiEndpoints}
+          projectId={projectId || null}
+          componentType={type}
+        />
+      )}
+
+      {/* Backend Action Section */}
+      {apiEndpoints && (
+        <BackendActionSection
+          props={props}
+          updateProp={updateProp}
+          apiEndpoints={apiEndpoints}
+          projectId={projectId || null}
+          componentType={type}
+          pages={pages}
+        />
+      )}
 
       {/* Reset & Theme Actions */}
       <AccordionItem

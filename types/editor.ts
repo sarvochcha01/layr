@@ -1,3 +1,5 @@
+import { ApiEndpoint } from "./backend";
+
 export interface ComponentDefinition {
     id: string;
     type: string;
@@ -46,6 +48,7 @@ export interface Project {
     name: string;
     pages: Page[];
     globalComponents?: GlobalComponents;
+    apiEndpoints?: ApiEndpoint[];
     globalThemeStyle?: string; // Global theme for the project
     isGlobalThemeEnabled?: boolean; // Whether global theme is active
     themeOverrides?: {

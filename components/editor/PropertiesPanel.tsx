@@ -2,6 +2,7 @@
 import React from "react";
 import { useState, useRef, useEffect } from "react";
 import { ComponentDefinition, Page, GlobalComponents } from "@/types/editor";
+import { ApiEndpoint } from "@/types/backend";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -31,6 +32,8 @@ interface PropertiesPanelProps {
   onMarkAsGlobal?: (componentId: string, globalName: string) => void;
   onUnmarkGlobal?: (componentId: string) => void;
   onApplyGlobalTemplate?: (componentId: string, globalName: string) => void;
+  apiEndpoints?: ApiEndpoint[];
+  projectId?: string | null;
 }
 
 export function PropertiesPanel({
@@ -46,6 +49,8 @@ export function PropertiesPanel({
   onMarkAsGlobal,
   onUnmarkGlobal,
   onApplyGlobalTemplate,
+  apiEndpoints = [],
+  projectId,
 }: PropertiesPanelProps) {
   const [showGlobalDialog, setShowGlobalDialog] = useState(false);
   const [globalName, setGlobalName] = useState("");
@@ -238,6 +243,8 @@ export function PropertiesPanel({
             props={primaryComponent.props}
             updateProp={updateProp}
             pages={pages}
+            apiEndpoints={apiEndpoints}
+            projectId={projectId}
           />
         </div>
       </div>

@@ -18,9 +18,11 @@ import {
   CustomComponents,
   ChatMessage,
 } from "@/types/editor";
+import { ApiEndpoint } from "@/types/backend";
 import { generateId } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProject, useUpdateProject } from "@/hooks/useProjects";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Loading } from "@/components/ui/loading";
 import { useHistory } from "@/hooks/useHistory";
@@ -154,6 +156,9 @@ export default function EditorPage() {
   // AI chat history
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
 
+  // Backend API endpoints (managed by /editor/backend, preserved here during save)
+  const [apiEndpoints, setApiEndpoints] = useState<ApiEndpoint[]>([]);
+
   const { addToRecent } = useComponentFavorites();
   const { copyComponent, pasteComponent, hasClipboard } =
     useComponentClipboard();
@@ -167,6 +172,15 @@ export default function EditorPage() {
   const components: ComponentDefinition[] = [...currentPage.components];
 
   // React Query hooks - disable refetching to prevent overwriting local changes
+  const queryClient = useQueryClient();
+
+  // Invalidate project cache on mount to pick up changes from backend editor
+  useEffect(() => {
+    if (projectId) {
+      queryClient.invalidateQueries({ queryKey: ["project", projectId] });
+    }
+  }, [projectId, queryClient]);
+
   const {
     data: projectData,
     isLoading: projectLoading,
@@ -214,6 +228,10 @@ export default function EditorPage() {
 
         const history = (projectData as any).chatHistory || [];
         setChatHistory(history);
+
+        // Load backend API endpoints
+        const endpoints = (projectData as any).apiEndpoints || [];
+        setApiEndpoints(endpoints);
 
         // Load theme settings with validation
         const savedTheme = projectData.globalThemeStyle as ThemeStyleVariant;
@@ -288,6 +306,7 @@ export default function EditorPage() {
         globalComponents,
         customComponents,
         chatHistory,
+        apiEndpoints,
         globalThemeStyle: globalThemeStyle,
         isGlobalThemeEnabled: isGlobalThemeEnabled,
         themeOverrides: themeOverrides,
@@ -335,6 +354,7 @@ export default function EditorPage() {
         globalComponents,
         customComponents,
         chatHistory,
+        apiEndpoints,
         globalThemeStyle: globalThemeStyle,
         isGlobalThemeEnabled: isGlobalThemeEnabled,
         themeOverrides: themeOverrides,
@@ -1204,6 +1224,8 @@ export default function EditorPage() {
           onSaveCodeComponent={handleSaveCodeComponent}
           chatHistory={chatHistory}
           onChatHistoryChange={setChatHistory}
+          apiEndpoints={apiEndpoints}
+          projectId={projectId}
         />
 
         <DragOverlay>
