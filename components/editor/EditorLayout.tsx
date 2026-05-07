@@ -8,6 +8,7 @@ import {
   CustomComponents,
   ChatMessage,
 } from "@/types/editor";
+import { BackendProvider } from "@/contexts/BackendContext";
 import { ApiEndpoint } from "@/types/backend";
 import { HierarchyPanel, HierarchyPanelRef } from "./HierarchyPanel";
 import { ComponentPalette } from "./ComponentPalette";
@@ -1322,6 +1323,7 @@ export function EditorLayout({
                   } : {}),
                 }}
               >
+              <BackendProvider projectId={projectId || null}>
                 <Canvas
                   components={components}
                   selectedComponentIds={
@@ -1389,6 +1391,7 @@ export function EditorLayout({
                     }, 100);
                   }}
                 />
+              </BackendProvider>
               </div>
             </div>
           </div>

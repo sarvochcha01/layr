@@ -1,31 +1,44 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { ApiEndpoint } from "@/types/backend";
+import { ApiEndpoint, DbCollection } from "@/types/backend";
 import { EndpointList } from "./EndpointList";
 import { EndpointEditor } from "./EndpointEditor";
+import { CollectionManager } from "./CollectionManager";
+import { SchemaEditor } from "./SchemaEditor";
 import { generateId } from "@/lib/utils";
+import { ENDPOINT_TEMPLATES } from "@/lib/endpoint-templates";
 import {
   ArrowLeft,
   Save,
   Database,
   Loader2,
   Zap,
+  ChevronDown,
+  ChevronRight,
+  Layers,
+  BookTemplate,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 interface BackendEditorLayoutProps {
   endpoints: ApiEndpoint[];
   onEndpointsChange: (endpoints: ApiEndpoint[]) => void;
+  dbSchema: DbCollection[];
+  onDbSchemaChange: (schema: DbCollection[]) => void;
   projectId: string | null;
   projectName: string;
   onSave?: () => void;
   isSaving?: boolean;
 }
 
+type ViewMode = "endpoints" | "schema";
+
 export function BackendEditorLayout({
   endpoints,
   onEndpointsChange,
+  dbSchema,
+  onDbSchemaChange,
   projectId,
   projectName,
   onSave,
@@ -37,6 +50,9 @@ export function BackendEditorLayout({
   );
   // Track which tab is active in the endpoint editor (lifted state)
   const [activeTab, setActiveTab] = useState<string>("general");
+  const [showCollections, setShowCollections] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>("endpoints");
+  const [showTemplatePicker, setShowTemplatePicker] = useState(false);
 
   const selectedEndpoint = endpoints.find((e) => e.id === selectedEndpointId);
 
@@ -75,6 +91,44 @@ export function BackendEditorLayout({
     setSelectedEndpointId(newEndpoint.id);
     setActiveTab("general");
   }, [endpoints, onEndpointsChange]);
+
+  const handleApplyTemplate = useCallback((templateId: string) => {
+    const template = ENDPOINT_TEMPLATES.find((t) => t.id === templateId);
+    if (!template) return;
+
+    const newEndpoints = template.create();
+
+    // Check for duplicate paths and skip those
+    const existingPaths = new Set(endpoints.map((e) => `${e.method}:${e.path}`));
+    const uniqueNew = newEndpoints.filter(
+      (ep) => !existingPaths.has(`${ep.method}:${ep.path}`)
+    );
+
+    if (uniqueNew.length === 0) {
+      return; // All endpoints already exist
+    }
+
+    // Also create a schema entry for "users" if the auth template is used
+    if (template.category === "auth" && dbSchema.length === 0) {
+      onDbSchemaChange([
+        ...dbSchema,
+        {
+          id: generateId(),
+          name: "users",
+          description: "User accounts",
+          fields: [
+            { id: generateId(), name: "email", type: "string", required: true, unique: true },
+            { id: generateId(), name: "password", type: "string", required: true },
+          ],
+        },
+      ]);
+    }
+
+    onEndpointsChange([...endpoints, ...uniqueNew]);
+    setSelectedEndpointId(uniqueNew[0].id);
+    setActiveTab("logic");
+    setShowTemplatePicker(false);
+  }, [endpoints, onEndpointsChange, dbSchema, onDbSchemaChange]);
 
   const handleDelete = (id: string) => {
     const updated = endpoints.filter((e) => e.id !== id);
@@ -230,12 +284,81 @@ export function BackendEditorLayout({
             <span>Save</span>
           </div>
 
-          {/* Endpoint count */}
-          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-muted/50 rounded-md">
-            <Zap className="w-3.5 h-3.5 text-primary" />
-            <span className="text-xs font-medium text-muted-foreground">
-              {endpoints.length} endpoint{endpoints.length !== 1 ? "s" : ""}
-            </span>
+          {/* View mode toggle */}
+          <div className="flex items-center bg-muted/50 rounded-md p-0.5">
+            <button
+              onClick={() => setViewMode("endpoints")}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium transition-colors ${
+                viewMode === "endpoints"
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground/60 hover:text-foreground"
+              }`}
+            >
+              <Zap className="w-3.5 h-3.5" />
+              Endpoints
+              <span className="text-[9px] text-muted-foreground/50">{endpoints.length}</span>
+            </button>
+            <button
+              onClick={() => setViewMode("schema")}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium transition-colors ${
+                viewMode === "schema"
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground/60 hover:text-foreground"
+              }`}
+            >
+              <Layers className="w-3.5 h-3.5" />
+              Schema
+              <span className="text-[9px] text-muted-foreground/50">{dbSchema.length}</span>
+            </button>
+          </div>
+
+          {/* Templates */}
+          <div className="relative">
+            <button
+              onClick={() => setShowTemplatePicker(!showTemplatePicker)}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-md transition-colors"
+            >
+              <BookTemplate className="w-3.5 h-3.5" />
+              Templates
+            </button>
+
+            {showTemplatePicker && (
+              <>
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={() => setShowTemplatePicker(false)}
+                />
+                <div className="absolute right-0 top-full mt-2 w-80 bg-card rounded-xl shadow-2xl border border-border z-50 overflow-hidden">
+                  <div className="px-4 py-3 border-b border-border bg-muted/30">
+                    <h4 className="text-xs font-semibold text-foreground">Endpoint Templates</h4>
+                    <p className="text-[10px] text-muted-foreground/60 mt-0.5">
+                      Pre-built, working pipelines — added to your project instantly.
+                    </p>
+                  </div>
+                  <div className="p-2 space-y-1 max-h-[300px] overflow-y-auto">
+                    {ENDPOINT_TEMPLATES.map((template) => (
+                      <button
+                        key={template.id}
+                        onClick={() => handleApplyTemplate(template.id)}
+                        className="w-full text-left px-3 py-2.5 rounded-lg hover:bg-muted/50 transition-colors group"
+                      >
+                        <div className="flex items-start gap-2.5">
+                          <span className="text-base mt-0.5">{template.icon}</span>
+                          <div className="flex-1 min-w-0">
+                            <div className="text-xs font-semibold text-foreground group-hover:text-primary transition-colors">
+                              {template.name}
+                            </div>
+                            <p className="text-[10px] text-muted-foreground/60 mt-0.5 leading-relaxed">
+                              {template.description}
+                            </p>
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
           </div>
 
           {/* Save */}
@@ -258,67 +381,102 @@ export function BackendEditorLayout({
         </div>
       </div>
 
-      {/* ── Main Content ────────────────────────────────────────────── */}
-      <div className="flex flex-1 overflow-hidden min-h-0">
-        {/* Left Panel — Endpoint List */}
-        <div
-          className="bg-card border-r border-border flex-shrink-0"
-          style={{ width: 300 }}
-          onClick={(e) => {
-            // Clicking on the list panel background deselects the endpoint
-            // (but not when clicking on an actual endpoint item or button)
-            if ((e.target as HTMLElement).closest("[data-endpoint-item]")) return;
-            if ((e.target as HTMLElement).closest("button")) return;
-            if ((e.target as HTMLElement).closest("input")) return;
-            setSelectedEndpointId(null);
-          }}
-        >
-          <EndpointList
-            endpoints={endpoints}
-            selectedEndpointId={selectedEndpointId}
-            onSelect={setSelectedEndpointId}
-            onCreate={handleCreate}
-            onDelete={handleDelete}
-            onToggleEnabled={handleToggleEnabled}
-          />
+      {/* ── Main Content ──────────────────────────────────────────── */}
+      {viewMode === "schema" ? (
+        /* Schema Designer — full width */
+        <div className="flex-1 overflow-hidden">
+          <SchemaEditor schema={dbSchema} onChange={onDbSchemaChange} />
         </div>
-
-        {/* Right Panel — Endpoint Editor */}
-        <div className="flex-1 min-w-0 overflow-hidden">
-          {selectedEndpoint ? (
-            <EndpointEditor
-              endpoint={selectedEndpoint}
-              onChange={handleUpdateEndpoint}
-              projectId={projectId}
-              activeTab={activeTab}
-              onTabChange={setActiveTab}
-              allEndpoints={endpoints}
-            />
-          ) : (
-            <div className="flex items-center justify-center h-full">
-              <div className="text-center max-w-xs">
-                <Database className="w-12 h-12 mx-auto mb-4 text-muted-foreground/20" />
-                <h3 className="text-sm font-semibold text-foreground mb-2">
-                  No Endpoint Selected
-                </h3>
-                <p className="text-xs text-muted-foreground/60 mb-4">
-                  Select an endpoint from the list or press{" "}
-                  <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded text-[10px] font-mono">
-                    Ctrl+N
-                  </kbd>{" "}
-                  to create a new one.
-                </p>
-                <button
-                  onClick={handleCreate}
-                  className="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-md text-xs font-semibold transition-colors"
-                >
-                  Create Endpoint
-                </button>
-              </div>
+      ) : (
+        /* Endpoints Mode — list + editor */
+        <div className="flex flex-1 overflow-hidden min-h-0">
+          {/* Left Panel — Endpoint List */}
+          <div
+            className="bg-card border-r border-border flex-shrink-0 flex flex-col"
+            style={{ width: 300 }}
+            onClick={(e) => {
+              if ((e.target as HTMLElement).closest("[data-endpoint-item]")) return;
+              if ((e.target as HTMLElement).closest("button")) return;
+              if ((e.target as HTMLElement).closest("input")) return;
+              if ((e.target as HTMLElement).closest("[data-collections-panel]")) return;
+              setSelectedEndpointId(null);
+            }}
+          >
+            {/* Endpoints section */}
+            <div className="flex-1 min-h-0 overflow-hidden">
+              <EndpointList
+                endpoints={endpoints}
+                selectedEndpointId={selectedEndpointId}
+                onSelect={setSelectedEndpointId}
+                onCreate={handleCreate}
+                onDelete={handleDelete}
+                onToggleEnabled={handleToggleEnabled}
+              />
             </div>
-          )}
+
+            {/* Collections panel — collapsible */}
+            <div
+              data-collections-panel
+              className="flex-shrink-0 border-t border-border"
+            >
+              <button
+                onClick={() => setShowCollections(!showCollections)}
+                className="w-full flex items-center gap-2 px-4 py-2.5 hover:bg-muted/50 transition-colors text-left"
+              >
+                {showCollections ? (
+                  <ChevronDown className="w-3.5 h-3.5 text-muted-foreground/40" />
+                ) : (
+                  <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/40" />
+                )}
+                <Database className="w-3.5 h-3.5 text-violet-400" />
+                <span className="text-[10px] font-semibold text-foreground uppercase tracking-wide">Database</span>
+              </button>
+              {showCollections && (
+                <div className="px-3 pb-3 max-h-[300px] overflow-y-auto">
+                  <CollectionManager projectId={projectId} />
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Right Panel — Endpoint Editor */}
+          <div className="flex-1 min-w-0 overflow-hidden">
+            {selectedEndpoint ? (
+              <EndpointEditor
+                endpoint={selectedEndpoint}
+                onChange={handleUpdateEndpoint}
+                projectId={projectId}
+                activeTab={activeTab}
+                onTabChange={setActiveTab}
+                allEndpoints={endpoints}
+                dbSchema={dbSchema}
+              />
+            ) : (
+              <div className="flex items-center justify-center h-full">
+                <div className="text-center max-w-xs">
+                  <Database className="w-12 h-12 mx-auto mb-4 text-muted-foreground/20" />
+                  <h3 className="text-sm font-semibold text-foreground mb-2">
+                    No Endpoint Selected
+                  </h3>
+                  <p className="text-xs text-muted-foreground/60 mb-4">
+                    Select an endpoint from the list or press{" "}
+                    <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded text-[10px] font-mono">
+                      Ctrl+N
+                    </kbd>{" "}
+                    to create a new one.
+                  </p>
+                  <button
+                    onClick={handleCreate}
+                    className="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-md text-xs font-semibold transition-colors"
+                  >
+                    Create Endpoint
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { ThemeStyleVariant, getThemeCSSVars } from "@/lib/themeStyles";
 import { getUserStyleOverrides } from "@/lib/buildStyle";
 import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
+import { useBackendContext } from "@/contexts/BackendContext";
 import { useState, useRef } from "react";
 import { BackendAction } from "@/types/backend";
 
@@ -62,6 +63,10 @@ export function Form({
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
   const [statusMessage, setStatusMessage] = useState("");
 
+  // Get projectId from context (provided by BackendProvider in EditorLayout)
+  const { projectId: ctxProjectId } = useBackendContext();
+  const resolvedProjectId = projectId || ctxProjectId;
+
   const rootStyle: React.CSSProperties = {
     ...cssVars,
     backgroundColor: backgroundColor || "var(--theme-surface)",
@@ -109,7 +114,7 @@ export function Form({
     });
 
     // If backendAction is configured, send to endpoint
-    if (backendAction?.endpointId && projectId) {
+    if (backendAction?.endpointId && resolvedProjectId) {
       setIsSubmitting(true);
       setSubmitStatus("idle");
 
@@ -140,13 +145,21 @@ export function Form({
           method: backendAction.endpointMethod || "POST",
           headers: {
             "Content-Type": "application/json",
-            "x-project-id": projectId,
+          "x-project-id": resolvedProjectId,
           },
           body: JSON.stringify(body),
         });
 
+        const data = await response.json().catch(() => null);
+
         if (!response.ok) {
-          throw new Error(`Request failed (${response.status})`);
+          // Parse error details from pipeline validation
+          let errMsg = `Request failed (${response.status})`;
+          if (data?.error) errMsg = data.error;
+          if (data?.details && Array.isArray(data.details)) {
+            errMsg += ": " + data.details.join(", ");
+          }
+          throw new Error(errMsg);
         }
 
         // Handle success behavior
@@ -165,12 +178,24 @@ export function Form({
           setStatusMessage("");
         }, 3000);
       } catch (err) {
-        setSubmitStatus("error");
-        setStatusMessage((err as Error).message);
-        setTimeout(() => {
-          setSubmitStatus("idle");
-          setStatusMessage("");
-        }, 5000);
+        const failMode = backendAction.onFail || "toast";
+
+        if (failMode === "redirect" && backendAction.failRedirectUrl) {
+          window.location.href = backendAction.failRedirectUrl;
+          return;
+        }
+
+        if (failMode !== "none") {
+          // Show error message (toast mode)
+          setSubmitStatus("error");
+          setStatusMessage(
+            backendAction.failMessage || (err as Error).message
+          );
+          setTimeout(() => {
+            setSubmitStatus("idle");
+            setStatusMessage("");
+          }, 5000);
+        }
       } finally {
         setIsSubmitting(false);
       }

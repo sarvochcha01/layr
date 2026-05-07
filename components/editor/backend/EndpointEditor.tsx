@@ -1,14 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   ApiEndpoint,
   HttpMethod,
   METHOD_COLORS,
   PayloadField,
+  DbCollection,
 } from "@/types/backend";
 import { PayloadFieldEditor } from "./PayloadFieldEditor";
 import { MockDataEditor } from "./MockDataEditor";
+import { NodePipelineEditor } from "./NodePipelineEditor";
 import {
   ChevronDown,
   ChevronRight,
@@ -27,6 +29,7 @@ interface EndpointEditorProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
   allEndpoints: ApiEndpoint[];
+  dbSchema?: DbCollection[];
 }
 
 const HTTP_METHODS: HttpMethod[] = ["GET", "POST", "PUT", "PATCH", "DELETE"];
@@ -38,6 +41,7 @@ export function EndpointEditor({
   activeTab,
   onTabChange,
   allEndpoints,
+  dbSchema = [],
 }: EndpointEditorProps) {
   const activeSection = activeTab;
 
@@ -49,9 +53,25 @@ export function EndpointEditor({
     status: number;
     data: any;
     time: number;
+    trace?: any[];
   } | null>(null);
   const [isTesting, setIsTesting] = useState(false);
   const [testError, setTestError] = useState<string | null>(null);
+  const [testBody, setTestBody] = useState<string>("");
+  const [testQuery, setTestQuery] = useState<string>("");
+
+  // Auto-generate a sample body when switching to Test tab or endpoint changes
+  useEffect(() => {
+    if (hasBody && endpoint.requestBody && endpoint.requestBody.length > 0) {
+      const sample: Record<string, any> = {};
+      endpoint.requestBody.forEach((field) => {
+        sample[field.name] = field.defaultValue ?? getSampleValue(field.type);
+      });
+      setTestBody(JSON.stringify(sample, null, 2));
+    } else {
+      setTestBody("");
+    }
+  }, [endpoint.id, endpoint.requestBody?.length]);
 
   const methodColors = METHOD_COLORS[endpoint.method];
   const hasBody = ["POST", "PUT", "PATCH"].includes(endpoint.method);
@@ -59,6 +79,7 @@ export function EndpointEditor({
   const sections = [
     { id: "general", label: "General" },
     { id: "request", label: "Request" },
+    { id: "logic", label: "Logic" },
     { id: "response", label: "Response" },
     { id: "test", label: "Test" },
   ];
@@ -73,7 +94,14 @@ export function EndpointEditor({
     const startTime = performance.now();
 
     try {
-      const url = `/api/backend${endpoint.path.startsWith("/") ? endpoint.path : `/${endpoint.path}`}`;
+      let basePath = endpoint.path.startsWith("/") ? endpoint.path : `/${endpoint.path}`;
+      // Append query string if provided
+      if (testQuery.trim()) {
+        const sep = basePath.includes("?") ? "&" : "?";
+        basePath += sep + testQuery.trim();
+      }
+      const url = `/api/backend${basePath}`;
+
       const options: RequestInit = {
         method: endpoint.method,
         headers: {
@@ -82,20 +110,30 @@ export function EndpointEditor({
         },
       };
 
-      if (hasBody && endpoint.requestBody && endpoint.requestBody.length > 0) {
-        // Send a sample body based on schema
-        const sampleBody: Record<string, any> = {};
-        endpoint.requestBody.forEach((field) => {
-          sampleBody[field.name] = field.defaultValue ?? getSampleValue(field.type);
-        });
-        options.body = JSON.stringify(sampleBody);
+      // Use the user-edited body
+      if (hasBody && testBody.trim()) {
+        try {
+          JSON.parse(testBody); // validate
+          options.body = testBody;
+        } catch {
+          setTestError("Invalid JSON in request body");
+          setIsTesting(false);
+          return;
+        }
       }
 
       const response = await fetch(url, options);
       const data = await response.json();
       const time = Math.round(performance.now() - startTime);
 
-      setTestResult({ status: response.status, data, time });
+      // Extract pipeline trace from response header
+      let trace: any[] | undefined;
+      try {
+        const traceHeader = response.headers.get("x-layr-pipeline-trace");
+        if (traceHeader) trace = JSON.parse(traceHeader);
+      } catch { /* ignore */ }
+
+      setTestResult({ status: response.status, data, time, trace });
     } catch (err) {
       setTestError((err as Error).message);
     } finally {
@@ -162,7 +200,11 @@ export function EndpointEditor({
       </div>
 
       {/* Section content */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-6">
+      <div className={`flex-1 ${
+        activeSection === "logic" 
+          ? "flex flex-col overflow-hidden" 
+          : "overflow-y-auto p-6 space-y-6"
+      }`}>
         {/* ── General ──────────────────────────────────────── */}
         {activeSection === "general" && (
           <>
@@ -320,6 +362,13 @@ export function EndpointEditor({
           </>
         )}
 
+        {/* ── Logic ──────────────────────────────────────────── */}
+        {activeSection === "logic" && (
+          <div className="flex-1 min-h-0">
+            <NodePipelineEditor endpoint={endpoint} onChange={onChange} dbSchema={dbSchema} />
+          </div>
+        )}
+
         {/* ── Response ─────────────────────────────────────── */}
         {activeSection === "response" && (
           <>
@@ -346,6 +395,7 @@ export function EndpointEditor({
         {/* ── Test ─────────────────────────────────────────── */}
         {activeSection === "test" && (
           <>
+            {/* Header + Send Button */}
             <div className="flex items-center justify-between">
               <div>
                 <h4 className="text-sm font-semibold text-foreground">
@@ -356,6 +406,11 @@ export function EndpointEditor({
                   <span className="font-mono text-primary/70">
                     /api/backend{endpoint.path}
                   </span>
+                  {endpoint.usePipeline && (
+                    <span className="ml-2 text-[9px] px-1.5 py-0.5 bg-primary/15 text-primary rounded-full font-medium">
+                      Pipeline
+                    </span>
+                  )}
                 </p>
               </div>
               <button
@@ -371,6 +426,39 @@ export function EndpointEditor({
                 {isTesting ? "Sending..." : "Send Request"}
               </button>
             </div>
+
+            {/* Query Params */}
+            {(endpoint.queryParams && endpoint.queryParams.length > 0 || endpoint.method === "GET") && (
+              <div>
+                <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5">
+                  Query String
+                </label>
+                <input
+                  type="text"
+                  value={testQuery}
+                  onChange={(e) => setTestQuery(e.target.value)}
+                  placeholder="key=value&key2=value2"
+                  className="w-full px-3 py-2 bg-muted/30 border border-border rounded-md text-xs text-foreground outline-none focus:ring-1 focus:ring-primary/40 font-mono placeholder:text-muted-foreground/30"
+                />
+              </div>
+            )}
+
+            {/* Request Body Editor */}
+            {hasBody && (
+              <div>
+                <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5">
+                  Request Body (JSON)
+                </label>
+                <textarea
+                  value={testBody}
+                  onChange={(e) => setTestBody(e.target.value)}
+                  rows={8}
+                  className="w-full px-3 py-2 bg-[#0d1117] text-emerald-300/80 text-xs font-mono rounded-md border border-border outline-none focus:ring-1 focus:ring-primary/40 resize-none leading-relaxed"
+                  placeholder='{\n  "email": "user@example.com",\n  "password": "secret123"\n}'
+                  spellCheck={false}
+                />
+              </div>
+            )}
 
             {/* Test result */}
             {testResult && (
@@ -408,9 +496,45 @@ export function EndpointEditor({
                   </button>
                 </div>
 
-                <pre className="bg-[#0d1117] text-emerald-300 text-xs font-mono p-4 rounded-lg overflow-auto max-h-[400px] leading-relaxed border border-border">
+                <pre className="bg-[#0d1117] text-emerald-300 text-xs font-mono p-4 rounded-lg overflow-auto max-h-[300px] leading-relaxed border border-border">
                   {JSON.stringify(testResult.data, null, 2)}
                 </pre>
+
+                {/* Pipeline Trace */}
+                {testResult.trace && testResult.trace.length > 0 && (
+                  <div>
+                    <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+                      Pipeline Trace
+                    </p>
+                    <div className="space-y-1">
+                      {testResult.trace.map((entry: any, i: number) => (
+                        <div
+                          key={i}
+                          className={`flex items-center gap-2 px-2.5 py-1.5 rounded text-[10px] font-mono ${
+                            entry.status === "ok"
+                              ? "bg-emerald-500/10 text-emerald-400"
+                              : entry.status === "fail"
+                                ? "bg-red-500/10 text-red-400"
+                                : "bg-muted/30 text-muted-foreground/50"
+                          }`}
+                        >
+                          <span className="w-3 text-center">
+                            {entry.status === "ok" ? "✓" : entry.status === "fail" ? "✗" : "–"}
+                          </span>
+                          <span className="font-semibold">{entry.stepLabel}</span>
+                          <span className="text-muted-foreground/40 ml-auto">
+                            {entry.durationMs}ms
+                          </span>
+                          {entry.detail && (
+                            <span className="text-muted-foreground/40 max-w-[200px] truncate" title={entry.detail}>
+                              {entry.detail}
+                            </span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
@@ -427,10 +551,12 @@ export function EndpointEditor({
             )}
 
             {!testResult && !testError && !isTesting && (
-              <div className="text-center py-12 text-muted-foreground/40">
+              <div className="text-center py-8 text-muted-foreground/40">
                 <Send className="w-8 h-8 mx-auto mb-3 opacity-30" />
                 <p className="text-xs">
-                  Click &quot;Send Request&quot; to test this endpoint
+                  {hasBody
+                    ? "Edit the request body above, then click \"Send Request\""
+                    : "Click \"Send Request\" to test this endpoint"}
                 </p>
               </div>
             )}

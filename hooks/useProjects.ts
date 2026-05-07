@@ -8,6 +8,7 @@ interface Project {
     pages?: any[]; // New multi-page support
     globalComponents?: Record<string, any>; // Global component templates
     apiEndpoints?: any[]; // Backend API endpoint definitions
+    dbSchema?: any[]; // Database schema definitions
     createdAt: any;
     updatedAt: any;
 }

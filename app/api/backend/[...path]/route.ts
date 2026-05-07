@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { ApiEndpoint } from "@/types/backend";
+import { executePipeline } from "@/lib/pipeline-executor";
+import { createFirestoreDelegate } from "@/lib/pipeline-delegates";
 
 /**
  * Dynamic catch-all API route that serves mock data
@@ -11,7 +13,8 @@ import { ApiEndpoint } from "@/types/backend";
  * Required header: x-project-id
  *
  * Matches the incoming method + path against the project's
- * apiEndpoints array and returns the configured mock response.
+ * apiEndpoints array. If the endpoint has a Logic Pipeline enabled,
+ * executes the pipeline steps. Otherwise returns the configured mock response.
  */
 async function handleRequest(
   request: NextRequest,
@@ -66,7 +69,41 @@ async function handleRequest(
       );
     }
 
-    // Return mock response
+    // ── Pipeline Mode ─────────────────────────────────────────────
+    if (endpoint.usePipeline && endpoint.pipeline && endpoint.pipeline.length > 0) {
+      let body: Record<string, any> = {};
+      try {
+        body = await request.json();
+      } catch {
+        // No body or invalid JSON
+      }
+
+      const query: Record<string, any> = {};
+      request.nextUrl.searchParams.forEach((v, k) => { query[k] = v; });
+
+      const headers: Record<string, string> = {};
+      request.headers.forEach((v, k) => { headers[k] = v; });
+
+      // Create delegate for DB/Hash operations scoped to this project
+      const delegate = createFirestoreDelegate(projectId);
+
+      const result = await executePipeline(endpoint.pipeline, {
+        body,
+        query,
+        headers,
+      }, delegate);
+
+      return NextResponse.json(result.body, {
+        status: result.status,
+        headers: {
+          "X-Layr-Endpoint": endpoint.name,
+          "X-Layr-Data-Source": "pipeline",
+          "X-Layr-Pipeline-Trace": JSON.stringify(result.trace),
+        },
+      });
+    }
+
+    // ── Mock Mode (default) ───────────────────────────────────────
     const statusCode = endpoint.statusCode || 200;
     const mockData = endpoint.mockResponse;
 

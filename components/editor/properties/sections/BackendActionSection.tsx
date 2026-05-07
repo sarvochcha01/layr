@@ -8,9 +8,11 @@ import {
   ACTION_TRIGGERS,
   PAYLOAD_SOURCES,
   SUCCESS_ACTIONS,
+  FAIL_ACTIONS,
   ActionTrigger,
   PayloadSource,
   ActionOnSuccess,
+  ActionOnFail,
 } from "@/types/backend";
 import { Page } from "@/types/editor";
 import {
@@ -535,6 +537,63 @@ export function BackendActionSection({
                     handleUpdate({ redirectUrl: e.target.value })
                   }
                   className="w-full px-2.5 py-1.5 text-[10px] bg-muted/30 border border-border rounded-md outline-none focus:ring-1 focus:ring-emerald-500/40 text-foreground appearance-none cursor-pointer"
+                >
+                  <option value="">— select page —</option>
+                  {pages.map((page) => (
+                    <option key={page.id} value={`/${page.slug}`}>
+                      {page.name} (/{page.slug})
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
+
+            {/* ── Fail Behavior ──────────────────────────── */}
+            <div className="space-y-1.5">
+              <Label className="text-xs font-medium text-muted-foreground">
+                On Fail
+              </Label>
+              <div className="grid grid-cols-3 gap-1">
+                {FAIL_ACTIONS.map((a) => (
+                  <button
+                    key={a.value}
+                    onClick={() =>
+                      handleUpdate({
+                        onFail: a.value as ActionOnFail,
+                      })
+                    }
+                    className={`px-2.5 py-1.5 rounded-md border text-[10px] font-medium transition-colors ${
+                      (backendAction.onFail || "toast") === a.value
+                        ? "bg-red-500/10 border-red-500/20 text-red-400"
+                        : "bg-muted/30 border-border text-muted-foreground/70 hover:bg-muted/50"
+                    }`}
+                  >
+                    {a.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Fail toast message */}
+              {(backendAction.onFail || "toast") === "toast" && (
+                <input
+                  type="text"
+                  value={backendAction.failMessage || ""}
+                  onChange={(e) =>
+                    handleUpdate({ failMessage: e.target.value })
+                  }
+                  placeholder="Custom error message (leave empty for server error)"
+                  className="w-full px-2.5 py-1.5 text-[10px] bg-muted/30 border border-border rounded-md outline-none focus:ring-1 focus:ring-red-500/40 text-foreground placeholder:text-muted-foreground/30"
+                />
+              )}
+
+              {/* Fail redirect */}
+              {backendAction.onFail === "redirect" && (
+                <select
+                  value={backendAction.failRedirectUrl || ""}
+                  onChange={(e) =>
+                    handleUpdate({ failRedirectUrl: e.target.value })
+                  }
+                  className="w-full px-2.5 py-1.5 text-[10px] bg-muted/30 border border-border rounded-md outline-none focus:ring-1 focus:ring-red-500/40 text-foreground appearance-none cursor-pointer"
                 >
                   <option value="">— select page —</option>
                   {pages.map((page) => (

@@ -10,7 +10,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Loading } from "@/components/ui/loading";
 import { BackendEditorLayout } from "@/components/editor/backend/BackendEditorLayout";
-import { ApiEndpoint } from "@/types/backend";
+import { ApiEndpoint, DbCollection } from "@/types/backend";
 
 // Utility to recursively remove undefined values so Firebase doesn't complain
 const sanitizeForFirestore = (obj: any): any => {
@@ -37,6 +37,7 @@ export default function BackendEditorPage() {
   const queryClient = useQueryClient();
 
   const [apiEndpoints, setApiEndpoints] = useState<ApiEndpoint[]>([]);
+  const [dbSchema, setDbSchema] = useState<DbCollection[]>([]);
   const [projectName, setProjectName] = useState("");
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [isSavingManual, setIsSavingManual] = useState(false);
@@ -87,6 +88,7 @@ export default function BackendEditorPage() {
   useEffect(() => {
     if (projectData && isInitialLoad) {
       setApiEndpoints(projectData.apiEndpoints || []);
+      setDbSchema(projectData.dbSchema || []);
       setProjectName(projectData.name || "Untitled Project");
       setIsInitialLoad(false);
     }
@@ -99,6 +101,7 @@ export default function BackendEditorPage() {
     const timeoutId = setTimeout(() => {
       const updates = sanitizeForFirestore({
         apiEndpoints,
+        dbSchema,
       });
 
       updateProjectMutation.mutate({
@@ -109,7 +112,7 @@ export default function BackendEditorPage() {
     }, 2000);
 
     return () => clearTimeout(timeoutId);
-  }, [apiEndpoints, projectId, user, isInitialLoad]);
+  }, [apiEndpoints, dbSchema, projectId, user, isInitialLoad]);
 
   // Manual save
   const handleManualSave = async () => {
@@ -119,6 +122,7 @@ export default function BackendEditorPage() {
     try {
       const updates = sanitizeForFirestore({
         apiEndpoints,
+        dbSchema,
       });
 
       await updateProjectMutation.mutateAsync({
@@ -152,6 +156,8 @@ export default function BackendEditorPage() {
     <BackendEditorLayout
       endpoints={apiEndpoints}
       onEndpointsChange={setApiEndpoints}
+      dbSchema={dbSchema}
+      onDbSchemaChange={setDbSchema}
       projectId={projectId}
       projectName={projectName}
       onSave={handleManualSave}
