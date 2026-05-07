@@ -36,15 +36,23 @@
 
 /* Data wire colors — applied via edge className */
 .pipeline-graph .react-flow__edge.data-wire .react-flow__edge-path {
-  stroke: #9ca3af;
+  stroke: #6b7280;
   stroke-width: 2;
+  transition: stroke 0.15s ease, stroke-width 0.15s ease, filter 0.15s ease;
 }
 
-.pipeline-graph .react-flow__edge.data-wire.selected .react-flow__edge-path,
+/* Selected edge — bright and obvious */
+.pipeline-graph .react-flow__edge.data-wire.selected .react-flow__edge-path {
+  stroke: #818cf8;
+  stroke-width: 3;
+  filter: drop-shadow(0 0 6px rgba(129, 140, 248, 0.7));
+}
+
+/* Hovered edge */
 .pipeline-graph .react-flow__edge.data-wire:hover .react-flow__edge-path {
-  stroke: #d1d5db;
+  stroke: #a5b4fc;
   stroke-width: 2.5;
-  filter: drop-shadow(0 0 3px rgba(156, 163, 175, 0.5));
+  filter: drop-shadow(0 0 3px rgba(165, 180, 252, 0.4));
 }
 
 /* Connection line while dragging */
@@ -200,16 +208,21 @@
 }
 
 /* ── Context Menu ───────────────────────────────────────────────────── */
+/* Portaled to document.body — uses fixed positioning, needs explicit solid bg */
 .node-context-menu {
-  position: absolute;
-  z-index: 100;
-  min-width: 200px;
-  background: hsl(var(--card));
-  border: 1px solid hsl(var(--border));
+  /* Hard-coded dark background so it's ALWAYS opaque, never transparent */
+  background: #1a1a2e !important;
+  background-color: #1a1a2e !important;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 10px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  min-width: 220px;
   overflow: hidden;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.06),
+    0 20px 60px rgba(0, 0, 0, 0.7),
+    0 4px 20px rgba(0, 0, 0, 0.4);
   animation: nodeMenuFadeIn 0.12s ease-out;
+  /* z-index set inline via style prop */
 }
 
 @keyframes nodeMenuFadeIn {
@@ -230,7 +243,7 @@
   width: 100%;
   padding: 8px 12px;
   font-size: 11px;
-  color: hsl(var(--foreground));
+  color: #e2e8f0;
   cursor: pointer;
   transition: background 0.1s;
   border: none;
@@ -239,7 +252,7 @@
 }
 
 .node-context-menu-item:hover {
-  background: hsl(var(--muted) / 0.5);
+  background: rgba(255, 255, 255, 0.07);
 }
 
 .node-context-menu-section {
@@ -248,8 +261,8 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: hsl(var(--muted-foreground) / 0.35);
-  border-top: 1px solid hsl(var(--border) / 0.3);
+  color: rgba(148, 163, 184, 0.5);
+  border-top: 1px solid rgba(255,255,255,0.06);
 }
 
 .node-context-menu-section:first-child {
@@ -260,6 +273,50 @@
   height: 1px;
   background: hsl(var(--border));
   margin: 2px 0;
+}
+
+/* Search bar */
+.node-context-menu-search-wrap {
+  padding: 8px 8px 4px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+
+.node-context-menu-search {
+  width: 100%;
+  padding: 5px 9px;
+  font-size: 11px;
+  font-family: inherit;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 6px;
+  color: #e2e8f0;
+  outline: none;
+  transition: border-color 0.15s ease;
+  box-sizing: border-box;
+}
+
+.node-context-menu-search:focus {
+  border-color: rgba(129,140,248,0.5);
+  background: rgba(255,255,255,0.09);
+}
+
+.node-context-menu-search::placeholder {
+  color: rgba(148,163,184,0.4);
+}
+
+.node-context-menu-header {
+  padding: 5px 12px 3px;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(148,163,184,0.45);
+}
+
+/* ── Collection Node ────────────────────────────────────────────────── */
+.collection-node .pipeline-node-header {
+  background: rgba(139, 92, 246, 0.12);
+  color: #a78bfa;
 }
 
 
