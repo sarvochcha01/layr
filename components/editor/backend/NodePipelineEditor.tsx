@@ -181,8 +181,10 @@ interface NodePipelineEditorProps {
   dbSchema?: DbCollection[];
 }
 
+const EMPTY_PIPELINE: PipelineStep[] = [];
+
 function NodePipelineEditorInner({ endpoint, onChange, dbSchema = [] }: NodePipelineEditorProps) {
-  const pipeline = endpoint.pipeline || [];
+  const pipeline = endpoint.pipeline ?? EMPTY_PIPELINE;
 
   // ── Step change handler (stable ref pattern to avoid node rebuild on every change) ──
   const onStepChangeRef = useRef<(id: string, u: Partial<PipelineStep>) => void>(() => {});
@@ -216,10 +218,13 @@ function NodePipelineEditorInner({ endpoint, onChange, dbSchema = [] }: NodePipe
   const pipelineRef = useRef(pipeline);
   const dbSchemaRef = useRef(dbSchema);
   const connectedCollectionsRef = useRef(connectedCollections);
+  const endpointRef = useRef(endpoint);
+  endpointRef.current = endpoint;
   useEffect(() => {
     const pipelineChanged = pipeline !== pipelineRef.current;
     const schemaChanged = dbSchema !== dbSchemaRef.current;
-    const collectionsChanged = connectedCollections !== connectedCollectionsRef.current;
+    // Deep compare connectedCollections since useMemo always returns a new object ref
+    const collectionsChanged = JSON.stringify(connectedCollections) !== JSON.stringify(connectedCollectionsRef.current);
 
     pipelineRef.current = pipeline;
     dbSchemaRef.current = dbSchema;
@@ -228,11 +233,12 @@ function NodePipelineEditorInner({ endpoint, onChange, dbSchema = [] }: NodePipe
     if (pipelineChanged || schemaChanged || collectionsChanged) {
       setNodes((curr) => {
         const selectedIds = new Set(curr.filter((n) => n.selected).map((n) => n.id));
-        return buildNodes(pipeline, endpoint, stableOnStepChange, dbSchema, connectedCollections)
+        return buildNodes(pipeline, endpointRef.current, stableOnStepChange, dbSchema, connectedCollections)
           .map((n) => ({ ...n, selected: selectedIds.has(n.id) }));
       });
     }
-  }, [pipeline, endpoint, stableOnStepChange, dbSchema, connectedCollections]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pipeline, stableOnStepChange, dbSchema, connectedCollections]);
 
   // ── Context menu state ─────────────────────────────────────────────
   const [contextMenu, setContextMenu] = useState<{
