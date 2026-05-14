@@ -341,6 +341,8 @@ function FormFieldsEditor({ fields, updateProp }: { fields: any[]; updateProp: (
                 className="w-full h-7 px-1 text-xs bg-background text-foreground appearance-none focus:outline-none">
                 <option value="text">Text</option>
                 <option value="email">Email</option>
+                <option value="password">Password</option>
+                <option value="number">Number</option>
                 <option value="tel">Phone</option>
                 <option value="textarea">Textarea</option>
                 <option value="select">Select</option>

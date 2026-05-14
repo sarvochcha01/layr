@@ -10,7 +10,7 @@ import { BackendAction } from "@/types/backend";
 
 interface FormField {
   id: string;
-  type: "text" | "email" | "tel" | "textarea" | "select" | "checkbox" | "radio";
+  type: "text" | "email" | "password" | "tel" | "number" | "textarea" | "select" | "checkbox" | "radio";
   label: string;
   placeholder?: string;
   required?: boolean;
@@ -35,6 +35,8 @@ interface FormProps {
   backendAction?: BackendAction;
   /** Project ID for backend calls */
   projectId?: string;
+  /** Callback for internal page navigation */
+  onNavigate?: (slug: string) => void;
   [key: string]: any;
 }
 
@@ -54,6 +56,7 @@ export function Form({
   themeStyle,
   backendAction,
   projectId,
+  onNavigate,
   ...rest
 }: FormProps) {
   const effectiveTheme = useEffectiveThemeStyle(themeStyle, themeStyle !== undefined);
@@ -169,7 +172,14 @@ export function Form({
         if (backendAction.onSuccess === "reset") {
           formRef.current.reset();
         } else if (backendAction.onSuccess === "redirect" && backendAction.redirectUrl) {
-          window.location.href = backendAction.redirectUrl;
+          const url = backendAction.redirectUrl;
+          if (url.startsWith("/") && !url.startsWith("//") && onNavigate) {
+            // Internal page — use onNavigate for SPA routing
+            const slug = url.replace(/^\/+/, ""); // strip leading slash
+            onNavigate(slug);
+          } else {
+            window.location.href = url;
+          }
         }
 
         // Auto-clear success message

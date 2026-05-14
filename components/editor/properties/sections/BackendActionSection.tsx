@@ -434,7 +434,7 @@ export function BackendActionSection({
                                 <option value="">— select field —</option>
                                 {formFields.map((f) => (
                                   <option key={f.id} value={f.id}>
-                                    {f.label} ({f.id})
+                                    {f.label || f.id}
                                   </option>
                                 ))}
                               </select>

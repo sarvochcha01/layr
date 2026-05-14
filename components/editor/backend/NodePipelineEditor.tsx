@@ -150,17 +150,33 @@ function buildNodes(
   return nodes;
 }
 
+/** Handle IDs that are exec-flow pins */
+const EXEC_HANDLES = new Set([
+  "exec-in", "exec-out", "exec-pass", "exec-fail",
+  "exec-true", "exec-false", "exec-match", "exec-mismatch",
+]);
+
+function isExecEdge(sourceHandle?: string, targetHandle?: string): boolean {
+  return EXEC_HANDLES.has(sourceHandle || "") || EXEC_HANDLES.has(targetHandle || "");
+}
+
 function buildEdges(saved?: PipelineEdge[]): Edge[] {
-  return (saved || []).map((e) => ({
-    id: e.id,
-    source: e.source,
-    sourceHandle: e.sourceHandle,
-    target: e.target,
-    targetHandle: e.targetHandle,
-    type: "smoothstep",
-    style: { stroke: "#6b7280", strokeWidth: 2 },
-    className: "data-wire",
-  }));
+  return (saved || []).map((e) => {
+    const exec = e.kind === "exec" || isExecEdge(e.sourceHandle, e.targetHandle);
+    return {
+      id: e.id,
+      source: e.source,
+      sourceHandle: e.sourceHandle,
+      target: e.target,
+      targetHandle: e.targetHandle,
+      type: "smoothstep",
+      style: exec
+        ? { stroke: "#e2e8f0", strokeWidth: 3 }
+        : { stroke: "#6b7280", strokeWidth: 2 },
+      className: exec ? "exec-wire" : "data-wire",
+      data: { kind: exec ? "exec" : "data" },
+    };
+  });
 }
 
 function edgesToPipelineEdges(edges: Edge[]): PipelineEdge[] {
@@ -170,6 +186,9 @@ function edgesToPipelineEdges(edges: Edge[]): PipelineEdge[] {
     sourceHandle: e.sourceHandle || "",
     target: e.target,
     targetHandle: e.targetHandle || "",
+    kind: (e.data?.kind === "exec" || isExecEdge(e.sourceHandle || "", e.targetHandle || ""))
+      ? "exec" as const
+      : "data" as const,
   }));
 }
 
@@ -350,12 +369,16 @@ function NodePipelineEditorInner({ endpoint, onChange, dbSchema = [] }: NodePipe
   // ── Connect handler ────────────────────────────────────────────────
   const onConnect: OnConnect = useCallback((connection: Connection) => {
     setEdges((eds) => {
+      const exec = isExecEdge(connection.sourceHandle || "", connection.targetHandle || "");
       const newEdge: Edge = {
         ...connection,
         id: `e-${generateId()}`,
         type: "smoothstep",
-        style: { stroke: "#6b7280", strokeWidth: 2 },
-        className: "data-wire",
+        style: exec
+          ? { stroke: "#e2e8f0", strokeWidth: 3 }
+          : { stroke: "#6b7280", strokeWidth: 2 },
+        className: exec ? "exec-wire" : "data-wire",
+        data: { kind: exec ? "exec" : "data" },
       };
       const updated = addEdge(newEdge, eds);
       // Persist immediately
@@ -580,7 +603,7 @@ function NodePipelineEditorInner({ endpoint, onChange, dbSchema = [] }: NodePipe
 
 export function NodePipelineEditor(props: NodePipelineEditorProps) {
   return (
-    <ReactFlowProvider>
+    <ReactFlowProvider key={props.endpoint.id}>
       <NodePipelineEditorInner {...props} />
     </ReactFlowProvider>
   );

@@ -286,6 +286,7 @@ export interface PipelineEdge {
   sourceHandle: string; // Output handle ID
   target: string;       // Target node ID
   targetHandle: string; // Input handle ID
+  kind?: "exec" | "data"; // "exec" = execution flow wire, "data" = data wire (default)
 }
 
 /** Display metadata for each step type — used in the UI */
