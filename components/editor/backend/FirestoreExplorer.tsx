@@ -310,7 +310,7 @@ export function FirestoreExplorer({
             schemaFields={schemaFieldNames}
           />
         ) : (
-          <div className="flex-1 flex items-center justify-center text-white/20 text-xs">
+          <div className="flex-1 flex items-center justify-center p-6 text-center text-white/20 text-xs">
             Select a collection to view documents
           </div>
         )}
