@@ -2,6 +2,7 @@
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import { Type, Search, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { DebouncedInput } from "../fields";
 import { Label } from "@/components/ui/label";
 import { StyleSectionProps } from "../types";
 import {
@@ -224,7 +225,7 @@ export function TypographySection({ props, updateProp }: StyleSectionProps) {
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
             <Label className={labelClass}>Font Size</Label>
-            <Input value={props.fontSize_css || ""} onChange={(e) => updateProp("fontSize_css", e.target.value)} placeholder="16px" className="h-8 text-xs" />
+            <DebouncedInput value={props.fontSize_css || ""} onChange={(v) => updateProp("fontSize_css", v)} placeholder="16px" className="h-8 text-xs" />
           </div>
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
@@ -254,7 +255,7 @@ export function TypographySection({ props, updateProp }: StyleSectionProps) {
           </div>
           <div className="space-y-1.5">
             <Label className={labelClass}>Line Height</Label>
-            <Input value={props.lineHeight_css || ""} onChange={(e) => updateProp("lineHeight_css", e.target.value)} placeholder="1.5" className="h-8 text-xs" />
+            <DebouncedInput value={props.lineHeight_css || ""} onChange={(v) => updateProp("lineHeight_css", v)} placeholder="1.5" className="h-8 text-xs" />
           </div>
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
@@ -268,7 +269,7 @@ export function TypographySection({ props, updateProp }: StyleSectionProps) {
                 </button>
               )}
             </div>
-            <Input value={props.letterSpacing_css || ""} onChange={(e) => updateProp("letterSpacing_css", e.target.value)} placeholder={themeLetterSpacing} className="h-8 text-xs" />
+            <DebouncedInput value={props.letterSpacing_css || ""} onChange={(v) => updateProp("letterSpacing_css", v)} placeholder={themeLetterSpacing} className="h-8 text-xs" />
           </div>
         </div>
         <div className="space-y-1.5">

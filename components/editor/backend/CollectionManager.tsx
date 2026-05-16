@@ -12,6 +12,7 @@ import {
   Timestamp,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { DbCollection } from "@/types/backend";
 import {
   Database,
   RefreshCw,
@@ -26,6 +27,7 @@ import {
 
 interface CollectionManagerProps {
   projectId: string | null;
+  dbSchema?: DbCollection[];
 }
 
 interface CollectionInfo {
@@ -39,7 +41,7 @@ interface CollectionInfo {
  * Collection Manager — lets users browse and inspect documents
  * stored in their project's database (under projects/{projectId}/data/*).
  */
-export function CollectionManager({ projectId }: CollectionManagerProps) {
+export function CollectionManager({ projectId, dbSchema = [] }: CollectionManagerProps) {
   const [collections, setCollections] = useState<CollectionInfo[]>([]);
   const [expandedCollection, setExpandedCollection] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -56,7 +58,8 @@ export function CollectionManager({ projectId }: CollectionManagerProps) {
       // We can't list sub-collections in client SDK, so we use a known-names approach.
       // Parse collection names from all known step configs in all endpoints.
       // Additionally, try a set of common names.
-      const commonNames = [...new Set([...knownCollections, "users", "posts", "products", "orders", "sessions"])];
+      const schemaNames = dbSchema.map((c) => c.name).filter(Boolean);
+      const commonNames = [...new Set([...knownCollections, ...schemaNames, "users", "posts", "products", "orders", "sessions"])];
 
       const results: CollectionInfo[] = [];
 
@@ -87,7 +90,7 @@ export function CollectionManager({ projectId }: CollectionManagerProps) {
     } finally {
       setIsLoading(false);
     }
-  }, [projectId, knownCollections]);
+  }, [projectId, knownCollections, dbSchema]);
 
   // Register a collection name (called externally or from the input)
   const addCollectionName = (name: string) => {

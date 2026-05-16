@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Paintbrush } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { DebouncedInput } from "../fields";
 import { Label } from "@/components/ui/label";
 import { StyleSectionProps } from "../types";
 import {
@@ -17,14 +18,7 @@ const selectClass = "w-full h-8 px-2 text-xs bg-transparent appearance-none focu
 const sectionTriggerClass = "hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50";
 const sectionContentClass = "px-4 pb-4 pt-2 space-y-4";
 
-/** Local-state input that commits on blur/Enter to prevent keystroke lag */
-function LocalTextInput({ value, onChange, placeholder, className }: { value: string; onChange: (v: string) => void; placeholder?: string; className?: string }) {
-  const [localValue, setLocalValue] = useState(value || "");
-  const prevRef = useRef(value);
-  useEffect(() => { if (value !== prevRef.current) { setLocalValue(value || ""); prevRef.current = value; } }, [value]);
-  const commit = () => { if (localValue !== value) { onChange(localValue); prevRef.current = localValue; } };
-  return <Input value={localValue} onChange={(e) => setLocalValue(e.target.value)} onBlur={commit} onKeyDown={(e) => { if (e.key === "Enter") { commit(); (e.target as HTMLInputElement).blur(); } }} placeholder={placeholder} className={className} />;
-}
+
 
 export function FillSection({ props, updateProp, componentType }: StyleSectionProps) {
   const bgType = props.backgroundType || "solid";
@@ -109,7 +103,7 @@ export function FillSection({ props, updateProp, componentType }: StyleSectionPr
             </div>
             <div className="flex gap-2 items-center">
               <Input type="color" value={props.backgroundColor || defaultBg} onChange={(e) => updateProp("backgroundColor", e.target.value)} className="w-8 h-8 p-0.5 min-h-0 cursor-pointer" />
-              <Input type="text" value={props.backgroundColor || defaultBg} onChange={(e) => updateProp("backgroundColor", e.target.value)} className="flex-1 h-8 text-xs font-mono" />
+              <DebouncedInput value={props.backgroundColor || defaultBg} onChange={(v) => updateProp("backgroundColor", v)} className="flex-1 h-8 text-xs font-mono" />
               {!props.backgroundColor && activeTheme && (
                 <span className="text-[9px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded flex-shrink-0">theme</span>
               )}
@@ -124,14 +118,14 @@ export function FillSection({ props, updateProp, componentType }: StyleSectionPr
               <Label className={labelClass}>Start Color</Label>
               <div className="flex gap-2 items-center">
                 <Input type="color" value={props.gradientStart || "#667eea"} onChange={(e) => updateProp("gradientStart", e.target.value)} className="w-8 h-8 p-0.5 min-h-0 cursor-pointer" />
-                <Input type="text" value={props.gradientStart || "#667eea"} onChange={(e) => updateProp("gradientStart", e.target.value)} className="flex-1 h-8 text-xs font-mono" />
+                <DebouncedInput value={props.gradientStart || "#667eea"} onChange={(v) => updateProp("gradientStart", v)} className="flex-1 h-8 text-xs font-mono" />
               </div>
             </div>
             <div className="space-y-1.5">
               <Label className={labelClass}>End Color</Label>
               <div className="flex gap-2 items-center">
                 <Input type="color" value={props.gradientEnd || "#764ba2"} onChange={(e) => updateProp("gradientEnd", e.target.value)} className="w-8 h-8 p-0.5 min-h-0 cursor-pointer" />
-                <Input type="text" value={props.gradientEnd || "#764ba2"} onChange={(e) => updateProp("gradientEnd", e.target.value)} className="flex-1 h-8 text-xs font-mono" />
+                <DebouncedInput value={props.gradientEnd || "#764ba2"} onChange={(v) => updateProp("gradientEnd", v)} className="flex-1 h-8 text-xs font-mono" />
               </div>
             </div>
             <div className="space-y-1.5">
@@ -173,7 +167,7 @@ export function FillSection({ props, updateProp, componentType }: StyleSectionPr
           <>
             <div className="space-y-1.5">
               <Label className={labelClass}>Image URL</Label>
-              <LocalTextInput value={props.backgroundImageUrl || ""} onChange={(v) => updateProp("backgroundImageUrl", v)} placeholder="https://example.com/bg.jpg" className="h-8 text-xs" />
+              <DebouncedInput value={props.backgroundImageUrl || ""} onChange={(v) => updateProp("backgroundImageUrl", v)} placeholder="https://example.com/bg.jpg" className="h-8 text-xs" />
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1.5">
@@ -241,7 +235,7 @@ export function FillSection({ props, updateProp, componentType }: StyleSectionPr
           </div>
           <div className="flex gap-2 items-center">
             <Input type="color" value={props.textColor || defaultText} onChange={(e) => updateProp("textColor", e.target.value)} className="w-8 h-8 p-0.5 min-h-0 cursor-pointer" />
-            <Input type="text" value={props.textColor || defaultText} onChange={(e) => updateProp("textColor", e.target.value)} className="flex-1 h-8 text-xs font-mono" />
+            <DebouncedInput value={props.textColor || defaultText} onChange={(v) => updateProp("textColor", v)} className="flex-1 h-8 text-xs font-mono" />
             {!props.textColor && activeTheme && (
               <span className="text-[9px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded flex-shrink-0">theme</span>
             )}

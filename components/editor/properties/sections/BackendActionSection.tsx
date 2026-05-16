@@ -37,6 +37,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { generateId } from "@/lib/utils";
+import { DebouncedInput } from "../fields";
 
 interface BackendActionSectionProps {
   props: Record<string, any>;
@@ -289,12 +290,12 @@ export function BackendActionSection({
                   <Label className="text-[10px] text-muted-foreground/60 whitespace-nowrap">
                     Every
                   </Label>
-                  <input
+                  <DebouncedInput
                     type="number"
-                    value={backendAction.intervalMs || 5000}
-                    onChange={(e) =>
+                    value={String(backendAction.intervalMs || 5000)}
+                    onChange={(v) =>
                       handleUpdate({
-                        intervalMs: Math.max(1000, parseInt(e.target.value) || 5000),
+                        intervalMs: Math.max(1000, parseInt(v) || 5000),
                       })
                     }
                     className="w-20 px-2 py-1 text-[10px] bg-muted/30 border border-border rounded outline-none focus:ring-1 focus:ring-blue-500/40 font-mono text-foreground"
@@ -308,6 +309,8 @@ export function BackendActionSection({
               )}
             </div>
 
+            {componentType === "Form" ? (
+              <>
             {/* ── Payload Source ──────────────────────────── */}
             <div className="space-y-1.5">
               <Label className="text-xs font-medium text-muted-foreground">
@@ -490,6 +493,78 @@ export function BackendActionSection({
                   </div>
                 </div>
               )}
+              </>
+            ) : (
+              <div className="space-y-2">
+                {selectedEndpoint && (selectedEndpoint.requestBody || []).length > 0 ? (
+                  <>
+                    <Label className="text-xs font-medium text-muted-foreground">
+                      Request Body
+                    </Label>
+                    <div className="space-y-2.5">
+                      {(selectedEndpoint.requestBody || []).map((field) => (
+                        <div key={field.id} className="space-y-1">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-[10px] font-mono text-foreground/80">
+                              {field.name}
+                            </span>
+                            <span className="text-[9px] font-mono px-1 py-0.5 rounded bg-muted/50 text-muted-foreground/40">
+                              {field.type}
+                            </span>
+                            {field.required && (
+                              <span className="text-[9px] text-red-400 font-medium">*</span>
+                            )}
+                          </div>
+                          {field.type === "boolean" ? (
+                            <select
+                              value={String(backendAction.staticPayload?.[field.name] ?? "")}
+                              onChange={(e) =>
+                                handleUpdate({
+                                  staticPayload: {
+                                    ...backendAction.staticPayload,
+                                    [field.name]: e.target.value === "" ? undefined : e.target.value === "true",
+                                  },
+                                })
+                              }
+                              className="w-full text-[10px] font-mono px-2 py-1.5 rounded border border-border bg-muted/30 text-foreground outline-none focus:ring-1 focus:ring-blue-500/40 appearance-none cursor-pointer"
+                            >
+                              <option value="">— select —</option>
+                              <option value="true">true</option>
+                              <option value="false">false</option>
+                            </select>
+                          ) : (
+                            <DebouncedInput
+                              value={String(backendAction.staticPayload?.[field.name] ?? "")}
+                              onChange={(v) => {
+                                let parsed: any = v;
+                                if (field.type === "number" && v !== "") parsed = Number(v);
+                                handleUpdate({
+                                  staticPayload: {
+                                    ...backendAction.staticPayload,
+                                    [field.name]: v === "" ? undefined : parsed,
+                                  },
+                                });
+                              }}
+                              type={field.type === "number" ? "number" : "text"}
+                              placeholder={field.description || `Enter ${field.name}...`}
+                              className="w-full px-2.5 py-1.5 text-[10px] font-mono bg-muted/30 border border-border rounded-md outline-none focus:ring-1 focus:ring-blue-500/40 text-foreground placeholder:text-muted-foreground/30"
+                            />
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-[9px] text-muted-foreground/40 text-center py-3 border border-dashed border-border rounded-md">
+                    <p>No request body fields defined.</p>
+                    <p className="mt-0.5">
+                      Add fields in the{" "}
+                      <span className="text-blue-400 font-medium">Backend Editor</span>.
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* ── Success Behavior ────────────────────────── */}
             <div className="space-y-1.5">
@@ -518,11 +593,10 @@ export function BackendActionSection({
 
               {/* Toast message */}
               {backendAction.onSuccess === "toast" && (
-                <input
-                  type="text"
+                <DebouncedInput
                   value={backendAction.successMessage || ""}
-                  onChange={(e) =>
-                    handleUpdate({ successMessage: e.target.value })
+                  onChange={(v) =>
+                    handleUpdate({ successMessage: v })
                   }
                   placeholder="Success message..."
                   className="w-full px-2.5 py-1.5 text-[10px] bg-muted/30 border border-border rounded-md outline-none focus:ring-1 focus:ring-emerald-500/40 text-foreground placeholder:text-muted-foreground/30"
@@ -575,11 +649,10 @@ export function BackendActionSection({
 
               {/* Fail toast message */}
               {(backendAction.onFail || "toast") === "toast" && (
-                <input
-                  type="text"
+                <DebouncedInput
                   value={backendAction.failMessage || ""}
-                  onChange={(e) =>
-                    handleUpdate({ failMessage: e.target.value })
+                  onChange={(v) =>
+                    handleUpdate({ failMessage: v })
                   }
                   placeholder="Custom error message (leave empty for server error)"
                   className="w-full px-2.5 py-1.5 text-[10px] bg-muted/30 border border-border rounded-md outline-none focus:ring-1 focus:ring-red-500/40 text-foreground placeholder:text-muted-foreground/30"

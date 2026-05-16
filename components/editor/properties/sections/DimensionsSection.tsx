@@ -2,6 +2,7 @@
 import React from "react";
 import { Scissors } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { DebouncedInput } from "../fields";
 import { Label } from "@/components/ui/label";
 import { StyleSectionProps } from "../types";
 import {
@@ -52,14 +53,12 @@ export function DimensionsSection({ props, updateProp }: StyleSectionProps) {
           <div className="space-y-1.5">
             <Label className={labelClass}>Width</Label>
             <div className="flex gap-0 border rounded-md overflow-hidden focus-within:ring-1 focus-within:ring-primary">
-              <Input
+              <DebouncedInput
                 type="number"
                 value={width.value}
-                onChange={(e) => updateProp("width", combineDimensionAllowEmpty(e.target.value, width.unit))}
-                onBlur={(e) => { if (!e.target.value && width.unit !== "auto") updateProp("width", "auto"); }}
+                onChange={(v) => updateProp("width", !v && width.unit !== "auto" ? "auto" : combineDimensionAllowEmpty(v, width.unit))}
                 placeholder="auto"
                 className="flex-1 h-8 text-xs border-0 rounded-none shadow-none focus-visible:ring-0 px-2"
-                disabled={width.unit === "auto"}
               />
               <select
                 value={width.unit}
@@ -81,14 +80,12 @@ export function DimensionsSection({ props, updateProp }: StyleSectionProps) {
           <div className="space-y-1.5">
             <Label className={labelClass}>Height</Label>
             <div className="flex gap-0 border rounded-md overflow-hidden focus-within:ring-1 focus-within:ring-primary">
-              <Input
+              <DebouncedInput
                 type="number"
                 value={height.value}
-                onChange={(e) => updateProp("height", combineDimensionAllowEmpty(e.target.value, height.unit))}
-                onBlur={(e) => { if (!e.target.value && height.unit !== "auto") updateProp("height", "auto"); }}
+                onChange={(v) => updateProp("height", !v && height.unit !== "auto" ? "auto" : combineDimensionAllowEmpty(v, height.unit))}
                 placeholder="auto"
                 className="flex-1 h-8 text-xs border-0 rounded-none shadow-none focus-visible:ring-0 px-2"
-                disabled={height.unit === "auto"}
               />
               <select
                 value={height.unit}

@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { Layout } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { DebouncedInput } from "../fields";
 import { Label } from "@/components/ui/label";
 import { StyleSectionProps } from "../types";
 import {
@@ -34,9 +34,9 @@ export function SpacingSection({ props, updateProp }: StyleSectionProps) {
               return (
                 <div key={key} className="space-y-0.5">
                   <span className="text-[10px] text-muted-foreground block text-center">{side[0]}</span>
-                  <Input
+                  <DebouncedInput
                     value={props[key] || ""}
-                    onChange={(e) => updateProp(key, e.target.value)}
+                    onChange={(v) => updateProp(key, v)}
                     placeholder="0"
                     className="h-7 text-xs text-center px-1"
                   />
@@ -53,9 +53,9 @@ export function SpacingSection({ props, updateProp }: StyleSectionProps) {
               return (
                 <div key={key} className="space-y-0.5">
                   <span className="text-[10px] text-muted-foreground block text-center">{side[0]}</span>
-                  <Input
+                  <DebouncedInput
                     value={props[key] || ""}
-                    onChange={(e) => updateProp(key, e.target.value)}
+                    onChange={(v) => updateProp(key, v)}
                     placeholder="0"
                     className="h-7 text-xs text-center px-1"
                   />

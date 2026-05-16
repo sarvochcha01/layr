@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { Layout } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { DebouncedInput } from "../fields";
 import { Label } from "@/components/ui/label";
 import { StyleSectionProps } from "../types";
 import {
@@ -44,14 +44,14 @@ export function PositionSection({ props, updateProp }: StyleSectionProps) {
             {(["posTop", "posRight", "posBottom", "posLeft"] as const).map((key) => (
               <div key={key} className="space-y-1">
                 <Label className={labelClass}>{key.replace("pos", "")}</Label>
-                <Input value={props[key] || ""} onChange={(e) => updateProp(key, e.target.value)} placeholder="auto" className="h-7 text-xs" />
+                <DebouncedInput value={props[key] || ""} onChange={(v) => updateProp(key, v)} placeholder="auto" className="h-7 text-xs" />
               </div>
             ))}
           </div>
         )}
         <div className="space-y-1.5">
           <Label className={labelClass}>Z-Index</Label>
-          <Input type="number" value={props.zIndex || ""} onChange={(e) => updateProp("zIndex", e.target.value)} placeholder="auto" className="h-8 text-xs" />
+          <DebouncedInput type="number" value={props.zIndex || ""} onChange={(v) => updateProp("zIndex", v)} placeholder="auto" className="h-8 text-xs" />
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
