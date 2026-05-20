@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import { Paintbrush } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { DebouncedInput } from "../fields";
 import { Label } from "@/components/ui/label";
 import { StyleSectionProps } from "../types";
 import {
@@ -17,44 +17,7 @@ const selectClass = "w-full h-8 px-2 text-xs bg-transparent appearance-none focu
 const sectionTriggerClass = "hover:no-underline py-3 px-4 text-xs font-semibold opacity-90 uppercase tracking-wide data-[state=open]:bg-muted/50";
 const sectionContentClass = "px-4 pb-4 pt-2 space-y-4";
 
-/**
- * Local-state input for box shadow custom value.
- * Commits on blur/Enter to prevent keystroke lag.
- */
-function BoxShadowInput({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder?: string }) {
-  const [localValue, setLocalValue] = useState(value || "");
-  const prevValueRef = useRef(value);
 
-  useEffect(() => {
-    if (value !== prevValueRef.current) {
-      setLocalValue(value || "");
-      prevValueRef.current = value;
-    }
-  }, [value]);
-
-  const commitValue = () => {
-    if (localValue !== value) {
-      onChange(localValue);
-      prevValueRef.current = localValue;
-    }
-  };
-
-  return (
-    <Input
-      value={localValue}
-      onChange={(e) => setLocalValue(e.target.value)}
-      onBlur={commitValue}
-      onKeyDown={(e) => {
-        if (e.key === "Enter") {
-          commitValue();
-          (e.target as HTMLInputElement).blur();
-        }
-      }}
-      placeholder={placeholder || "Custom: 0 4px 6px rgba(0,0,0,0.1)"}
-      className="h-8 text-xs font-mono"
-    />
-  );
-}
 
 export function EffectsSection({ props, updateProp }: StyleSectionProps) {
   // Get active theme defaults
@@ -114,10 +77,11 @@ export function EffectsSection({ props, updateProp }: StyleSectionProps) {
               <option className="bg-background text-foreground" value="0 25px 50px -12px rgba(0,0,0,0.25)">2XL</option>
             </select>
           </div>
-          <BoxShadowInput
+          <DebouncedInput
             value={props.boxShadow || ""}
             onChange={(v) => updateProp("boxShadow", v)}
-            placeholder={themeShadow !== "none" ? themeShadow : undefined}
+            placeholder={themeShadow !== "none" ? themeShadow : "Custom: 0 4px 6px rgba(0,0,0,0.1)"}
+            className="h-8 text-xs font-mono"
           />
         </div>
       </AccordionContent>

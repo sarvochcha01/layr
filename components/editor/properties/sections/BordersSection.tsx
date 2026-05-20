@@ -2,6 +2,7 @@
 import React from "react";
 import { Scissors } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { DebouncedInput } from "../fields";
 import { Label } from "@/components/ui/label";
 import { StyleSectionProps } from "../types";
 import {
@@ -66,9 +67,9 @@ export function BordersSection({ props, updateProp }: StyleSectionProps) {
                 </button>
               )}
             </div>
-            <Input
+            <DebouncedInput
               value={displayRadius}
-              onChange={(e) => updateProp("borderRadius_css", e.target.value || undefined)}
+              onChange={(v) => updateProp("borderRadius_css", v || undefined)}
               placeholder="0px"
               className={`h-8 text-xs ${isRadiusInherited ? "text-muted-foreground italic" : ""}`}
             />
@@ -85,9 +86,9 @@ export function BordersSection({ props, updateProp }: StyleSectionProps) {
                 </button>
               )}
             </div>
-            <Input
+            <DebouncedInput
               value={displayWidth}
-              onChange={(e) => updateProp("borderWidth_css", e.target.value || undefined)}
+              onChange={(v) => updateProp("borderWidth_css", v || undefined)}
               placeholder="0px"
               className={`h-8 text-xs ${isWidthInherited ? "text-muted-foreground italic" : ""}`}
             />
@@ -113,10 +114,9 @@ export function BordersSection({ props, updateProp }: StyleSectionProps) {
                 onChange={(e) => updateProp("borderColor", e.target.value)}
                 className="w-8 h-8 p-0.5 min-h-0 cursor-pointer"
               />
-              <Input
-                type="text"
+              <DebouncedInput
                 value={props.borderColor || (themeName && themeBorderColor.startsWith("#") ? themeBorderColor : "")}
-                onChange={(e) => updateProp("borderColor", e.target.value || undefined)}
+                onChange={(v) => updateProp("borderColor", v || undefined)}
                 placeholder="#000000"
                 className={`flex-1 h-8 text-xs font-mono ${isColorInherited ? "text-muted-foreground italic" : ""}`}
               />

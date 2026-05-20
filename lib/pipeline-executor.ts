@@ -1,9 +1,9 @@
 /**
- * Pipeline Executor — Phase 1
+ * Pipeline Executor — Graph-Driven
  *
- * Executes an ordered list of PipelineSteps against a PipelineContext.
- * Designed to be runtime-agnostic: it receives a plain context object
- * and returns a plain result, so it can be reused in export targets later.
+ * Executes pipeline steps by following exec wires (like Unreal Blueprints).
+ * Data only flows between nodes that are physically connected by data wires.
+ * Nodes without exec wires are NOT executed.
  */
 
 import {
@@ -37,7 +37,7 @@ export interface PipelineContext {
   response: {
     status: number;
     body: any;
-    ended: boolean; // true when a Respond step or short-circuit fires
+    ended: boolean;
   };
 }
 
@@ -45,7 +45,7 @@ export interface PipelineContext {
 export interface PipelineResult {
   status: number;
   body: any;
-  trace: PipelineTraceEntry[]; // Step-by-step execution log (for debugging)
+  trace: PipelineTraceEntry[];
 }
 
 /** A single entry in the execution trace */
@@ -58,20 +58,51 @@ export interface PipelineTraceEntry {
   durationMs: number;
 }
 
+// ── Graph structures ──────────────────────────────────────────────────
+
+/** Exec adjacency: which step(s) to run next from a given exec-out handle */
+interface ExecAdjacency {
+  [sourceHandle: string]: string; // sourceHandle → target stepId
+}
+
+/** Data wire: what source feeds a given input pin */
+interface DataWireSource {
+  sourceStepId: string;
+  sourceHandle: string;
+}
+
+/** Per-step stored outputs keyed by output handle ID */
+type StepOutputs = Map<string, Map<string, any>>;
+
+// ── Exec handle IDs ───────────────────────────────────────────────────
+
+const EXEC_HANDLES = new Set([
+  "exec-in", "exec-out", "exec-pass", "exec-fail",
+  "exec-true", "exec-false", "exec-match", "exec-mismatch",
+]);
+
 // ── Helpers ───────────────────────────────────────────────────────────
 
+function isValidEmail(value: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+function generateUUID(): string {
+  if (typeof crypto !== "undefined" && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
 /**
- * Resolve a dot-path like "body.email" or "variables.user.name"
- * against the pipeline context.
- *
- * Shorthand rules:
- *   "body.x"      → "request.body.x"
- *   "query.x"     → "request.query.x"
- *   "headers.x"   → "request.headers.x"
- *   "hashedPw"    → tries top-level first, falls back to "variables.hashedPw"
+ * Resolve a dot-path against the pipeline context.
+ * Shorthand: "body.x" → "request.body.x", etc.
  */
 function resolveContextPath(ctx: PipelineContext, path: string): any {
-  // Support shorthand: "body.x" → "request.body.x"
   let normalizedPath = path;
   if (normalizedPath.startsWith("body.") || normalizedPath === "body") {
     normalizedPath = "request." + normalizedPath;
@@ -95,9 +126,6 @@ function resolveContextPath(ctx: PipelineContext, path: string): any {
 
   const result = resolve(normalizedPath);
 
-  // Fallback: if the path didn't start with a known prefix and resolved to
-  // undefined, try again under "variables." — this lets users write
-  // "hashedPassword" instead of "variables.hashedPassword" in field mappings.
   if (
     result === undefined &&
     !path.startsWith("request.") &&
@@ -114,178 +142,63 @@ function resolveContextPath(ctx: PipelineContext, path: string): any {
   return result;
 }
 
-/**
- * Simple email regex — good enough for validation, not for parsing.
- */
-function isValidEmail(value: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-}
+// ── Graph building ────────────────────────────────────────────────────
+
+const REQUEST_NODE_ID = "__request__";
 
 /**
- * Generate a v4-style UUID (crypto-safe when available, Math.random fallback).
+ * Build adjacency maps from edges:
+ * - execAdj: stepId → { execHandleId → nextStepId }
+ * - dataWires: targetStepId → { targetHandle → { sourceStepId, sourceHandle } }
  */
-function generateUUID(): string {
-  if (typeof crypto !== "undefined" && crypto.randomUUID) {
-    return crypto.randomUUID();
-  }
-  // Fallback
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
-    const r = (Math.random() * 16) | 0;
-    const v = c === "x" ? r : (r & 0x3) | 0x8;
-    return v.toString(16);
-  });
-}
-
-// ── Graph-aware pre-processing ────────────────────────────────────────
-
-/**
- * Before execution, walk the node graph edges to:
- * 1. Copy collection names from Collection nodes into dbXxxConfig.collection
- * 2. Build fieldMapping entries from field-input edges (source handle label → field name)
- *
- * This bridges the visual node graph to the runtime executor.
- */
-function resolvePipelineFromGraph(
-  steps: PipelineStep[],
-  edges: PipelineEdge[]
-): PipelineStep[] {
-  // Map stepId → step for fast lookups
-  const stepMap = new Map(steps.map((s) => [s.id, s]));
-
-  // Collection input handle IDs for each DB node type
-  const COLLECTION_HANDLES: Record<string, string> = {
-    "i-collection": "db-insert",
-    "q-collection": "db-query",
-    "u-collection": "db-update",
-    "d-collection": "db-delete",
-  };
-
-  // Clone steps so we don't mutate originals
-  const resolved = steps.map((s) => ({
-    ...s,
-    dbInsertConfig: s.dbInsertConfig ? { ...s.dbInsertConfig, fieldMapping: { ...s.dbInsertConfig.fieldMapping } } : undefined,
-    dbQueryConfig:  s.dbQueryConfig  ? { ...s.dbQueryConfig  } : undefined,
-    dbUpdateConfig: s.dbUpdateConfig ? { ...s.dbUpdateConfig, fieldMapping: { ...s.dbUpdateConfig.fieldMapping } } : undefined,
-    dbDeleteConfig: s.dbDeleteConfig ? { ...s.dbDeleteConfig } : undefined,
-  }));
-  const resolvedMap = new Map(resolved.map((s) => [s.id, s]));
+function buildGraphMaps(edges: PipelineEdge[]) {
+  const execAdj = new Map<string, ExecAdjacency>();
+  const dataWires = new Map<string, Map<string, DataWireSource>>();
 
   for (const edge of edges) {
-    const sourceStep = stepMap.get(edge.source);
-    const targetStep = resolvedMap.get(edge.target);
-    if (!sourceStep || !targetStep) continue;
+    const isExec =
+      edge.kind === "exec" ||
+      EXEC_HANDLES.has(edge.sourceHandle) ||
+      EXEC_HANDLES.has(edge.targetHandle);
 
-    const targetHandle = edge.targetHandle || "";
-    const sourceHandle = edge.sourceHandle || "";
-
-    // ── 1. Collection node wired to a DB node's collection input ──────
-    if (COLLECTION_HANDLES[targetHandle] && sourceStep.type === "collection") {
-      const collectionName = sourceStep.collectionConfig?.collectionName || "";
-      if (collectionName) {
-        switch (targetStep.type) {
-          case "db-insert":
-            if (targetStep.dbInsertConfig) targetStep.dbInsertConfig.collection = collectionName;
-            break;
-          case "db-query":
-            if (targetStep.dbQueryConfig) targetStep.dbQueryConfig.collection = collectionName;
-            break;
-          case "db-update":
-            if (targetStep.dbUpdateConfig) targetStep.dbUpdateConfig.collection = collectionName;
-            break;
-          case "db-delete":
-            if (targetStep.dbDeleteConfig) targetStep.dbDeleteConfig.collection = collectionName;
-            break;
-        }
-      }
-      continue;
-    }
-
-    // ── 2. Any wire going into a field-input pin of a DB node ─────────
-    // Target handle format: "field-<fieldName>" (db-insert, db-update)
-    if (targetHandle.startsWith("field-")) {
-      const fieldName = targetHandle.slice(6); // strip "field-"
-
-      // The source produces a context-resolvable path based on the source handle:
-      //   body-<name>   → "body.<name>"
-      //   query-<name>  → "query.<name>"
-      //   var-out       → "variables.<step.label or name>"
-      //   hash-result   → "variables.<resultVariable>"
-      //   insert-result → "variables.<resultVariable>"
-      //   literal-value → "variables.<step.label>"
-      let sourcePath = "";
-
-      if (sourceHandle.startsWith("body-")) {
-        sourcePath = "body." + sourceHandle.slice(5);
-      } else if (sourceHandle.startsWith("query-")) {
-        sourcePath = "query." + sourceHandle.slice(6);
-      } else if (sourceHandle === "var-out") {
-        sourcePath = "variables." + (sourceStep.setVariableConfig?.name || sourceStep.label);
-      } else if (sourceHandle === "hash-result") {
-        sourcePath = "variables." + (sourceStep.hashConfig?.resultVariable || "hashed");
-      } else if (sourceHandle === "insert-result") {
-        sourcePath = "variables." + (sourceStep.dbInsertConfig?.resultVariable || "newId");
-      } else if (sourceHandle === "query-result") {
-        sourcePath = "variables." + (sourceStep.dbQueryConfig?.resultVariable || "result");
-      } else if (sourceHandle === "literal-value") {
-        sourcePath = "variables." + (sourceStep.label || sourceStep.id);
-      } else if (sourceHandle === "validate-pass") {
-        // Validate pass doesn't carry a value — skip
-        continue;
-      }
-
-      if (sourcePath) {
-        if (targetStep.type === "db-insert" && targetStep.dbInsertConfig) {
-          targetStep.dbInsertConfig.fieldMapping[fieldName] = sourcePath;
-        } else if (targetStep.type === "db-update" && targetStep.dbUpdateConfig) {
-          targetStep.dbUpdateConfig.fieldMapping[fieldName] = sourcePath;
-        }
-      }
-      continue;
-    }
-
-    // ── 3. Wire into respond body ─────────────────────────────────────
-    if (targetHandle === "resp-body" && targetStep.type === "respond" && targetStep.respondConfig) {
-      // Switch respond to mapping mode and map "body" → source path
-      let sourcePath = "";
-      if (sourceHandle === "insert-result") {
-        sourcePath = "variables." + (sourceStep.dbInsertConfig?.resultVariable || "newId");
-      } else if (sourceHandle === "query-result") {
-        sourcePath = "variables." + (sourceStep.dbQueryConfig?.resultVariable || "result");
-      } else if (sourceHandle === "var-out") {
-        sourcePath = "variables." + (sourceStep.setVariableConfig?.name || sourceStep.label);
-      }
-      if (sourcePath) {
-        targetStep.respondConfig = {
-          ...targetStep.respondConfig,
-          bodyMode: "mapping",
-          bodyMapping: { ...targetStep.respondConfig.bodyMapping, body: sourcePath },
-        };
-      }
-      continue;
+    if (isExec) {
+      // Exec edge: source's exec-out handle → target step
+      if (!execAdj.has(edge.source)) execAdj.set(edge.source, {});
+      execAdj.get(edge.source)![edge.sourceHandle] = edge.target;
+    } else {
+      // Data edge: target's input handle ← source's output handle
+      if (!dataWires.has(edge.target)) dataWires.set(edge.target, new Map());
+      dataWires.get(edge.target)!.set(edge.targetHandle, {
+        sourceStepId: edge.source,
+        sourceHandle: edge.sourceHandle,
+      });
     }
   }
 
-  return resolved;
+  return { execAdj, dataWires };
+}
+
+/**
+ * Resolve a data input for a step by tracing back through data wires.
+ * Returns the value from the source step's output, or undefined if no wire.
+ */
+function resolveDataInput(
+  targetStepId: string,
+  targetHandle: string,
+  dataWires: Map<string, Map<string, DataWireSource>>,
+  stepOutputs: StepOutputs,
+): any {
+  const wires = dataWires.get(targetStepId);
+  if (!wires) return undefined;
+  const wire = wires.get(targetHandle);
+  if (!wire) return undefined;
+
+  const sourceOutputs = stepOutputs.get(wire.sourceStepId);
+  if (!sourceOutputs) return undefined;
+  return sourceOutputs.get(wire.sourceHandle);
 }
 
 // ── Step executors ────────────────────────────────────────────────────
-
-function executeValidateStep(
-  ctx: PipelineContext,
-  config: ValidateStepConfig
-): { ok: boolean; errors: string[] } {
-  const errors: string[] = [];
-
-  for (const rule of config.rules) {
-    const value = resolveContextPath(ctx, rule.field);
-    const failed = checkValidationRule(rule, value);
-    if (failed) {
-      errors.push(rule.errorMessage || failed);
-    }
-  }
-
-  return { ok: errors.length === 0, errors };
-}
 
 function checkValidationRule(rule: ValidationRule, value: any): string | null {
   switch (rule.rule) {
@@ -294,37 +207,31 @@ function checkValidationRule(rule: ValidationRule, value: any): string | null {
         return `${rule.field} is required`;
       }
       return null;
-
     case "email":
       if (typeof value !== "string" || !isValidEmail(value)) {
         return `${rule.field} must be a valid email`;
       }
       return null;
-
     case "minLength":
       if (typeof value !== "string" || value.length < Number(rule.value || 0)) {
         return `${rule.field} must be at least ${rule.value} characters`;
       }
       return null;
-
     case "maxLength":
       if (typeof value !== "string" || value.length > Number(rule.value || Infinity)) {
         return `${rule.field} must be at most ${rule.value} characters`;
       }
       return null;
-
     case "min":
       if (typeof value !== "number" || value < Number(rule.value || 0)) {
         return `${rule.field} must be at least ${rule.value}`;
       }
       return null;
-
     case "max":
       if (typeof value !== "number" || value > Number(rule.value || Infinity)) {
         return `${rule.field} must be at most ${rule.value}`;
       }
       return null;
-
     case "regex": {
       try {
         const re = new RegExp(String(rule.value || ""));
@@ -336,26 +243,15 @@ function checkValidationRule(rule: ValidationRule, value: any): string | null {
       }
       return null;
     }
-
     case "equals":
       // eslint-disable-next-line eqeqeq
       if (value != rule.value) {
         return `${rule.field} must equal ${rule.value}`;
       }
       return null;
-
     default:
       return null;
   }
-}
-
-function executeConditionStep(
-  ctx: PipelineContext,
-  config: ConditionStepConfig
-): { passed: boolean } {
-  const value = resolveContextPath(ctx, config.field);
-  const passed = evaluateCondition(value, config.operator, config.value);
-  return { passed };
 }
 
 function evaluateCondition(
@@ -387,68 +283,12 @@ function evaluateCondition(
   }
 }
 
-function executeSetVariableStep(
-  ctx: PipelineContext,
-  config: SetVariableStepConfig
-): void {
-  let value: any;
-
-  if (config.isLiteral) {
-    value = config.source;
-  } else {
-    value = resolveContextPath(ctx, config.source);
-  }
-
-  // Apply transform
-  switch (config.transform) {
-    case "lowercase":
-      if (typeof value === "string") value = value.toLowerCase();
-      break;
-    case "uppercase":
-      if (typeof value === "string") value = value.toUpperCase();
-      break;
-    case "trim":
-      if (typeof value === "string") value = value.trim();
-      break;
-    case "timestamp":
-      value = new Date().toISOString();
-      break;
-    case "uuid":
-      value = generateUUID();
-      break;
-    // "none" or undefined — leave as-is
-  }
-
-  ctx.variables[config.name] = value;
-}
-
-function executeRespondStep(
-  ctx: PipelineContext,
-  config: RespondStepConfig
-): void {
-  ctx.response.status = config.status;
-
-  if (config.bodyMode === "static") {
-    ctx.response.body = config.staticBody ?? {};
-  } else {
-    // Mapping mode — build body from context paths
-    const body: Record<string, any> = {};
-    for (const [key, sourcePath] of Object.entries(config.bodyMapping || {})) {
-      body[key] = resolveContextPath(ctx, sourcePath);
-    }
-    ctx.response.body = body;
-  }
-
-  ctx.response.ended = true;
-}
-
 // ── Main executor ─────────────────────────────────────────────────────
 
 /**
- * Execute a pipeline of steps against a request context.
- *
- * Returns a PipelineResult with the final status, body, and
- * an execution trace for debugging.
+ * Execute a pipeline by walking the exec-wire graph.
+ * Only nodes reachable via exec wires from the Request node are executed.
+ * Data only flows through connected data wires.
  */
 export async function executePipeline(
   steps: PipelineStep[],
@@ -460,10 +300,6 @@ export async function executePipeline(
   delegate?: PipelineDelegate,
   nodeEdges?: PipelineEdge[]
 ): Promise<PipelineResult> {
-  // Pre-process: resolve collection names and field mappings from graph wiring
-  const resolvedSteps = nodeEdges && nodeEdges.length > 0
-    ? resolvePipelineFromGraph(steps, nodeEdges)
-    : steps;
   const ctx: PipelineContext = {
     request,
     variables: {},
@@ -475,293 +311,388 @@ export async function executePipeline(
   };
 
   const trace: PipelineTraceEntry[] = [];
+  const edges = nodeEdges || [];
 
-  for (const step of resolvedSteps) {
-    // Skip disabled steps
+  // If no edges at all, nothing to execute
+  if (edges.length === 0) {
+    return { status: ctx.response.status, body: ctx.response.body, trace };
+  }
+
+  const stepMap = new Map(steps.map((s) => [s.id, s]));
+  const { execAdj, dataWires } = buildGraphMaps(edges);
+
+  // Per-step output storage: stepId → Map<handleId, value>
+  const stepOutputs: StepOutputs = new Map();
+
+  // ── Seed the Request node's outputs ──────────────────────────────
+  const requestOutputs = new Map<string, any>();
+  for (const [key, val] of Object.entries(request.body || {})) {
+    requestOutputs.set(`body-${key}`, val);
+  }
+  for (const [key, val] of Object.entries(request.query || {})) {
+    requestOutputs.set(`query-${key}`, val);
+  }
+  stepOutputs.set(REQUEST_NODE_ID, requestOutputs);
+
+  // ── Seed literal & collection node outputs (pure data, no exec needed) ──
+  for (const step of steps) {
+    if (step.type === "string-literal") {
+      const out = new Map<string, any>();
+      out.set("literal-value", step.stringLiteralConfig?.value ?? "");
+      stepOutputs.set(step.id, out);
+    } else if (step.type === "number-literal") {
+      const out = new Map<string, any>();
+      out.set("literal-value", step.numberLiteralConfig?.value ?? 0);
+      stepOutputs.set(step.id, out);
+    } else if (step.type === "boolean-literal") {
+      const out = new Map<string, any>();
+      out.set("literal-value", step.booleanLiteralConfig?.value ?? false);
+      stepOutputs.set(step.id, out);
+    } else if (step.type === "json-literal") {
+      const out = new Map<string, any>();
+      try {
+        out.set("literal-value", JSON.parse(step.jsonLiteralConfig?.value || "{}"));
+      } catch {
+        out.set("literal-value", {});
+      }
+      stepOutputs.set(step.id, out);
+    } else if (step.type === "collection") {
+      const out = new Map<string, any>();
+      out.set("collection-out", step.collectionConfig?.collectionName || "");
+      stepOutputs.set(step.id, out);
+    }
+  }
+
+  // ── Walk exec graph starting from Request node ──────────────────
+  // Find first step: Request's exec-out target
+  const requestExec = execAdj.get(REQUEST_NODE_ID);
+  let currentStepId: string | undefined = requestExec?.["exec-out"];
+
+  // Safety: max 200 steps to prevent infinite loops
+  let safetyCounter = 0;
+  const MAX_STEPS = 200;
+
+  while (currentStepId && safetyCounter < MAX_STEPS) {
+    safetyCounter++;
+    const step = stepMap.get(currentStepId);
+    if (!step) break;
+
+    // Skip disabled steps — follow exec-out if available
     if (!step.isEnabled) {
       trace.push({
-        stepId: step.id,
-        stepLabel: step.label,
-        stepType: step.type,
-        status: "skipped",
-        detail: "Step is disabled",
-        durationMs: 0,
+        stepId: step.id, stepLabel: step.label, stepType: step.type,
+        status: "skipped", detail: "Step is disabled", durationMs: 0,
       });
+      const adj = execAdj.get(step.id);
+      currentStepId = adj?.["exec-out"];
       continue;
     }
 
-    // If a previous step ended the response, skip remaining steps
     if (ctx.response.ended) {
       trace.push({
-        stepId: step.id,
-        stepLabel: step.label,
-        stepType: step.type,
-        status: "skipped",
-        detail: "Pipeline already responded",
-        durationMs: 0,
+        stepId: step.id, stepLabel: step.label, stepType: step.type,
+        status: "skipped", detail: "Pipeline already responded", durationMs: 0,
       });
-      continue;
+      break;
     }
 
     const startTime = performance.now();
+    const outputs = new Map<string, any>();
+
+    // Helper to resolve data for a specific input handle of this step
+    const getInput = (handle: string): any =>
+      resolveDataInput(step.id, handle, dataWires, stepOutputs);
+
+    // Helper to resolve collection name from data wire
+    const getCollectionName = (handle: string): string => {
+      const val = getInput(handle);
+      return typeof val === "string" ? val : "";
+    };
+
+    // Helper to build field mapping from data wires
+    const buildFieldMapping = (): Record<string, any> => {
+      const mapping: Record<string, any> = {};
+      const wires = dataWires.get(step.id);
+      if (wires) {
+        for (const [targetHandle, _source] of wires) {
+          if (targetHandle.startsWith("field-")) {
+            const fieldName = targetHandle.slice(6);
+            const val = getInput(targetHandle);
+            if (val !== undefined) mapping[fieldName] = val;
+          }
+        }
+      }
+      return mapping;
+    };
+
+    // What exec handle to follow after this step
+    let nextExecHandle = "exec-out";
 
     try {
       switch (step.type) {
         case "validate": {
           if (!step.validateConfig) break;
-          const result = executeValidateStep(ctx, step.validateConfig);
-          if (!result.ok) {
+          const inputData = getInput("validate-data");
+          const errors: string[] = [];
+
+          for (const rule of step.validateConfig.rules) {
+            // The value to validate: if data is wired in, validate that value
+            // using the rule's field as context path relative to the input
+            let value: any;
+            if (inputData !== undefined) {
+              // If a single value was wired in, validate it directly
+              if (typeof inputData !== "object" || inputData === null) {
+                value = inputData;
+              } else {
+                // If an object was wired in, resolve field within it
+                const fieldParts = rule.field.replace(/^body\./, "").split(".");
+                value = inputData;
+                for (const p of fieldParts) {
+                  if (value && typeof value === "object") value = value[p];
+                  else { value = undefined; break; }
+                }
+              }
+            } else {
+              // Fallback: resolve from context (backward compat)
+              value = resolveContextPath(ctx, rule.field);
+            }
+            const failed = checkValidationRule(rule, value);
+            if (failed) errors.push(failed);
+          }
+
+          if (errors.length > 0) {
+            // Validation failed — follow exec-fail
+            nextExecHandle = "exec-fail";
+            // Also set context response for convenience
             ctx.response.status = step.validateConfig.failStatus || 400;
-            ctx.response.body = {
-              error: "Validation failed",
-              details: result.errors,
-            };
-            ctx.response.ended = true;
+            ctx.response.body = { error: "Validation failed", details: errors };
             trace.push({
-              stepId: step.id,
-              stepLabel: step.label,
-              stepType: step.type,
-              status: "fail",
-              detail: `Failed: ${result.errors.join("; ")}`,
+              stepId: step.id, stepLabel: step.label, stepType: step.type,
+              status: "fail", detail: `Failed: ${errors.join("; ")}`,
               durationMs: Math.round(performance.now() - startTime),
             });
-            continue;
+          } else {
+            nextExecHandle = "exec-pass";
           }
           break;
         }
 
         case "condition": {
           if (!step.conditionConfig) break;
-          const { passed } = executeConditionStep(ctx, step.conditionConfig);
+          const value = getInput("cond-value") ?? resolveContextPath(ctx, step.conditionConfig.field);
+          const passed = evaluateCondition(value, step.conditionConfig.operator, step.conditionConfig.value);
+          nextExecHandle = passed ? "exec-true" : "exec-false";
+
           if (!passed) {
-            if (step.conditionConfig.onFail === "respond") {
-              ctx.response.status = step.conditionConfig.failStatus || 400;
-              ctx.response.body = step.conditionConfig.failBody || {
-                error: "Condition not met",
-              };
-              ctx.response.ended = true;
-            }
-            // "skip" → just continue to next step (condition didn't pass, but pipeline continues)
             trace.push({
-              stepId: step.id,
-              stepLabel: step.label,
-              stepType: step.type,
+              stepId: step.id, stepLabel: step.label, stepType: step.type,
               status: "fail",
-              detail: `Condition failed: ${step.conditionConfig.field} ${step.conditionConfig.operator}${step.conditionConfig.value !== undefined ? " " + step.conditionConfig.value : ""}`,
+              detail: `Condition failed: ${step.conditionConfig.field} ${step.conditionConfig.operator}`,
               durationMs: Math.round(performance.now() - startTime),
             });
-            continue;
           }
           break;
         }
 
         case "set-variable": {
           if (!step.setVariableConfig) break;
-          executeSetVariableStep(ctx, step.setVariableConfig);
+          const cfg = step.setVariableConfig;
+          let value: any;
+
+          if (cfg.isLiteral) {
+            value = cfg.source;
+          } else {
+            value = getInput("var-input") ?? resolveContextPath(ctx, cfg.source);
+          }
+
+          switch (cfg.transform) {
+            case "lowercase": if (typeof value === "string") value = value.toLowerCase(); break;
+            case "uppercase": if (typeof value === "string") value = value.toUpperCase(); break;
+            case "trim": if (typeof value === "string") value = value.trim(); break;
+            case "timestamp": value = new Date().toISOString(); break;
+            case "uuid": value = generateUUID(); break;
+          }
+
+          ctx.variables[cfg.name] = value;
+          outputs.set("var-out", value);
           break;
         }
 
         case "respond": {
           if (!step.respondConfig) break;
-          executeRespondStep(ctx, step.respondConfig);
+          const cfg = step.respondConfig;
+          const statusInput = getInput("resp-status");
+          ctx.response.status = statusInput != null ? Number(statusInput) : cfg.status;
+
+          if (cfg.bodyMode === "static") {
+            const bodyInput = getInput("resp-body");
+            ctx.response.body = bodyInput !== undefined ? bodyInput : (cfg.staticBody ?? {});
+          } else {
+            const body: Record<string, any> = {};
+            for (const [key, sourcePath] of Object.entries(cfg.bodyMapping || {})) {
+              const wiredVal = getInput(`resp-${key}`);
+              body[key] = wiredVal !== undefined ? wiredVal : resolveContextPath(ctx, sourcePath);
+            }
+            ctx.response.body = body;
+          }
+          ctx.response.ended = true;
           break;
         }
-
-        // ── Phase 2: Database steps ──────────────────────
 
         case "db-query": {
           if (!step.dbQueryConfig || !delegate) break;
           const cfg = step.dbQueryConfig;
+          const collection = getCollectionName("q-collection") || cfg.collection;
 
-          // Resolve filter values from context
+          if (!collection) throw new Error("Collection name is missing");
+
           const resolvedFilters = cfg.filters.map((f) => ({
             field: f.field,
             operator: f.operator,
-            value: f.isLiteral ? f.value : resolveContextPath(ctx, f.value),
+            value: f.isLiteral ? f.value : (getInput(`filter-${f.field}`) ?? resolveContextPath(ctx, f.value)),
           }));
 
           const docs = await delegate.dbQuery(
-            cfg.collection,
-            resolvedFilters,
-            cfg.orderBy,
-            cfg.orderDirection,
-            cfg.limit
+            collection, resolvedFilters, cfg.orderBy, cfg.orderDirection, cfg.limit
           );
 
-          // Store as single doc (if limit=1) or array
-          ctx.variables[cfg.resultVariable] = cfg.limit === 1 ? (docs[0] || null) : docs;
+          const result = cfg.limit === 1 ? (docs[0] || null) : docs;
+          ctx.variables[cfg.resultVariable] = result;
+          outputs.set("query-result", result);
+          // Output individual fields so they can be wired to specific inputs
+          if (result && typeof result === "object" && !Array.isArray(result)) {
+            for (const [key, val] of Object.entries(result)) {
+              outputs.set(`qf-${key}`, val);
+            }
+          }
           break;
         }
 
         case "db-insert": {
           if (!step.dbInsertConfig || !delegate) break;
           const cfg = step.dbInsertConfig;
+          const collection = getCollectionName("i-collection") || cfg.collection;
 
-          if (!cfg.collection) {
-            throw new Error("Collection name is missing");
-          }
+          if (!collection) throw new Error("Collection name is missing");
 
-          // Build document data from field mapping
-          const data: Record<string, any> = {};
+          // Build data from wired field inputs
+          const data = buildFieldMapping();
+          // Also include any fieldMapping from config as fallback
           for (const [docField, sourcePath] of Object.entries(cfg.fieldMapping)) {
-            const val = resolveContextPath(ctx, sourcePath);
-            if (val !== undefined) {
-              data[docField] = val;
+            if (data[docField] === undefined) {
+              const val = resolveContextPath(ctx, sourcePath);
+              if (val !== undefined) data[docField] = val;
             }
           }
 
-          const newId = await delegate.dbInsert(cfg.collection, data);
-          if (cfg.resultVariable) {
-            ctx.variables[cfg.resultVariable] = newId;
-          }
+          const newId = await delegate.dbInsert(collection, data);
+          if (cfg.resultVariable) ctx.variables[cfg.resultVariable] = newId;
+          outputs.set("insert-result", newId);
           break;
         }
 
         case "db-update": {
           if (!step.dbUpdateConfig || !delegate) break;
           const cfg = step.dbUpdateConfig;
-          const docId = resolveContextPath(ctx, cfg.documentId);
+          const collection = getCollectionName("u-collection") || cfg.collection;
+          const docId = getInput("doc-id") ?? resolveContextPath(ctx, cfg.documentId);
 
-          if (!cfg.collection) {
-            throw new Error("Collection name is missing");
-          }
+          if (!collection) throw new Error("Collection name is missing");
+          if (!docId) throw new Error("Document ID resolved to null/undefined");
 
-          if (!docId) {
-            throw new Error("Document ID resolved to null/undefined");
-          }
-
-          const data: Record<string, any> = {};
+          const data = buildFieldMapping();
           for (const [docField, sourcePath] of Object.entries(cfg.fieldMapping)) {
-            const val = resolveContextPath(ctx, sourcePath);
-            if (val !== undefined) {
-              data[docField] = val;
+            if (data[docField] === undefined) {
+              const val = resolveContextPath(ctx, sourcePath);
+              if (val !== undefined) data[docField] = val;
             }
           }
 
-          await delegate.dbUpdate(cfg.collection, String(docId), data);
+          await delegate.dbUpdate(collection, String(docId), data);
           break;
         }
 
         case "db-delete": {
           if (!step.dbDeleteConfig || !delegate) break;
           const cfg = step.dbDeleteConfig;
-          const docId = resolveContextPath(ctx, cfg.documentId);
+          const collection = getCollectionName("d-collection") || cfg.collection;
+          const docId = getInput("doc-id") ?? resolveContextPath(ctx, cfg.documentId);
 
-          if (!cfg.collection) {
-            throw new Error("Collection name is missing");
-          }
+          if (!collection) throw new Error("Collection name is missing");
+          if (!docId) throw new Error("Document ID resolved to null/undefined");
 
-          if (!docId) {
-            throw new Error("Document ID resolved to null/undefined");
-          }
-
-          await delegate.dbDelete(cfg.collection, String(docId));
+          await delegate.dbDelete(collection, String(docId));
           break;
         }
-
-        // ── Phase 2: Hash step ───────────────────────────
 
         case "hash": {
           if (!step.hashConfig || !delegate) break;
           const cfg = step.hashConfig;
-          const plaintext = resolveContextPath(ctx, cfg.input);
+          const plaintext = getInput("hash-input") ?? resolveContextPath(ctx, cfg.input);
           const hashed = await delegate.hashPassword(String(plaintext || ""));
-          if (cfg.resultVariable) {
-            ctx.variables[cfg.resultVariable] = hashed;
-          }
+          if (cfg.resultVariable) ctx.variables[cfg.resultVariable] = hashed;
+          outputs.set("hash-result", hashed);
           break;
         }
 
         case "hash-compare": {
           if (!step.hashCompareConfig || !delegate) break;
           const cfg = step.hashCompareConfig;
-          // plaintext and storedHash come from connected pins / context
-          // For now, we expect them to be pre-resolved via edges or context
-          // The executor uses the connected edge data
-          const plaintext = ctx.variables["__hc_plaintext"] || "";
-          const storedHash = ctx.variables["__hc_storedHash"] || "";
-          const match = await delegate.comparePassword(
-            String(plaintext),
-            String(storedHash)
-          );
+          const plaintext = getInput("hc-plaintext") || "";
+          const storedHash = getInput("hc-storedHash") || "";
+          const match = await delegate.comparePassword(String(plaintext), String(storedHash));
 
-          if (!match) {
-            if (cfg.onFail === "respond") {
-              ctx.response.status = cfg.failStatus || 401;
-              ctx.response.body = cfg.failBody || { error: "Invalid credentials" };
-              ctx.response.ended = true;
-            }
+          if (match) {
+            nextExecHandle = "exec-match";
+          } else {
+            nextExecHandle = "exec-mismatch";
             trace.push({
-              stepId: step.id,
-              stepLabel: step.label,
-              stepType: step.type,
-              status: "fail",
-              detail: "Password mismatch",
+              stepId: step.id, stepLabel: step.label, stepType: step.type,
+              status: "fail", detail: "Password mismatch",
               durationMs: Math.round(performance.now() - startTime),
             });
-            continue;
           }
           break;
         }
 
-        // ── collection node — UI-only, skip at runtime ───────────────
+        // Literal & collection nodes are pure data — already seeded, skip
         case "collection":
+        case "string-literal":
+        case "number-literal":
+        case "boolean-literal":
+        case "json-literal":
           break;
-
-        // ── Literal nodes ── store their value as a variable
-        case "string-literal": {
-          const val = step.stringLiteralConfig?.value ?? "";
-          ctx.variables[step.label || step.id] = val;
-          break;
-        }
-        case "number-literal": {
-          const val = step.numberLiteralConfig?.value ?? 0;
-          ctx.variables[step.label || step.id] = val;
-          break;
-        }
-        case "boolean-literal": {
-          const val = step.booleanLiteralConfig?.value ?? false;
-          ctx.variables[step.label || step.id] = val;
-          break;
-        }
-        case "json-literal": {
-          try {
-            const val = JSON.parse(step.jsonLiteralConfig?.value || "{}");
-            ctx.variables[step.label || step.id] = val;
-          } catch {
-            ctx.variables[step.label || step.id] = {};
-          }
-          break;
-        }
       }
 
-      trace.push({
-        stepId: step.id,
-        stepLabel: step.label,
-        stepType: step.type,
-        status: "ok",
-        durationMs: Math.round(performance.now() - startTime),
-      });
+      // Store outputs for downstream data wires
+      if (outputs.size > 0) {
+        stepOutputs.set(step.id, outputs);
+      }
+
+      // Add trace entry (if not already added by branching logic)
+      if (!trace.some((t) => t.stepId === step.id)) {
+        trace.push({
+          stepId: step.id, stepLabel: step.label, stepType: step.type,
+          status: "ok", durationMs: Math.round(performance.now() - startTime),
+        });
+      }
     } catch (error) {
       const errMsg = (error as Error).message || String(error);
       console.error(`[Pipeline] Step "${step.label}" (${step.type}) failed:`, errMsg);
       trace.push({
-        stepId: step.id,
-        stepLabel: step.label,
-        stepType: step.type,
-        status: "fail",
-        detail: `Error: ${errMsg}`,
+        stepId: step.id, stepLabel: step.label, stepType: step.type,
+        status: "fail", detail: `Error: ${errMsg}`,
         durationMs: Math.round(performance.now() - startTime),
       });
-      // On error, short-circuit with 500
       ctx.response.status = 500;
-      ctx.response.body = {
-        error: "Pipeline execution error",
-        step: step.label,
-        detail: errMsg,
-      };
+      ctx.response.body = { error: "Pipeline execution error", step: step.label, detail: errMsg };
       ctx.response.ended = true;
+      break;
     }
+
+    // Follow the exec wire to the next step
+    const adj = execAdj.get(currentStepId);
+    currentStepId = adj?.[nextExecHandle];
   }
 
   return {

@@ -4,8 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { ApiEndpoint, DbCollection } from "@/types/backend";
 import { EndpointList } from "./EndpointList";
 import { EndpointEditor } from "./EndpointEditor";
-import { CollectionManager } from "./CollectionManager";
-import { SchemaEditor } from "./SchemaEditor";
+import { FirestoreExplorer } from "./FirestoreExplorer";
 import { generateId } from "@/lib/utils";
 import { ENDPOINT_TEMPLATES } from "@/lib/endpoint-templates";
 import {
@@ -14,8 +13,6 @@ import {
   Database,
   Loader2,
   Zap,
-  ChevronDown,
-  ChevronRight,
   Layers,
   BookTemplate,
 } from "lucide-react";
@@ -50,7 +47,7 @@ export function BackendEditorLayout({
   );
   // Track which tab is active in the endpoint editor (lifted state)
   const [activeTab, setActiveTab] = useState<string>("general");
-  const [showCollections, setShowCollections] = useState(false);
+
   const [viewMode, setViewMode] = useState<ViewMode>("endpoints");
   const [showTemplatePicker, setShowTemplatePicker] = useState(false);
 
@@ -383,9 +380,13 @@ export function BackendEditorLayout({
 
       {/* ── Main Content ──────────────────────────────────────────── */}
       {viewMode === "schema" ? (
-        /* Schema Designer — full width */
-        <div className="flex-1 overflow-hidden">
-          <SchemaEditor schema={dbSchema} onChange={onDbSchemaChange} />
+        /* Unified Firestore Database Explorer */
+        <div className="flex flex-1 overflow-hidden min-h-0">
+          <FirestoreExplorer
+            projectId={projectId}
+            dbSchema={dbSchema}
+            onDbSchemaChange={onDbSchemaChange}
+          />
         </div>
       ) : (
         /* Endpoints Mode — list + editor */
@@ -398,7 +399,7 @@ export function BackendEditorLayout({
               if ((e.target as HTMLElement).closest("[data-endpoint-item]")) return;
               if ((e.target as HTMLElement).closest("button")) return;
               if ((e.target as HTMLElement).closest("input")) return;
-              if ((e.target as HTMLElement).closest("[data-collections-panel]")) return;
+
               setSelectedEndpointId(null);
             }}
           >
@@ -412,30 +413,6 @@ export function BackendEditorLayout({
                 onDelete={handleDelete}
                 onToggleEnabled={handleToggleEnabled}
               />
-            </div>
-
-            {/* Collections panel — collapsible */}
-            <div
-              data-collections-panel
-              className="flex-shrink-0 border-t border-border"
-            >
-              <button
-                onClick={() => setShowCollections(!showCollections)}
-                className="w-full flex items-center gap-2 px-4 py-2.5 hover:bg-muted/50 transition-colors text-left"
-              >
-                {showCollections ? (
-                  <ChevronDown className="w-3.5 h-3.5 text-muted-foreground/40" />
-                ) : (
-                  <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/40" />
-                )}
-                <Database className="w-3.5 h-3.5 text-violet-400" />
-                <span className="text-[10px] font-semibold text-foreground uppercase tracking-wide">Database</span>
-              </button>
-              {showCollections && (
-                <div className="px-3 pb-3 max-h-[300px] overflow-y-auto">
-                  <CollectionManager projectId={projectId} />
-                </div>
-              )}
             </div>
           </div>
 

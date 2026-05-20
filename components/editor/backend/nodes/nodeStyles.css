@@ -41,18 +41,37 @@
   transition: stroke 0.15s ease, stroke-width 0.15s ease, filter 0.15s ease;
 }
 
-/* Selected edge — bright and obvious */
+/* Selected data edge — bright and obvious */
 .pipeline-graph .react-flow__edge.data-wire.selected .react-flow__edge-path {
   stroke: #818cf8;
   stroke-width: 3;
   filter: drop-shadow(0 0 6px rgba(129, 140, 248, 0.7));
 }
 
-/* Hovered edge */
+/* Hovered data edge */
 .pipeline-graph .react-flow__edge.data-wire:hover .react-flow__edge-path {
   stroke: #a5b4fc;
   stroke-width: 2.5;
   filter: drop-shadow(0 0 3px rgba(165, 180, 252, 0.4));
+}
+
+/* ── Exec wire (white, thicker — execution flow) ──────────────────── */
+.pipeline-graph .react-flow__edge.exec-wire .react-flow__edge-path {
+  stroke: #e2e8f0;
+  stroke-width: 3;
+  transition: stroke 0.15s ease, stroke-width 0.15s ease, filter 0.15s ease;
+}
+
+.pipeline-graph .react-flow__edge.exec-wire.selected .react-flow__edge-path {
+  stroke: #f8fafc;
+  stroke-width: 4;
+  filter: drop-shadow(0 0 8px rgba(248, 250, 252, 0.6));
+}
+
+.pipeline-graph .react-flow__edge.exec-wire:hover .react-flow__edge-path {
+  stroke: #f1f5f9;
+  stroke-width: 3.5;
+  filter: drop-shadow(0 0 4px rgba(241, 245, 249, 0.4));
 }
 
 /* Connection line while dragging */

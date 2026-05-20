@@ -5,3 +5,4 @@ export { SelectField } from "./SelectField";
 export { SwitchField } from "./SwitchField";
 export { SliderField } from "./SliderField";
 export { LinkField } from "./LinkField";
+export { DebouncedInput } from "./DebouncedInput";

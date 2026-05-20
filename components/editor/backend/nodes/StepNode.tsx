@@ -1,6 +1,6 @@
 "use client";
 
-import React, { memo } from "react";
+import React, { memo, useState, useRef, useEffect } from "react";
 import { Handle, Position } from "@xyflow/react";
 import type { NodeProps } from "@xyflow/react";
 import {
@@ -73,7 +73,7 @@ export interface HandleDef {
   id: string;
   label: string;
   type: "source" | "target";
-  kind: "data";
+  kind: "exec" | "data";
 }
 
 /**
@@ -99,24 +99,33 @@ export function getStepHandles(
     return col ? col.fields.map((f) => f.name) : [];
   };
 
+  // Helper: add standard exec-in pin
+  const addExecIn = () => inputs.push({ id: "exec-in", label: "▶", type: "target", kind: "exec" });
+  // Helper: add standard exec-out pin
+  const addExecOut = () => outputs.push({ id: "exec-out", label: "▶", type: "source", kind: "exec" });
+
   switch (step.type) {
     case "validate":
+      addExecIn();
       inputs.push({ id: "validate-data", label: "data", type: "target", kind: "data" });
-      outputs.push({ id: "validate-pass", label: "✓ pass", type: "source", kind: "data" });
-      outputs.push({ id: "validate-fail", label: "✗ fail", type: "source", kind: "data" });
+      outputs.push({ id: "exec-pass", label: "✓ pass", type: "source", kind: "exec" });
+      outputs.push({ id: "exec-fail", label: "✗ fail", type: "source", kind: "exec" });
       break;
 
     case "condition":
+      addExecIn();
       inputs.push({
         id: "cond-value",
         label: (step.conditionConfig?.field || "value").replace(/^(body\.|variables\.|query\.)/, ""),
         type: "target",
         kind: "data",
       });
-      outputs.push({ id: "cond-result", label: "result", type: "source", kind: "data" });
+      outputs.push({ id: "exec-true", label: "✓ true", type: "source", kind: "exec" });
+      outputs.push({ id: "exec-false", label: "✗ false", type: "source", kind: "exec" });
       break;
 
     case "set-variable":
+      addExecIn();
       if (!step.setVariableConfig?.isLiteral) {
         inputs.push({
           id: "var-input",
@@ -125,6 +134,7 @@ export function getStepHandles(
           kind: "data",
         });
       }
+      addExecOut();
       outputs.push({
         id: "var-out",
         label: step.setVariableConfig?.name || "variable",
@@ -134,6 +144,7 @@ export function getStepHandles(
       break;
 
     case "respond":
+      addExecIn();
       inputs.push({ id: "resp-status", label: "status", type: "target", kind: "data" });
       if (step.respondConfig?.bodyMode === "mapping" && step.respondConfig.bodyMapping) {
         Object.keys(step.respondConfig.bodyMapping).forEach((key) => {
@@ -142,9 +153,11 @@ export function getStepHandles(
       } else {
         inputs.push({ id: "resp-body", label: "body", type: "target", kind: "data" });
       }
+      // Respond is a terminal node — no exec out
       break;
 
     case "db-query": {
+      addExecIn();
       inputs.push({ id: "q-collection", label: "collection", type: "target", kind: "data" });
       const qFields = getSchemaFields();
       if (qFields.length > 0) {
@@ -160,16 +173,25 @@ export function getStepHandles(
       }
       inputs.push({ id: "q-orderBy", label: "orderBy", type: "target", kind: "data" });
       inputs.push({ id: "q-limit", label: "limit", type: "target", kind: "data" });
+      addExecOut();
       outputs.push({
         id: "query-result",
         label: step.dbQueryConfig?.resultVariable || "result",
         type: "source",
         kind: "data",
       });
+      // Per-field outputs so individual fields can be wired (e.g. .password → hash-compare)
+      const qOutFields = getSchemaFields();
+      if (qOutFields.length > 0) {
+        qOutFields.forEach((fn) => {
+          outputs.push({ id: `qf-${fn}`, label: `.${fn}`, type: "source", kind: "data" });
+        });
+      }
       break;
     }
 
     case "db-insert": {
+      addExecIn();
       inputs.push({ id: "i-collection", label: "collection", type: "target", kind: "data" });
       const iFields = getSchemaFields();
       if (iFields.length > 0) {
@@ -181,6 +203,7 @@ export function getStepHandles(
           inputs.push({ id: `field-${fn}`, label: fn, type: "target", kind: "data" });
         });
       }
+      addExecOut();
       outputs.push({
         id: "insert-result",
         label: step.dbInsertConfig?.resultVariable || "newId",
@@ -191,6 +214,7 @@ export function getStepHandles(
     }
 
     case "db-update": {
+      addExecIn();
       inputs.push({ id: "u-collection", label: "collection", type: "target", kind: "data" });
       inputs.push({ id: "doc-id", label: "docId", type: "target", kind: "data" });
       const uFields = getSchemaFields();
@@ -203,12 +227,15 @@ export function getStepHandles(
           inputs.push({ id: `field-${fn}`, label: fn, type: "target", kind: "data" });
         });
       }
+      addExecOut();
       break;
     }
 
     case "db-delete":
+      addExecIn();
       inputs.push({ id: "d-collection", label: "collection", type: "target", kind: "data" });
       inputs.push({ id: "doc-id", label: "docId", type: "target", kind: "data" });
+      addExecOut();
       break;
 
     case "collection":
@@ -221,7 +248,9 @@ export function getStepHandles(
       break;
 
     case "hash":
+      addExecIn();
       inputs.push({ id: "hash-input", label: "input", type: "target", kind: "data" });
+      addExecOut();
       outputs.push({
         id: "hash-result",
         label: step.hashConfig?.resultVariable || "hashed",
@@ -231,10 +260,11 @@ export function getStepHandles(
       break;
 
     case "hash-compare":
+      addExecIn();
       inputs.push({ id: "hc-plaintext", label: "plaintext", type: "target", kind: "data" });
       inputs.push({ id: "hc-storedHash", label: "storedHash", type: "target", kind: "data" });
-      outputs.push({ id: "hc-match", label: "✓ match", type: "source", kind: "data" });
-      outputs.push({ id: "hc-mismatch", label: "✗ mismatch", type: "source", kind: "data" });
+      outputs.push({ id: "exec-match", label: "✓ match", type: "source", kind: "exec" });
+      outputs.push({ id: "exec-mismatch", label: "✗ mismatch", type: "source", kind: "exec" });
       break;
 
     case "string-literal":
@@ -254,6 +284,8 @@ export function getStepHandles(
  */
 export function getRequestHandles(bodyFields: string[], queryFields: string[]): HandleDef[] {
   const handles: HandleDef[] = [];
+  // Exec-out: the entry point of the pipeline execution
+  handles.push({ id: "exec-out", label: "▶", type: "source", kind: "exec" });
   bodyFields.forEach((f) => {
     handles.push({ id: `body-${f}`, label: f, type: "source", kind: "data" });
   });
@@ -298,6 +330,16 @@ const dataHandleStyle = (color: string): React.CSSProperties => ({
   boxShadow: `0 0 4px ${color}33`,
 });
 
+const execHandleStyle = (): React.CSSProperties => ({
+  width: 10,
+  height: 10,
+  background: "hsl(var(--card))",
+  border: "2.5px solid #e2e8f0",
+  borderRadius: "2px",
+  transform: "rotate(45deg)",
+  boxShadow: "0 0 6px rgba(226,232,240,0.25)",
+});
+
 // ── Shared inline input style ─────────────────────────────────────────
 const inlineInputStyle: React.CSSProperties = {
   width: "100%",
@@ -328,6 +370,28 @@ function StepNodeComponent({ data, selected }: NodeProps) {
   const icon = STEP_ICONS[step.type];
   const meta = STEP_TYPE_META[step.type as PipelineStepType];
   const { inputs, outputs } = getStepHandles(step, dbSchema, connectedCollectionName);
+
+  // ── Double-click rename ────────────────────────────────────────────
+  const [isRenaming, setIsRenaming] = useState(false);
+  const [renameValue, setRenameValue] = useState(step.label);
+  const renameRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isRenaming && renameRef.current) {
+      renameRef.current.focus();
+      renameRef.current.select();
+    }
+  }, [isRenaming]);
+
+  const commitRename = () => {
+    const trimmed = renameValue.trim();
+    if (trimmed && trimmed !== step.label) {
+      onStepChange(step.id, { label: trimmed });
+    } else {
+      setRenameValue(step.label);
+    }
+    setIsRenaming(false);
+  };
 
   const bodyRows = Math.max(inputs.length, outputs.length);
   const isValidate = step.type === "validate";
@@ -414,9 +478,43 @@ function StepNodeComponent({ data, selected }: NodeProps) {
         }}
       >
         {icon}
-        <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-          {step.label || meta?.label || step.type}
-        </span>
+        {isRenaming ? (
+          <input
+            ref={renameRef}
+            value={renameValue}
+            onChange={(e) => setRenameValue(e.target.value)}
+            onBlur={commitRename}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") commitRename();
+              if (e.key === "Escape") { setRenameValue(step.label); setIsRenaming(false); }
+              e.stopPropagation();
+            }}
+            style={{
+              flex: 1,
+              background: "transparent",
+              border: "none",
+              borderBottom: "1px solid currentColor",
+              outline: "none",
+              color: "inherit",
+              font: "inherit",
+              fontWeight: 600,
+              padding: 0,
+              margin: 0,
+              minWidth: 0,
+            }}
+          />
+        ) : (
+          <span
+            style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", cursor: "text" }}
+            onDoubleClick={(e) => {
+              e.stopPropagation();
+              setRenameValue(step.label || meta?.label || step.type);
+              setIsRenaming(true);
+            }}
+          >
+            {step.label || meta?.label || step.type}
+          </span>
+        )}
         {!step.isEnabled && <span style={{ fontSize: 9, opacity: 0.5 }}>OFF</span>}
       </div>
 
@@ -567,30 +665,32 @@ function StepNodeComponent({ data, selected }: NodeProps) {
         </div>
       )}
 
-      {/* Data input handles */}
+      {/* Input handles */}
       {inputs.map((inp, i) => {
         const top = HEADER_HEIGHT + inlineHeight + BODY_PAD + i * ROW_HEIGHT + ROW_HEIGHT / 2;
+        const style = inp.kind === "exec" ? execHandleStyle() : dataHandleStyle(colors.handle);
         return (
           <Handle
             key={inp.id}
             type="target"
             position={Position.Left}
             id={inp.id}
-            style={{ ...dataHandleStyle(colors.handle), top }}
+            style={{ ...style, top }}
           />
         );
       })}
 
-      {/* Data output handles */}
+      {/* Output handles */}
       {outputs.map((out, i) => {
         const top = HEADER_HEIGHT + inlineHeight + BODY_PAD + i * ROW_HEIGHT + ROW_HEIGHT / 2;
+        const style = out.kind === "exec" ? execHandleStyle() : dataHandleStyle(colors.handle);
         return (
           <Handle
             key={out.id}
             type="source"
             position={Position.Right}
             id={out.id}
-            style={{ ...dataHandleStyle(colors.handle), top }}
+            style={{ ...style, top }}
           />
         );
       })}
@@ -676,16 +776,17 @@ function RequestNodeComponent({ data }: NodeProps) {
         </div>
       )}
 
-      {/* Data output handles */}
+      {/* Output handles */}
       {handles.map((h, i) => {
         const top = HEADER_HEIGHT + BODY_PAD + i * ROW_HEIGHT + ROW_HEIGHT / 2;
+        const style = h.kind === "exec" ? execHandleStyle() : dataHandleStyle(colors.handle);
         return (
           <Handle
             key={h.id}
             type="source"
             position={Position.Right}
             id={h.id}
-            style={{ ...dataHandleStyle(colors.handle), top }}
+            style={{ ...style, top }}
           />
         );
       })}
