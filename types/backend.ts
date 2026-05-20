@@ -97,6 +97,10 @@ export type PipelineStepType =
   | "collection"
   | "hash"
   | "hash-compare"
+  | "firebase-signup"
+  | "firebase-login"
+  | "firebase-signout"
+  | "firebase-get-user"
   | "string-literal"
   | "number-literal"
   | "boolean-literal"
@@ -246,6 +250,28 @@ export interface JsonLiteralConfig {
   value: string; // Raw JSON string
 }
 
+// ── Firebase Auth Step Configs ────────────────────────────────────────
+
+/** Config for "firebase-signup" step — creates a user with Firebase Auth */
+export interface FirebaseSignupStepConfig {
+  resultVariable: string;     // Variable to store { uid, email } of created user
+}
+
+/** Config for "firebase-login" step — signs in with Firebase Auth */
+export interface FirebaseLoginStepConfig {
+  resultVariable: string;     // Variable to store { uid, email, token } of logged-in user
+}
+
+/** Config for "firebase-signout" step — signs out the current user */
+export interface FirebaseSignoutStepConfig {
+  // No config needed; just signs out
+}
+
+/** Config for "firebase-get-user" step — gets the current authenticated user */
+export interface FirebaseGetUserStepConfig {
+  resultVariable: string;     // Variable to store current user info or null
+}
+
 /**
  * A single step in the Logic Pipeline.
  * Steps execute top-to-bottom. Each step reads from / writes to
@@ -273,6 +299,10 @@ export interface PipelineStep {
   collectionConfig?: CollectionStepConfig;
   hashConfig?: HashStepConfig;
   hashCompareConfig?: HashCompareStepConfig;
+  firebaseSignupConfig?: FirebaseSignupStepConfig;
+  firebaseLoginConfig?: FirebaseLoginStepConfig;
+  firebaseSignoutConfig?: FirebaseSignoutStepConfig;
+  firebaseGetUserConfig?: FirebaseGetUserStepConfig;
   stringLiteralConfig?: StringLiteralConfig;
   numberLiteralConfig?: NumberLiteralConfig;
   booleanLiteralConfig?: BooleanLiteralConfig;
@@ -385,6 +415,30 @@ export const STEP_TYPE_META: Record<PipelineStepType, {
     description: "A raw JSON value",
     icon: "Braces",
     color: "slate",
+  },
+  "firebase-signup": {
+    label: "Firebase Signup",
+    description: "Create a user with Firebase Auth",
+    icon: "UserPlus",
+    color: "amber",
+  },
+  "firebase-login": {
+    label: "Firebase Login",
+    description: "Sign in with Firebase Auth",
+    icon: "LogIn",
+    color: "green",
+  },
+  "firebase-signout": {
+    label: "Firebase Signout",
+    description: "Sign out the current user",
+    icon: "LogOut",
+    color: "red",
+  },
+  "firebase-get-user": {
+    label: "Get User",
+    description: "Get the current authenticated user",
+    icon: "User",
+    color: "blue",
   },
 };
 

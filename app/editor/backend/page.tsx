@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { Loading } from "@/components/ui/loading";
 import { BackendEditorLayout } from "@/components/editor/backend/BackendEditorLayout";
 import { ApiEndpoint, DbCollection } from "@/types/backend";
+import type { UserFirebaseConfig } from "@/types/editor";
 
 // Utility to recursively remove undefined values so Firebase doesn't complain
 const sanitizeForFirestore = (obj: any): any => {
@@ -38,6 +39,7 @@ export default function BackendEditorPage() {
 
   const [apiEndpoints, setApiEndpoints] = useState<ApiEndpoint[]>([]);
   const [dbSchema, setDbSchema] = useState<DbCollection[]>([]);
+  const [firebaseConfig, setFirebaseConfig] = useState<UserFirebaseConfig | undefined>(undefined);
   const [projectName, setProjectName] = useState("");
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [isSavingManual, setIsSavingManual] = useState(false);
@@ -89,6 +91,7 @@ export default function BackendEditorPage() {
     if (projectData && isInitialLoad) {
       setApiEndpoints(projectData.apiEndpoints || []);
       setDbSchema(projectData.dbSchema || []);
+      setFirebaseConfig(projectData.firebaseConfig || undefined);
       setProjectName(projectData.name || "Untitled Project");
       setIsInitialLoad(false);
     }
@@ -102,6 +105,7 @@ export default function BackendEditorPage() {
       const updates = sanitizeForFirestore({
         apiEndpoints,
         dbSchema,
+        ...(firebaseConfig ? { firebaseConfig } : {}),
       });
 
       updateProjectMutation.mutate({
@@ -112,7 +116,7 @@ export default function BackendEditorPage() {
     }, 2000);
 
     return () => clearTimeout(timeoutId);
-  }, [apiEndpoints, dbSchema, projectId, user, isInitialLoad]);
+  }, [apiEndpoints, dbSchema, firebaseConfig, projectId, user, isInitialLoad]);
 
   // Manual save
   const handleManualSave = async () => {
@@ -123,6 +127,7 @@ export default function BackendEditorPage() {
       const updates = sanitizeForFirestore({
         apiEndpoints,
         dbSchema,
+        ...(firebaseConfig ? { firebaseConfig } : {}),
       });
 
       await updateProjectMutation.mutateAsync({
@@ -158,6 +163,8 @@ export default function BackendEditorPage() {
       onEndpointsChange={setApiEndpoints}
       dbSchema={dbSchema}
       onDbSchemaChange={setDbSchema}
+      firebaseConfig={firebaseConfig}
+      onFirebaseConfigChange={setFirebaseConfig}
       projectId={projectId}
       projectName={projectName}
       onSave={handleManualSave}

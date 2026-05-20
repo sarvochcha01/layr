@@ -655,6 +655,75 @@ export async function executePipeline(
           break;
         }
 
+        // ── Firebase Auth steps ─────────────────────────────────────────
+
+        case "firebase-signup": {
+          if (!step.firebaseSignupConfig || !delegate) break;
+          const cfg = step.firebaseSignupConfig;
+          const email = getInput("auth-email") ?? resolveContextPath(ctx, "body.email");
+          const password = getInput("auth-password") ?? resolveContextPath(ctx, "body.password");
+
+          if (!email || !password) {
+            throw new Error("Email and password are required for Firebase signup");
+          }
+
+          const result = await delegate.firebaseSignup(String(email), String(password));
+          if (cfg.resultVariable) ctx.variables[cfg.resultVariable] = result;
+          outputs.set("auth-user", result);
+          outputs.set("auth-uid", result.uid);
+          outputs.set("auth-email", result.email);
+          break;
+        }
+
+        case "firebase-login": {
+          if (!step.firebaseLoginConfig || !delegate) break;
+          const cfg = step.firebaseLoginConfig;
+          const email = getInput("auth-email") ?? resolveContextPath(ctx, "body.email");
+          const password = getInput("auth-password") ?? resolveContextPath(ctx, "body.password");
+
+          if (!email || !password) {
+            throw new Error("Email and password are required for Firebase login");
+          }
+
+          try {
+            const result = await delegate.firebaseLogin(String(email), String(password));
+            if (cfg.resultVariable) ctx.variables[cfg.resultVariable] = result;
+            outputs.set("auth-user", result);
+            outputs.set("auth-uid", result.uid);
+            outputs.set("auth-email", result.email);
+            outputs.set("auth-token", result.token);
+            nextExecHandle = "exec-out";
+          } catch (loginError: any) {
+            // Firebase auth errors (wrong password, user not found, etc.)
+            nextExecHandle = "exec-fail";
+            trace.push({
+              stepId: step.id, stepLabel: step.label, stepType: step.type,
+              status: "fail", detail: `Auth failed: ${loginError.message || loginError}`,
+              durationMs: Math.round(performance.now() - startTime),
+            });
+          }
+          break;
+        }
+
+        case "firebase-signout": {
+          if (!delegate) break;
+          await delegate.firebaseSignout();
+          break;
+        }
+
+        case "firebase-get-user": {
+          if (!step.firebaseGetUserConfig || !delegate) break;
+          const cfg = step.firebaseGetUserConfig;
+          const result = await delegate.firebaseGetUser();
+          if (cfg.resultVariable) ctx.variables[cfg.resultVariable] = result;
+          outputs.set("auth-user", result);
+          if (result) {
+            outputs.set("auth-uid", result.uid);
+            outputs.set("auth-email", result.email);
+          }
+          break;
+        }
+
         // Literal & collection nodes are pure data — already seeded, skip
         case "collection":
         case "string-literal":

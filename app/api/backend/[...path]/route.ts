@@ -4,6 +4,7 @@ import { db } from "@/lib/firebase";
 import { ApiEndpoint } from "@/types/backend";
 import { executePipeline } from "@/lib/pipeline-executor";
 import { createFirestoreDelegate } from "@/lib/pipeline-delegates";
+import type { UserFirebaseConfig } from "@/types/editor";
 
 /**
  * Dynamic catch-all API route that serves mock data
@@ -15,6 +16,9 @@ import { createFirestoreDelegate } from "@/lib/pipeline-delegates";
  * Matches the incoming method + path against the project's
  * apiEndpoints array. If the endpoint has a Logic Pipeline enabled,
  * executes the pipeline steps. Otherwise returns the configured mock response.
+ *
+ * When the project has a `firebaseConfig`, the pipeline delegate
+ * uses the USER's Firebase for auth & database operations.
  */
 async function handleRequest(
   request: NextRequest,
@@ -47,6 +51,7 @@ async function handleRequest(
 
     const projectData = projectSnap.data();
     const endpoints: ApiEndpoint[] = projectData.apiEndpoints || [];
+    const userFirebaseConfig: UserFirebaseConfig | undefined = projectData.firebaseConfig;
 
     // Find matching endpoint
     const endpoint = endpoints.find(
@@ -69,7 +74,7 @@ async function handleRequest(
       );
     }
 
-    // ── Pipeline Mode ─────────────────────────────────────────────
+    // -- Pipeline Mode -------------------------------------------------
     if (endpoint.usePipeline && endpoint.pipeline && endpoint.pipeline.length > 0) {
       let body: Record<string, any> = {};
       try {
@@ -84,8 +89,8 @@ async function handleRequest(
       const headers: Record<string, string> = {};
       request.headers.forEach((v, k) => { headers[k] = v; });
 
-      // Create delegate for DB/Hash operations scoped to this project
-      const delegate = createFirestoreDelegate(projectId);
+      // Create delegate � uses user's Firebase when config is available
+      const delegate = createFirestoreDelegate(projectId, userFirebaseConfig);
 
       const result = await executePipeline(endpoint.pipeline, {
         body,
@@ -97,25 +102,24 @@ async function handleRequest(
         status: result.status,
         headers: {
           "X-Layr-Endpoint": endpoint.name,
-          "X-Layr-Data-Source": "pipeline",
+          "X-Layr-Data-Source": userFirebaseConfig ? "user-firebase" : "pipeline",
           "X-Layr-Pipeline-Trace": JSON.stringify(result.trace),
         },
       });
     }
 
-    // ── Mock Mode (default) ───────────────────────────────────────
+    // -- Mock Mode (default) -------------------------------------------
     const statusCode = endpoint.statusCode || 200;
     const mockData = endpoint.mockResponse;
 
     // For write methods (POST/PUT/PATCH), echo back the received body
-    // so the user can verify their data mapping is working
     let responseData: any;
     if (["POST", "PUT", "PATCH"].includes(method)) {
       let receivedBody = null;
       try {
         receivedBody = await request.json();
       } catch {
-        // No body or invalid JSON — that's fine
+        // No body or invalid JSON
       }
       responseData = mockData ?? {
         success: true,

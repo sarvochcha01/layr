@@ -2,9 +2,11 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { ApiEndpoint, DbCollection } from "@/types/backend";
+import type { UserFirebaseConfig } from "@/types/editor";
 import { EndpointList } from "./EndpointList";
 import { EndpointEditor } from "./EndpointEditor";
 import { FirestoreExplorer } from "./FirestoreExplorer";
+import { FirebaseConfigEditor } from "./FirebaseConfigEditor";
 import { generateId } from "@/lib/utils";
 import { ENDPOINT_TEMPLATES } from "@/lib/endpoint-templates";
 import {
@@ -15,6 +17,7 @@ import {
   Zap,
   Layers,
   BookTemplate,
+  Flame,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -23,19 +26,23 @@ interface BackendEditorLayoutProps {
   onEndpointsChange: (endpoints: ApiEndpoint[]) => void;
   dbSchema: DbCollection[];
   onDbSchemaChange: (schema: DbCollection[]) => void;
+  firebaseConfig?: UserFirebaseConfig;
+  onFirebaseConfigChange?: (config: UserFirebaseConfig | undefined) => void;
   projectId: string | null;
   projectName: string;
   onSave?: () => void;
   isSaving?: boolean;
 }
 
-type ViewMode = "endpoints" | "schema";
+type ViewMode = "endpoints" | "schema" | "firebase";
 
 export function BackendEditorLayout({
   endpoints,
   onEndpointsChange,
   dbSchema,
   onDbSchemaChange,
+  firebaseConfig,
+  onFirebaseConfigChange,
   projectId,
   projectName,
   onSave,
@@ -119,6 +126,60 @@ export function BackendEditorLayout({
           ],
         },
       ]);
+    }
+
+    // Create ecommerce collection schemas
+    if (template.category === "ecommerce") {
+      const existingNames = new Set(dbSchema.map((c) => c.name));
+      const newCollections: DbCollection[] = [];
+
+      if (!existingNames.has("products")) {
+        newCollections.push({
+          id: generateId(),
+          name: "products",
+          description: "Product catalog",
+          fields: [
+            { id: generateId(), name: "name", type: "string", required: true },
+            { id: generateId(), name: "price", type: "number", required: true },
+            { id: generateId(), name: "description", type: "string", required: false },
+            { id: generateId(), name: "image", type: "string", required: false },
+            { id: generateId(), name: "category", type: "string", required: false },
+          ],
+        });
+      }
+      if (!existingNames.has("carts")) {
+        newCollections.push({
+          id: generateId(),
+          name: "carts",
+          description: "User shopping carts",
+          fields: [
+            { id: generateId(), name: "userId", type: "string", required: true },
+            { id: generateId(), name: "productId", type: "string", required: true },
+            { id: generateId(), name: "name", type: "string", required: false },
+            { id: generateId(), name: "price", type: "number", required: false },
+            { id: generateId(), name: "quantity", type: "number", required: false },
+            { id: generateId(), name: "image", type: "string", required: false },
+          ],
+        });
+      }
+      if (!existingNames.has("orders")) {
+        newCollections.push({
+          id: generateId(),
+          name: "orders",
+          description: "Customer orders",
+          fields: [
+            { id: generateId(), name: "userId", type: "string", required: true },
+            { id: generateId(), name: "items", type: "array", required: true },
+            { id: generateId(), name: "total", type: "number", required: true },
+            { id: generateId(), name: "shippingAddress", type: "object", required: false },
+            { id: generateId(), name: "status", type: "string", required: false },
+          ],
+        });
+      }
+
+      if (newCollections.length > 0) {
+        onDbSchemaChange([...dbSchema, ...newCollections]);
+      }
     }
 
     onEndpointsChange([...endpoints, ...uniqueNew]);
@@ -307,6 +368,18 @@ export function BackendEditorLayout({
               Schema
               <span className="text-[9px] text-muted-foreground/50">{dbSchema.length}</span>
             </button>
+            <button
+              onClick={() => setViewMode("firebase")}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium transition-colors ${
+                viewMode === "firebase"
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground/60 hover:text-foreground"
+              }`}
+            >
+              <Flame className="w-3.5 h-3.5" />
+              Firebase
+              {firebaseConfig && <span className="w-1.5 h-1.5 rounded-full bg-green-500" />}
+            </button>
           </div>
 
           {/* Templates */}
@@ -379,7 +452,15 @@ export function BackendEditorLayout({
       </div>
 
       {/* ── Main Content ──────────────────────────────────────────── */}
-      {viewMode === "schema" ? (
+      {viewMode === "firebase" ? (
+        /* Firebase Config Editor */
+        <div className="flex flex-1 overflow-hidden min-h-0">
+          <FirebaseConfigEditor
+            config={firebaseConfig}
+            onChange={onFirebaseConfigChange}
+          />
+        </div>
+      ) : viewMode === "schema" ? (
         /* Unified Firestore Database Explorer */
         <div className="flex flex-1 overflow-hidden min-h-0">
           <FirestoreExplorer

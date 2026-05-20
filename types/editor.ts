@@ -1,4 +1,14 @@
-import { ApiEndpoint } from "./backend";
+import { ApiEndpoint, DbCollection } from "./backend";
+
+/** Firebase config that users provide for their own project's auth & database */
+export interface UserFirebaseConfig {
+    apiKey: string;
+    authDomain: string;
+    projectId: string;
+    storageBucket?: string;
+    messagingSenderId?: string;
+    appId: string;
+}
 
 export interface ComponentDefinition {
     id: string;
@@ -49,6 +59,8 @@ export interface Project {
     pages: Page[];
     globalComponents?: GlobalComponents;
     apiEndpoints?: ApiEndpoint[];
+    dbCollections?: DbCollection[];       // User-defined database collections
+    firebaseConfig?: UserFirebaseConfig;  // User's own Firebase config for their app
     globalThemeStyle?: string; // Global theme for the project
     isGlobalThemeEnabled?: boolean; // Whether global theme is active
     themeOverrides?: {

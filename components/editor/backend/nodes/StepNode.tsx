@@ -26,6 +26,10 @@ import {
   ToggleLeft,
   Braces,
   TableProperties,
+  UserPlus,
+  LogIn,
+  LogOut,
+  User,
 } from "lucide-react";
 
 // ── Icons ─────────────────────────────────────────────────────────────
@@ -46,6 +50,10 @@ const STEP_ICONS: Record<string, React.ReactNode> = {
   "number-literal": <Hash className="w-3.5 h-3.5" />,
   "boolean-literal": <ToggleLeft className="w-3.5 h-3.5" />,
   "json-literal": <Braces className="w-3.5 h-3.5" />,
+  "firebase-signup": <UserPlus className="w-3.5 h-3.5" />,
+  "firebase-login": <LogIn className="w-3.5 h-3.5" />,
+  "firebase-signout": <LogOut className="w-3.5 h-3.5" />,
+  "firebase-get-user": <User className="w-3.5 h-3.5" />,
 };
 
 // ── Colors (Unreal Blueprint-inspired palette) ────────────────────────
@@ -66,6 +74,10 @@ const STEP_COLORS: Record<string, { bg: string; text: string; handle: string }> 
   "number-literal":  { bg: "rgba(148,163,184,0.12)",  text: "#94a3b8", handle: "#94a3b8" },
   "boolean-literal": { bg: "rgba(148,163,184,0.12)",  text: "#94a3b8", handle: "#94a3b8" },
   "json-literal":    { bg: "rgba(148,163,184,0.12)",  text: "#94a3b8", handle: "#94a3b8" },
+  "firebase-signup":  { bg: "rgba(245,158,11,0.15)",  text: "#fbbf24", handle: "#fbbf24" },
+  "firebase-login":   { bg: "rgba(34,197,94,0.15)",   text: "#4ade80", handle: "#4ade80" },
+  "firebase-signout": { bg: "rgba(239,68,68,0.15)",   text: "#f87171", handle: "#f87171" },
+  "firebase-get-user":{ bg: "rgba(59,130,246,0.15)",  text: "#60a5fa", handle: "#60a5fa" },
 };
 
 // ── Handle defs ───────────────────────────────────────────────────────
@@ -272,6 +284,40 @@ export function getStepHandles(
     case "boolean-literal":
     case "json-literal":
       outputs.push({ id: "literal-value", label: "value", type: "source", kind: "data" });
+      break;
+
+    case "firebase-signup":
+      addExecIn();
+      inputs.push({ id: "auth-email", label: "email", type: "target", kind: "data" });
+      inputs.push({ id: "auth-password", label: "password", type: "target", kind: "data" });
+      addExecOut();
+      outputs.push({ id: "auth-user", label: "user", type: "source", kind: "data" });
+      outputs.push({ id: "auth-uid", label: "uid", type: "source", kind: "data" });
+      outputs.push({ id: "auth-email", label: "email", type: "source", kind: "data" });
+      break;
+
+    case "firebase-login":
+      addExecIn();
+      inputs.push({ id: "auth-email", label: "email", type: "target", kind: "data" });
+      inputs.push({ id: "auth-password", label: "password", type: "target", kind: "data" });
+      outputs.push({ id: "exec-out", label: "✓ success", type: "source", kind: "exec" });
+      outputs.push({ id: "exec-fail", label: "✗ failed", type: "source", kind: "exec" });
+      outputs.push({ id: "auth-user", label: "user", type: "source", kind: "data" });
+      outputs.push({ id: "auth-uid", label: "uid", type: "source", kind: "data" });
+      outputs.push({ id: "auth-token", label: "token", type: "source", kind: "data" });
+      break;
+
+    case "firebase-signout":
+      addExecIn();
+      addExecOut();
+      break;
+
+    case "firebase-get-user":
+      addExecIn();
+      addExecOut();
+      outputs.push({ id: "auth-user", label: "user", type: "source", kind: "data" });
+      outputs.push({ id: "auth-uid", label: "uid", type: "source", kind: "data" });
+      outputs.push({ id: "auth-email", label: "email", type: "source", kind: "data" });
       break;
   }
 
