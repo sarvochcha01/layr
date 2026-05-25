@@ -1,0 +1,309 @@
+{
+    "name": "Amazon-Style E-Commerce Store",
+    "description": "Full-featured e-commerce template with Home, Shop, Product Detail, Cart, Checkout, and Account pages. Includes Firebase Auth integration and complete backend endpoints.",
+    "category": "E-commerce",
+    "thumbnail": "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400",
+    "featured": true,
+    "pages": [
+        {
+            "id": "home-page",
+            "name": "Home",
+            "slug": "index",
+            "components": [
+                {
+                    "id": "nav-home",
+                    "type": "Navbar",
+                    "props": {
+                        "logoText": "NEXUS STORE",
+                        "links": [
+                            { "text": "Home", "href": "/" },
+                            { "text": "Shop", "href": "/shop" },
+                            { "text": "Cart", "href": "/cart" },
+                            { "text": "Account", "href": "/account" }
+                        ],
+                        "ctaText": "🛒 Cart",
+                        "ctaLink": "/cart",
+                        "theme": "dark"
+                    },
+                    "children": [],
+                    "isGlobal": "GlobalNavbar"
+                },
+                {
+                    "id": "home-hero",
+                    "type": "Hero",
+                    "props": {
+                        "title": "Shop the Future",
+                        "subtitle": "NEW COLLECTION 2024",
+                        "description": "Discover premium products curated for the modern lifestyle. Free shipping on orders over $50.",
+                        "primaryButtonText": "Shop Now",
+                        "primaryButtonLink": "/shop",
+                        "secondaryButtonText": "View Deals",
+                        "secondaryButtonLink": "/shop",
+                        "backgroundImage": "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1920",
+                        "backgroundSize": "cover",
+                        "backgroundPosition": "center",
+                        "minHeight": "650px",
+                        "textAlign": "center",
+                        "textColor": "#FFFFFF",
+                        "backgroundImageOverlay": 0.5
+                    },
+                    "children": []
+                },
+                {
+                    "id": "home-features",
+                    "type": "Container",
+                    "props": {
+                        "padding": "xl",
+                        "backgroundColor": "#0f172a",
+                        "maxWidth": "xl",
+                        "marginLeft": "auto",
+                        "marginRight": "auto"
+                    },
+                    "children": [
+                        {
+                            "id": "features-grid",
+                            "type": "Grid",
+                            "props": { "columns": 4, "gap": "2rem" },
+                            "children": [
+                                { "id": "feat-1", "type": "Feature", "props": { "title": "Free Shipping", "description": "On orders over $50", "icon": "🚚", "textAlign": "center" }, "children": [] },
+                                { "id": "feat-2", "type": "Feature", "props": { "title": "24/7 Support", "description": "Always here to help", "icon": "💬", "textAlign": "center" }, "children": [] },
+                                { "id": "feat-3", "type": "Feature", "props": { "title": "Easy Returns", "description": "30-day return policy", "icon": "↩️", "textAlign": "center" }, "children": [] },
+                                { "id": "feat-4", "type": "Feature", "props": { "title": "Secure Payment", "description": "100% encrypted", "icon": "🔒", "textAlign": "center" }, "children": [] }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "home-categories",
+                    "type": "Container",
+                    "props": { "padding": "2xl", "backgroundColor": "#FFFFFF", "maxWidth": "xl", "marginLeft": "auto", "marginRight": "auto" },
+                    "children": [
+                        { "id": "cat-title", "type": "Text", "props": { "content": "Shop by Category", "tag": "h2", "size": "3xl", "weight": "700", "color": "#111827", "marginBottom": "2rem", "textAlign": "center" }, "children": [] },
+                        {
+                            "id": "cat-grid",
+                            "type": "Grid",
+                            "props": { "columns": 4, "gap": "1.5rem" },
+                            "children": [
+                                { "id": "cat-1", "type": "Card", "props": { "title": "Electronics", "description": "Latest gadgets & tech", "buttonText": "Browse", "buttonLink": "/shop", "backgroundColor": "#FFFFFF", "borderRadius": "12px" }, "children": [{ "id": "cat-img-1", "type": "Image", "props": { "src": "https://images.unsplash.com/photo-1498049794561-7780e7231661?w=400", "alt": "Electronics", "height": "200px", "objectFit": "cover" }, "children": [] }] },
+                                { "id": "cat-2", "type": "Card", "props": { "title": "Fashion", "description": "Trending styles", "buttonText": "Browse", "buttonLink": "/shop", "backgroundColor": "#FFFFFF", "borderRadius": "12px" }, "children": [{ "id": "cat-img-2", "type": "Image", "props": { "src": "https://images.unsplash.com/photo-1445205170230-053b83016050?w=400", "alt": "Fashion", "height": "200px", "objectFit": "cover" }, "children": [] }] },
+                                { "id": "cat-3", "type": "Card", "props": { "title": "Home & Living", "description": "Elevate your space", "buttonText": "Browse", "buttonLink": "/shop", "backgroundColor": "#FFFFFF", "borderRadius": "12px" }, "children": [{ "id": "cat-img-3", "type": "Image", "props": { "src": "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400", "alt": "Home", "height": "200px", "objectFit": "cover" }, "children": [] }] },
+                                { "id": "cat-4", "type": "Card", "props": { "title": "Sports", "description": "Gear up for adventure", "buttonText": "Browse", "buttonLink": "/shop", "backgroundColor": "#FFFFFF", "borderRadius": "12px" }, "children": [{ "id": "cat-img-4", "type": "Image", "props": { "src": "https://images.unsplash.com/photo-1461896836934-bd45ba8fcf9b?w=400", "alt": "Sports", "height": "200px", "objectFit": "cover" }, "children": [] }] }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "home-featured",
+                    "type": "Container",
+                    "props": { "padding": "2xl", "backgroundColor": "#F8FAFC", "maxWidth": "xl", "marginLeft": "auto", "marginRight": "auto" },
+                    "children": [
+                        { "id": "fp-title", "type": "Text", "props": { "content": "Featured Products", "tag": "h2", "size": "3xl", "weight": "700", "color": "#111827", "marginBottom": "2rem", "textAlign": "center" }, "children": [] },
+                        {
+                            "id": "fp-grid",
+                            "type": "Grid",
+                            "props": { "columns": 4, "gap": "1.5rem" },
+                            "children": [
+                                { "id": "fp-1", "type": "Card", "props": { "title": "Wireless Headphones", "description": "$129.99", "buttonText": "Add to Cart", "backgroundColor": "#FFFFFF", "borderRadius": "12px" }, "children": [{ "id": "fp-img-1", "type": "Image", "props": { "src": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400", "alt": "Headphones", "height": "250px", "objectFit": "cover" }, "children": [] }] },
+                                { "id": "fp-2", "type": "Card", "props": { "title": "Smart Watch Pro", "description": "$299.99", "buttonText": "Add to Cart", "backgroundColor": "#FFFFFF", "borderRadius": "12px" }, "children": [{ "id": "fp-img-2", "type": "Image", "props": { "src": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400", "alt": "Watch", "height": "250px", "objectFit": "cover" }, "children": [] }] },
+                                { "id": "fp-3", "type": "Card", "props": { "title": "Designer Backpack", "description": "$89.99", "buttonText": "Add to Cart", "backgroundColor": "#FFFFFF", "borderRadius": "12px" }, "children": [{ "id": "fp-img-3", "type": "Image", "props": { "src": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400", "alt": "Backpack", "height": "250px", "objectFit": "cover" }, "children": [] }] },
+                                { "id": "fp-4", "type": "Card", "props": { "title": "Running Shoes", "description": "$149.99", "buttonText": "Add to Cart", "backgroundColor": "#FFFFFF", "borderRadius": "12px" }, "children": [{ "id": "fp-img-4", "type": "Image", "props": { "src": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400", "alt": "Shoes", "height": "250px", "objectFit": "cover" }, "children": [] }] }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "home-deals",
+                    "type": "CTA",
+                    "props": {
+                        "title": "🔥 Flash Sale — Up to 60% Off",
+                        "description": "Limited time only. Don't miss out on our biggest sale of the season!",
+                        "primaryButtonText": "Shop Sale",
+                        "primaryButtonLink": "/shop",
+                        "backgroundColor": "#1E293B",
+                        "textColor": "#FFFFFF"
+                    },
+                    "children": []
+                },
+                {
+                    "id": "home-testimonials",
+                    "type": "Container",
+                    "props": { "padding": "2xl", "backgroundColor": "#FFFFFF", "maxWidth": "xl", "marginLeft": "auto", "marginRight": "auto" },
+                    "children": [
+                        { "id": "test-title", "type": "Text", "props": { "content": "What Our Customers Say", "tag": "h2", "size": "3xl", "weight": "700", "color": "#111827", "marginBottom": "2rem", "textAlign": "center" }, "children": [] },
+                        {
+                            "id": "test-grid",
+                            "type": "Grid",
+                            "props": { "columns": 3, "gap": "2rem" },
+                            "children": [
+                                { "id": "test-1", "type": "Testimonial", "props": { "quote": "Incredible quality and lightning-fast delivery. My go-to store for everything!", "author": "Sarah Chen", "role": "Verified Buyer", "rating": 5 }, "children": [] },
+                                { "id": "test-2", "type": "Testimonial", "props": { "quote": "The best online shopping experience. Customer service is outstanding!", "author": "Marcus Rivera", "role": "Verified Buyer", "rating": 5 }, "children": [] },
+                                { "id": "test-3", "type": "Testimonial", "props": { "quote": "Premium products at great prices. Free returns made me a loyal customer.", "author": "Emily Watson", "role": "Verified Buyer", "rating": 5 }, "children": [] }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "home-footer",
+                    "type": "Footer",
+                    "props": {
+                        "logoText": "NEXUS STORE",
+                        "description": "Your destination for premium products and an unmatched shopping experience.",
+                        "copyright": "© 2024 Nexus Store. All rights reserved.",
+                        "backgroundColor": "#0F172A",
+                        "textColor": "#94A3B8",
+                        "sections": [
+                            { "title": "Shop", "links": [{ "text": "New Arrivals", "href": "/shop" }, { "text": "Best Sellers", "href": "/shop" }, { "text": "Sale", "href": "/shop" }, { "text": "Gift Cards", "href": "#" }] },
+                            { "title": "Support", "links": [{ "text": "Contact Us", "href": "#" }, { "text": "Shipping", "href": "#" }, { "text": "Returns", "href": "#" }, { "text": "FAQ", "href": "#" }] },
+                            { "title": "Company", "links": [{ "text": "About", "href": "#" }, { "text": "Careers", "href": "#" }, { "text": "Privacy", "href": "#" }, { "text": "Terms", "href": "#" }] }
+                        ]
+                    },
+                    "children": [],
+                    "isGlobal": "GlobalFooter"
+                }
+            ]
+        },
+        {
+            "id": "shop-page",
+            "name": "Shop",
+            "slug": "shop",
+            "components": [
+                { "id": "nav-shop", "type": "Navbar", "props": {}, "children": [], "isGlobal": "GlobalNavbar" },
+                {
+                    "id": "shop-header",
+                    "type": "Container",
+                    "props": { "padding": "xl", "backgroundColor": "#F8FAFC", "textAlign": "center" },
+                    "children": [
+                        { "id": "shop-title", "type": "Text", "props": { "content": "Shop All Products", "tag": "h1", "size": "3xl", "weight": "700", "color": "#111827", "marginBottom": "0.5rem" }, "children": [] },
+                        { "id": "shop-sub", "type": "Text", "props": { "content": "Discover our curated collection of premium products", "tag": "p", "size": "lg", "color": "#6B7280" }, "children": [] }
+                    ]
+                },
+                {
+                    "id": "shop-products",
+                    "type": "Container",
+                    "props": { "padding": "2xl", "backgroundColor": "#FFFFFF", "maxWidth": "xl", "marginLeft": "auto", "marginRight": "auto" },
+                    "children": [
+                        {
+                            "id": "shop-grid",
+                            "type": "Grid",
+                            "props": { "columns": 4, "gap": "1.5rem" },
+                            "children": [
+                                { "id": "sp-1", "type": "Card", "props": { "title": "Wireless Earbuds Pro", "description": "$79.99", "buttonText": "Add to Cart", "backgroundColor": "#FFFFFF", "borderRadius": "12px" }, "children": [{ "id": "sp-img-1", "type": "Image", "props": { "src": "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=400", "alt": "Earbuds", "height": "280px", "objectFit": "cover" }, "children": [] }] },
+                                { "id": "sp-2", "type": "Card", "props": { "title": "Leather Messenger Bag", "description": "$159.99", "buttonText": "Add to Cart", "backgroundColor": "#FFFFFF", "borderRadius": "12px" }, "children": [{ "id": "sp-img-2", "type": "Image", "props": { "src": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400", "alt": "Bag", "height": "280px", "objectFit": "cover" }, "children": [] }] },
+                                { "id": "sp-3", "type": "Card", "props": { "title": "Minimalist Watch", "description": "$199.99", "buttonText": "Add to Cart", "backgroundColor": "#FFFFFF", "borderRadius": "12px" }, "children": [{ "id": "sp-img-3", "type": "Image", "props": { "src": "https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=400", "alt": "Watch", "height": "280px", "objectFit": "cover" }, "children": [] }] },
+                                { "id": "sp-4", "type": "Card", "props": { "title": "Canvas Sneakers", "description": "$69.99", "buttonText": "Add to Cart", "backgroundColor": "#FFFFFF", "borderRadius": "12px" }, "children": [{ "id": "sp-img-4", "type": "Image", "props": { "src": "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400", "alt": "Sneakers", "height": "280px", "objectFit": "cover" }, "children": [] }] },
+                                { "id": "sp-5", "type": "Card", "props": { "title": "Bluetooth Speaker", "description": "$49.99", "buttonText": "Add to Cart", "backgroundColor": "#FFFFFF", "borderRadius": "12px" }, "children": [{ "id": "sp-img-5", "type": "Image", "props": { "src": "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=400", "alt": "Speaker", "height": "280px", "objectFit": "cover" }, "children": [] }] },
+                                { "id": "sp-6", "type": "Card", "props": { "title": "Sunglasses", "description": "$129.99", "buttonText": "Add to Cart", "backgroundColor": "#FFFFFF", "borderRadius": "12px" }, "children": [{ "id": "sp-img-6", "type": "Image", "props": { "src": "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400", "alt": "Sunglasses", "height": "280px", "objectFit": "cover" }, "children": [] }] },
+                                { "id": "sp-7", "type": "Card", "props": { "title": "Denim Jacket", "description": "$119.99", "buttonText": "Add to Cart", "backgroundColor": "#FFFFFF", "borderRadius": "12px" }, "children": [{ "id": "sp-img-7", "type": "Image", "props": { "src": "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400", "alt": "Jacket", "height": "280px", "objectFit": "cover" }, "children": [] }] },
+                                { "id": "sp-8", "type": "Card", "props": { "title": "Yoga Mat Premium", "description": "$39.99", "buttonText": "Add to Cart", "backgroundColor": "#FFFFFF", "borderRadius": "12px" }, "children": [{ "id": "sp-img-8", "type": "Image", "props": { "src": "https://images.unsplash.com/photo-1601925260368-ae2f83cf8b7f?w=400", "alt": "Yoga Mat", "height": "280px", "objectFit": "cover" }, "children": [] }] }
+                            ]
+                        }
+                    ]
+                },
+                { "id": "shop-footer", "type": "Footer", "props": {}, "children": [], "isGlobal": "GlobalFooter" }
+            ]
+        },
+        {
+            "id": "cart-page",
+            "name": "Cart",
+            "slug": "cart",
+            "components": [
+                { "id": "nav-cart", "type": "Navbar", "props": {}, "children": [], "isGlobal": "GlobalNavbar" },
+                {
+                    "id": "cart-container",
+                    "type": "Container",
+                    "props": { "padding": "2xl", "backgroundColor": "#F8FAFC", "maxWidth": "lg", "marginLeft": "auto", "marginRight": "auto" },
+                    "children": [
+                        { "id": "cart-title", "type": "Text", "props": { "content": "🛒 Your Shopping Cart", "tag": "h1", "size": "3xl", "weight": "700", "color": "#111827", "marginBottom": "2rem" }, "children": [] },
+                        { "id": "cart-item-1", "type": "Card", "props": { "title": "Wireless Headphones", "description": "$129.99 × 1 = $129.99", "buttonText": "Remove", "backgroundColor": "#FFFFFF", "borderRadius": "12px" }, "children": [] },
+                        { "id": "cart-item-2", "type": "Card", "props": { "title": "Smart Watch Pro", "description": "$299.99 × 1 = $299.99", "buttonText": "Remove", "backgroundColor": "#FFFFFF", "borderRadius": "12px" }, "children": [] },
+                        { "id": "cart-divider", "type": "Divider", "props": {}, "children": [] },
+                        { "id": "cart-total", "type": "Text", "props": { "content": "Total: $429.98", "tag": "h2", "size": "2xl", "weight": "700", "color": "#111827", "textAlign": "right", "marginBottom": "1rem" }, "children": [] },
+                        { "id": "cart-checkout-btn", "type": "Button", "props": { "text": "Proceed to Checkout →", "variant": "default", "size": "lg", "fullWidth": true, "href": "/checkout" }, "children": [] }
+                    ]
+                },
+                { "id": "cart-footer", "type": "Footer", "props": {}, "children": [], "isGlobal": "GlobalFooter" }
+            ]
+        },
+        {
+            "id": "checkout-page",
+            "name": "Checkout",
+            "slug": "checkout",
+            "components": [
+                { "id": "nav-checkout", "type": "Navbar", "props": {}, "children": [], "isGlobal": "GlobalNavbar" },
+                {
+                    "id": "checkout-container",
+                    "type": "Container",
+                    "props": { "padding": "2xl", "backgroundColor": "#F8FAFC", "maxWidth": "lg", "marginLeft": "auto", "marginRight": "auto" },
+                    "children": [
+                        { "id": "checkout-title", "type": "Text", "props": { "content": "Checkout", "tag": "h1", "size": "3xl", "weight": "700", "color": "#111827", "marginBottom": "2rem" }, "children": [] },
+                        {
+                            "id": "checkout-form",
+                            "type": "Form",
+                            "props": {
+                                "title": "Shipping Information",
+                                "description": "Enter your delivery details",
+                                "fields": [
+                                    { "id": "fullName", "label": "Full Name", "type": "text", "placeholder": "John Doe", "required": true },
+                                    { "id": "email", "label": "Email", "type": "email", "placeholder": "john@example.com", "required": true },
+                                    { "id": "address", "label": "Address", "type": "text", "placeholder": "123 Main Street", "required": true },
+                                    { "id": "city", "label": "City", "type": "text", "placeholder": "New York", "required": true },
+                                    { "id": "zip", "label": "Zip Code", "type": "text", "placeholder": "10001", "required": true }
+                                ],
+                                "submitText": "Place Order — $429.98"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                { "id": "checkout-footer", "type": "Footer", "props": {}, "children": [], "isGlobal": "GlobalFooter" }
+            ]
+        },
+        {
+            "id": "account-page",
+            "name": "Account",
+            "slug": "account",
+            "components": [
+                { "id": "nav-account", "type": "Navbar", "props": {}, "children": [], "isGlobal": "GlobalNavbar" },
+                {
+                    "id": "account-container",
+                    "type": "Container",
+                    "props": { "padding": "2xl", "backgroundColor": "#F8FAFC", "maxWidth": "md", "marginLeft": "auto", "marginRight": "auto" },
+                    "children": [
+                        { "id": "account-title", "type": "Text", "props": { "content": "Welcome Back", "tag": "h1", "size": "3xl", "weight": "700", "color": "#111827", "marginBottom": "0.5rem", "textAlign": "center" }, "children": [] },
+                        { "id": "account-sub", "type": "Text", "props": { "content": "Sign in to your account or create a new one", "tag": "p", "size": "lg", "color": "#6B7280", "marginBottom": "2rem", "textAlign": "center" }, "children": [] },
+                        {
+                            "id": "login-form",
+                            "type": "Form",
+                            "props": {
+                                "title": "Sign In",
+                                "fields": [
+                                    { "id": "email", "label": "Email Address", "type": "email", "placeholder": "you@example.com", "required": true },
+                                    { "id": "password", "label": "Password", "type": "password", "placeholder": "••••••••", "required": true }
+                                ],
+                                "submitText": "Sign In"
+                            },
+                            "children": []
+                        },
+                        { "id": "account-spacer", "type": "Spacer", "props": { "size": "md" }, "children": [] },
+                        {
+                            "id": "signup-form",
+                            "type": "Form",
+                            "props": {
+                                "title": "Create Account",
+                                "description": "New here? Create an account to get started",
+                                "fields": [
+                                    { "id": "name", "label": "Full Name", "type": "text", "placeholder": "John Doe", "required": true },
+                                    { "id": "email", "label": "Email Address", "type": "email", "placeholder": "you@example.com", "required": true },
+                                    { "id": "password", "label": "Password", "type": "password", "placeholder": "Min 6 characters", "required": true }
+                                ],
+                                "submitText": "Create Account"
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                { "id": "account-footer", "type": "Footer", "props": {}, "children": [], "isGlobal": "GlobalFooter" }
+            ]
+        }
+    ]
+}

@@ -15,7 +15,7 @@ export interface EndpointTemplate {
   name: string;
   description: string;
   icon: string;
-  category: "auth" | "crud" | "utility";
+  category: "auth" | "crud" | "utility" | "ecommerce";
   create: () => ApiEndpoint[];
 }
 
@@ -525,6 +525,548 @@ export const ENDPOINT_TEMPLATES: EndpointTemplate[] = [
       });
 
       return [list, create, del];
+    },
+  },
+
+  // ─────────────────────────────── ECOMMERCE ──────────────────────────
+  {
+    id: "ecommerce-full",
+    name: "E-Commerce: Full Store",
+    description: "Complete e-commerce backend with Firebase Auth, products CRUD, cart management, and orders.",
+    icon: "🛒",
+    category: "ecommerce",
+    create: () => {
+      // ── POST /auth/signup ─────────────────────────────────────────
+
+      const sValEmail = makeStep("validate", "Validate Email", {
+        validateConfig: {
+          rules: [
+            { id: generateId(), field: "body.email", rule: "required", errorMessage: "Email is required" },
+            { id: generateId(), field: "body.email", rule: "email", errorMessage: "Invalid email format" },
+          ],
+          failStatus: 400,
+        },
+      }, { x: COL_GAP, y: 50 });
+
+      const sValPw = makeStep("validate", "Validate Password", {
+        validateConfig: {
+          rules: [
+            { id: generateId(), field: "body.password", rule: "required", errorMessage: "Password is required" },
+            { id: generateId(), field: "body.password", rule: "minLength", value: "6", errorMessage: "Password must be at least 6 characters" },
+          ],
+          failStatus: 400,
+        },
+      }, { x: COL_GAP * 2, y: 50 });
+
+      const sFirebaseSignup = makeStep("firebase-signup", "Create Account", {
+        firebaseSignupConfig: { resultVariable: "newUser" },
+      }, { x: COL_GAP * 3, y: 50 });
+
+      const sRespondSignup = makeStep("respond", "Return User", {
+        respondConfig: {
+          status: 201,
+          bodyMode: "static",
+          staticBody: { success: true, message: "Account created successfully" },
+        },
+      }, { x: COL_GAP * 4, y: 50 });
+
+      const signupPipeline = [sValEmail, sValPw, sFirebaseSignup, sRespondSignup];
+      const signupEdges: PipelineEdge[] = [
+        execEdge(REQUEST_NODE_ID, "exec-out", sValEmail.id),
+        execEdge(sValEmail.id, "exec-pass", sValPw.id),
+        execEdge(sValPw.id, "exec-pass", sFirebaseSignup.id),
+        execEdge(sFirebaseSignup.id, "exec-out", sRespondSignup.id),
+        dataEdge(REQUEST_NODE_ID, "body-email", sValEmail.id, "validate-data"),
+        dataEdge(REQUEST_NODE_ID, "body-password", sValPw.id, "validate-data"),
+        dataEdge(REQUEST_NODE_ID, "body-email", sFirebaseSignup.id, "auth-email"),
+        dataEdge(REQUEST_NODE_ID, "body-password", sFirebaseSignup.id, "auth-password"),
+      ];
+
+      const signup = makeEndpoint({
+        name: "Sign Up",
+        path: "/auth/signup",
+        method: "POST",
+        description: "Register a new user with Firebase Auth",
+        requestBody: [
+          { id: generateId(), name: "email", type: "string", required: true },
+          { id: generateId(), name: "password", type: "string", required: true },
+        ],
+        pipeline: signupPipeline,
+        nodeEdges: signupEdges,
+      });
+
+      // ── POST /auth/login ──────────────────────────────────────────
+
+      const lValEmail = makeStep("validate", "Validate Email", {
+        validateConfig: {
+          rules: [
+            { id: generateId(), field: "body.email", rule: "required", errorMessage: "Email is required" },
+          ],
+          failStatus: 400,
+        },
+      }, { x: COL_GAP, y: 50 });
+
+      const lValPw = makeStep("validate", "Validate Password", {
+        validateConfig: {
+          rules: [
+            { id: generateId(), field: "body.password", rule: "required", errorMessage: "Password is required" },
+          ],
+          failStatus: 400,
+        },
+      }, { x: COL_GAP * 2, y: 50 });
+
+      const lFirebaseLogin = makeStep("firebase-login", "Sign In", {
+        firebaseLoginConfig: { resultVariable: "loggedInUser" },
+      }, { x: COL_GAP * 3, y: 50 });
+
+      const lRespondOk = makeStep("respond", "Return Token", {
+        respondConfig: {
+          status: 200,
+          bodyMode: "mapping",
+          bodyMapping: {
+            success: "true",
+            uid: "variables.loggedInUser.uid",
+            email: "variables.loggedInUser.email",
+            token: "variables.loggedInUser.token",
+          },
+        },
+      }, { x: COL_GAP * 4, y: 50 });
+
+      const lRespondFail = makeStep("respond", "Auth Failed", {
+        respondConfig: {
+          status: 401,
+          bodyMode: "static",
+          staticBody: { error: "Invalid email or password" },
+        },
+      }, { x: COL_GAP * 4, y: ROW_GAP + 50 });
+
+      const loginPipeline = [lValEmail, lValPw, lFirebaseLogin, lRespondOk, lRespondFail];
+      const loginEdges: PipelineEdge[] = [
+        execEdge(REQUEST_NODE_ID, "exec-out", lValEmail.id),
+        execEdge(lValEmail.id, "exec-pass", lValPw.id),
+        execEdge(lValPw.id, "exec-pass", lFirebaseLogin.id),
+        execEdge(lFirebaseLogin.id, "exec-out", lRespondOk.id),
+        execEdge(lFirebaseLogin.id, "exec-fail", lRespondFail.id),
+        dataEdge(REQUEST_NODE_ID, "body-email", lValEmail.id, "validate-data"),
+        dataEdge(REQUEST_NODE_ID, "body-password", lValPw.id, "validate-data"),
+        dataEdge(REQUEST_NODE_ID, "body-email", lFirebaseLogin.id, "auth-email"),
+        dataEdge(REQUEST_NODE_ID, "body-password", lFirebaseLogin.id, "auth-password"),
+      ];
+
+      const login = makeEndpoint({
+        name: "Login",
+        path: "/auth/login",
+        method: "POST",
+        description: "Authenticate with Firebase Auth",
+        requestBody: [
+          { id: generateId(), name: "email", type: "string", required: true },
+          { id: generateId(), name: "password", type: "string", required: true },
+        ],
+        pipeline: loginPipeline,
+        nodeEdges: loginEdges,
+      });
+
+      // ── GET /products ─────────────────────────────────────────────
+
+      const pCol = makeStep("collection", "Products Collection", {
+        collectionConfig: { collectionName: "products" },
+      }, { x: COL_GAP, y: 250 });
+
+      const pQuery = makeStep("db-query", "Fetch Products", {
+        dbQueryConfig: {
+          collection: "products",
+          filters: [],
+          limit: 50,
+          resultVariable: "products",
+        },
+      }, { x: COL_GAP, y: 50 });
+
+      const pRespond = makeStep("respond", "Return Products", {
+        respondConfig: {
+          status: 200,
+          bodyMode: "mapping",
+          bodyMapping: { products: "variables.products" },
+        },
+      }, { x: COL_GAP * 2, y: 50 });
+
+      const listProducts = makeEndpoint({
+        name: "List Products",
+        path: "/products",
+        method: "GET",
+        description: "Get all products",
+        pipeline: [pCol, pQuery, pRespond],
+        nodeEdges: [
+          execEdge(REQUEST_NODE_ID, "exec-out", pQuery.id),
+          execEdge(pQuery.id, "exec-out", pRespond.id),
+          dataEdge(pCol.id, "collection-out", pQuery.id, "q-collection"),
+        ],
+      });
+
+      // ── POST /products ────────────────────────────────────────────
+
+      const cpVal = makeStep("validate", "Validate Product", {
+        validateConfig: {
+          rules: [
+            { id: generateId(), field: "body.name", rule: "required", errorMessage: "Product name is required" },
+            { id: generateId(), field: "body.price", rule: "required", errorMessage: "Price is required" },
+          ],
+          failStatus: 400,
+        },
+      }, { x: COL_GAP, y: 50 });
+
+      const cpCol = makeStep("collection", "Products Collection", {
+        collectionConfig: { collectionName: "products" },
+      }, { x: COL_GAP * 2, y: 300 });
+
+      const cpInsert = makeStep("db-insert", "Insert Product", {
+        dbInsertConfig: {
+          collection: "products",
+          fieldMapping: {},
+          resultVariable: "productId",
+        },
+      }, { x: COL_GAP * 2, y: 50 });
+
+      const cpRespond = makeStep("respond", "Return Created", {
+        respondConfig: {
+          status: 201,
+          bodyMode: "static",
+          staticBody: { success: true, message: "Product created" },
+        },
+      }, { x: COL_GAP * 3, y: 50 });
+
+      const createProduct = makeEndpoint({
+        name: "Create Product",
+        path: "/products",
+        method: "POST",
+        description: "Add a new product",
+        requestBody: [
+          { id: generateId(), name: "name", type: "string", required: true },
+          { id: generateId(), name: "price", type: "number", required: true },
+          { id: generateId(), name: "description", type: "string", required: false },
+          { id: generateId(), name: "image", type: "string", required: false },
+          { id: generateId(), name: "category", type: "string", required: false },
+        ],
+        pipeline: [cpVal, cpCol, cpInsert, cpRespond],
+        nodeEdges: [
+          execEdge(REQUEST_NODE_ID, "exec-out", cpVal.id),
+          execEdge(cpVal.id, "exec-pass", cpInsert.id),
+          execEdge(cpInsert.id, "exec-out", cpRespond.id),
+          dataEdge(REQUEST_NODE_ID, "body-name", cpVal.id, "validate-data"),
+          dataEdge(cpCol.id, "collection-out", cpInsert.id, "i-collection"),
+          dataEdge(REQUEST_NODE_ID, "body-name", cpInsert.id, "field-name"),
+          dataEdge(REQUEST_NODE_ID, "body-price", cpInsert.id, "field-price"),
+          dataEdge(REQUEST_NODE_ID, "body-description", cpInsert.id, "field-description"),
+          dataEdge(REQUEST_NODE_ID, "body-image", cpInsert.id, "field-image"),
+          dataEdge(REQUEST_NODE_ID, "body-category", cpInsert.id, "field-category"),
+        ],
+      });
+
+      // ── DELETE /products ──────────────────────────────────────────
+
+      const dpVal = makeStep("validate", "Validate ID", {
+        validateConfig: {
+          rules: [
+            { id: generateId(), field: "body.id", rule: "required", errorMessage: "Product ID is required" },
+          ],
+          failStatus: 400,
+        },
+      }, { x: COL_GAP, y: 50 });
+
+      const dpCol = makeStep("collection", "Products Collection", {
+        collectionConfig: { collectionName: "products" },
+      }, { x: COL_GAP * 2, y: 300 });
+
+      const dpDelete = makeStep("db-delete", "Delete Product", {
+        dbDeleteConfig: {
+          collection: "products",
+          documentId: "body.id",
+        },
+      }, { x: COL_GAP * 2, y: 50 });
+
+      const dpRespond = makeStep("respond", "Return Success", {
+        respondConfig: {
+          status: 200,
+          bodyMode: "static",
+          staticBody: { success: true, message: "Product deleted" },
+        },
+      }, { x: COL_GAP * 3, y: 50 });
+
+      const deleteProduct = makeEndpoint({
+        name: "Delete Product",
+        path: "/products",
+        method: "DELETE",
+        description: "Delete a product by ID",
+        requestBody: [
+          { id: generateId(), name: "id", type: "string", required: true },
+        ],
+        pipeline: [dpVal, dpCol, dpDelete, dpRespond],
+        nodeEdges: [
+          execEdge(REQUEST_NODE_ID, "exec-out", dpVal.id),
+          execEdge(dpVal.id, "exec-pass", dpDelete.id),
+          execEdge(dpDelete.id, "exec-out", dpRespond.id),
+          dataEdge(REQUEST_NODE_ID, "body-id", dpVal.id, "validate-data"),
+          dataEdge(dpCol.id, "collection-out", dpDelete.id, "d-collection"),
+          dataEdge(REQUEST_NODE_ID, "body-id", dpDelete.id, "doc-id"),
+        ],
+      });
+
+      // ── POST /cart/add ────────────────────────────────────────────
+
+      const caVal = makeStep("validate", "Validate Cart Item", {
+        validateConfig: {
+          rules: [
+            { id: generateId(), field: "body.userId", rule: "required", errorMessage: "User ID is required" },
+            { id: generateId(), field: "body.productId", rule: "required", errorMessage: "Product ID is required" },
+          ],
+          failStatus: 400,
+        },
+      }, { x: COL_GAP, y: 50 });
+
+      const caCol = makeStep("collection", "Cart Collection", {
+        collectionConfig: { collectionName: "carts" },
+      }, { x: COL_GAP * 2, y: 300 });
+
+      const caInsert = makeStep("db-insert", "Add to Cart", {
+        dbInsertConfig: {
+          collection: "carts",
+          fieldMapping: {},
+          resultVariable: "cartItemId",
+        },
+      }, { x: COL_GAP * 2, y: 50 });
+
+      const caRespond = makeStep("respond", "Return Success", {
+        respondConfig: {
+          status: 200,
+          bodyMode: "static",
+          staticBody: { success: true, message: "Item added to cart" },
+        },
+      }, { x: COL_GAP * 3, y: 50 });
+
+      const addToCart = makeEndpoint({
+        name: "Add to Cart",
+        path: "/cart/add",
+        method: "POST",
+        description: "Add a product to the user's cart",
+        requestBody: [
+          { id: generateId(), name: "userId", type: "string", required: true },
+          { id: generateId(), name: "productId", type: "string", required: true },
+          { id: generateId(), name: "name", type: "string", required: false },
+          { id: generateId(), name: "price", type: "number", required: false },
+          { id: generateId(), name: "quantity", type: "number", required: false },
+          { id: generateId(), name: "image", type: "string", required: false },
+        ],
+        pipeline: [caVal, caCol, caInsert, caRespond],
+        nodeEdges: [
+          execEdge(REQUEST_NODE_ID, "exec-out", caVal.id),
+          execEdge(caVal.id, "exec-pass", caInsert.id),
+          execEdge(caInsert.id, "exec-out", caRespond.id),
+          dataEdge(REQUEST_NODE_ID, "body-userId", caVal.id, "validate-data"),
+          dataEdge(caCol.id, "collection-out", caInsert.id, "i-collection"),
+          dataEdge(REQUEST_NODE_ID, "body-userId", caInsert.id, "field-userId"),
+          dataEdge(REQUEST_NODE_ID, "body-productId", caInsert.id, "field-productId"),
+          dataEdge(REQUEST_NODE_ID, "body-name", caInsert.id, "field-name"),
+          dataEdge(REQUEST_NODE_ID, "body-price", caInsert.id, "field-price"),
+          dataEdge(REQUEST_NODE_ID, "body-quantity", caInsert.id, "field-quantity"),
+          dataEdge(REQUEST_NODE_ID, "body-image", caInsert.id, "field-image"),
+        ],
+      });
+
+      // ── POST /cart/remove ─────────────────────────────────────────
+
+      const crVal = makeStep("validate", "Validate Item ID", {
+        validateConfig: {
+          rules: [
+            { id: generateId(), field: "body.cartItemId", rule: "required", errorMessage: "Cart item ID is required" },
+          ],
+          failStatus: 400,
+        },
+      }, { x: COL_GAP, y: 50 });
+
+      const crCol = makeStep("collection", "Cart Collection", {
+        collectionConfig: { collectionName: "carts" },
+      }, { x: COL_GAP * 2, y: 300 });
+
+      const crDelete = makeStep("db-delete", "Remove from Cart", {
+        dbDeleteConfig: {
+          collection: "carts",
+          documentId: "body.cartItemId",
+        },
+      }, { x: COL_GAP * 2, y: 50 });
+
+      const crRespond = makeStep("respond", "Return Success", {
+        respondConfig: {
+          status: 200,
+          bodyMode: "static",
+          staticBody: { success: true, message: "Item removed from cart" },
+        },
+      }, { x: COL_GAP * 3, y: 50 });
+
+      const removeFromCart = makeEndpoint({
+        name: "Remove from Cart",
+        path: "/cart/remove",
+        method: "POST",
+        description: "Remove a product from the cart",
+        requestBody: [
+          { id: generateId(), name: "cartItemId", type: "string", required: true },
+        ],
+        pipeline: [crVal, crCol, crDelete, crRespond],
+        nodeEdges: [
+          execEdge(REQUEST_NODE_ID, "exec-out", crVal.id),
+          execEdge(crVal.id, "exec-pass", crDelete.id),
+          execEdge(crDelete.id, "exec-out", crRespond.id),
+          dataEdge(REQUEST_NODE_ID, "body-cartItemId", crVal.id, "validate-data"),
+          dataEdge(crCol.id, "collection-out", crDelete.id, "d-collection"),
+          dataEdge(REQUEST_NODE_ID, "body-cartItemId", crDelete.id, "doc-id"),
+        ],
+      });
+
+      // ── GET /cart ─────────────────────────────────────────────────
+
+      const gcCol = makeStep("collection", "Cart Collection", {
+        collectionConfig: { collectionName: "carts" },
+      }, { x: COL_GAP, y: 250 });
+
+      const gcQuery = makeStep("db-query", "Fetch Cart Items", {
+        dbQueryConfig: {
+          collection: "carts",
+          filters: [
+            { id: generateId(), field: "userId", operator: "==", value: "query.userId", isLiteral: false },
+          ],
+          limit: 100,
+          resultVariable: "cartItems",
+        },
+      }, { x: COL_GAP, y: 50 });
+
+      const gcRespond = makeStep("respond", "Return Cart", {
+        respondConfig: {
+          status: 200,
+          bodyMode: "mapping",
+          bodyMapping: { items: "variables.cartItems" },
+        },
+      }, { x: COL_GAP * 2, y: 50 });
+
+      const getCart = makeEndpoint({
+        name: "Get Cart",
+        path: "/cart",
+        method: "GET",
+        description: "Get all items in a user's cart",
+        queryParams: [
+          { id: generateId(), name: "userId", type: "string", required: true },
+        ],
+        pipeline: [gcCol, gcQuery, gcRespond],
+        nodeEdges: [
+          execEdge(REQUEST_NODE_ID, "exec-out", gcQuery.id),
+          execEdge(gcQuery.id, "exec-out", gcRespond.id),
+          dataEdge(gcCol.id, "collection-out", gcQuery.id, "q-collection"),
+          dataEdge(REQUEST_NODE_ID, "query-userId", gcQuery.id, "filter-userId"),
+        ],
+      });
+
+      // ── POST /orders ──────────────────────────────────────────────
+
+      const oVal = makeStep("validate", "Validate Order", {
+        validateConfig: {
+          rules: [
+            { id: generateId(), field: "body.userId", rule: "required", errorMessage: "User ID is required" },
+            { id: generateId(), field: "body.items", rule: "required", errorMessage: "Items are required" },
+          ],
+          failStatus: 400,
+        },
+      }, { x: COL_GAP, y: 50 });
+
+      const oCol = makeStep("collection", "Orders Collection", {
+        collectionConfig: { collectionName: "orders" },
+      }, { x: COL_GAP * 2, y: 300 });
+
+      const oInsert = makeStep("db-insert", "Create Order", {
+        dbInsertConfig: {
+          collection: "orders",
+          fieldMapping: {},
+          resultVariable: "orderId",
+        },
+      }, { x: COL_GAP * 2, y: 50 });
+
+      const oRespond = makeStep("respond", "Return Order", {
+        respondConfig: {
+          status: 201,
+          bodyMode: "static",
+          staticBody: { success: true, message: "Order placed successfully" },
+        },
+      }, { x: COL_GAP * 3, y: 50 });
+
+      const createOrder = makeEndpoint({
+        name: "Create Order",
+        path: "/orders",
+        method: "POST",
+        description: "Place a new order",
+        requestBody: [
+          { id: generateId(), name: "userId", type: "string", required: true },
+          { id: generateId(), name: "items", type: "array", required: true },
+          { id: generateId(), name: "total", type: "number", required: true },
+          { id: generateId(), name: "shippingAddress", type: "object", required: false },
+        ],
+        pipeline: [oVal, oCol, oInsert, oRespond],
+        nodeEdges: [
+          execEdge(REQUEST_NODE_ID, "exec-out", oVal.id),
+          execEdge(oVal.id, "exec-pass", oInsert.id),
+          execEdge(oInsert.id, "exec-out", oRespond.id),
+          dataEdge(REQUEST_NODE_ID, "body-userId", oVal.id, "validate-data"),
+          dataEdge(oCol.id, "collection-out", oInsert.id, "i-collection"),
+          dataEdge(REQUEST_NODE_ID, "body-userId", oInsert.id, "field-userId"),
+          dataEdge(REQUEST_NODE_ID, "body-items", oInsert.id, "field-items"),
+          dataEdge(REQUEST_NODE_ID, "body-total", oInsert.id, "field-total"),
+          dataEdge(REQUEST_NODE_ID, "body-shippingAddress", oInsert.id, "field-shippingAddress"),
+        ],
+      });
+
+      // ── GET /orders ───────────────────────────────────────────────
+
+      const goCol = makeStep("collection", "Orders Collection", {
+        collectionConfig: { collectionName: "orders" },
+      }, { x: COL_GAP, y: 250 });
+
+      const goQuery = makeStep("db-query", "Fetch Orders", {
+        dbQueryConfig: {
+          collection: "orders",
+          filters: [
+            { id: generateId(), field: "userId", operator: "==", value: "query.userId", isLiteral: false },
+          ],
+          limit: 50,
+          resultVariable: "orders",
+        },
+      }, { x: COL_GAP, y: 50 });
+
+      const goRespond = makeStep("respond", "Return Orders", {
+        respondConfig: {
+          status: 200,
+          bodyMode: "mapping",
+          bodyMapping: { orders: "variables.orders" },
+        },
+      }, { x: COL_GAP * 2, y: 50 });
+
+      const getOrders = makeEndpoint({
+        name: "Get Orders",
+        path: "/orders",
+        method: "GET",
+        description: "Get all orders for a user",
+        queryParams: [
+          { id: generateId(), name: "userId", type: "string", required: true },
+        ],
+        pipeline: [goCol, goQuery, goRespond],
+        nodeEdges: [
+          execEdge(REQUEST_NODE_ID, "exec-out", goQuery.id),
+          execEdge(goQuery.id, "exec-out", goRespond.id),
+          dataEdge(goCol.id, "collection-out", goQuery.id, "q-collection"),
+          dataEdge(REQUEST_NODE_ID, "query-userId", goQuery.id, "filter-userId"),
+        ],
+      });
+
+      return [
+        signup, login,
+        listProducts, createProduct, deleteProduct,
+        addToCart, removeFromCart, getCart,
+        createOrder, getOrders,
+      ];
     },
   },
 ];
