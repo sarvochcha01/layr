@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
   collection,
   getDocs,
@@ -9,9 +9,11 @@ import {
   doc,
   query,
   limit,
+  Firestore,
 } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { db, getUserFirestore } from "@/lib/firebase";
 import { DbCollection } from "@/types/backend";
+import type { UserFirebaseConfig } from "@/types/editor";
 import { CollectionSidebar } from "./firestore/CollectionSidebar";
 import { DocumentList } from "./firestore/DocumentList";
 import { DocumentDetail } from "./firestore/DocumentDetail";
@@ -30,12 +32,14 @@ interface FirestoreExplorerProps {
   projectId: string | null;
   dbSchema: DbCollection[];
   onDbSchemaChange: (schema: DbCollection[]) => void;
+  firebaseConfig?: UserFirebaseConfig;
 }
 
 export function FirestoreExplorer({
   projectId,
   dbSchema,
   onDbSchemaChange,
+  firebaseConfig,
 }: FirestoreExplorerProps) {
   const [selectedCollection, setSelectedCollection] = useState<string | null>(null);
   const [documents, setDocuments] = useState<any[]>([]);
@@ -50,6 +54,33 @@ export function FirestoreExplorer({
 
   // Mapping from collection name -> document count (fetched lazily)
   const [collectionDocCounts, setCollectionDocCounts] = useState<Record<string, number>>({});
+
+  // ── Resolve which Firestore and collection path strategy to use ──────
+  // When user has their own Firebase config, data lives at root-level
+  // collections in THEIR Firestore (matching how pipeline-delegates works).
+  // Otherwise, fall back to Layr's Firestore at projects/{id}/data/{col}/records.
+  const useUserFirebase = !!(firebaseConfig?.apiKey && firebaseConfig?.projectId && firebaseConfig?.appId);
+
+  const firestoreDb: Firestore = useMemo(() => {
+    if (useUserFirebase && projectId) {
+      try {
+        return getUserFirestore(firebaseConfig!, projectId);
+      } catch (e) {
+        console.warn("Failed to init user Firebase, falling back to Layr DB:", e);
+        return db;
+      }
+    }
+    return db;
+  }, [useUserFirebase, firebaseConfig, projectId]);
+
+  const getCollectionPath = useCallback((colName: string) => {
+    if (useUserFirebase) {
+      // User's Firebase: collections at root level (same as pipeline-delegates)
+      return colName;
+    }
+    // Layr's Firebase: scoped under projects/{projectId}/data/{col}/records
+    return `projects/${projectId}/data/${colName}/records`;
+  }, [useUserFirebase, projectId]);
 
   // 1. Discover collections and fetch counts
   const fetchCounts = useCallback(async () => {
@@ -78,7 +109,8 @@ export function FirestoreExplorer({
     for (const name of commonNames) {
       if (!name) continue;
       try {
-        const colRef = collection(db, `projects/${projectId}/data/${name}/records`);
+        const colPath = getCollectionPath(name);
+        const colRef = collection(firestoreDb, colPath);
         const snap = await getDocs(query(colRef, limit(100)));
         
         if (!snap.empty || schemaNames.includes(name)) {
@@ -107,19 +139,20 @@ export function FirestoreExplorer({
     if (missingFromSchema.length > 0) {
       onDbSchemaChange([...dbSchema, ...missingFromSchema]);
     }
-  }, [projectId, dbSchema, onDbSchemaChange]);
+  }, [projectId, dbSchema, onDbSchemaChange, firestoreDb, getCollectionPath]);
 
   useEffect(() => {
     fetchCounts();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [projectId]); // Run once per project load, otherwise it might loop if dbSchema updates
+  }, [projectId, useUserFirebase]); // Re-run when project loads or firebase config changes
 
   // 2. Fetch docs when collection selected
   const fetchDocuments = useCallback(async (colName: string) => {
     if (!projectId) return;
     setIsLoadingDocs(true);
     try {
-      const colRef = collection(db, `projects/${projectId}/data/${colName}/records`);
+      const colPath = getCollectionPath(colName);
+      const colRef = collection(firestoreDb, colPath);
       const snap = await getDocs(colRef);
       const docs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
       setDocuments(docs);
@@ -132,7 +165,7 @@ export function FirestoreExplorer({
     } finally {
       setIsLoadingDocs(false);
     }
-  }, [projectId]);
+  }, [projectId, firestoreDb, getCollectionPath]);
 
   useEffect(() => {
     if (selectedCollection) {
@@ -148,7 +181,8 @@ export function FirestoreExplorer({
   const handleSaveDoc = async (docId: string, data: Record<string, any>) => {
     if (!projectId || !selectedCollection) return;
     try {
-      const docRef = doc(db, `projects/${projectId}/data/${selectedCollection}/records`, docId);
+      const colPath = getCollectionPath(selectedCollection);
+      const docRef = doc(firestoreDb, colPath, docId);
       
       // Add server timestamps
       const now = new Date().toISOString();
@@ -176,7 +210,8 @@ export function FirestoreExplorer({
   const handleDeleteDoc = async (docId: string) => {
     if (!projectId || !selectedCollection) return;
     try {
-      const docRef = doc(db, `projects/${projectId}/data/${selectedCollection}/records`, docId);
+      const colPath = getCollectionPath(selectedCollection);
+      const docRef = doc(firestoreDb, colPath, docId);
       await deleteDoc(docRef);
       
       setDocuments((prev) => prev.filter((d) => d.id !== docId));
@@ -196,9 +231,10 @@ export function FirestoreExplorer({
   const handleBatchDelete = async (docIds: string[]) => {
     if (!projectId || !selectedCollection) return;
     try {
+      const colPath = getCollectionPath(selectedCollection);
       // In a real app we'd use a batched write, but loop is fine for prototyping
       for (const id of docIds) {
-        const docRef = doc(db, `projects/${projectId}/data/${selectedCollection}/records`, id);
+        const docRef = doc(firestoreDb, colPath, id);
         await deleteDoc(docRef);
       }
       
@@ -224,7 +260,8 @@ export function FirestoreExplorer({
 
     try {
       // 1. Fetch all documents to delete them
-      const colRef = collection(db, `projects/${projectId}/data/${name}/records`);
+      const colPath = getCollectionPath(name);
+      const colRef = collection(firestoreDb, colPath);
       const snap = await getDocs(colRef);
       
       // 2. Delete all docs

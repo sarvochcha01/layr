@@ -89,7 +89,7 @@ async function handleRequest(
       const headers: Record<string, string> = {};
       request.headers.forEach((v, k) => { headers[k] = v; });
 
-      // Create delegate — uses user's Firebase when config is available
+      // Create delegate - uses user's Firebase when config is available
       const delegate = createFirestoreDelegate(projectId, userFirebaseConfig);
 
       const result = await executePipeline(endpoint.pipeline, {

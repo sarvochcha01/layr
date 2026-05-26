@@ -154,6 +154,12 @@ export function Navbar({
               // Determine if this link is active based on current page slug
               const getLinkSlug = (href: string, text: string) => {
                 let slug = href;
+                if (slug.startsWith("page:")) {
+                  const pageId = slug.substring(5);
+                  const page = pages?.find((p: any) => p.id === pageId);
+                  if (page) return page.slug;
+                }
+                
                 if (slug.startsWith("page:")) slug = slug.replace("page:", "");
                 else slug = slug.replace(/^\//, "").replace(/\.html$/, "");
                 if (!slug || slug === "#") {
@@ -169,33 +175,17 @@ export function Navbar({
                               (linkSlug === "/" && currentPageSlug === "index");
 
               const handleClick = (e: React.MouseEvent) => {
-                e.preventDefault();
-                e.stopPropagation();
+                // In editor, use onNavigate callback
                 if (onNavigate && !link.external) {
+                  e.preventDefault();
+                  e.stopPropagation();
                   onNavigate(linkSlug);
                 }
+                // In exported project, Link component handles navigation
               };
 
-              return (
-                <a
-                  key={index}
-                  href={link.external ? link.href : "#"}
-                  className="px-4 py-2 text-sm font-medium relative group overflow-hidden transition-all duration-200"
-                  style={{
-                    color: linkColor || (isActive ? "var(--theme-text)" : "var(--theme-text-muted)"),
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.color = linkHoverColor || "var(--theme-text)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.color = linkColor || (isActive ? "var(--theme-text)" : "var(--theme-text-muted)");
-                  }}
-                  onClick={handleClick}
-                  {...(link.external && isPreviewMode && {
-                    target: "_blank",
-                    rel: "noopener noreferrer",
-                  })}
-                >
+              const linkContent = (
+                <>
                   {link.text}
                   {/* Animated underline */}
                   <span
@@ -212,11 +202,79 @@ export function Navbar({
                       style={{
                         background: "var(--theme-accent)",
                         width: "0%",
-                        transition: "width 250ms cubic-bezier(0.4,0,0.2,1), opacity 200ms ease",
+                        transition: "width 250ms cubic-bezier(0.4,0,0.2,1), opacity 250ms cubic-bezier(0.4,0,0.2,1)",
                       }}
                     />
                   )}
-                </a>
+                </>
+              );
+
+              const linkStyles = {
+                color: linkColor || (isActive ? "var(--theme-text)" : "var(--theme-text-muted)"),
+              };
+
+              const linkClassName = "px-4 py-2 text-sm font-medium relative group overflow-hidden transition-all duration-200";
+
+              // External link
+              if (link.external) {
+                return (
+                  <a
+                    key={index}
+                    href={link.href}
+                    className={linkClassName}
+                    style={linkStyles}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.color = linkHoverColor || "var(--theme-text)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = linkColor || (isActive ? "var(--theme-text)" : "var(--theme-text-muted)");
+                    }}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {linkContent}
+                  </a>
+                );
+              }
+
+              // Internal link - use Next.js Link in exported projects, callback in editor
+              if (onNavigate) {
+                // Editor mode - use callback
+                return (
+                  <a
+                    key={index}
+                    href="#"
+                    className={linkClassName}
+                    style={linkStyles}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.color = linkHoverColor || "var(--theme-text)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = linkColor || (isActive ? "var(--theme-text)" : "var(--theme-text-muted)");
+                    }}
+                    onClick={handleClick}
+                  >
+                    {linkContent}
+                  </a>
+                );
+              }
+
+              // Exported project - use Next.js Link
+              return (
+                <Link
+                  key={index}
+                  href={`/${linkSlug === "index" ? "" : linkSlug}`}
+                  className={linkClassName}
+                  style={linkStyles}
+                  onMouseEnter={(e: any) => {
+                    e.currentTarget.style.color = linkHoverColor || "var(--theme-text)";
+                  }}
+                  onMouseLeave={(e: any) => {
+                    e.currentTarget.style.color = linkColor || (isActive ? "var(--theme-text)" : "var(--theme-text-muted)");
+                  }}
+                >
+                  {linkContent}
+                </Link>
               );
             })}
           </div>
@@ -243,9 +301,21 @@ export function Navbar({
                   {ctaText}
                 </a>
               ) : (
-                <Link
-                  href={isPreviewMode ? ctaLink : "#"}
-                  onClick={isPreviewMode ? undefined : (e) => e.preventDefault()}
+                <a
+                  href={isPreviewMode && !ctaLink.startsWith("page:") ? ctaLink : "#"}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (isPreviewMode && onNavigate && ctaLink) {
+                      if (ctaLink.startsWith("page:")) {
+                        const pageId = ctaLink.substring(5);
+                        const page = pages?.find((p: any) => p.id === pageId);
+                        if (page) onNavigate(page.slug);
+                      } else {
+                        const slug = ctaLink.replace(/^\//, "");
+                        onNavigate(slug);
+                      }
+                    }
+                  }}
                   className="inline-flex items-center px-4 h-9 text-xs font-semibold transition-all duration-200 hover:opacity-90 hover:scale-[1.03] active:scale-[0.97]"
                   style={{
                     background: "var(--theme-accent)",
@@ -256,7 +326,7 @@ export function Navbar({
                   }}
                 >
                   {ctaText}
-                </Link>
+                </a>
               )}
             </div>
           )}
@@ -301,6 +371,12 @@ export function Navbar({
               // Determine if this link is active
               const getLinkSlug = (href: string, text: string) => {
                 let slug = href;
+                if (slug.startsWith("page:")) {
+                  const pageId = slug.substring(5);
+                  const page = pages?.find((p: any) => p.id === pageId);
+                  if (page) return page.slug;
+                }
+                
                 if (slug.startsWith("page:")) slug = slug.replace("page:", "");
                 else slug = slug.replace(/^\//, "").replace(/\.html$/, "");
                 if (!slug || slug === "#") {

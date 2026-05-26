@@ -356,6 +356,148 @@ export const ENDPOINT_TEMPLATES: EndpointTemplate[] = [
     },
   },
 
+  // ─────────────────────────── FIREBASE AUTH ───────────────────────────
+  {
+    id: "firebase-auth",
+    name: "Firebase Auth: Signup + Login",
+    description: "Signup & Login endpoints using Firebase Authentication. Requires Firebase config to be set up.",
+    icon: "🔥",
+    category: "auth",
+    create: () => {
+      // ── POST /signup ─────────────────────────────────────────────
+
+      const sValEmail = makeStep("validate", "Validate Email", {
+        validateConfig: {
+          rules: [
+            { id: generateId(), field: "body.email", rule: "required", errorMessage: "Email is required" },
+            { id: generateId(), field: "body.email", rule: "email", errorMessage: "Invalid email format" },
+          ],
+          failStatus: 400,
+        },
+      }, { x: COL_GAP, y: 50 });
+
+      const sValPw = makeStep("validate", "Validate Password", {
+        validateConfig: {
+          rules: [
+            { id: generateId(), field: "body.password", rule: "required", errorMessage: "Password is required" },
+            { id: generateId(), field: "body.password", rule: "minLength", value: "6", errorMessage: "Password must be at least 6 characters" },
+          ],
+          failStatus: 400,
+        },
+      }, { x: COL_GAP * 2, y: 50 });
+
+      const sFirebaseSignup = makeStep("firebase-signup", "Create Account", {
+        firebaseSignupConfig: { resultVariable: "newUser" },
+      }, { x: COL_GAP * 3, y: 50 });
+
+      const sRespondOk = makeStep("respond", "Return Success", {
+        respondConfig: {
+          status: 201,
+          bodyMode: "static",
+          staticBody: { success: true, message: "Account created successfully" },
+        },
+      }, { x: COL_GAP * 4, y: 50 });
+
+      const signupPipeline = [sValEmail, sValPw, sFirebaseSignup, sRespondOk];
+      const signupEdges: PipelineEdge[] = [
+        execEdge(REQUEST_NODE_ID, "exec-out", sValEmail.id),
+        execEdge(sValEmail.id, "exec-pass", sValPw.id),
+        execEdge(sValPw.id, "exec-pass", sFirebaseSignup.id),
+        execEdge(sFirebaseSignup.id, "exec-out", sRespondOk.id),
+        dataEdge(REQUEST_NODE_ID, "body-email", sValEmail.id, "validate-data"),
+        dataEdge(REQUEST_NODE_ID, "body-password", sValPw.id, "validate-data"),
+        dataEdge(REQUEST_NODE_ID, "body-email", sFirebaseSignup.id, "auth-email"),
+        dataEdge(REQUEST_NODE_ID, "body-password", sFirebaseSignup.id, "auth-password"),
+      ];
+
+      const signup = makeEndpoint({
+        name: "Sign Up",
+        path: "/signup",
+        method: "POST",
+        description: "Register a new user with Firebase Auth",
+        requestBody: [
+          { id: generateId(), name: "email", type: "string", required: true },
+          { id: generateId(), name: "password", type: "string", required: true },
+        ],
+        pipeline: signupPipeline,
+        nodeEdges: signupEdges,
+      });
+
+      // ── POST /login ──────────────────────────────────────────────
+
+      const lValEmail = makeStep("validate", "Validate Email", {
+        validateConfig: {
+          rules: [
+            { id: generateId(), field: "body.email", rule: "required", errorMessage: "Email is required" },
+          ],
+          failStatus: 400,
+        },
+      }, { x: COL_GAP, y: 50 });
+
+      const lValPw = makeStep("validate", "Validate Password", {
+        validateConfig: {
+          rules: [
+            { id: generateId(), field: "body.password", rule: "required", errorMessage: "Password is required" },
+          ],
+          failStatus: 400,
+        },
+      }, { x: COL_GAP * 2, y: 50 });
+
+      const lFirebaseLogin = makeStep("firebase-login", "Sign In", {
+        firebaseLoginConfig: { resultVariable: "loggedInUser" },
+      }, { x: COL_GAP * 3, y: 50 });
+
+      const lRespondOk = makeStep("respond", "Return Token", {
+        respondConfig: {
+          status: 200,
+          bodyMode: "mapping",
+          bodyMapping: {
+            success: "true",
+            uid: "variables.loggedInUser.uid",
+            email: "variables.loggedInUser.email",
+            token: "variables.loggedInUser.token",
+          },
+        },
+      }, { x: COL_GAP * 4, y: 50 });
+
+      const lRespondFail = makeStep("respond", "Auth Failed", {
+        respondConfig: {
+          status: 401,
+          bodyMode: "static",
+          staticBody: { error: "Invalid email or password" },
+        },
+      }, { x: COL_GAP * 4, y: ROW_GAP + 50 });
+
+      const loginPipeline = [lValEmail, lValPw, lFirebaseLogin, lRespondOk, lRespondFail];
+      const loginEdges: PipelineEdge[] = [
+        execEdge(REQUEST_NODE_ID, "exec-out", lValEmail.id),
+        execEdge(lValEmail.id, "exec-pass", lValPw.id),
+        execEdge(lValPw.id, "exec-pass", lFirebaseLogin.id),
+        execEdge(lFirebaseLogin.id, "exec-out", lRespondOk.id),
+        execEdge(lFirebaseLogin.id, "exec-fail", lRespondFail.id),
+        dataEdge(REQUEST_NODE_ID, "body-email", lValEmail.id, "validate-data"),
+        dataEdge(REQUEST_NODE_ID, "body-password", lValPw.id, "validate-data"),
+        dataEdge(REQUEST_NODE_ID, "body-email", lFirebaseLogin.id, "auth-email"),
+        dataEdge(REQUEST_NODE_ID, "body-password", lFirebaseLogin.id, "auth-password"),
+      ];
+
+      const login = makeEndpoint({
+        name: "Login",
+        path: "/login",
+        method: "POST",
+        description: "Authenticate with Firebase Auth",
+        requestBody: [
+          { id: generateId(), name: "email", type: "string", required: true },
+          { id: generateId(), name: "password", type: "string", required: true },
+        ],
+        pipeline: loginPipeline,
+        nodeEdges: loginEdges,
+      });
+
+      return [signup, login];
+    },
+  },
+
   // ─────────────────────────────── CRUD ────────────────────────────────
   {
     id: "crud-basic",

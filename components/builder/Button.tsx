@@ -7,6 +7,8 @@ import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
 import { useBackendContext } from "@/contexts/BackendContext";
 import { BackendAction } from "@/types/backend";
 import { useState } from "react";
+import { toast } from "sonner";
+import Link from "next/link";
 
 interface ButtonProps {
   children?: React.ReactNode;
@@ -71,10 +73,6 @@ export function Button({
   const { projectId: ctxProjectId } = useBackendContext();
   const resolvedProjectId = projectId || ctxProjectId;
   const [isLoading, setIsLoading] = useState(false);
-  const [feedback, setFeedback] = useState<{
-    type: "success" | "error";
-    message: string;
-  } | null>(null);
 
   const sizeStyles: React.CSSProperties = {
     sm: { padding: "6px 14px", fontSize: "12px" },
@@ -141,7 +139,6 @@ export function Button({
     if (!backendAction?.endpointId || !resolvedProjectId) return;
 
     setIsLoading(true);
-    setFeedback(null);
 
     try {
       // Build the request body from staticPayload
@@ -184,8 +181,7 @@ export function Button({
         }
       } else if (backendAction.onSuccess !== "none") {
         // Show success feedback (toast mode)
-        setFeedback({ type: "success", message: successMsg });
-        setTimeout(() => setFeedback(null), 3000);
+        toast.success(successMsg);
       }
     } catch (err) {
       const failMode = backendAction.onFail || "toast";
@@ -196,11 +192,7 @@ export function Button({
       }
 
       if (failMode !== "none") {
-        setFeedback({
-          type: "error",
-          message: backendAction.failMessage || (err as Error).message,
-        });
-        setTimeout(() => setFeedback(null), 5000);
+        toast.error(backendAction.failMessage || (err as Error).message);
       }
     } finally {
       setIsLoading(false);
@@ -212,6 +204,7 @@ export function Button({
       e.preventDefault();
       return;
     }
+    // For internal page links in editor, use onNavigate callback
     if (linkInfo.isPageLink && onNavigate && linkInfo.slug) {
       e.preventDefault();
       onNavigate(linkInfo.slug);
@@ -248,37 +241,6 @@ export function Button({
   const wrappedElement = (
     <div style={{ position: "relative", display: fullWidth ? "block" : "inline-flex" }}>
       {buttonElement}
-      {/* Feedback toast */}
-      {feedback && (
-        <div
-          style={{
-            position: "absolute",
-            top: "calc(100% + 8px)",
-            left: "50%",
-            transform: "translateX(-50%)",
-            whiteSpace: "nowrap",
-            padding: "6px 14px",
-            borderRadius: "var(--theme-radius, 6px)",
-            fontSize: "12px",
-            fontWeight: 500,
-            zIndex: 50,
-            animation: "fadeIn 200ms ease",
-            ...(feedback.type === "success"
-              ? {
-                  background: "rgba(34, 197, 94, 0.15)",
-                  color: "#22c55e",
-                  border: "1px solid rgba(34, 197, 94, 0.3)",
-                }
-              : {
-                  background: "rgba(239, 68, 68, 0.15)",
-                  color: "#ef4444",
-                  border: "1px solid rgba(239, 68, 68, 0.3)",
-                }),
-          }}
-        >
-          {feedback.message}
-        </div>
-      )}
     </div>
   );
 
@@ -290,6 +252,16 @@ export function Button({
     );
   }
 
+  // Internal page link - use Next.js Link for proper routing
+  if (linkInfo.isPageLink && !disabled && !backendAction?.endpointId) {
+    return (
+      <Link href={linkInfo.resolved} style={{ display: "inline-flex" }}>
+        {buttonElement}
+      </Link>
+    );
+  }
+
+  // External link
   if (href && !disabled && !linkInfo.isPageLink && !backendAction?.endpointId) {
     return (
       <a

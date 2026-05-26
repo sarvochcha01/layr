@@ -1,6 +1,6 @@
 import { ComponentDefinition } from "@/types/editor";
 0
-export function generateReactComponent(components: ComponentDefinition[], pageName: string = "Page"): string {
+export function generateReactComponent(components: ComponentDefinition[], pageName: string = "Page", pages?: any[]): string {
   const renderComponent = (component: ComponentDefinition, indent: number = 2): string => {
     const { type, props, children } = component;
     const indentStr = " ".repeat(indent);
@@ -9,6 +9,30 @@ export function generateReactComponent(components: ComponentDefinition[], pageNa
     const propsStr = Object.entries(props)
       .filter(([key, value]) => value !== undefined && value !== null)
       .map(([key, value]) => {
+        // Special handling for href prop - resolve page: links
+        if (key === "href" && typeof value === "string" && value.startsWith("page:")) {
+          const pageId = value.substring(5);
+          let page = pages?.find((p: any) => p.id === pageId);
+          
+          // Fallback: if page not found by ID, try to match by name (case-insensitive)
+          if (!page && pages) {
+            const searchName = pageId.toLowerCase().replace(/-/g, ' ');
+            page = pages.find((p: any) => 
+              p.name?.toLowerCase() === searchName ||
+              p.slug?.toLowerCase() === pageId.toLowerCase()
+            );
+          }
+          
+          if (page) {
+            // Convert to actual route path
+            const slug = page.slug === "index" ? "" : page.slug;
+            return `${key}="/${slug}"`;
+          }
+          // If page not found, use # to avoid 404
+          console.warn(`Page not found for href="${value}" - using # as fallback`);
+          return `${key}="#"`;
+        }
+        
         if (typeof value === "string") {
           return `${key}="${value}"`;
         } else if (typeof value === "boolean") {
@@ -107,7 +131,30 @@ export { CustomCode } from './CustomCode';
 `;
 }
 
-export function generatePackageJson(projectName: string): string {
+export function generatePackageJson(projectName: string, extraDependencies: Record<string, string> = {}): string {
+  const baseDependencies = {
+    react: "^19.0.0",
+    "react-dom": "^19.0.0",
+    next: "^15.1.6",
+    clsx: "^2.1.1",
+    "tailwind-merge": "^2.5.5",
+    "lucide-react": "^0.468.0",
+    "@radix-ui/react-slot": "^1.1.1",
+    "@radix-ui/react-label": "^2.1.7",
+    "@radix-ui/react-dialog": "^1.1.15",
+    "@radix-ui/react-dropdown-menu": "^2.1.16",
+    "@radix-ui/react-switch": "^1.2.6",
+    "@radix-ui/react-accordion": "^1.2.3",
+    "@radix-ui/react-tabs": "^1.1.3",
+    "class-variance-authority": "^0.7.1",
+    "sonner": "^2.0.7",
+  };
+
+  const dependencies = {
+    ...baseDependencies,
+    ...extraDependencies,
+  };
+
   return JSON.stringify(
     {
       name: projectName.toLowerCase().replace(/\s+/g, "-"),
@@ -119,23 +166,7 @@ export function generatePackageJson(projectName: string): string {
         start: "next start",
         lint: "next lint",
       },
-      dependencies: {
-        react: "^19.0.0",
-        "react-dom": "^19.0.0",
-        next: "^15.1.6",
-        clsx: "^2.1.1",
-        "tailwind-merge": "^2.5.5",
-        "lucide-react": "^0.468.0",
-        "@radix-ui/react-slot": "^1.1.1",
-        "@radix-ui/react-label": "^2.1.7",
-        "@radix-ui/react-dialog": "^1.1.15",
-        "@radix-ui/react-dropdown-menu": "^2.1.16",
-        "@radix-ui/react-switch": "^1.2.6",
-        "@radix-ui/react-accordion": "^1.2.3",
-        "@radix-ui/react-tabs": "^1.1.3",
-        "class-variance-authority": "^0.7.1",
-        "sonner": "^2.0.7",
-      },
+      dependencies,
       devDependencies: {
         "@types/node": "^22.10.5",
         "@types/react": "^19.0.6",
@@ -182,6 +213,9 @@ module.exports = {
 export function generateAppLayout(projectName: string): string {
   return `import type { Metadata } from 'next';
 import './globals.css';
+import { ThemeStyleProvider } from '@/contexts/ThemeStyleContext';
+import { BackendProvider } from '@/contexts/BackendContext';
+import { Toaster } from 'sonner';
 
 export const metadata: Metadata = {
   title: '${projectName}',
@@ -196,7 +230,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased">
-        {children}
+        <ThemeStyleProvider>
+          <BackendProvider projectId="standalone">
+            <Toaster position="top-right" />
+            {children}
+          </BackendProvider>
+        </ThemeStyleProvider>
       </body>
     </html>
   );
@@ -204,7 +243,7 @@ export default function RootLayout({
 `;
 }
 
-export function generateAppPage(components: ComponentDefinition[], pageName: string = "Home", pageDescription: string = "Welcome to our website"): string {
+export function generateAppPage(components: ComponentDefinition[], pageName: string = "Home", pageDescription: string = "Welcome to our website", pages?: any[]): string {
   const renderComponent = (component: ComponentDefinition, indent: number = 2): string => {
     const { type, props, children } = component;
     const indentStr = " ".repeat(indent);
@@ -213,6 +252,30 @@ export function generateAppPage(components: ComponentDefinition[], pageName: str
     const propsStr = Object.entries(props)
       .filter(([key, value]) => value !== undefined && value !== null)
       .map(([key, value]) => {
+        // Special handling for href prop - resolve page: links
+        if (key === "href" && typeof value === "string" && value.startsWith("page:")) {
+          const pageId = value.substring(5);
+          let page = pages?.find((p: any) => p.id === pageId);
+          
+          // Fallback: if page not found by ID, try to match by name (case-insensitive)
+          if (!page && pages) {
+            const searchName = pageId.toLowerCase().replace(/-/g, ' ');
+            page = pages.find((p: any) => 
+              p.name?.toLowerCase() === searchName ||
+              p.slug?.toLowerCase() === pageId.toLowerCase()
+            );
+          }
+          
+          if (page) {
+            // Convert to actual route path
+            const slug = page.slug === "index" ? "" : page.slug;
+            return `${key}="/${slug}"`;
+          }
+          // If page not found, use # to avoid 404
+          console.warn(`Page not found for href="${value}" - using # as fallback`);
+          return `${key}="#"`;
+        }
+        
         if (typeof value === "string") {
           return `${key}="${value}"`;
         } else if (typeof value === "boolean") {
@@ -1509,7 +1572,53 @@ export function Alert({ message = 'Alert message', type = 'info', className = ''
   return componentTemplates[componentName] || '';
 }
 
-export function generateREADME(projectName: string): string {
+export function generateREADME(projectName: string, hasBackend: boolean = false): string {
+  const backendSection = hasBackend ? `
+
+## Backend API
+
+This project includes a fully functional backend API system.
+
+### Testing Your API
+
+Visit [http://localhost:3000/api-test](http://localhost:3000/api-test) to test your endpoints.
+
+### API Endpoints
+
+All your API endpoints are available at \`/api/backend/*\`. Check the API test page for a complete list.
+
+### Firebase Setup (Required for Pipeline Mode)
+
+If your endpoints use pipeline mode (not mock mode), you need to configure Firebase:
+
+1. Create a Firebase project at [console.firebase.google.com](https://console.firebase.google.com/)
+2. Enable Firestore Database and Authentication
+3. Copy your Firebase config
+4. Update \`.env.local\` with your Firebase credentials:
+
+\`\`\`env
+FIREBASE_API_KEY=your-api-key
+FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+FIREBASE_PROJECT_ID=your-project-id
+FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+FIREBASE_MESSAGING_SENDER_ID=123456789
+FIREBASE_APP_ID=1:123456789:web:abc123
+\`\`\`
+
+### Troubleshooting
+
+- **Endpoint not found**: Check that the path in your component matches the endpoint path exactly
+- **Firebase errors**: Verify your \`.env.local\` has correct Firebase config
+- **Network errors**: Make sure the dev server is running (\`npm run dev\`)
+- **Check logs**: Open browser console and server terminal for detailed error messages
+
+### Mock Mode vs Pipeline Mode
+
+- **Mock Mode**: Returns static mock data, no Firebase needed
+- **Pipeline Mode**: Executes full backend logic with database operations, requires Firebase
+
+` : '';
+
   return `# ${projectName}
 
 This is a Next.js project generated from your website builder.
@@ -1537,11 +1646,14 @@ pnpm dev
 \`\`\`
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
+${backendSection}
 ## Project Structure
 
 - \`/app\` - Next.js App Router pages
 - \`/components\` - React components
+- \`/lib\` - Utility functions and backend logic
+- \`/contexts\` - React context providers
+- \`/types\` - TypeScript type definitions
 - \`/public\` - Static assets
 
 ## Learn More
@@ -1554,6 +1666,8 @@ To learn more about Next.js, take a look at the following resources:
 ## Deploy
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new).
+
+**Important**: When deploying, make sure to add your Firebase environment variables in the Vercel dashboard.
 
 Check out the [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
 `;

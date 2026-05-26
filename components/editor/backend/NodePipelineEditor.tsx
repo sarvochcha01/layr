@@ -35,7 +35,7 @@ import "./nodes/nodeStyles.css";
 import {
   ShieldCheck, GitBranch, Variable, Send, Search, DatabaseZap,
   RefreshCw, Trash2, Lock, ShieldOff, Type, Hash, ToggleLeft,
-  Braces, TableProperties,
+  Braces, TableProperties, UserPlus, LogIn, LogOut, User,
 } from "lucide-react";
 
 // ── Constants ─────────────────────────────────────────────────────────
@@ -77,6 +77,15 @@ const STEP_PALETTE: PaletteSection[] = [
     items: [
       { type: "hash",          label: "Hash",        icon: <Lock className="w-3.5 h-3.5" /> },
       { type: "hash-compare",  label: "Compare Hash",icon: <ShieldOff className="w-3.5 h-3.5" /> },
+    ],
+  },
+  {
+    label: "Firebase",
+    items: [
+      { type: "firebase-signup",   label: "Firebase Signup",  icon: <UserPlus className="w-3.5 h-3.5" /> },
+      { type: "firebase-login",    label: "Firebase Login",   icon: <LogIn className="w-3.5 h-3.5" /> },
+      { type: "firebase-signout",  label: "Firebase Signout", icon: <LogOut className="w-3.5 h-3.5" /> },
+      { type: "firebase-get-user", label: "Get User",         icon: <User className="w-3.5 h-3.5" /> },
     ],
   },
   {
@@ -444,6 +453,10 @@ function NodePipelineEditorInner({ endpoint, onChange, dbSchema = [] }: NodePipe
       case "db-delete":      newStep.dbDeleteConfig      = { collection: "", documentId: "" }; break;
       case "hash":           newStep.hashConfig          = { input: "", resultVariable: "hashed" }; break;
       case "hash-compare":   newStep.hashCompareConfig   = { onFail: "respond", failStatus: 401, failBody: { error: "Invalid credentials" } }; break;
+      case "firebase-signup":  newStep.firebaseSignupConfig  = { resultVariable: "newUser" }; break;
+      case "firebase-login":   newStep.firebaseLoginConfig   = { resultVariable: "loggedInUser" }; break;
+      case "firebase-signout":  newStep.firebaseSignoutConfig  = {}; break;
+      case "firebase-get-user": newStep.firebaseGetUserConfig = { resultVariable: "currentUser" }; break;
       case "string-literal": newStep.stringLiteralConfig = { value: "" }; break;
       case "number-literal": newStep.numberLiteralConfig = { value: 0 }; break;
       case "boolean-literal":newStep.booleanLiteralConfig= { value: false }; break;

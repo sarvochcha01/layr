@@ -91,6 +91,7 @@ export async function PATCH(
             chatHistory,
             apiEndpoints,
             dbSchema,
+            firebaseConfig,
             globalThemeStyle,
             isGlobalThemeEnabled,
             themeOverrides
@@ -110,6 +111,7 @@ export async function PATCH(
         if (chatHistory !== undefined) updateData.chatHistory = chatHistory;
         if (apiEndpoints !== undefined) updateData.apiEndpoints = apiEndpoints;
         if (dbSchema !== undefined) updateData.dbSchema = dbSchema;
+        if (firebaseConfig !== undefined) updateData.firebaseConfig = firebaseConfig;
         if (globalThemeStyle !== undefined) updateData.globalThemeStyle = globalThemeStyle;
         if (isGlobalThemeEnabled !== undefined) updateData.isGlobalThemeEnabled = isGlobalThemeEnabled;
         if (themeOverrides !== undefined) updateData.themeOverrides = themeOverrides;

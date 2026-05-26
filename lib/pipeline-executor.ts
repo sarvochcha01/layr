@@ -667,11 +667,37 @@ export async function executePipeline(
             throw new Error("Email and password are required for Firebase signup");
           }
 
-          const result = await delegate.firebaseSignup(String(email), String(password));
-          if (cfg.resultVariable) ctx.variables[cfg.resultVariable] = result;
-          outputs.set("auth-user", result);
-          outputs.set("auth-uid", result.uid);
-          outputs.set("auth-email", result.email);
+          try {
+            const result = await delegate.firebaseSignup(String(email), String(password));
+            if (cfg.resultVariable) ctx.variables[cfg.resultVariable] = result;
+            outputs.set("auth-user", result);
+            outputs.set("auth-uid", result.uid);
+            outputs.set("auth-email", result.email);
+            nextExecHandle = "exec-out";
+          } catch (signupError: any) {
+            // Firebase auth errors (email already exists, weak password, etc.)
+            // Parse Firebase error codes to user-friendly messages
+            let errorMessage = signupError.message || String(signupError);
+            
+            if (signupError.code === "auth/email-already-in-use") {
+              errorMessage = "An account with this email already exists";
+            } else if (signupError.code === "auth/weak-password") {
+              errorMessage = "Password is too weak. Please use a stronger password";
+            } else if (signupError.code === "auth/invalid-email") {
+              errorMessage = "Invalid email address";
+            }
+            
+            nextExecHandle = "exec-fail";
+            ctx.response.status = 400;
+            ctx.response.body = { error: errorMessage };
+            ctx.response.ended = true;
+            
+            trace.push({
+              stepId: step.id, stepLabel: step.label, stepType: step.type,
+              status: "fail", detail: `Signup failed: ${errorMessage}`,
+              durationMs: Math.round(performance.now() - startTime),
+            });
+          }
           break;
         }
 
@@ -695,10 +721,31 @@ export async function executePipeline(
             nextExecHandle = "exec-out";
           } catch (loginError: any) {
             // Firebase auth errors (wrong password, user not found, etc.)
+            // Parse Firebase error codes to user-friendly messages
+            let errorMessage = loginError.message || String(loginError);
+            
+            if (loginError.code === "auth/user-not-found") {
+              errorMessage = "No account found with this email";
+            } else if (loginError.code === "auth/wrong-password") {
+              errorMessage = "Incorrect password";
+            } else if (loginError.code === "auth/invalid-email") {
+              errorMessage = "Invalid email address";
+            } else if (loginError.code === "auth/user-disabled") {
+              errorMessage = "This account has been disabled";
+            } else if (loginError.code === "auth/too-many-requests") {
+              errorMessage = "Too many failed login attempts. Please try again later";
+            } else if (loginError.code === "auth/invalid-credential") {
+              errorMessage = "Invalid email or password";
+            }
+            
             nextExecHandle = "exec-fail";
+            ctx.response.status = 401;
+            ctx.response.body = { error: errorMessage };
+            ctx.response.ended = true;
+            
             trace.push({
               stepId: step.id, stepLabel: step.label, stepType: step.type,
-              status: "fail", detail: `Auth failed: ${loginError.message || loginError}`,
+              status: "fail", detail: `Login failed: ${errorMessage}`,
               durationMs: Math.round(performance.now() - startTime),
             });
           }

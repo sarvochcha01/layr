@@ -158,6 +158,8 @@ export default function EditorPage() {
 
   // Backend API endpoints (managed by /editor/backend, preserved here during save)
   const [apiEndpoints, setApiEndpoints] = useState<ApiEndpoint[]>([]);
+  const [firebaseConfig, setFirebaseConfig] = useState<any>(undefined);
+  const [dbSchema, setDbSchema] = useState<any[]>([]);
 
   const { addToRecent } = useComponentFavorites();
   const { copyComponent, pasteComponent, hasClipboard } =
@@ -229,9 +231,11 @@ export default function EditorPage() {
         const history = (projectData as any).chatHistory || [];
         setChatHistory(history);
 
-        // Load backend API endpoints
+        // Load backend API endpoints and config
         const endpoints = (projectData as any).apiEndpoints || [];
         setApiEndpoints(endpoints);
+        setFirebaseConfig((projectData as any).firebaseConfig || undefined);
+        setDbSchema((projectData as any).dbSchema || []);
 
         // Load theme settings with validation
         const savedTheme = projectData.globalThemeStyle as ThemeStyleVariant;
@@ -1226,6 +1230,8 @@ export default function EditorPage() {
           onChatHistoryChange={setChatHistory}
           apiEndpoints={apiEndpoints}
           projectId={projectId}
+          firebaseConfig={firebaseConfig}
+          dbSchema={dbSchema}
         />
 
         <DragOverlay>

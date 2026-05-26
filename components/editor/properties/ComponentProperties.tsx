@@ -404,7 +404,7 @@ export function ComponentProperties({ type, props, updateProp, pages, apiEndpoin
       // Background
       "backgroundColor", "backgroundType", "gradientStart", "gradientEnd", 
       "gradientDirection", "gradientAngle", "backgroundImage", "backgroundImageUrl",
-      "bottomBackgroundImageUrl", "bottomBackgroundSize", "bottomBackgroundPosition",
+
       "topImage", "topImageHeight", "topImageObjectFit",
       // Text
       "textColor", "fontSize_css", "fontWeight_css", "lineHeight_css", 
