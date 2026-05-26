@@ -21,14 +21,16 @@ export function generateHTML(components: ComponentDefinition[], allPages?: any[]
         if (!href || !allPages) return href;
 
         if (href.startsWith('page:')) {
-            const pageId = href.substring(5);
-            const page = allPages.find(p => p.id === pageId);
+            const parts = href.substring(5).split('?');
+            const pageId = parts[0];
+            const queryParams = parts[1] ? `?${parts[1]}` : "";
+            const page = allPages.find(p => p.id === pageId || p.slug === pageId);
             if (page) {
-                if (page.slug) return `${page.slug}.html`;
+                if (page.slug) return `${page.slug}.html${queryParams}`;
                 else if (page.path) {
                     const pathName = page.path === "/" ? "index" : page.path.replace(/^\//, "").replace(/\//g, "-");
-                    return `${pathName}.html`;
-                } else return `${page.id}.html`;
+                    return `${pathName}.html${queryParams}`;
+                } else return `${page.id}.html${queryParams}`;
             }
         }
 
@@ -182,7 +184,8 @@ export function generateHTML(components: ComponentDefinition[], allPages?: any[]
                     lg: 'btn-lg',
                 };
                 const btnClass = `${btnVariantClasses[props.variant || 'default']} ${btnSizeClasses[props.size || 'default']} ${props.fullWidth ? 'w-full' : ''}`.trim();
-                const button = `<button class="${btnClass}"${props.disabled ? ' disabled' : ''}${getInlineStyles(props)}>${props.text || "Button"}</button>`;
+                const actionAttr = props.backendAction ? ` data-action="${JSON.stringify(props.backendAction).replace(/"/g, '&quot;')}"` : '';
+                const button = `<button id="${component.id}"${actionAttr} class="${btnClass}"${props.disabled ? ' disabled' : ''}${getInlineStyles(props)}>${props.text || "Button"}</button>`;
                 return props.href && !props.disabled ? `<a href="${convertLink(props.href)}">${button}</a>` : button;
 
             case "Text":
@@ -191,10 +194,10 @@ export function generateHTML(components: ComponentDefinition[], allPages?: any[]
                     lg: 'text-lg', xl: 'text-xl', '2xl': 'text-2xl', '3xl': 'text-3xl'
                 };
                 const tag = props.tag || 'p';
-                return `<${tag} class="${sizeMap[props.size || 'base'] || sizeMap.base}"${getInlineStyles(props)}>${props.content || "Text content"}</${tag}>`;
+                return `<${tag} id="${component.id}" class="${sizeMap[props.size || 'base'] || sizeMap.base}"${getInlineStyles(props)}>${props.content || "Text content"}</${tag}>`;
 
             case "Image":
-                return `<img src="${props.src || ''}" alt="${props.alt || ''}" class="w-full h-auto rounded-2xl"${getInlineStyles(props)} />`;
+                return `<img id="${component.id}" src="${props.src || ''}" alt="${props.alt || ''}" class="w-full h-auto rounded-2xl"${getInlineStyles(props)} />`;
 
             case "Footer":
                 const footerSections = props.sections || [];
@@ -697,5 +700,149 @@ document.querySelectorAll('form').forEach(form => {
         e.preventDefault();
         alert('Form submitted successfully!');
     });
+});
+
+// Dynamic Product Details Hydration
+document.addEventListener('DOMContentLoaded', function() {
+    const PRODUCTS_MAP = {
+      "fp-1": {
+        id: "fp-1",
+        name: "Wireless Earbuds Pro",
+        price: "$79.99",
+        numericPrice: 79.99,
+        image: "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=600",
+        description: "Experience premium sound quality and active noise cancellation. With up to 30 hours of battery life and a wireless charging case, these earbuds are perfect for your daily commute or intense workouts."
+      },
+      "fp-2": {
+        id: "fp-2",
+        name: "Smart Watch Ultra",
+        price: "$249.99",
+        numericPrice: 249.99,
+        image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600",
+        description: "The ultimate sports and adventure watch. Featuring a rugged titanium case, up to 36 hours of battery life, advanced health tracking sensors, and a dual-frequency GPS system."
+      },
+      "fp-3": {
+        id: "fp-3",
+        name: "Leather Backpack",
+        price: "$129.99",
+        numericPrice: 129.99,
+        image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600",
+        description: "Handcrafted from full-grain premium leather. Designed to carry your 15-inch laptop, tablet, and daily essentials with comfortable padded shoulder straps and multiple organizational pockets."
+      },
+      "fp-4": {
+        id: "fp-4",
+        name: "Running Shoes",
+        price: "$139.99",
+        numericPrice: 139.99,
+        image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600",
+        description: "Engineered for maximum comfort and speed. Features breathable mesh upper, responsive cushioning midsole, and a durable rubber outsole that provides excellent traction on all surfaces."
+      },
+      "sp-1": {
+        id: "sp-1",
+        name: "Wireless Earbuds Pro",
+        price: "$79.99",
+        numericPrice: 79.99,
+        image: "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=600",
+        description: "Experience premium sound quality and active noise cancellation. With up to 30 hours of battery life and a wireless charging case."
+      },
+      "sp-2": {
+        id: "sp-2",
+        name: "Smart Watch Ultra",
+        price: "$249.99",
+        numericPrice: 249.99,
+        image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600",
+        description: "The ultimate sports and adventure watch. Featuring a rugged titanium case, up to 36 hours of battery life, and advanced health tracking."
+      },
+      "sp-3": {
+        id: "sp-3",
+        name: "Leather Backpack",
+        price: "$129.99",
+        numericPrice: 129.99,
+        image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600",
+        description: "Handcrafted from full-grain premium leather. Designed to carry your laptop and daily essentials with style."
+      },
+      "sp-4": {
+        id: "sp-4",
+        name: "Running Shoes",
+        price: "$139.99",
+        numericPrice: 139.99,
+        image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600",
+        description: "Engineered for maximum comfort and speed. Features breathable mesh upper and responsive cushioning."
+      },
+      "sp-5": {
+        id: "sp-5",
+        name: "Noise Cancelling Headphones",
+        price: "$199.99",
+        numericPrice: 199.99,
+        image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600",
+        description: "Immerse yourself in music. Industry-leading noise cancellation, crystal clear voice calls, and up to 40 hours of continuous playback."
+      },
+      "sp-6": {
+        id: "sp-6",
+        name: "Mechanical Keyboard",
+        price: "$129.99",
+        numericPrice: 129.99,
+        image: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=600",
+        description: "Tactile and responsive mechanical switches. Featuring custom RGB backlighting, durable double-shot PBT keycaps, and a solid aluminum top plate."
+      },
+      "sp-7": {
+        id: "sp-7",
+        name: "Wireless Gaming Mouse",
+        price: "$59.99",
+        numericPrice: 59.99,
+        image: "https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?w=600",
+        description: "Ultra-lightweight gaming mouse with sub-millisecond wireless connectivity. Precision 20K DPI optical sensor and up to 70 hours of battery life."
+      },
+      "sp-8": {
+        id: "sp-8",
+        name: "UltraWide Monitor 34\"",
+        price: "$399.99",
+        numericPrice: 399.99,
+        image: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=600",
+        description: "Immersive 34-inch curved ultrawide monitor. 144Hz refresh rate, 1ms response time, and stunning HDR400 color accuracy for work or gaming."
+      }
+    };
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = urlParams.get('productId') || 'fp-1';
+    const product = PRODUCTS_MAP[productId] || PRODUCTS_MAP['fp-1'];
+
+    const imgEl = document.getElementById('pd-image');
+    if (imgEl) {
+        imgEl.src = product.image;
+        imgEl.alt = product.name;
+    }
+
+    const titleEl = document.getElementById('pd-title');
+    if (titleEl) titleEl.textContent = product.name;
+
+    const priceEl = document.getElementById('pd-price');
+    if (priceEl) priceEl.textContent = product.price;
+
+    const descEl = document.getElementById('pd-desc');
+    if (descEl) descEl.textContent = product.description;
+
+    const btnEl = document.getElementById('pd-button');
+    if (btnEl) {
+        const actionData = btnEl.getAttribute('data-action');
+        if (actionData) {
+            try {
+                const action = JSON.parse(actionData);
+                if (action.customPayload) {
+                    action.customPayload = JSON.stringify({
+                        userId: "{{user.uid || 'guest'}}",
+                        productId: product.id,
+                        name: product.name,
+                        price: product.numericPrice,
+                        quantity: 1,
+                        image: product.image
+                    });
+                    btnEl.setAttribute('data-action', JSON.stringify(action));
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+    }
 });`;
 }

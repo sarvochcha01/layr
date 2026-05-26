@@ -469,7 +469,7 @@ export const FIELD_TYPE_OPTIONS: { value: FieldType; label: string }[] = [
 export type ActionTrigger = "submit" | "click" | "interval" | "mount";
 
 /** Where the payload data comes from */
-export type PayloadSource = "form" | "static" | "props";
+export type PayloadSource = "form" | "static" | "props" | "custom";
 
 /** What happens after a successful action */
 export type ActionOnSuccess = "toast" | "redirect" | "reset" | "none";
@@ -491,6 +491,7 @@ export interface BackendAction {
   payloadSource: PayloadSource; // Where data comes from
   payloadMapping: Record<string, string>;  // sourceKey → requestBodyKey
   staticPayload?: Record<string, any>;     // For "static" source
+  customPayload?: string;                  // JSON string template for custom payloads
   onSuccess: ActionOnSuccess;   // What to do on success
   successMessage?: string;      // Toast message
   redirectUrl?: string;         // Redirect URL

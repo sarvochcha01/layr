@@ -10,6 +10,112 @@ import { useCtrlDrag } from "@/hooks/useCtrlDrag";
 import { useCanvasZoom } from "@/hooks/useCanvasZoom";
 import { useComponentAnimation } from "@/hooks/useComponentAnimation";
 
+export const PRODUCTS_MAP: Record<string, {
+  id: string;
+  name: string;
+  price: string;
+  numericPrice: number;
+  image: string;
+  description: string;
+}> = {
+  "fp-1": {
+    id: "fp-1",
+    name: "Wireless Earbuds Pro",
+    price: "$79.99",
+    numericPrice: 79.99,
+    image: "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=600",
+    description: "Experience premium sound quality and active noise cancellation. With up to 30 hours of battery life and a wireless charging case, these earbuds are perfect for your daily commute or intense workouts."
+  },
+  "fp-2": {
+    id: "fp-2",
+    name: "Smart Watch Ultra",
+    price: "$249.99",
+    numericPrice: 249.99,
+    image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600",
+    description: "The ultimate sports and adventure watch. Featuring a rugged titanium case, up to 36 hours of battery life, advanced health tracking sensors, and a dual-frequency GPS system."
+  },
+  "fp-3": {
+    id: "fp-3",
+    name: "Leather Backpack",
+    price: "$129.99",
+    numericPrice: 129.99,
+    image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600",
+    description: "Handcrafted from full-grain premium leather. Designed to carry your 15-inch laptop, tablet, and daily essentials with comfortable padded shoulder straps and multiple organizational pockets."
+  },
+  "fp-4": {
+    id: "fp-4",
+    name: "Running Shoes",
+    price: "$139.99",
+    numericPrice: 139.99,
+    image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600",
+    description: "Engineered for maximum comfort and speed. Features breathable mesh upper, responsive cushioning midsole, and a durable rubber outsole that provides excellent traction on all surfaces."
+  },
+  "sp-1": {
+    id: "sp-1",
+    name: "Wireless Earbuds Pro",
+    price: "$79.99",
+    numericPrice: 79.99,
+    image: "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=600",
+    description: "Experience premium sound quality and active noise cancellation. With up to 30 hours of battery life and a wireless charging case."
+  },
+  "sp-2": {
+    id: "sp-2",
+    name: "Smart Watch Ultra",
+    price: "$249.99",
+    numericPrice: 249.99,
+    image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600",
+    description: "The ultimate sports and adventure watch. Featuring a rugged titanium case, up to 36 hours of battery life, and advanced health tracking."
+  },
+  "sp-3": {
+    id: "sp-3",
+    name: "Leather Backpack",
+    price: "$129.99",
+    numericPrice: 129.99,
+    image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600",
+    description: "Handcrafted from full-grain premium leather. Designed to carry your laptop and daily essentials with style."
+  },
+  "sp-4": {
+    id: "sp-4",
+    name: "Running Shoes",
+    price: "$139.99",
+    numericPrice: 139.99,
+    image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600",
+    description: "Engineered for maximum comfort and speed. Features breathable mesh upper and responsive cushioning."
+  },
+  "sp-5": {
+    id: "sp-5",
+    name: "Noise Cancelling Headphones",
+    price: "$199.99",
+    numericPrice: 199.99,
+    image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600",
+    description: "Immerse yourself in music. Industry-leading noise cancellation, crystal clear voice calls, and up to 40 hours of continuous playback."
+  },
+  "sp-6": {
+    id: "sp-6",
+    name: "Mechanical Keyboard",
+    price: "$129.99",
+    numericPrice: 129.99,
+    image: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=600",
+    description: "Tactile and responsive mechanical switches. Featuring custom RGB backlighting, durable double-shot PBT keycaps, and a solid aluminum top plate."
+  },
+  "sp-7": {
+    id: "sp-7",
+    name: "Wireless Gaming Mouse",
+    price: "$59.99",
+    numericPrice: 59.99,
+    image: "https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?w=600",
+    description: "Ultra-lightweight gaming mouse with sub-millisecond wireless connectivity. Precision 20K DPI optical sensor and up to 70 hours of battery life."
+  },
+  "sp-8": {
+    id: "sp-8",
+    name: "UltraWide Monitor 34\"",
+    price: "$399.99",
+    numericPrice: 399.99,
+    image: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=600",
+    description: "Immersive 34-inch curved ultrawide monitor. 144Hz refresh rate, 1ms response time, and stunning HDR400 color accuracy for work or gaming."
+  }
+};
+
 interface CanvasProps {
   components: ComponentDefinition[];
   selectedComponentIds: string[];
@@ -22,6 +128,7 @@ interface CanvasProps {
   onNavigate?: (slug: string) => void;
   pages?: any[];
   currentPageSlug?: string;
+  currentPageParams?: string;
   showOutlines?: boolean;
   outlineColor?: "black" | "white";
   showComponentTags?: boolean;
@@ -99,6 +206,7 @@ function ComponentWrapper({
   onNavigate,
   pages,
   currentPageSlug,
+  currentPageParams = "",
   showOutlines,
   outlineColor,
   showComponentTags,
@@ -116,6 +224,7 @@ function ComponentWrapper({
   onNavigate?: (slug: string) => void;
   pages?: any[];
   currentPageSlug?: string;
+  currentPageParams?: string;
   showOutlines?: boolean;
   outlineColor?: "black" | "white";
   showComponentTags?: boolean;
@@ -123,6 +232,66 @@ function ComponentWrapper({
 }) {
   const Component =
     COMPONENT_REGISTRY[component.type as keyof typeof COMPONENT_REGISTRY];
+
+  // Overrides for product details page
+  let resolvedProps = { ...component.props };
+  if (currentPageSlug === "product-details") {
+    const getProductId = () => {
+      if (currentPageParams) {
+        const match = currentPageParams.match(/productId=([^&]+)/);
+        if (match) return match[1];
+      }
+      if (typeof window !== "undefined") {
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get("productId");
+        if (id) return id;
+      }
+      return "fp-1";
+    };
+    
+    const productId = getProductId();
+    const product = PRODUCTS_MAP[productId] || PRODUCTS_MAP["fp-1"];
+
+    if (component.id === "pd-image") {
+      resolvedProps = {
+        ...resolvedProps,
+        src: product.image,
+        alt: product.name,
+      };
+    } else if (component.id === "pd-title") {
+      resolvedProps = {
+        ...resolvedProps,
+        content: product.name,
+      };
+    } else if (component.id === "pd-price") {
+      resolvedProps = {
+        ...resolvedProps,
+        content: product.price,
+      };
+    } else if (component.id === "pd-desc") {
+      resolvedProps = {
+        ...resolvedProps,
+        content: product.description,
+      };
+    } else if (component.id === "pd-button") {
+      if (resolvedProps.backendAction) {
+        resolvedProps = {
+          ...resolvedProps,
+          backendAction: {
+            ...resolvedProps.backendAction,
+            customPayload: JSON.stringify({
+              userId: "{{user.uid || 'guest'}}",
+              productId: product.id,
+              name: product.name,
+              price: product.numericPrice,
+              quantity: 1,
+              image: product.image,
+            }),
+          },
+        };
+      }
+    }
+  }
 
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: `canvas-${component.id}`,
@@ -136,7 +305,7 @@ function ComponentWrapper({
 
   // Animation hook — only active in preview mode
   const animRef = useRef<HTMLDivElement>(null);
-  useComponentAnimation(animRef, component.props.animations, !!isPreviewMode);
+  useComponentAnimation(animRef, resolvedProps.animations, !!isPreviewMode);
 
   if (!Component) {
     return (
@@ -230,9 +399,9 @@ function ComponentWrapper({
         componentId={component.id}
         isSelected={isSelected}
         isPreviewMode={!!isPreviewMode}
-        currentWidth={component.props.width}
-        currentHeight={component.props.height}
-        currentTransform={component.props.transform}
+        currentWidth={resolvedProps.width}
+        currentHeight={resolvedProps.height}
+        currentTransform={resolvedProps.transform}
         onResize={handleResize}
         componentType={component.type}
         className={cn(
@@ -305,7 +474,7 @@ function ComponentWrapper({
         {/* Render component with or without children */}
         {canHaveChildren(component.type) ? (
           <Component
-            {...component.props}
+            {...resolvedProps}
             viewport={viewport}
             isPreviewMode={isPreviewMode}
             onNavigate={onNavigate}
@@ -330,6 +499,7 @@ function ComponentWrapper({
                         onNavigate={onNavigate}
                         pages={pages}
                         currentPageSlug={currentPageSlug}
+                        currentPageParams={currentPageParams}
                         showOutlines={showOutlines}
                         outlineColor={outlineColor}
                         showComponentTags={showComponentTags}
@@ -362,6 +532,7 @@ function ComponentWrapper({
                         onNavigate={onNavigate}
                         pages={pages}
                         currentPageSlug={currentPageSlug}
+                        currentPageParams={currentPageParams}
                         showOutlines={showOutlines}
                         outlineColor={outlineColor}
                         showComponentTags={showComponentTags}
@@ -391,7 +562,7 @@ function ComponentWrapper({
         ) : (
           // For leaf components (Image, Button, Text, etc.) that don't have children
           <Component
-            {...component.props}
+            {...resolvedProps}
             viewport={viewport}
             isPreviewMode={isPreviewMode}
             onNavigate={onNavigate}
@@ -417,6 +588,7 @@ function ComponentRenderer({
   onNavigate,
   pages,
   currentPageSlug,
+  currentPageParams = "",
   showOutlines,
   outlineColor,
   showComponentTags,
@@ -432,6 +604,7 @@ function ComponentRenderer({
   onNavigate?: (slug: string) => void;
   pages?: any[];
   currentPageSlug?: string;
+  currentPageParams?: string;
   showOutlines?: boolean;
   outlineColor?: "black" | "white";
   showComponentTags?: boolean;
@@ -451,6 +624,7 @@ function ComponentRenderer({
       onNavigate={onNavigate}
       pages={pages}
       currentPageSlug={currentPageSlug}
+      currentPageParams={currentPageParams}
       showOutlines={showOutlines}
       outlineColor={outlineColor}
       showComponentTags={showComponentTags}
@@ -471,6 +645,7 @@ export function Canvas({
   onNavigate,
   pages,
   currentPageSlug,
+  currentPageParams = "",
   showOutlines = false,
   outlineColor = "black",
   showComponentTags = true,
@@ -635,6 +810,7 @@ export function Canvas({
                     onNavigate={onNavigate}
                     pages={pages}
                     currentPageSlug={currentPageSlug}
+                    currentPageParams={currentPageParams}
                     showOutlines={showOutlines}
                     outlineColor={outlineColor}
                     showComponentTags={showComponentTags}

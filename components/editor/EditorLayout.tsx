@@ -52,6 +52,7 @@ import {
   Database,
 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useShortcuts } from "@/hooks/useShortcuts";
 
@@ -76,7 +77,8 @@ interface EditorLayoutProps {
   onProjectNameChange?: (name: string) => void;
   pages: Page[];
   currentPageId: string;
-  onPageSelect: (pageId: string) => void;
+  currentPageParams?: string;
+  onPageSelect: (pageId: string, params?: string) => void;
   onPageAdd: (name: string, slug: string) => void;
   onPageDelete: (pageId: string) => void;
   onPageDuplicate?: (pageId: string) => void;
@@ -127,6 +129,7 @@ export function EditorLayout({
   onProjectNameChange,
   pages,
   currentPageId,
+  currentPageParams = "",
   onPageSelect,
   onPageAdd,
   onPageDelete,
@@ -159,6 +162,7 @@ export function EditorLayout({
   dbSchema,
 }: EditorLayoutProps) {
   const router = useRouter();
+  const { user } = useAuth();
   const hierarchyPanelRef = useRef<HierarchyPanelRef>(null);
   const [viewport, setViewport] = useState<Viewport>("desktop");
   const [isPreviewMode, setIsPreviewMode] = useState(false);
@@ -216,7 +220,7 @@ export function EditorLayout({
     isEnabled: true,
   });
 
-  // Auto-fetch data source bindings when entering preview mode
+  // Auto-fetch data source bindings when entering preview mode or changing page
   useEffect(() => {
     if (!isPreviewMode || !projectId || apiEndpoints.length === 0) return;
 
@@ -229,7 +233,13 @@ export function EditorLayout({
     ): ComponentDefinition[] => {
       const result: ComponentDefinition[] = [];
       for (const c of comps) {
-        if (c.props?.dataSource?.endpointId && c.props.dataSource.fieldMappings) {
+        // dataSource can be at the top level of the component or inside props
+        const ds = (c as any).dataSource || c.props?.dataSource;
+        if (ds?.endpointId) {
+          // Normalize: ensure dataSource is accessible from props for downstream code
+          if ((c as any).dataSource && !c.props?.dataSource) {
+            c.props = { ...c.props, dataSource: (c as any).dataSource };
+          }
           result.push(c);
         }
         if (c.children?.length) {
@@ -240,6 +250,7 @@ export function EditorLayout({
     };
 
     const boundComponents = collectBound(currentPage.components);
+    console.log("[DataSource] Page:", currentPageId, "Bound components:", boundComponents.length, boundComponents.map(c => c.id));
     if (boundComponents.length === 0) return;
 
     setIsDataSourceFetching(true);
@@ -247,12 +258,13 @@ export function EditorLayout({
     // Fetch data for each unique endpoint and apply mappings
     const endpointCache: Record<string, Promise<any>> = {};
 
-    const fetchEndpoint = (endpoint: ApiEndpoint): Promise<any> => {
-      if (endpoint.id in endpointCache) return endpointCache[endpoint.id];
+    const fetchEndpoint = (pathWithParams: string, method: string): Promise<any> => {
+      const cacheKey = `${method}:${pathWithParams}`;
+      if (cacheKey in endpointCache) return endpointCache[cacheKey];
 
-      const url = `/api/backend${endpoint.path.startsWith("/") ? endpoint.path : `/${endpoint.path}`}`;
+      const url = `/api/backend${pathWithParams.startsWith("/") ? pathWithParams : `/${pathWithParams}`}`;
       const promise = fetch(url, {
-        method: endpoint.method,
+        method,
         headers: {
           "Content-Type": "application/json",
           "x-project-id": projectId,
@@ -261,7 +273,7 @@ export function EditorLayout({
         .then((res) => (res.ok ? res.json() : null))
         .catch(() => null);
 
-      endpointCache[endpoint.id] = promise;
+      endpointCache[cacheKey] = promise;
       return promise;
     };
 
@@ -276,6 +288,21 @@ export function EditorLayout({
       return current;
     };
 
+    // Resolve preview user UID once
+    let previewUid = "";
+    if (typeof window !== "undefined" && projectId) {
+      try {
+        const stored = localStorage.getItem(`preview-user-${projectId}`);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (parsed && parsed.uid) {
+            previewUid = parsed.uid;
+          }
+        }
+      } catch {}
+    }
+    const uid = previewUid || user?.uid || "";
+
     // Fetch and apply for each bound component, then clear loading
     const fetchPromises: Promise<void>[] = [];
 
@@ -284,20 +311,94 @@ export function EditorLayout({
       const endpoint = apiEndpoints.find((ep) => ep.id === ds.endpointId);
       if (!endpoint || !endpoint.isEnabled) continue;
 
-      const p = fetchEndpoint(endpoint).then((data) => {
+      let pathWithParams = endpoint.path;
+      if (ds.queryParams && Object.keys(ds.queryParams).length > 0) {
+        const params = new URLSearchParams();
+
+        for (const [key, value] of Object.entries(ds.queryParams as Record<string, string>)) {
+          let resolvedValue = value;
+          resolvedValue = resolvedValue.replace(/\{\{\s*user\.uid\s*\|\|\s*'guest'\s*\}\}/g, uid || "guest");
+          resolvedValue = resolvedValue.replace(/\{\{\s*user\.uid\s*\}\}/g, uid);
+          params.append(key, resolvedValue);
+        }
+        const queryString = params.toString();
+        if (queryString) {
+          pathWithParams += (pathWithParams.includes("?") ? "&" : "?") + queryString;
+        }
+      }
+
+      const p = fetchEndpoint(pathWithParams, endpoint.method).then((data) => {
         if (!data) return;
-        const updates: Record<string, any> = {};
-        for (const [propKey, responsePath] of Object.entries(
-          ds.fieldMappings as Record<string, string>,
-        )) {
-          const value = getNestedValue(data, responsePath);
-          if (value !== undefined) {
-            updates[propKey] =
-              typeof value === "object" ? JSON.stringify(value) : String(value);
+
+        // If fieldMappings exist, apply them as prop updates
+        if (ds.fieldMappings && Object.keys(ds.fieldMappings).length > 0) {
+          const updates: Record<string, any> = {};
+          for (const [propKey, responsePath] of Object.entries(
+            ds.fieldMappings as Record<string, string>,
+          )) {
+            const value = getNestedValue(data, responsePath);
+            if (value !== undefined) {
+              updates[propKey] =
+                typeof value === "object" ? JSON.stringify(value) : String(value);
+            }
+          }
+          if (Object.keys(updates).length > 0) {
+            onUpdateComponent(comp.id, updates);
           }
         }
-        if (Object.keys(updates).length > 0) {
-          onUpdateComponent(comp.id, updates);
+
+        // If response contains an array of items (e.g. cart items),
+        // inject dynamic Card children into the container
+        const items = Array.isArray(data) ? data : (data.items && Array.isArray(data.items) ? data.items : null);
+        if (items && items.length > 0) {
+          const dynamicChildren: ComponentDefinition[] = items.map((item: any, idx: number) => ({
+            id: `${comp.id}-dynamic-${idx}`,
+            type: "Card",
+            props: {
+              title: item.name || item.title || `Item ${idx + 1}`,
+              description: item.price != null ? `$${Number(item.price).toFixed(2)}${item.quantity ? ` × ${item.quantity}` : ""}` : "",
+              topImage: item.image || undefined,
+              topImageHeight: "180px",
+              topImageObjectFit: "cover",
+              buttonText: "Remove",
+              backendAction: {
+                id: `action-remove-${idx}`,
+                endpointId: "ecom-cart-remove",
+                endpointPath: "/cart/remove",
+                endpointMethod: "POST",
+                trigger: "click",
+                payloadSource: "custom",
+                customPayload: JSON.stringify({
+                  userId: uid,
+                  cartItemId: item.id || item.cartItemId || "",
+                }),
+                onSuccess: "toast",
+                successMessage: "Removed from cart",
+                onFail: "toast",
+                failMessage: "Failed to remove item",
+              },
+            },
+            children: [],
+          }));
+          onUpdateComponent(comp.id, { __children__: dynamicChildren });
+        } else if (items && items.length === 0) {
+          // Empty cart — show message
+          onUpdateComponent(comp.id, {
+            __children__: [{
+              id: `${comp.id}-empty`,
+              type: "Text",
+              props: {
+                content: "Your cart is empty. Start shopping to add items!",
+                tag: "p",
+                size: "base",
+                color: "#9CA3AF",
+                textAlign: "center",
+                marginTop: "2rem",
+                marginBottom: "2rem",
+              },
+              children: [],
+            }],
+          });
         }
       });
       fetchPromises.push(p);
@@ -306,7 +407,7 @@ export function EditorLayout({
     Promise.all(fetchPromises).finally(() => {
       setIsDataSourceFetching(false);
     });
-  }, [isPreviewMode]); // Only trigger on preview mode change
+  }, [isPreviewMode, currentPageId]); // Trigger on preview mode change AND page navigation
 
   const isResizingRef = useRef<string | null>(null);
   const startPosRef = useRef({ x: 0, y: 0 });
@@ -1215,16 +1316,18 @@ export function EditorLayout({
                   }
                   onUpdateComponent={onUpdateComponent}
                   onRepositionComponent={onRepositionComponent}
-                  viewport={viewport}
+                   viewport={viewport}
                   isPreviewMode={isPreviewMode}
-                  onNavigate={(slug) => {
-                    const targetPage = pages.find((p) => p.slug === slug);
-                    if (targetPage) onPageSelect(targetPage.id);
+                  onNavigate={(slugWithParams) => {
+                    const [slug, paramString] = slugWithParams.split("?");
+                    const targetPage = pages.find((p) => p.slug === slug || p.id === slug);
+                    if (targetPage) onPageSelect(targetPage.id, paramString || "");
                   }}
                   pages={pages}
                   currentPageSlug={
                     pages.find((p) => p.id === currentPageId)?.slug
                   }
+                  currentPageParams={currentPageParams}
                   showOutlines={!isPreviewMode && showOutlines}
                   outlineColor={outlineColor}
                   showComponentTags={showComponentTags}

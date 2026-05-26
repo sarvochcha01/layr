@@ -128,6 +128,7 @@ export default function EditorPage() {
   ]);
 
   const [currentPageId, setCurrentPageId] = useState<string>("home");
+  const [currentPageParams, setCurrentPageParams] = useState<string>("");
   const [draggedComponent, setDraggedComponent] = useState<any>(null);
   const [redirecting, setRedirecting] = useState(false);
   const [projectName, setProjectName] = useState<string>("");
@@ -460,8 +461,9 @@ export default function EditorPage() {
     );
   };
 
-  const handlePageSelect = (pageId: string) => {
+  const handlePageSelect = (pageId: string, params: string = "") => {
     setCurrentPageId(pageId);
+    setCurrentPageParams(params);
     multiSelect.clearSelection();
   };
 
@@ -1201,7 +1203,8 @@ export default function EditorPage() {
           projectName={projectName}
           onProjectNameChange={handleProjectNameChange}
           pages={pages}
-          currentPageId={currentPageId}
+           currentPageId={currentPageId}
+          currentPageParams={currentPageParams}
           onPageSelect={handlePageSelect}
           onPageAdd={handlePageAdd}
           onPageDelete={handlePageDelete}
@@ -1717,10 +1720,16 @@ function updateComponentInTree(
 ): ComponentDefinition[] {
   return components.map((component) => {
     if (component.id === componentId) {
-      return {
+      // If updates contains __children__, update the component's children array directly
+      const { __children__, ...propUpdates } = updates as any;
+      const updated: ComponentDefinition = {
         ...component,
-        props: { ...component.props, ...updates },
+        props: { ...component.props, ...propUpdates },
       };
+      if (__children__ !== undefined) {
+        updated.children = __children__;
+      }
+      return updated;
     }
 
     if (component.children.length > 0) {

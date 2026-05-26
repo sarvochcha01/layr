@@ -11,8 +11,10 @@ export function generateReactComponent(components: ComponentDefinition[], pageNa
       .map(([key, value]) => {
         // Special handling for href prop - resolve page: links
         if (key === "href" && typeof value === "string" && value.startsWith("page:")) {
-          const pageId = value.substring(5);
-          let page = pages?.find((p: any) => p.id === pageId);
+          const parts = value.substring(5).split("?");
+          const pageId = parts[0];
+          const queryParams = parts[1] ? `?${parts[1]}` : "";
+          let page = pages?.find((p: any) => p.id === pageId || p.slug === pageId);
           
           // Fallback: if page not found by ID, try to match by name (case-insensitive)
           if (!page && pages) {
@@ -26,7 +28,7 @@ export function generateReactComponent(components: ComponentDefinition[], pageNa
           if (page) {
             // Convert to actual route path
             const slug = page.slug === "index" ? "" : page.slug;
-            return `${key}="/${slug}"`;
+            return `${key}="/${slug}${queryParams}"`;
           }
           // If page not found, use # to avoid 404
           console.warn(`Page not found for href="${value}" - using # as fallback`);
@@ -254,8 +256,10 @@ export function generateAppPage(components: ComponentDefinition[], pageName: str
       .map(([key, value]) => {
         // Special handling for href prop - resolve page: links
         if (key === "href" && typeof value === "string" && value.startsWith("page:")) {
-          const pageId = value.substring(5);
-          let page = pages?.find((p: any) => p.id === pageId);
+          const parts = value.substring(5).split("?");
+          const pageId = parts[0];
+          const queryParams = parts[1] ? `?${parts[1]}` : "";
+          let page = pages?.find((p: any) => p.id === pageId || p.slug === pageId);
           
           // Fallback: if page not found by ID, try to match by name (case-insensitive)
           if (!page && pages) {
@@ -269,7 +273,7 @@ export function generateAppPage(components: ComponentDefinition[], pageName: str
           if (page) {
             // Convert to actual route path
             const slug = page.slug === "index" ? "" : page.slug;
-            return `${key}="/${slug}"`;
+            return `${key}="/${slug}${queryParams}"`;
           }
           // If page not found, use # to avoid 404
           console.warn(`Page not found for href="${value}" - using # as fallback`);
