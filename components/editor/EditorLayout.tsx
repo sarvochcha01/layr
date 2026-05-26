@@ -54,19 +54,7 @@ import {
 import { useRouter, useSearchParams } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useShortcuts } from "@/hooks/useShortcuts";
-import JSZip from "jszip";
-import { generateCSS, generateHTML, generateJS } from "@/lib/codeGenerator";
-import {
-  generateReactComponent,
-  generateReactComponentsIndex,
-  generatePackageJson,
-  generateNextConfig,
-  generateTailwindConfig,
-  generateREADME,
-  generateAppLayout,
-  generateAppPage,
-  generateComponentImplementation,
-} from "@/lib/reactGenerator";
+
 
 type Viewport = "desktop" | "tablet" | "mobile";
 
@@ -121,6 +109,8 @@ interface EditorLayoutProps {
   onChatHistoryChange?: (messages: ChatMessage[]) => void;
   apiEndpoints?: ApiEndpoint[];
   projectId?: string | null;
+  firebaseConfig?: any;
+  dbSchema?: any[];
 }
 
 export function EditorLayout({
@@ -165,6 +155,8 @@ export function EditorLayout({
   onChatHistoryChange,
   apiEndpoints = [],
   projectId,
+  firebaseConfig,
+  dbSchema,
 }: EditorLayoutProps) {
   const router = useRouter();
   const hierarchyPanelRef = useRef<HierarchyPanelRef>(null);
@@ -442,158 +434,34 @@ export function EditorLayout({
   const exportToZip = async (format: "html" | "react" = "html") => {
     try {
       setShowExportMenu(false);
-      const zip = new JSZip();
-      const pagesToExport = pages;
       const name = projectName || "my-website";
+      
+      const response = await fetch('/api/export', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          pages,
+          format,
+          projectName: name,
+          apiEndpoints,
+          firebaseConfig,
+          dbSchema
+        }),
+      });
 
-      if (format === "react") {
-        const appFolder = zip.folder("app");
-        const componentsFolder = zip.folder("components");
-        const publicFolder = zip.folder("public");
-
-        appFolder?.file("layout.tsx", generateAppLayout(name));
-        appFolder?.file(
-          "globals.css",
-          `@tailwind base;\n@tailwind components;\n@tailwind utilities;\n\n:root {\n  --foreground-rgb: 0, 0, 0;\n  --background-start-rgb: 214, 219, 220;\n  --background-end-rgb: 255, 255, 255;\n}\n\nbody {\n  color: rgb(var(--foreground-rgb));\n  background: linear-gradient(\n      to bottom,\n      transparent,\n      rgb(var(--background-end-rgb))\n    )\n    rgb(var(--background-start-rgb));\n}\n`,
-        );
-
-        for (let i = 0; i < pagesToExport.length; i++) {
-          const page = pagesToExport[i];
-          const pageName = page.name.replace(/\s+/g, "");
-          if (
-            page.slug === "index" ||
-            (i === 0 && !pagesToExport.some((p) => p.slug === "index"))
-          ) {
-            appFolder?.file(
-              "page.tsx",
-              generateAppPage(
-                page.components,
-                pageName,
-                `${pageName} - ${name}`,
-              ),
-            );
-          } else {
-            const slugPath =
-              page.slug ||
-              page.name.toLowerCase().replace(/\s+/g, "-") ||
-              page.id;
-            appFolder
-              ?.folder(slugPath)
-              ?.file(
-                "page.tsx",
-                generateReactComponent(page.components, pageName),
-              );
-          }
-        }
-
-        const componentNames = [
-          "Header",
-          "Footer",
-          "Hero",
-          "Section",
-          "Container",
-          "Grid",
-          "Card",
-          "Button",
-          "Text",
-          "Image",
-          "Video",
-          "Form",
-          "Navbar",
-          "Accordion",
-          "Tabs",
-          "Testimonial",
-          "PricingCard",
-          "Feature",
-          "Stats",
-          "CTA",
-          "Divider",
-          "Spacer",
-          "Badge",
-          "Alert",
-        ];
-        for (const componentName of componentNames) {
-          componentsFolder?.file(
-            `${componentName}.tsx`,
-            generateComponentImplementation(componentName),
-          );
-        }
-        componentsFolder?.file("index.ts", generateReactComponentsIndex());
-
-        zip.file("package.json", generatePackageJson(name));
-        zip.file("next.config.js", generateNextConfig());
-        zip.file("tailwind.config.js", generateTailwindConfig());
-        zip.file("README.md", generateREADME(name));
-        zip.file(
-          "postcss.config.js",
-          `/** @type {import('postcss-load-config').Config} */\nconst config = {\n  plugins: {\n    tailwindcss: {},\n    autoprefixer: {},\n  },\n}\n\nmodule.exports = config\n`,
-        );
-        zip.file(
-          ".gitignore",
-          `# dependencies\n/node_modules\n/.pnp\n.pnp.js\n\n# testing\n/coverage\n\n# next.js\n/.next/\n/out/\n\n# production\n/build\n\n# misc\n.DS_Store\n*.pem\n\n# debug\nnpm-debug.log*\nyarn-debug.log*\nyarn-error.log*\n\n# local env files\n.env*.local\n\n# vercel\n.vercel\n\n# typescript\n*.tsbuildinfo\nnext-env.d.ts\n`,
-        );
-        zip.file(
-          ".eslintrc.json",
-          JSON.stringify({ extends: "next/core-web-vitals" }, null, 2),
-        );
-        zip.file(
-          "next-env.d.ts",
-          `/// <reference types="next" />\n/// <reference types="next/image-types/global" />\n\n// NOTE: This file should not be edited\n// see https://nextjs.org/docs/app/building-your-application/configuring/typescript for more information.\n`,
-        );
-        zip.file(
-          "tsconfig.json",
-          JSON.stringify(
-            {
-              compilerOptions: {
-                target: "ES2017",
-                lib: ["dom", "dom.iterable", "esnext"],
-                allowJs: true,
-                skipLibCheck: true,
-                strict: true,
-                noEmit: true,
-                esModuleInterop: true,
-                module: "esnext",
-                moduleResolution: "node",
-                resolveJsonModule: true,
-                isolatedModules: true,
-                jsx: "preserve",
-                incremental: true,
-                plugins: [{ name: "next" }],
-                paths: { "@/*": ["./*"] },
-              },
-              include: [
-                "next-env.d.ts",
-                "**/*.ts",
-                "**/*.tsx",
-                ".next/types/**/*.ts",
-              ],
-              exclude: ["node_modules"],
-            },
-            null,
-            2,
-          ),
-        );
-        publicFolder?.file(".gitkeep", "");
-      } else {
-        const css = generateCSS();
-        const js = generateJS();
-        for (const page of pagesToExport) {
-          zip.file(
-            `${page.slug || page.id}.html`,
-            generateHTML(page.components, pagesToExport),
-          );
-        }
-        zip.file("styles.css", css);
-        zip.file("script.js", js);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to generate export');
       }
 
       // Download the zip file
-      const blob = await zip.generateAsync({ type: "blob" });
+      const blob = await response.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download =
-        format === "react" ? `${name}-nextjs.zip` : `${name}-export.zip`;
+      a.download = format === "react" ? `${name}-nextjs.zip` : `${name}-export.zip`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -1076,7 +944,7 @@ export function EditorLayout({
                   <div className="absolute right-0 top-full mt-2 w-52 bg-card rounded-lg shadow-xl border border-border overflow-hidden z-50">
                     <button
                       onClick={() => exportToZip("html")}
-                      className="w-full text-left px-4 py-3 text-sm hover:bg-muted transition-colors"
+                      className="w-full text-left px-4 py-3 text-sm hover:bg-muted transition-colors relative"
                     >
                       <div className="font-medium text-foreground">
                         Export as HTML
@@ -1084,6 +952,11 @@ export function EditorLayout({
                       <div className="text-xs text-muted-foreground mt-0.5">
                         Static website
                       </div>
+                      {apiEndpoints.length > 0 && (
+                        <div className="mt-2 text-[10px] text-amber-500 bg-amber-500/10 px-2 py-1 rounded">
+                          Warning: HTML export doesn't include backend logic
+                        </div>
+                      )}
                     </button>
                     <div className="h-px bg-border" />
                     <button
@@ -1096,6 +969,11 @@ export function EditorLayout({
                       <div className="text-xs text-muted-foreground mt-0.5">
                         Next.js project
                       </div>
+                      {apiEndpoints.length > 0 && (
+                        <div className="mt-2 text-[10px] text-green-500 bg-green-500/10 px-2 py-1 rounded">
+                          Includes {apiEndpoints.length} API endpoint{apiEndpoints.length !== 1 ? 's' : ''}
+                        </div>
+                      )}
                     </button>
                   </div>
                 </>

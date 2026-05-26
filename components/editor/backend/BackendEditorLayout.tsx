@@ -467,6 +467,7 @@ export function BackendEditorLayout({
             projectId={projectId}
             dbSchema={dbSchema}
             onDbSchemaChange={onDbSchemaChange}
+            firebaseConfig={firebaseConfig}
           />
         </div>
       ) : (

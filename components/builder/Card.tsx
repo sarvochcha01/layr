@@ -5,6 +5,9 @@ import { cn } from "@/lib/utils";
 import { ThemeStyleVariant, getThemeCSSVars } from "@/lib/themeStyles";
 import { getUserStyleOverrides } from "@/lib/buildStyle";
 import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
+import { useBackendContext } from "@/contexts/BackendContext";
+import { BackendAction } from "@/types/backend";
+import { toast } from "sonner";
 
 interface CardProps {
   title?: string;
@@ -13,9 +16,6 @@ interface CardProps {
   topImage?: string;
   topImageHeight?: string;
   topImageObjectFit?: "cover" | "contain" | "fill" | "scale-down" | "none";
-  bottomBackgroundImageUrl?: string;
-  bottomBackgroundSize?: string;
-  bottomBackgroundPosition?: string;
   icon?: string;
   iconBg?: string;
   iconColor?: string;
@@ -33,6 +33,9 @@ interface CardProps {
   gradientAngle?: string;
   textColor?: string;
   themeStyle?: ThemeStyleVariant;
+  backendAction?: BackendAction;
+  projectId?: string;
+  onNavigate?: (slugOrId: string) => void;
   children?: React.ReactNode;
   [key: string]: any;
 }
@@ -40,13 +43,10 @@ interface CardProps {
 export function Card({
   title = "Card Title",
   description = "A short description of this card's content goes here.",
-  image = "https://images.unsplash.com/photo-1557683316-973673baf926?w=800&h=400&fit=crop",
+  image,
   topImage,
   topImageHeight = "208px",
   topImageObjectFit = "cover",
-  bottomBackgroundImageUrl,
-  bottomBackgroundSize = "cover",
-  bottomBackgroundPosition = "center",
   icon,
   buttonText,
   buttonLink = "#",
@@ -62,6 +62,9 @@ export function Card({
   gradientAngle,
   textColor,
   themeStyle,
+  backendAction,
+  projectId,
+  onNavigate,
   children,
   iconBg,
   iconColor,
@@ -70,6 +73,79 @@ export function Card({
   const [hovered, setHovered] = useState(false);
   const effectiveTheme = useEffectiveThemeStyle(themeStyle, themeStyle !== undefined);
   const cssVars = getThemeCSSVars(effectiveTheme);
+  
+  const { projectId: ctxProjectId } = useBackendContext();
+  const resolvedProjectId = projectId || ctxProjectId;
+  const [isLoading, setIsLoading] = useState(false);
+
+  const executeBackendAction = async () => {
+    if (!backendAction?.endpointId || !resolvedProjectId) return;
+
+    setIsLoading(true);
+
+    try {
+      const body = backendAction.staticPayload || {};
+      const path = backendAction.endpointPath?.startsWith("/")
+        ? backendAction.endpointPath
+        : `/${backendAction.endpointPath || ""}`;
+
+      const response = await fetch(`/api/backend${path}`, {
+        method: backendAction.endpointMethod || "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-project-id": resolvedProjectId,
+        },
+        body: JSON.stringify(body),
+      });
+
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        let errMsg = `Request failed (${response.status})`;
+        if (data?.error) errMsg = data.error;
+        if (data?.details && Array.isArray(data.details)) {
+          errMsg += ": " + data.details.join(", ");
+        }
+        throw new Error(errMsg);
+      }
+
+      const successMsg = backendAction.successMessage || "Success!";
+
+      if (backendAction.onSuccess === "redirect" && backendAction.redirectUrl) {
+        const url = backendAction.redirectUrl;
+        if (url.startsWith("/") && !url.startsWith("//") && onNavigate) {
+          const slug = url.replace(/^\/+/, "");
+          onNavigate(slug);
+        } else {
+          window.location.href = url;
+        }
+      } else if (backendAction.onSuccess !== "none") {
+        toast.success(successMsg);
+      }
+    } catch (err) {
+      const failMode = backendAction.onFail || "toast";
+      if (failMode === "redirect" && backendAction.failRedirectUrl) {
+        window.location.href = backendAction.failRedirectUrl;
+        return;
+      }
+      if (failMode !== "none") {
+        toast.error(backendAction.failMessage || (err as Error).message);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleActionClick = (e: React.MouseEvent) => {
+    if (backendAction?.endpointId) {
+      e.preventDefault();
+      executeBackendAction();
+    } else if (buttonLink.startsWith("page:") && onNavigate) {
+      e.preventDefault();
+      const pageId = buttonLink.substring(5);
+      onNavigate(pageId);
+    }
+  };
 
   const isNeoBrutalist = effectiveTheme === "neobrutalist";
   const isBrutalist = effectiveTheme === "brutalist";
@@ -117,16 +193,6 @@ export function Card({
     baseStyle.color = "var(--theme-text)";
   }
 
-  // Build bottom background image style
-  const bottomBackgroundStyle = bottomBackgroundImageUrl
-    ? {
-        backgroundImage: `url(${bottomBackgroundImageUrl})`,
-        backgroundSize: bottomBackgroundSize,
-        backgroundPosition: bottomBackgroundPosition,
-        backgroundRepeat: "no-repeat",
-      }
-    : {};
-
   const showTopImage = topImage || image;
   const showIcon = icon && !showTopImage;
 
@@ -140,13 +206,7 @@ export function Card({
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {/* Bottom Background Image Layer */}
-      {bottomBackgroundImageUrl && (
-        <div
-          className="absolute inset-0"
-          style={bottomBackgroundStyle}
-        />
-      )}
+
 
       {/* Top Image */}
       {showTopImage && (
@@ -164,6 +224,8 @@ export function Card({
           />
         </div>
       )}
+
+      {children}
 
       {/* Icon */}
       {showIcon && (
@@ -214,17 +276,20 @@ export function Card({
           <div className="pt-2">
             <a
               href={buttonLink}
+              onClick={handleActionClick}
               className="inline-flex items-center gap-1.5 text-sm font-semibold transition-all duration-200 hover:opacity-80 group/btn"
-              style={{ color: textColor || "var(--theme-accent)" }}
+              style={{
+                color: textColor || "var(--theme-accent)",
+                opacity: isLoading ? 0.5 : 1,
+                pointerEvents: isLoading ? "none" : "auto",
+              }}
             >
-              {buttonText}
+              {isLoading ? "Wait..." : buttonText}
               <span className="text-xs transition-transform duration-200 group-hover/btn:translate-x-1">→</span>
             </a>
           </div>
         )}
       </div>
-
-      {children}
     </div>
   );
 }

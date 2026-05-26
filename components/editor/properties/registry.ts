@@ -327,16 +327,6 @@ export const COMPONENT_SCHEMAS: Record<string, ComponentPropertySchema> = {
               { label: "None (Original Size)", value: "none" },
             ],
           },
-          { key: "bottomBackgroundImageUrl", label: "Bottom Background Image URL", type: "text", placeholder: "https://example.com/bg.jpg" },
-          {
-            key: "bottomBackgroundSize", label: "Bottom Background Fit", type: "select",
-            options: [
-              { label: "Cover", value: "cover" },
-              { label: "Contain", value: "contain" },
-              { label: "Auto", value: "auto" },
-              { label: "Stretch", value: "100% 100%" },
-            ],
-          },
         ],
       },
       {

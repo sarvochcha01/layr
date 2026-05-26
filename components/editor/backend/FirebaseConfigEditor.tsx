@@ -47,8 +47,11 @@ export function FirebaseConfigEditor({ config, onChange }: FirebaseConfigEditorP
       cleanInput = cleanInput.replace(/^(?:const|var|let)\s+\w+\s*=\s*/, "");
       // Strip trailing semicolon
       cleanInput = cleanInput.replace(/;\s*$/, "");
-      // Convert JS property keys to JSON (unquoted → quoted)
-      cleanInput = cleanInput.replace(/(\w+)\s*:/g, '"$1":');
+      // Convert unquoted JS property keys to JSON (only at start of line, not inside strings)
+      cleanInput = cleanInput.replace(/^\s*(\w+)\s*:/gm, (match, key) => {
+        const leadingWhitespace = match.match(/^\s*/)?.[0] || "";
+        return `${leadingWhitespace}"${key}":`;
+      });
       // Remove trailing commas
       cleanInput = cleanInput.replace(/,\s*([\]}])/g, "$1");
 

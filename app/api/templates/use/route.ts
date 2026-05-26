@@ -52,6 +52,8 @@ export async function POST(request: Request) {
             pages,
             globalComponents: templateData.globalComponents || {},
             customComponents: templateData.customComponents || {},
+            apiEndpoints: templateData.apiEndpoints || [],
+            dbSchema: templateData.dbCollections || templateData.dbSchema || [],
             createdAt: serverTimestamp(),
             updatedAt: serverTimestamp(),
             templateId,

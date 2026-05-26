@@ -7,6 +7,7 @@ import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
 import { useBackendContext } from "@/contexts/BackendContext";
 import { useState, useRef } from "react";
 import { BackendAction } from "@/types/backend";
+import { toast } from "sonner";
 
 interface FormField {
   id: string;
@@ -63,8 +64,6 @@ export function Form({
   const cssVars = getThemeCSSVars(effectiveTheme);
   const formRef = useRef<HTMLFormElement>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
-  const [statusMessage, setStatusMessage] = useState("");
 
   // Get projectId from context (provided by BackendProvider in EditorLayout)
   const { projectId: ctxProjectId } = useBackendContext();
@@ -119,7 +118,6 @@ export function Form({
     // If backendAction is configured, send to endpoint
     if (backendAction?.endpointId && resolvedProjectId) {
       setIsSubmitting(true);
-      setSubmitStatus("idle");
 
       try {
         // Build mapped body
@@ -166,8 +164,7 @@ export function Form({
         }
 
         // Handle success behavior
-        setSubmitStatus("success");
-        setStatusMessage(backendAction.successMessage || "Submitted successfully!");
+        toast.success(backendAction.successMessage || "Submitted successfully!");
 
         if (backendAction.onSuccess === "reset") {
           formRef.current.reset();
@@ -181,12 +178,6 @@ export function Form({
             window.location.href = url;
           }
         }
-
-        // Auto-clear success message
-        setTimeout(() => {
-          setSubmitStatus("idle");
-          setStatusMessage("");
-        }, 3000);
       } catch (err) {
         const failMode = backendAction.onFail || "toast";
 
@@ -196,15 +187,7 @@ export function Form({
         }
 
         if (failMode !== "none") {
-          // Show error message (toast mode)
-          setSubmitStatus("error");
-          setStatusMessage(
-            backendAction.failMessage || (err as Error).message
-          );
-          setTimeout(() => {
-            setSubmitStatus("idle");
-            setStatusMessage("");
-          }, 5000);
+          toast.error(backendAction.failMessage || (err as Error).message);
         }
       } finally {
         setIsSubmitting(false);
@@ -354,31 +337,6 @@ export function Form({
 
       <form ref={formRef} onSubmit={handleSubmit} className="space-y-5">
         {fields.map((field) => renderField(field))}
-
-        {/* Status message */}
-        {submitStatus !== "idle" && statusMessage && (
-          <div
-            style={{
-              padding: "10px 14px",
-              borderRadius: "var(--theme-radius)",
-              fontSize: "13px",
-              fontWeight: 500,
-              ...(submitStatus === "success"
-                ? {
-                    background: "rgba(34, 197, 94, 0.1)",
-                    color: "#22c55e",
-                    border: "1px solid rgba(34, 197, 94, 0.2)",
-                  }
-                : {
-                    background: "rgba(239, 68, 68, 0.1)",
-                    color: "#ef4444",
-                    border: "1px solid rgba(239, 68, 68, 0.2)",
-                  }),
-            }}
-          >
-            {statusMessage}
-          </div>
-        )}
 
         <button
           type="submit"
