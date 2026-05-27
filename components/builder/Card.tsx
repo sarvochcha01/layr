@@ -150,6 +150,12 @@ export function Card({
       } else if (backendAction.onSuccess !== "none") {
         toast.success(successMsg);
       }
+
+      // Dispatch a data-refresh event so parent components (EditorLayout)
+      // can re-fetch data sources (e.g. reload cart after removing an item)
+      setTimeout(() => {
+        window.dispatchEvent(new Event("layr-data-refresh"));
+      }, 300);
     } catch (err) {
       const failMode = backendAction.onFail || "toast";
       if (failMode === "redirect" && backendAction.failRedirectUrl) {

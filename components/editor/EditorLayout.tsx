@@ -167,6 +167,7 @@ export function EditorLayout({
   const [viewport, setViewport] = useState<Viewport>("desktop");
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [isDataSourceFetching, setIsDataSourceFetching] = useState(false);
+  const [dataRefreshKey, setDataRefreshKey] = useState(0);
   const [showCodeEditor, setShowCodeEditor] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedName, setEditedName] = useState(projectName || "");
@@ -219,6 +220,15 @@ export function EditorLayout({
     onTogglePreview: () => setIsPreviewMode(!isPreviewMode),
     isEnabled: true,
   });
+
+  // Listen for data-refresh events dispatched by child components (e.g. after cart item removal)
+  useEffect(() => {
+    const handleDataRefresh = () => {
+      setDataRefreshKey((k) => k + 1);
+    };
+    window.addEventListener("layr-data-refresh", handleDataRefresh);
+    return () => window.removeEventListener("layr-data-refresh", handleDataRefresh);
+  }, []);
 
   // Auto-fetch data source bindings when entering preview mode or changing page
   useEffect(() => {
@@ -365,7 +375,7 @@ export function EditorLayout({
                 id: `action-remove-${idx}`,
                 endpointId: "ecom-cart-remove",
                 endpointPath: "/cart/remove",
-                endpointMethod: "POST",
+                endpointMethod: "DELETE",
                 trigger: "click",
                 payloadSource: "custom",
                 customPayload: JSON.stringify({
@@ -407,7 +417,7 @@ export function EditorLayout({
     Promise.all(fetchPromises).finally(() => {
       setIsDataSourceFetching(false);
     });
-  }, [isPreviewMode, currentPageId]); // Trigger on preview mode change AND page navigation
+  }, [isPreviewMode, currentPageId, dataRefreshKey]); // Trigger on preview mode change, page navigation, AND backend action refresh
 
   const isResizingRef = useRef<string | null>(null);
   const startPosRef = useRef({ x: 0, y: 0 });

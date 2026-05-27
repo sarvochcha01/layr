@@ -192,6 +192,12 @@ export function Form({
             window.location.href = url;
           }
         }
+
+        // Dispatch a data-refresh event so parent components (EditorLayout)
+        // can re-fetch data sources after a mutation
+        setTimeout(() => {
+          window.dispatchEvent(new Event("layr-data-refresh"));
+        }, 300);
       } catch (err) {
         const failMode = backendAction.onFail || "toast";
 

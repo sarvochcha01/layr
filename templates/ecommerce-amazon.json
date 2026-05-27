@@ -571,6 +571,139 @@
       "dataSource": "pipeline"
     },
     {
+      "id": "ecom-cart-remove",
+      "name": "Remove from Cart",
+      "description": "",
+      "path": "/cart/remove",
+      "method": "DELETE",
+      "isEnabled": true,
+      "usePipeline": true,
+      "pipeline": [
+        {
+          "id": "step-validate-remove",
+          "type": "validate",
+          "label": "Validate",
+          "isEnabled": true,
+          "position": {
+            "x": 300,
+            "y": 50
+          },
+          "validateConfig": {
+            "rules": [
+              {
+                "id": "rule-cartid",
+                "field": "body.cartItemId",
+                "rule": "required",
+                "errorMessage": "cartItemId required"
+              }
+            ],
+            "failStatus": 400
+          }
+        },
+        {
+          "id": "step-cart-collection",
+          "type": "collection",
+          "label": "Cart",
+          "isEnabled": true,
+          "position": {
+            "x": 300,
+            "y": 250
+          },
+          "collectionConfig": {
+            "collectionName": "carts"
+          }
+        },
+        {
+          "id": "step-delete-item",
+          "type": "db-delete",
+          "label": "Delete",
+          "isEnabled": true,
+          "position": {
+            "x": 600,
+            "y": 50
+          },
+          "dbDeleteConfig": {
+            "collection": "",
+            "documentId": "",
+            "resultVariable": "deleteResult"
+          }
+        },
+        {
+          "id": "step-respond-success",
+          "type": "respond",
+          "label": "Success",
+          "isEnabled": true,
+          "position": {
+            "x": 900,
+            "y": 50
+          },
+          "respondConfig": {
+            "status": 200,
+            "bodyMode": "static",
+            "staticBody": {
+              "success": true,
+              "message": "Item removed from cart"
+            }
+          }
+        }
+      ],
+      "nodeEdges": [
+        {
+          "id": "e-remove-validate",
+          "source": "__request__",
+          "sourceHandle": "exec-out",
+          "target": "step-validate-remove",
+          "targetHandle": "exec-in",
+          "kind": "exec"
+        },
+        {
+          "id": "e-validate-delete",
+          "source": "step-validate-remove",
+          "sourceHandle": "exec-pass",
+          "target": "step-delete-item",
+          "targetHandle": "exec-in",
+          "kind": "exec"
+        },
+        {
+          "id": "e-delete-respond",
+          "source": "step-delete-item",
+          "sourceHandle": "exec-out",
+          "target": "step-respond-success",
+          "targetHandle": "exec-in",
+          "kind": "exec"
+        },
+        {
+          "id": "e-collection-delete",
+          "source": "step-cart-collection",
+          "sourceHandle": "collection-out",
+          "target": "step-delete-item",
+          "targetHandle": "d-collection",
+          "kind": "data"
+        },
+        {
+          "id": "e-cartid-delete",
+          "source": "__request__",
+          "sourceHandle": "body-cartItemId",
+          "target": "step-delete-item",
+          "targetHandle": "d-documentId",
+          "kind": "data"
+        }
+      ],
+      "requestBody": [
+        {
+          "id": "rb-remove-1",
+          "name": "cartItemId",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "pathParams": [],
+      "statusCode": 200,
+      "mockResponse": null,
+      "dataSource": "pipeline"
+    },
+    {
       "id": "ecom-checkout",
       "name": "Checkout",
       "description": "",
@@ -710,6 +843,448 @@
           "sourceHandle": "body-address",
           "target": "step-uc32tuzk",
           "targetHandle": "field-address",
+          "kind": "data"
+        }
+      ],
+      "requestBody": [],
+      "queryParams": [],
+      "pathParams": [],
+      "statusCode": 200,
+      "mockResponse": null,
+      "dataSource": "pipeline"
+    },
+    {
+      "id": "ecom-products-list",
+      "name": "List Products",
+      "description": "Get all products",
+      "path": "/products",
+      "method": "GET",
+      "isEnabled": true,
+      "usePipeline": true,
+      "pipeline": [
+        {
+          "id": "step-pl-col",
+          "type": "collection",
+          "label": "Products",
+          "isEnabled": true,
+          "position": { "x": 300, "y": 250 },
+          "collectionConfig": { "collectionName": "products" }
+        },
+        {
+          "id": "step-pl-query",
+          "type": "db-query",
+          "label": "Fetch All",
+          "isEnabled": true,
+          "position": { "x": 300, "y": 50 },
+          "dbQueryConfig": {
+            "collection": "",
+            "filters": [],
+            "limit": 50,
+            "resultVariable": "products"
+          }
+        },
+        {
+          "id": "step-pl-respond",
+          "type": "respond",
+          "label": "Return Products",
+          "isEnabled": true,
+          "position": { "x": 600, "y": 50 },
+          "respondConfig": {
+            "status": 200,
+            "bodyMode": "mapping",
+            "bodyMapping": {
+              "products": "variables.products"
+            }
+          }
+        }
+      ],
+      "nodeEdges": [
+        {
+          "id": "e-pl-req-query",
+          "source": "__request__",
+          "sourceHandle": "exec-out",
+          "target": "step-pl-query",
+          "targetHandle": "exec-in",
+          "kind": "exec"
+        },
+        {
+          "id": "e-pl-query-respond",
+          "source": "step-pl-query",
+          "sourceHandle": "exec-out",
+          "target": "step-pl-respond",
+          "targetHandle": "exec-in",
+          "kind": "exec"
+        },
+        {
+          "id": "e-pl-col-query",
+          "source": "step-pl-col",
+          "sourceHandle": "collection-out",
+          "target": "step-pl-query",
+          "targetHandle": "q-collection",
+          "kind": "data"
+        }
+      ],
+      "requestBody": [],
+      "queryParams": [],
+      "pathParams": [],
+      "statusCode": 200,
+      "mockResponse": null,
+      "dataSource": "pipeline"
+    },
+    {
+      "id": "ecom-products-create",
+      "name": "Create Product",
+      "description": "Add a new product",
+      "path": "/products",
+      "method": "POST",
+      "isEnabled": true,
+      "usePipeline": true,
+      "pipeline": [
+        {
+          "id": "step-pc-validate",
+          "type": "validate",
+          "label": "Validate Product",
+          "isEnabled": true,
+          "position": { "x": 300, "y": 50 },
+          "validateConfig": {
+            "rules": [
+              {
+                "id": "rule-pc-name",
+                "field": "body.name",
+                "rule": "required",
+                "errorMessage": "Product name is required"
+              },
+              {
+                "id": "rule-pc-price",
+                "field": "body.price",
+                "rule": "required",
+                "errorMessage": "Price is required"
+              }
+            ],
+            "failStatus": 400
+          }
+        },
+        {
+          "id": "step-pc-col",
+          "type": "collection",
+          "label": "Products",
+          "isEnabled": true,
+          "position": { "x": 600, "y": 250 },
+          "collectionConfig": { "collectionName": "products" }
+        },
+        {
+          "id": "step-pc-insert",
+          "type": "db-insert",
+          "label": "Insert Product",
+          "isEnabled": true,
+          "position": { "x": 600, "y": 50 },
+          "dbInsertConfig": {
+            "collection": "",
+            "fieldMapping": {},
+            "resultVariable": "productId"
+          }
+        },
+        {
+          "id": "step-pc-respond",
+          "type": "respond",
+          "label": "Return Created",
+          "isEnabled": true,
+          "position": { "x": 900, "y": 50 },
+          "respondConfig": {
+            "status": 201,
+            "bodyMode": "static",
+            "staticBody": {
+              "success": true,
+              "message": "Product created"
+            }
+          }
+        }
+      ],
+      "nodeEdges": [
+        {
+          "id": "e-pc-req-val",
+          "source": "__request__",
+          "sourceHandle": "exec-out",
+          "target": "step-pc-validate",
+          "targetHandle": "exec-in",
+          "kind": "exec"
+        },
+        {
+          "id": "e-pc-val-insert",
+          "source": "step-pc-validate",
+          "sourceHandle": "exec-pass",
+          "target": "step-pc-insert",
+          "targetHandle": "exec-in",
+          "kind": "exec"
+        },
+        {
+          "id": "e-pc-insert-respond",
+          "source": "step-pc-insert",
+          "sourceHandle": "exec-out",
+          "target": "step-pc-respond",
+          "targetHandle": "exec-in",
+          "kind": "exec"
+        },
+        {
+          "id": "e-pc-col-insert",
+          "source": "step-pc-col",
+          "sourceHandle": "collection-out",
+          "target": "step-pc-insert",
+          "targetHandle": "i-collection",
+          "kind": "data"
+        },
+        {
+          "id": "e-pc-body-name",
+          "source": "__request__",
+          "sourceHandle": "body-name",
+          "target": "step-pc-insert",
+          "targetHandle": "field-name",
+          "kind": "data"
+        },
+        {
+          "id": "e-pc-body-price",
+          "source": "__request__",
+          "sourceHandle": "body-price",
+          "target": "step-pc-insert",
+          "targetHandle": "field-price",
+          "kind": "data"
+        },
+        {
+          "id": "e-pc-body-desc",
+          "source": "__request__",
+          "sourceHandle": "body-description",
+          "target": "step-pc-insert",
+          "targetHandle": "field-description",
+          "kind": "data"
+        },
+        {
+          "id": "e-pc-body-image",
+          "source": "__request__",
+          "sourceHandle": "body-image",
+          "target": "step-pc-insert",
+          "targetHandle": "field-image",
+          "kind": "data"
+        },
+        {
+          "id": "e-pc-body-category",
+          "source": "__request__",
+          "sourceHandle": "body-category",
+          "target": "step-pc-insert",
+          "targetHandle": "field-category",
+          "kind": "data"
+        }
+      ],
+      "requestBody": [
+        { "id": "rb-pc-1", "name": "name", "type": "string", "required": true },
+        { "id": "rb-pc-2", "name": "price", "type": "number", "required": true },
+        { "id": "rb-pc-3", "name": "description", "type": "string", "required": false },
+        { "id": "rb-pc-4", "name": "image", "type": "string", "required": false },
+        { "id": "rb-pc-5", "name": "category", "type": "string", "required": false }
+      ],
+      "queryParams": [],
+      "pathParams": [],
+      "statusCode": 201,
+      "mockResponse": null,
+      "dataSource": "pipeline"
+    },
+    {
+      "id": "ecom-products-delete",
+      "name": "Delete Product",
+      "description": "Delete a product by ID",
+      "path": "/products",
+      "method": "DELETE",
+      "isEnabled": true,
+      "usePipeline": true,
+      "pipeline": [
+        {
+          "id": "step-pd-validate",
+          "type": "validate",
+          "label": "Validate ID",
+          "isEnabled": true,
+          "position": { "x": 300, "y": 50 },
+          "validateConfig": {
+            "rules": [
+              {
+                "id": "rule-pd-id",
+                "field": "body.id",
+                "rule": "required",
+                "errorMessage": "Product ID is required"
+              }
+            ],
+            "failStatus": 400
+          }
+        },
+        {
+          "id": "step-pd-col",
+          "type": "collection",
+          "label": "Products",
+          "isEnabled": true,
+          "position": { "x": 600, "y": 250 },
+          "collectionConfig": { "collectionName": "products" }
+        },
+        {
+          "id": "step-pd-delete",
+          "type": "db-delete",
+          "label": "Delete Product",
+          "isEnabled": true,
+          "position": { "x": 600, "y": 50 },
+          "dbDeleteConfig": {
+            "collection": "",
+            "documentId": "",
+            "resultVariable": "deleteResult"
+          }
+        },
+        {
+          "id": "step-pd-respond",
+          "type": "respond",
+          "label": "Return Success",
+          "isEnabled": true,
+          "position": { "x": 900, "y": 50 },
+          "respondConfig": {
+            "status": 200,
+            "bodyMode": "static",
+            "staticBody": {
+              "success": true,
+              "message": "Product deleted"
+            }
+          }
+        }
+      ],
+      "nodeEdges": [
+        {
+          "id": "e-pd-req-val",
+          "source": "__request__",
+          "sourceHandle": "exec-out",
+          "target": "step-pd-validate",
+          "targetHandle": "exec-in",
+          "kind": "exec"
+        },
+        {
+          "id": "e-pd-val-delete",
+          "source": "step-pd-validate",
+          "sourceHandle": "exec-pass",
+          "target": "step-pd-delete",
+          "targetHandle": "exec-in",
+          "kind": "exec"
+        },
+        {
+          "id": "e-pd-delete-respond",
+          "source": "step-pd-delete",
+          "sourceHandle": "exec-out",
+          "target": "step-pd-respond",
+          "targetHandle": "exec-in",
+          "kind": "exec"
+        },
+        {
+          "id": "e-pd-col-delete",
+          "source": "step-pd-col",
+          "sourceHandle": "collection-out",
+          "target": "step-pd-delete",
+          "targetHandle": "d-collection",
+          "kind": "data"
+        },
+        {
+          "id": "e-pd-body-id",
+          "source": "__request__",
+          "sourceHandle": "body-id",
+          "target": "step-pd-delete",
+          "targetHandle": "d-documentId",
+          "kind": "data"
+        }
+      ],
+      "requestBody": [
+        { "id": "rb-pd-1", "name": "id", "type": "string", "required": true }
+      ],
+      "queryParams": [],
+      "pathParams": [],
+      "statusCode": 200,
+      "mockResponse": null,
+      "dataSource": "pipeline"
+    },
+    {
+      "id": "ecom-orders-get",
+      "name": "Get Orders",
+      "description": "Get all orders for a user",
+      "path": "/orders",
+      "method": "GET",
+      "isEnabled": true,
+      "usePipeline": true,
+      "pipeline": [
+        {
+          "id": "step-go-col",
+          "type": "collection",
+          "label": "Orders",
+          "isEnabled": true,
+          "position": { "x": 300, "y": 250 },
+          "collectionConfig": { "collectionName": "orders" }
+        },
+        {
+          "id": "step-go-query",
+          "type": "db-query",
+          "label": "Fetch Orders",
+          "isEnabled": true,
+          "position": { "x": 300, "y": 50 },
+          "dbQueryConfig": {
+            "collection": "",
+            "filters": [
+              {
+                "id": "filter-go-uid",
+                "field": "userId",
+                "operator": "==",
+                "isLiteral": false,
+                "value": "query.userId"
+              }
+            ],
+            "limit": 50,
+            "resultVariable": "orders"
+          }
+        },
+        {
+          "id": "step-go-respond",
+          "type": "respond",
+          "label": "Return Orders",
+          "isEnabled": true,
+          "position": { "x": 600, "y": 50 },
+          "respondConfig": {
+            "status": 200,
+            "bodyMode": "mapping",
+            "bodyMapping": {
+              "orders": "variables.orders"
+            }
+          }
+        }
+      ],
+      "nodeEdges": [
+        {
+          "id": "e-go-req-query",
+          "source": "__request__",
+          "sourceHandle": "exec-out",
+          "target": "step-go-query",
+          "targetHandle": "exec-in",
+          "kind": "exec"
+        },
+        {
+          "id": "e-go-query-respond",
+          "source": "step-go-query",
+          "sourceHandle": "exec-out",
+          "target": "step-go-respond",
+          "targetHandle": "exec-in",
+          "kind": "exec"
+        },
+        {
+          "id": "e-go-col-query",
+          "source": "step-go-col",
+          "sourceHandle": "collection-out",
+          "target": "step-go-query",
+          "targetHandle": "q-collection",
+          "kind": "data"
+        },
+        {
+          "id": "e-go-uid-filter",
+          "source": "__request__",
+          "sourceHandle": "query-userId",
+          "target": "step-go-query",
+          "targetHandle": "filter-userId",
           "kind": "data"
         }
       ],

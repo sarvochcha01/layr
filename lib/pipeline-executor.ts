@@ -616,7 +616,7 @@ export async function executePipeline(
           if (!step.dbDeleteConfig || !delegate) break;
           const cfg = step.dbDeleteConfig;
           const collection = getCollectionName("d-collection") || cfg.collection;
-          const docId = getInput("doc-id") ?? resolveContextPath(ctx, cfg.documentId);
+          const docId = getInput("d-documentId") ?? getInput("doc-id") ?? resolveContextPath(ctx, cfg.documentId);
 
           if (!collection) throw new Error("Collection name is missing");
           if (!docId) throw new Error("Document ID resolved to null/undefined");
