@@ -163,6 +163,20 @@ export function Form({
           throw new Error(errMsg);
         }
 
+        // Save preview auth session if payload returned user details
+        if (data && (data.uid || data.token)) {
+          if (typeof window !== "undefined" && resolvedProjectId) {
+            localStorage.setItem(`preview-user-${resolvedProjectId}`, JSON.stringify(data));
+          }
+        }
+
+        // Clear preview session if signing out
+        if (path.toLowerCase().endsWith("/signout")) {
+          if (typeof window !== "undefined" && resolvedProjectId) {
+            localStorage.removeItem(`preview-user-${resolvedProjectId}`);
+          }
+        }
+
         // Handle success behavior
         toast.success(backendAction.successMessage || "Submitted successfully!");
 

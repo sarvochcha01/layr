@@ -155,9 +155,11 @@ export function Navbar({
               const getLinkSlug = (href: string, text: string) => {
                 let slug = href;
                 if (slug.startsWith("page:")) {
-                  const pageId = slug.substring(5);
-                  const page = pages?.find((p: any) => p.id === pageId);
-                  if (page) return page.slug;
+                  const parts = slug.substring(5).split("?");
+                  const pageId = parts[0];
+                  const queryParams = parts[1] ? `?${parts[1]}` : "";
+                  const page = pages?.find((p: any) => p.id === pageId || p.slug === pageId);
+                  if (page) return `${page.slug}${queryParams}`;
                 }
                 
                 if (slug.startsWith("page:")) slug = slug.replace("page:", "");
@@ -170,9 +172,10 @@ export function Navbar({
               };
 
               const linkSlug = getLinkSlug(link.href, link.text);
-              const isActive = currentPageSlug === linkSlug || 
-                              (currentPageSlug === "index" && linkSlug === "index") ||
-                              (linkSlug === "/" && currentPageSlug === "index");
+              const baseLinkSlug = linkSlug.split("?")[0];
+              const isActive = currentPageSlug === baseLinkSlug || 
+                              (currentPageSlug === "index" && baseLinkSlug === "index") ||
+                              (baseLinkSlug === "/" && currentPageSlug === "index");
 
               const handleClick = (e: React.MouseEvent) => {
                 // In editor, use onNavigate callback
@@ -307,9 +310,11 @@ export function Navbar({
                     e.preventDefault();
                     if (isPreviewMode && onNavigate && ctaLink) {
                       if (ctaLink.startsWith("page:")) {
-                        const pageId = ctaLink.substring(5);
-                        const page = pages?.find((p: any) => p.id === pageId);
-                        if (page) onNavigate(page.slug);
+                        const parts = ctaLink.substring(5).split("?");
+                        const pageId = parts[0];
+                        const queryParams = parts[1] ? `?${parts[1]}` : "";
+                        const page = pages?.find((p: any) => p.id === pageId || p.slug === pageId);
+                        if (page) onNavigate(`${page.slug}${queryParams}`);
                       } else {
                         const slug = ctaLink.replace(/^\//, "");
                         onNavigate(slug);
@@ -372,9 +377,11 @@ export function Navbar({
               const getLinkSlug = (href: string, text: string) => {
                 let slug = href;
                 if (slug.startsWith("page:")) {
-                  const pageId = slug.substring(5);
-                  const page = pages?.find((p: any) => p.id === pageId);
-                  if (page) return page.slug;
+                  const parts = slug.substring(5).split("?");
+                  const pageId = parts[0];
+                  const queryParams = parts[1] ? `?${parts[1]}` : "";
+                  const page = pages?.find((p: any) => p.id === pageId || p.slug === pageId);
+                  if (page) return `${page.slug}${queryParams}`;
                 }
                 
                 if (slug.startsWith("page:")) slug = slug.replace("page:", "");
@@ -387,9 +394,10 @@ export function Navbar({
               };
 
               const linkSlug = getLinkSlug(link.href, link.text);
-              const isActive = currentPageSlug === linkSlug || 
-                              (currentPageSlug === "index" && linkSlug === "index") ||
-                              (linkSlug === "/" && currentPageSlug === "index");
+              const baseLinkSlug = linkSlug.split("?")[0];
+              const isActive = currentPageSlug === baseLinkSlug || 
+                              (currentPageSlug === "index" && baseLinkSlug === "index") ||
+                              (baseLinkSlug === "/" && currentPageSlug === "index");
 
               return (
                 <a

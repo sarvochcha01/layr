@@ -171,9 +171,11 @@ export function Footer({
     }
     if (href.startsWith("page:") && onNavigate) {
       e.preventDefault();
-      const pageId = href.substring(5);
-      const page = pages?.find((p: any) => p.id === pageId);
-      if (page) onNavigate(page.slug);
+      const parts = href.substring(5).split("?");
+      const pageId = parts[0];
+      const queryParams = parts[1] ? `?${parts[1]}` : "";
+      const page = pages?.find((p: any) => p.id === pageId || p.slug === pageId);
+      if (page) onNavigate(`${page.slug}${queryParams}`);
     }
   };
 

@@ -963,7 +963,7 @@
                     "image": "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=400",
                     "topImageHeight": "220px",
                     "buttonText": "View Details",
-                    "buttonLink": "page:shop-page"
+                    "buttonLink": "page:product-details-page?productId=fp-1"
                   },
                   "children": []
                 },
@@ -976,7 +976,7 @@
                     "image": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400",
                     "topImageHeight": "220px",
                     "buttonText": "View Details",
-                    "buttonLink": "page:shop-page"
+                    "buttonLink": "page:product-details-page?productId=fp-2"
                   },
                   "children": []
                 },
@@ -989,7 +989,7 @@
                     "image": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400",
                     "topImageHeight": "220px",
                     "buttonText": "View Details",
-                    "buttonLink": "page:shop-page"
+                    "buttonLink": "page:product-details-page?productId=fp-3"
                   },
                   "children": []
                 },
@@ -1002,7 +1002,7 @@
                     "image": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400",
                     "topImageHeight": "220px",
                     "buttonText": "View Details",
-                    "buttonLink": "page:shop-page"
+                    "buttonLink": "page:product-details-page?productId=fp-4"
                   },
                   "children": []
                 }
@@ -2441,6 +2441,195 @@
                   {
                     "text": "Contact Us",
                     "href": "#"
+                  }
+                ]
+              }
+            ]
+          },
+          "children": [],
+          "isGlobal": "GlobalFooter"
+        }
+      ]
+    },
+    {
+      "id": "product-details-page",
+      "name": "Product Details",
+      "slug": "product-details",
+      "components": [
+        {
+          "id": "nav-pd",
+          "type": "Navbar",
+          "props": {
+            "logoText": "NEXUS STORE",
+            "links": [
+              {
+                "text": "Home",
+                "href": "page:home-page"
+              },
+              {
+                "text": "Shop",
+                "href": "page:shop-page"
+              },
+              {
+                "text": "Cart",
+                "href": "page:cart-page"
+              },
+              {
+                "text": "Login",
+                "href": "page:login-page"
+              }
+            ],
+            "ctaText": "🛒 Cart",
+            "ctaLink": "page:cart-page",
+            "backgroundColor": "#0F172A",
+            "textColor": "#F8FAFC",
+            "linkColor": "#94A3B8",
+            "linkHoverColor": "#FFFFFF"
+          },
+          "children": [],
+          "isGlobal": "GlobalNavbar"
+        },
+        {
+          "id": "pd-container",
+          "type": "Container",
+          "props": {
+            "padding": "2xl",
+            "backgroundColor": "#FFFFFF",
+            "maxWidth": "xl",
+            "marginLeft": "auto",
+            "marginRight": "auto",
+            "marginTop": "2rem",
+            "marginBottom": "4rem"
+          },
+          "children": [
+            {
+              "id": "pd-grid",
+              "type": "Grid",
+              "props": {
+                "columns": 2,
+                "gap": "3rem"
+              },
+              "children": [
+                {
+                  "id": "pd-image-container",
+                  "type": "Container",
+                  "props": {},
+                  "children": [
+                    {
+                      "id": "pd-image",
+                      "type": "Image",
+                      "props": {
+                        "src": "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=600",
+                        "alt": "Product Image"
+                      },
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "id": "pd-info-container",
+                  "type": "Container",
+                  "props": {},
+                  "children": [
+                    {
+                      "id": "pd-title",
+                      "type": "Text",
+                      "props": {
+                        "content": "Product Title",
+                        "tag": "h1",
+                        "size": "3xl",
+                        "weight": "700",
+                        "marginBottom": "1rem"
+                      },
+                      "children": []
+                    },
+                    {
+                      "id": "pd-price",
+                      "type": "Text",
+                      "props": {
+                        "content": "$0.00",
+                        "tag": "p",
+                        "size": "2xl",
+                        "weight": "600",
+                        "color": "#EF4444",
+                        "marginBottom": "1.5rem"
+                      },
+                      "children": []
+                    },
+                    {
+                      "id": "pd-desc",
+                      "type": "Text",
+                      "props": {
+                        "content": "Product description goes here.",
+                        "tag": "p",
+                        "size": "base",
+                        "color": "#4B5563",
+                        "marginBottom": "2rem"
+                      },
+                      "children": []
+                    },
+                    {
+                      "id": "pd-button",
+                      "type": "Button",
+                      "props": {
+                        "text": "Add to Cart",
+                        "variant": "primary",
+                        "size": "lg",
+                        "fullWidth": true,
+                        "backendAction": {
+                          "id": "action-add-pd",
+                          "endpointId": "ecom-cart-add",
+                          "endpointPath": "/cart/add",
+                          "endpointMethod": "POST",
+                          "trigger": "click",
+                          "payloadSource": "custom",
+                          "customPayload": "{\"userId\": \"{{user.uid || 'guest'}}\", \"productId\": \"pd\", \"name\": \"Product\", \"price\": 0.0, \"quantity\": 1}",
+                          "onSuccess": "toast",
+                          "successMessage": "Added to cart!",
+                          "onFail": "toast",
+                          "failMessage": "Please log in to add items to your cart."
+                        }
+                      },
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "footer-pd",
+          "type": "Footer",
+          "props": {
+            "logoText": "NEXUS STORE",
+            "description": "Your one-stop shop for premium tech, apparel, and lifestyle products.",
+            "backgroundColor": "#0F172A",
+            "textColor": "#E2E8F0",
+            "sections": [
+              {
+                "title": "Shop",
+                "links": [
+                  {
+                    "text": "All Products",
+                    "href": "page:shop-page"
+                  },
+                  {
+                    "text": "Featured",
+                    "href": "page:home-page"
+                  }
+                ]
+              },
+              {
+                "title": "Account",
+                "links": [
+                  {
+                    "text": "Login",
+                    "href": "page:login-page"
+                  },
+                  {
+                    "text": "Cart",
+                    "href": "page:cart-page"
                   }
                 ]
               }

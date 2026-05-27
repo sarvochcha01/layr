@@ -8,6 +8,7 @@ import { useBackendContext } from "@/contexts/BackendContext";
 import { BackendAction } from "@/types/backend";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
 
 interface ButtonProps {
@@ -70,6 +71,7 @@ export function Button({
   const cssVars = getThemeCSSVars(effectiveTheme);
 
   // Backend action state
+  const { user } = useAuth();
   const { projectId: ctxProjectId } = useBackendContext();
   const resolvedProjectId = projectId || ctxProjectId;
   const [isLoading, setIsLoading] = useState(false);
@@ -124,9 +126,17 @@ export function Button({
   ): { resolved: string; isPageLink: boolean; slug?: string } => {
     if (!rawHref) return { resolved: "#", isPageLink: false };
     if (rawHref.startsWith("page:")) {
-      const pageId = rawHref.substring(5);
-      const page = pages?.find((p: any) => p.id === pageId);
-      if (page) return { resolved: `/${page.slug}`, isPageLink: true, slug: page.slug };
+      const parts = rawHref.substring(5).split("?");
+      const pageId = parts[0];
+      const queryParams = parts[1] ? `?${parts[1]}` : "";
+      const page = pages?.find((p: any) => p.id === pageId || p.slug === pageId);
+      if (page) {
+        return {
+          resolved: `/${page.slug}${queryParams}`,
+          isPageLink: true,
+          slug: `${page.slug}${queryParams}`,
+        };
+      }
       return { resolved: "#", isPageLink: true };
     }
     return { resolved: rawHref, isPageLink: false };
@@ -141,8 +151,34 @@ export function Button({
     setIsLoading(true);
 
     try {
-      // Build the request body from staticPayload
-      const body = backendAction.staticPayload || {};
+      // Build the request body
+      let body = backendAction.staticPayload || {};
+
+      if (backendAction.payloadSource === "custom" && backendAction.customPayload) {
+        let payloadStr = backendAction.customPayload;
+        let previewUid = "";
+        if (typeof window !== "undefined" && resolvedProjectId) {
+          try {
+            const stored = localStorage.getItem(`preview-user-${resolvedProjectId}`);
+            if (stored) {
+              const parsed = JSON.parse(stored);
+              if (parsed && parsed.uid) {
+                previewUid = parsed.uid;
+              }
+            }
+          } catch (e) {
+            console.error("Failed to parse preview user session:", e);
+          }
+        }
+        const uid = previewUid || user?.uid || "";
+        payloadStr = payloadStr.replace(/\{\{\s*user\.uid\s*\|\|\s*'guest'\s*\}\}/g, uid || "guest");
+        payloadStr = payloadStr.replace(/\{\{\s*user\.uid\s*\}\}/g, uid);
+        try {
+          body = JSON.parse(payloadStr);
+        } catch (e) {
+          console.error("Failed to parse custom payload:", e);
+        }
+      }
 
       const path = backendAction.endpointPath?.startsWith("/")
         ? backendAction.endpointPath

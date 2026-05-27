@@ -8,6 +8,7 @@ import { useEffectiveThemeStyle } from "@/contexts/ThemeStyleContext";
 import { useBackendContext } from "@/contexts/BackendContext";
 import { BackendAction } from "@/types/backend";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface CardProps {
   title?: string;
@@ -74,6 +75,7 @@ export function Card({
   const effectiveTheme = useEffectiveThemeStyle(themeStyle, themeStyle !== undefined);
   const cssVars = getThemeCSSVars(effectiveTheme);
   
+  const { user } = useAuth();
   const { projectId: ctxProjectId } = useBackendContext();
   const resolvedProjectId = projectId || ctxProjectId;
   const [isLoading, setIsLoading] = useState(false);
@@ -84,7 +86,33 @@ export function Card({
     setIsLoading(true);
 
     try {
-      const body = backendAction.staticPayload || {};
+      let body = backendAction.staticPayload || {};
+
+      if (backendAction.payloadSource === "custom" && backendAction.customPayload) {
+        let payloadStr = backendAction.customPayload;
+        let previewUid = "";
+        if (typeof window !== "undefined" && resolvedProjectId) {
+          try {
+            const stored = localStorage.getItem(`preview-user-${resolvedProjectId}`);
+            if (stored) {
+              const parsed = JSON.parse(stored);
+              if (parsed && parsed.uid) {
+                previewUid = parsed.uid;
+              }
+            }
+          } catch (e) {
+            console.error("Failed to parse preview user session:", e);
+          }
+        }
+        const uid = previewUid || user?.uid || "";
+        payloadStr = payloadStr.replace(/\{\{\s*user\.uid\s*\|\|\s*'guest'\s*\}\}/g, uid || "guest");
+        payloadStr = payloadStr.replace(/\{\{\s*user\.uid\s*\}\}/g, uid);
+        try {
+          body = JSON.parse(payloadStr);
+        } catch (e) {
+          console.error("Failed to parse custom payload:", e);
+        }
+      }
       const path = backendAction.endpointPath?.startsWith("/")
         ? backendAction.endpointPath
         : `/${backendAction.endpointPath || ""}`;
