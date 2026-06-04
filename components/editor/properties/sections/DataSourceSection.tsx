@@ -80,26 +80,38 @@ function getBindableProps(componentType: string): { key: string; label: string }
 
 /**
  * Extract available response fields from an endpoint's mockResponse
- * as dot-notation paths (e.g., "name", "items.0.title")
+ * as dot-notation paths (e.g., "name", "items[0].title", "[0].name")
  */
 function extractResponsePaths(data: any, prefix = ""): string[] {
   if (data === null || data === undefined) return [];
 
   const paths: string[] = [];
 
-  if (typeof data === "object" && !Array.isArray(data)) {
-    for (const [key, value] of Object.entries(data)) {
-      const path = prefix ? `${prefix}.${key}` : key;
-      paths.push(path);
-      if (typeof value === "object" && value !== null) {
-        paths.push(...extractResponsePaths(value, path));
+  if (Array.isArray(data)) {
+    // Handle array at any level (including root)
+    if (data.length > 0) {
+      const arrayPath = prefix ? `${prefix}[0]` : "[0]";
+      
+      if (typeof data[0] === "object" && data[0] !== null) {
+        // Recursively extract paths from first array item
+        paths.push(...extractResponsePaths(data[0], arrayPath));
+      } else {
+        // Primitive array item
+        paths.push(arrayPath);
       }
     }
-  } else if (Array.isArray(data) && data.length > 0) {
-    // Show first array item's structure
-    const path = prefix ? `${prefix}[0]` : "[0]";
-    if (typeof data[0] === "object" && data[0] !== null) {
-      paths.push(...extractResponsePaths(data[0], path));
+  } else if (typeof data === "object") {
+    // Handle object
+    for (const [key, value] of Object.entries(data)) {
+      const path = prefix ? `${prefix}.${key}` : key;
+      
+      if (value !== null && typeof value === "object") {
+        // Recursively handle nested objects/arrays
+        paths.push(...extractResponsePaths(value, path));
+      } else {
+        // Leaf value (string, number, boolean, null)
+        paths.push(path);
+      }
     }
   }
 
@@ -117,20 +129,27 @@ export function DataSourceSection({
   const [previewData, setPreviewData] = useState<any>(null);
   const [isFetching, setIsFetching] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
+  const [manualInputMode, setManualInputMode] = useState<Record<string, boolean>>({});
 
   const selectedEndpoint = dataSource
     ? apiEndpoints.find((ep) => ep.id === dataSource.endpointId)
     : null;
 
   const bindableProps = getBindableProps(componentType);
-  const responsePaths = selectedEndpoint?.mockResponse
-    ? extractResponsePaths(selectedEndpoint.mockResponse)
-    : [];
+  
+  // Use mockResponse if available, otherwise use previewData (for Firebase/pipeline endpoints)
+  const dataForPaths = selectedEndpoint?.mockResponse || previewData;
+  const responsePaths = dataForPaths ? extractResponsePaths(dataForPaths) : [];
 
   // Filter to leaf-level paths (no parent objects that have children)
+  // For arrays, we want to show [0].field paths, not just [0]
   const leafPaths = responsePaths.filter((path) => {
+    // Check if any other path starts with this path followed by . or [
     return !responsePaths.some(
-      (other) => other !== path && other.startsWith(path + ".")
+      (other) => other !== path && (
+        other.startsWith(path + ".") || 
+        other.startsWith(path + "[")
+      )
     );
   });
 
@@ -141,6 +160,14 @@ export function DataSourceSection({
       autoFetch: true,
     } as DataSourceBinding);
   };
+
+  // Auto-fetch preview data when endpoint is selected and has no mockResponse
+  useEffect(() => {
+    if (selectedEndpoint && !selectedEndpoint.mockResponse && !previewData && !isFetching && projectId) {
+      // Automatically fetch to discover fields
+      handleFetchPreview();
+    }
+  }, [selectedEndpoint?.id, projectId]);
 
   const handleRemoveBinding = () => {
     updateProp("dataSource", undefined);
@@ -316,6 +343,26 @@ export function DataSourceSection({
                 </span>
               </div>
 
+              {/* Array response helper */}
+              {leafPaths.length > 0 && leafPaths[0].startsWith("[0]") && (
+                <div className="text-[10px] text-amber-400/70 bg-amber-500/10 border border-amber-500/20 rounded px-2 py-1.5 flex items-start gap-1.5">
+                  <span className="flex-shrink-0 mt-0.5">💡</span>
+                  <span>
+                    Array response detected. Mapping to <code className="text-amber-300">[0]</code> will use the first item.
+                  </span>
+                </div>
+              )}
+
+              {/* Firebase/Pipeline mode helper */}
+              {selectedEndpoint && !selectedEndpoint.mockResponse && leafPaths.length === 0 && !isFetching && (
+                <div className="text-[10px] text-blue-400/70 bg-blue-500/10 border border-blue-500/20 rounded px-2 py-1.5 flex items-start gap-1.5">
+                  <span className="flex-shrink-0 mt-0.5">ℹ️</span>
+                  <span>
+                    No mock response defined. Click <strong>Fetch Preview</strong> below to discover available fields from your Firebase data.
+                  </span>
+                </div>
+              )}
+
               {bindableProps.length === 0 ? (
                 <p className="text-[10px] text-muted-foreground/50 italic py-2">
                   No bindable properties found for this component type.
@@ -353,25 +400,57 @@ export function DataSourceSection({
 
                         {/* Response field selector */}
                         <div className="flex-1 min-w-0 relative">
-                          <select
-                            value={currentMapping || ""}
-                            onChange={(e) =>
-                              handleSetMapping(key, e.target.value)
-                            }
-                            className={`w-full text-[10px] font-mono px-2 py-1.5 rounded border outline-none appearance-none cursor-pointer truncate ${
-                              currentMapping
-                                ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-300"
-                                : "bg-muted/30 border-border text-muted-foreground/50"
-                            }`}
-                          >
-                            <option value="">— none —</option>
-                            {leafPaths.map((path) => (
-                              <option key={path} value={path}>
-                                {path}
-                              </option>
-                            ))}
-                          </select>
+                          {manualInputMode[key] ? (
+                            <input
+                              type="text"
+                              value={currentMapping || ""}
+                              onChange={(e) => handleSetMapping(key, e.target.value)}
+                              placeholder="e.g., [0].name"
+                              className={`w-full text-[10px] font-mono px-2 py-1.5 rounded border outline-none ${
+                                currentMapping
+                                  ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-300"
+                                  : "bg-muted/30 border-border text-muted-foreground/50"
+                              }`}
+                            />
+                          ) : (
+                            <select
+                              value={currentMapping || ""}
+                              onChange={(e) =>
+                                handleSetMapping(key, e.target.value)
+                              }
+                              className={`w-full text-[10px] font-mono px-2 py-1.5 rounded border outline-none appearance-none cursor-pointer truncate ${
+                                currentMapping
+                                  ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-300"
+                                  : "bg-muted/30 border-border text-muted-foreground/50"
+                              }`}
+                            >
+                              <option value="">— none —</option>
+                              {leafPaths.map((path) => (
+                                <option key={path} value={path}>
+                                  {path}
+                                </option>
+                              ))}
+                              {leafPaths.length === 0 && (
+                                <option value="" disabled>
+                                  Click "Fetch Preview" to discover fields
+                                </option>
+                              )}
+                            </select>
+                          )}
                         </div>
+
+                        {/* Toggle manual input */}
+                        <button
+                          onClick={() => setManualInputMode(prev => ({ ...prev, [key]: !prev[key] }))}
+                          className="p-0.5 text-muted-foreground/40 hover:text-blue-400 transition-all"
+                          title={manualInputMode[key] ? "Switch to dropdown" : "Type custom path"}
+                        >
+                          {manualInputMode[key] ? (
+                            <ChevronDown className="w-3 h-3" />
+                          ) : (
+                            <span className="text-[10px] font-mono">✏️</span>
+                          )}
+                        </button>
 
                         {/* Clear mapping */}
                         {currentMapping && (

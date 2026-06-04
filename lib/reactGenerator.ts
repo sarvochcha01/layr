@@ -1,5 +1,51 @@
 import { ComponentDefinition } from "@/types/editor";
-0
+
+/**
+ * Recursively resolve "page:xxx" references within any value.
+ * Handles strings, arrays, and nested objects so that Navbar links,
+ * Button hrefs, and any other prop containing page references get
+ * properly resolved to their slug-based routes during export.
+ */
+function resolvePageLinks(value: any, pages?: any[]): any {
+  if (!pages || pages.length === 0) return value;
+
+  if (typeof value === "string" && value.startsWith("page:")) {
+    const parts = value.substring(5).split("?");
+    const pageId = parts[0];
+    const queryParams = parts[1] ? `?${parts[1]}` : "";
+
+    let page = pages.find((p: any) => p.id === pageId || p.slug === pageId);
+    if (!page) {
+      const searchName = pageId.toLowerCase().replace(/-/g, " ");
+      page = pages.find(
+        (p: any) =>
+          p.name?.toLowerCase() === searchName ||
+          p.slug?.toLowerCase() === pageId.toLowerCase()
+      );
+    }
+
+    if (page) {
+      const slug = page.slug === "index" ? "" : page.slug;
+      return `/${slug}${queryParams}`;
+    }
+    return "#";
+  }
+
+  if (Array.isArray(value)) {
+    return value.map((item) => resolvePageLinks(item, pages));
+  }
+
+  if (value && typeof value === "object") {
+    const resolved: Record<string, any> = {};
+    for (const [k, v] of Object.entries(value)) {
+      resolved[k] = resolvePageLinks(v, pages);
+    }
+    return resolved;
+  }
+
+  return value;
+}
+
 export function generateReactComponent(components: ComponentDefinition[], pageName: string = "Page", pages?: any[]): string {
   const renderComponent = (component: ComponentDefinition, indent: number = 2): string => {
     const { type, props, children } = component;
@@ -9,30 +55,10 @@ export function generateReactComponent(components: ComponentDefinition[], pageNa
     const propsStr = Object.entries(props)
       .filter(([key, value]) => value !== undefined && value !== null)
       .map(([key, value]) => {
-        // Special handling for href prop - resolve page: links
-        if (key === "href" && typeof value === "string" && value.startsWith("page:")) {
-          const parts = value.substring(5).split("?");
-          const pageId = parts[0];
-          const queryParams = parts[1] ? `?${parts[1]}` : "";
-          let page = pages?.find((p: any) => p.id === pageId || p.slug === pageId);
-          
-          // Fallback: if page not found by ID, try to match by name (case-insensitive)
-          if (!page && pages) {
-            const searchName = pageId.toLowerCase().replace(/-/g, ' ');
-            page = pages.find((p: any) => 
-              p.name?.toLowerCase() === searchName ||
-              p.slug?.toLowerCase() === pageId.toLowerCase()
-            );
-          }
-          
-          if (page) {
-            // Convert to actual route path
-            const slug = page.slug === "index" ? "" : page.slug;
-            return `${key}="/${slug}${queryParams}"`;
-          }
-          // If page not found, use # to avoid 404
-          console.warn(`Page not found for href="${value}" - using # as fallback`);
-          return `${key}="#"`;
+        // Resolve page: links in string values (href, ctaLink, etc.)
+        if (typeof value === "string" && value.startsWith("page:")) {
+          const resolved = resolvePageLinks(value, pages);
+          return `${key}="${resolved}"`;
         }
         
         if (typeof value === "string") {
@@ -40,7 +66,9 @@ export function generateReactComponent(components: ComponentDefinition[], pageNa
         } else if (typeof value === "boolean") {
           return value ? key : "";
         } else if (typeof value === "object") {
-          return `${key}={${JSON.stringify(value)}}`;
+          // Recursively resolve page: links inside objects/arrays (e.g. Navbar links)
+          const resolved = resolvePageLinks(value, pages);
+          return `${key}={${JSON.stringify(resolved)}}`;
         } else {
           return `${key}={${value}}`;
         }
@@ -254,30 +282,10 @@ export function generateAppPage(components: ComponentDefinition[], pageName: str
     const propsStr = Object.entries(props)
       .filter(([key, value]) => value !== undefined && value !== null)
       .map(([key, value]) => {
-        // Special handling for href prop - resolve page: links
-        if (key === "href" && typeof value === "string" && value.startsWith("page:")) {
-          const parts = value.substring(5).split("?");
-          const pageId = parts[0];
-          const queryParams = parts[1] ? `?${parts[1]}` : "";
-          let page = pages?.find((p: any) => p.id === pageId || p.slug === pageId);
-          
-          // Fallback: if page not found by ID, try to match by name (case-insensitive)
-          if (!page && pages) {
-            const searchName = pageId.toLowerCase().replace(/-/g, ' ');
-            page = pages.find((p: any) => 
-              p.name?.toLowerCase() === searchName ||
-              p.slug?.toLowerCase() === pageId.toLowerCase()
-            );
-          }
-          
-          if (page) {
-            // Convert to actual route path
-            const slug = page.slug === "index" ? "" : page.slug;
-            return `${key}="/${slug}${queryParams}"`;
-          }
-          // If page not found, use # to avoid 404
-          console.warn(`Page not found for href="${value}" - using # as fallback`);
-          return `${key}="#"`;
+        // Resolve page: links in string values (href, ctaLink, etc.)
+        if (typeof value === "string" && value.startsWith("page:")) {
+          const resolved = resolvePageLinks(value, pages);
+          return `${key}="${resolved}"`;
         }
         
         if (typeof value === "string") {
@@ -285,7 +293,9 @@ export function generateAppPage(components: ComponentDefinition[], pageName: str
         } else if (typeof value === "boolean") {
           return value ? key : "";
         } else if (typeof value === "object") {
-          return `${key}={${JSON.stringify(value)}}`;
+          // Recursively resolve page: links inside objects/arrays (e.g. Navbar links)
+          const resolved = resolvePageLinks(value, pages);
+          return `${key}={${JSON.stringify(resolved)}}`;
         } else {
           return `${key}={${value}}`;
         }

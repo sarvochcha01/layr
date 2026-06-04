@@ -132,7 +132,22 @@ body {
                 if (!componentCode.trim().startsWith('"use client"') && !componentCode.trim().startsWith("'use client'")) {
                     componentCode = '"use client";\n\n' + componentCode;
                 }
-                
+
+                // Strip Layr-internal imports that don't exist in the exported project
+                // Remove AuthContext import line
+                componentCode = componentCode.replace(/import\s*\{[^}]*useAuth[^}]*\}\s*from\s*["']@\/contexts\/AuthContext["'];?\s*\n?/g, '');
+                // Replace `const { user } = useAuth();` with a no-op stub
+                componentCode = componentCode.replace(/const\s*\{\s*user\s*\}\s*=\s*useAuth\(\);?/g, 'const user: any = null;');
+                // Replace any other useAuth() calls
+                componentCode = componentCode.replace(/useAuth\(\)/g, '({ user: null } as any)');
+
+                // Remove the layr-data-refresh event dispatch (not needed in exported projects)
+                // These are editor-only refresh triggers
+                componentCode = componentCode.replace(
+                    /\/\/\s*Dispatch a data-refresh event[\s\S]*?window\.dispatchEvent\(new Event\(["']layr-data-refresh["']\)\);?\s*\n?\s*\},?\s*\d*\);?\s*\n?/g,
+                    ''
+                );
+
                 componentsFolder?.file(`${componentName}.tsx`, componentCode);
             }
 

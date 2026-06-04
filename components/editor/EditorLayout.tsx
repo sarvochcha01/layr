@@ -340,6 +340,9 @@ export function EditorLayout({
       const p = fetchEndpoint(pathWithParams, endpoint.method).then((data) => {
         if (!data) return;
 
+        console.log("[DataSource] Fetched data for component:", comp.id, data);
+        console.log("[DataSource] Field mappings:", ds.fieldMappings);
+
         // If fieldMappings exist, apply them as prop updates
         if (ds.fieldMappings && Object.keys(ds.fieldMappings).length > 0) {
           const updates: Record<string, any> = {};
@@ -347,11 +350,13 @@ export function EditorLayout({
             ds.fieldMappings as Record<string, string>,
           )) {
             const value = getNestedValue(data, responsePath);
+            console.log(`[DataSource] Mapping ${propKey} <- ${responsePath}:`, value);
             if (value !== undefined) {
               updates[propKey] =
                 typeof value === "object" ? JSON.stringify(value) : String(value);
             }
           }
+          console.log("[DataSource] Applying updates:", updates);
           if (Object.keys(updates).length > 0) {
             onUpdateComponent(comp.id, updates);
           }
